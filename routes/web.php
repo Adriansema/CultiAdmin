@@ -1,12 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StatisticController;
+
+Route::get('/admin/statistics', [StatisticController::class, 'index'])->name('statistics.index');
+
 
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::get('/admin/statistics', [StatisticController::class, 'index'])->name('statistics.index');
 
 Route::middleware([
     'auth:sanctum',
