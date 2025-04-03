@@ -9,5 +9,7 @@ class Boletin extends Model
 {
     use HasFactory;
 
+    protected $table = 'boletines';
+
     protected $fillable = ['asunto', 'contenido'];
 }

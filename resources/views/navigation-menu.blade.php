@@ -110,32 +110,27 @@
 
                             <div class="border-t border-gray-200"></div>
                             
-                            <form method="POST" action="{{ route('logout') }}" x-data>
-                            @csrf
-                                <div class="block px-4 py-2 text-xs text-gray-400">
-                                        {{ __('CRUD') }}
-                                        
-                                    <x-dropdown-link href="{{ route('logout') }}"
-                                            @click.prevent="$root.submit();">
-                                        {{ __('Información') }}
-                                    </x-dropdown-link>
+                            <div class="block px-4 py-2 text-xs text-gray-400">
+                                {{ __('CRUD') }}
 
-                                    <x-dropdown-link href="{{ route('logout') }}"
-                                            @click.prevent="$root.submit();">
-                                        {{ __('Boletines') }}
-                                    </x-dropdown-link>
+                                <x-dropdown-link href="{{ route('informaciones.index') }}">
+                                    {{ __('Información') }}
+                                </x-dropdown-link>
 
-                                    <x-dropdown-link href="{{ route('logout') }}"
-                                            @click.prevent="$root.submit();">
-                                        {{ __('Comentarios') }}
-                                    </x-dropdown-link>
+                                <x-dropdown-link href="{{ route('boletines.index') }}">
+                                    {{ __('Boletines') }}
+                                </x-dropdown-link>
 
-                                    <x-dropdown-link href="{{ route('logout') }}"
-                                            @click.prevent="$root.submit();">
-                                        {{ __('Clientes') }}
-                                    </x-dropdown-link>
-                                </div>
-                            </form>
+                                <x-dropdown-link href="{{ route('comentarios.index') }}">
+                                    {{ __('Comentarios') }}
+                                </x-dropdown-link>
+
+                                <x-dropdown-link href="{{ route('clientes.index') }}">
+                                    {{ __('Clientes') }}
+                                </x-dropdown-link>
+                            </div>
+
+                                
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}" x-data>
                                 @csrf
