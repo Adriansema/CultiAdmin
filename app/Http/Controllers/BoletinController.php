@@ -22,8 +22,12 @@ class BoletinController extends Controller
     }
 
     public function edit(Boletin $boletin) {
-        return view('boletines.edit', compact('boletin'));
-    }
+        $boletin = Boletin::findOrFail($boletin->id);
+        if (!$boletin) {
+            return redirect()->route('boletines.index')->with('error', 'Boletín no encontrado.');
+        }
+/*         return view('boletines.edit', compact('boletin'));
+ */    }
 
     public function update(Request $request, Boletin $boletin) {
         $boletin->update($request->all());
