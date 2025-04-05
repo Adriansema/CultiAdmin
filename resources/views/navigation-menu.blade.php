@@ -110,25 +110,38 @@
 
                             <div class="border-t border-gray-200"></div>
                             
-                            <div class="block px-4 py-2 text-xs text-gray-400">
-                                {{ __('CRUD') }}
+                            <div class="block px-4 py-2 text-xs text-gray-500">
+                                <!-- Dashboard (todos los usuarios) -->
+                                <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                                    Dashboard
+                                </x-responsive-nav-link>
 
-                                <x-dropdown-link href="{{ route('informaciones.index') }}">
-                                    {{ __('Información') }}
-                                </x-dropdown-link>
+                                <!-- Productos Agrícolas (todos los roles) -->
+                                <x-responsive-nav-link href="{{ route('productos-agricolas.index') }}" :active="request()->routeIs('productos-agricolas.*')">
+                                    Productos Agrícolas
+                                </x-responsive-nav-link>
 
-                                <x-dropdown-link href="{{ route('boletines.index') }}">
-                                    {{ __('Boletines') }}
-                                </x-dropdown-link>
+                                <!-- Boletines (todos los roles) -->
+                                <x-responsive-nav-link href="{{ route('boletines.index') }}" :active="request()->routeIs('boletines.*')">
+                                    Boletines
+                                </x-responsive-nav-link>
 
-                                <x-dropdown-link href="{{ route('comentarios.index') }}">
-                                    {{ __('Comentarios') }}
-                                </x-dropdown-link>
+                                <!-- Gestión de Usuarios (solo administrador) -->
+                                @role('administrador')
+                                    <x-responsive-nav-link href="{{ route('usuarios.index') }}" :active="request()->routeIs('usuarios.*')">
+                                        Gestión de Usuarios
+                                    </x-responsive-nav-link>
+                                @endrole
 
-                                <x-dropdown-link href="{{ route('clientes.index') }}">
-                                    {{ __('Clientes') }}
-                                </x-dropdown-link>
+                                <!-- Validar Productos (solo operador, pero va a la misma ruta) -->
+                                @role('operador')
+                                    <x-nav-link href="{{ route('productos.pendientes') }}" :active="request()->routeIs('productos.pendientes')">
+                                        Productos por Validar
+                                    </x-nav-link>
+                                @endrole
+
                             </div>
+
 
                                 
                             <!-- Authentication -->
