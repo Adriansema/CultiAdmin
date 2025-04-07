@@ -7,6 +7,9 @@ use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\InformacionController;
 use App\Http\Controllers\StatisticController;
 
+// Ruta para acceder a los datos del gráfico
+Route::get('/statistics', [StatisticController::class, 'index'])->name('statistics.index');
+
 Route::get('/admin/statistics', [StatisticController::class, 'index'])->name('statistics.index');
 
 
