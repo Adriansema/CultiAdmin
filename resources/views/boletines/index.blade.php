@@ -1,41 +1,43 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="text-xl font-semibold text-gray-800">Lista de Boletines</h2>
+    </x-slot>
 
-@section('content')
-<div class="container">
-    <h1 class="mb-4">Lista de Boletines</h1>
+    <div class="py-6 mx-auto max-w-7xl">
+        <a href="{{ route('boletines.create') }}" class="inline-block px-4 py-2 mb-4 text-white bg-blue-600 rounded hover:bg-blue-700">
+            + Nuevo Boletín
+        </a>
 
-    <a href="{{ route('boletines.create') }}" class="mb-3 btn btn-primary">Agregar Boletín</a>
+        <x-success />
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Asunto</th>
-                <th>Contenido</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($boletines as $boletin)
-                <tr>
-                    <td>{{ $boletin->id }}</td>
-                    <td>{{ $boletin->asunto }}</td>
-                    <td>{{ $boletin->contenido }}</td>
-                    <td>
-                        <a href="{{ route('boletines.edit', $boletin->id) }}" class="btn btn-warning btn-sm">Editar</a>
-                        <form action="{{ route('boletines.destroy', $boletin->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
-@endsection
+        <div class="p-6 bg-white rounded shadow">
+            <table class="w-full table-auto">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-4 py-2">Asunto</th>
+                        <th class="px-4 py-2">Contenido</th>
+                        <th class="px-4 py-2">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($boletines as $boletin)
+                        <tr>
+                            <td class="px-4 py-2 border">{{ $boletin->asunto }}</td>
+                            <td class="px-4 py-2 border">{{ Str::limit($boletin->contenido, 50) }}</td>
+                            <td class="px-4 py-2 space-x-2 border">
+                                <a href="{{ route('boletines.show', $boletin) }}" class="text-blue-600 hover:underline">Ver</a>
+                                <a href="{{ route('boletines.edit', $boletin) }}" class="text-yellow-600 hover:underline">Editar</a>
+                                <form action="{{ route('boletines.destroy', $boletin) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este boletín?')">
+                                    @csrf @method('DELETE')
+                                    <button class="text-red-600 hover:underline">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="3" class="py-4 text-center">No hay boletines aún.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</x-app-layout>

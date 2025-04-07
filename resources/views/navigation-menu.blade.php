@@ -71,6 +71,7 @@
                     </div>
                 @endif
 
+                
                 <!-- Settings Dropdown -->
                 <div class="relative ms-3">
                     <x-dropdown align="right" width="48">
@@ -91,6 +92,9 @@
                                 </span>
                             @endif
                         </x-slot>
+                        
+                      
+
 
                         <x-slot name="content">
                             <!-- Account Management -->
@@ -107,43 +111,35 @@
                                     {{ __('API Tokens') }}
                                 </x-dropdown-link>
                             @endif
-
                             <div class="border-t border-gray-200"></div>
                             
-                            <div class="block px-4 py-2 text-xs text-gray-500">
-                                <!-- Dashboard (todos los usuarios) -->
-                                <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                                    Dashboard
-                                </x-responsive-nav-link>
+                            <div class="block px-4 py-2 text-xs text-gray-400">
+                                    {{ __('CRUD') }}
 
-                                <!-- Productos Agrícolas (todos los roles) -->
-                                <x-responsive-nav-link href="{{ route('productos-agricolas.index') }}" :active="request()->routeIs('productos-agricolas.*')">
-                                    Productos Agrícolas
-                                </x-responsive-nav-link>
-
-                                <!-- Boletines (todos los roles) -->
-                                <x-responsive-nav-link href="{{ route('boletines.index') }}" :active="request()->routeIs('boletines.*')">
-                                    Boletines
-                                </x-responsive-nav-link>
-
-                                <!-- Gestión de Usuarios (solo administrador) -->
                                 @role('administrador')
-                                    <x-responsive-nav-link href="{{ route('usuarios.index') }}" :active="request()->routeIs('usuarios.*')">
-                                        Gestión de Usuarios
-                                    </x-responsive-nav-link>
-                                @endrole
+                                    <x-nav-link href="{{ route('productos.index') }}" :active="request()->routeIs('productos.*')">
+                                        {{ __('Productos Agrícolas') }}
+                                    </x-nav-link>
 
-                                <!-- Validar Productos (solo operador, pero va a la misma ruta) -->
-                                @role('operador')
-                                    <x-nav-link href="{{ route('productos.pendientes') }}" :active="request()->routeIs('productos.pendientes')">
-                                        Productos por Validar
+                                    <x-nav-link href="{{ route('boletines.index') }}" :active="request()->routeIs('boletines.*')">
+                                        {{ __('Boletines') }}
+                                    </x-nav-link>
+
+
+                                    <x-nav-link href="{{ route('usuarios.index') }}" :active="request()->routeIs('usuarios.*')">
+                                        {{ __('Gestión de Usuarios') }}
                                     </x-nav-link>
                                 @endrole
 
+                                @role('operador')
+                                    <x-nav-link href="{{ route('productos.pendientes') }}" :active="request()->routeIs('productos.pendientes')">
+                                        {{ __('Validar Productos') }}
+                                    </x-nav-link>
+                                @endrole
+                                <div class="border-t border-gray-200"></div>
                             </div>
-
-
-                                
+                            
+                                                    
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}" x-data>
                                 @csrf
