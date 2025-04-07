@@ -6,6 +6,9 @@ use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\ProductoAgricolaController;
 use App\Http\Controllers\UsuarioController;
 
+// Ruta para acceder a los datos del gráfico
+Route::get('/statistics', [StatisticController::class, 'index'])->name('statistics.index');
+
 Route::get('/admin/statistics', [StatisticController::class, 'index'])->name('statistics.index');
 
 
