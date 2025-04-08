@@ -5,11 +5,15 @@ use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\Admin\StatsController;
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/admin/stats', [StatsController::class, 'index'])->name('admin.stats');
+
 
 // Ruta para acceder a los datos del gráfico
-Route::get('/statistics', [StatisticController::class, 'index'])->name('statistics.index');
-
-Route::get('/admin/statistics', [StatisticController::class, 'index'])->name('statistics.index');
+Route::get('/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index');
+// Ruta por defecto al acceder al sitio (por ejemplo, el cliente)
+Route::get('/admin/statistics', [StatisticController::class, 'getStatistics']);
     Route::get('/', function () {
         return view('welcome');
     })->name('welcome');
@@ -24,8 +28,7 @@ Route::get('/admin/statistics', [StatisticController::class, 'index'])->name('st
         return view('dashboard');
     })->name('dashboard');
 
-    Route::get('/admin/statistics', [StatisticController::class, 'index'])->name('statistics.index');
-
+   
     //  Rutas solo para administrador
     Route::middleware(['auth', 'role:administrador'])->group(function () {
         Route::resource('productos', ProductoController::class);
