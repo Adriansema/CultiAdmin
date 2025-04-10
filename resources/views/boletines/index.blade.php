@@ -1,50 +1,66 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-800">Lista de Boletines</h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-6 mx-auto max-w-7xl">
-        <a href="{{ route('boletines.create') }}" class="inline-block px-4 py-2 mb-4 text-white bg-blue-600 rounded hover:bg-blue-700">
-            + Nuevo Boletín
-        </a>
+@section('header')
+    <h2 class="text-xl font-semibold">Listado de Boletines</h2>
+@endsection
 
-        <!-- actualizacion 09/04/2025 -->
-
+@section('content')
+    <div class="max-w-6xl py-6 mx-auto">
         @if (session('success'))
-            <div class="alert alert-success">
+            <div class="p-4 mb-4 text-green-800 bg-green-100 border border-green-300 rounded">
                 {{ session('success') }}
             </div>
         @endif
 
+        <div class="mb-4">
+            <a href="{{ route('boletines.create') }}" class="inline-block px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
+                + Crear Boletín
+            </a>
+        </div>
 
-        <div class="p-6 bg-white rounded shadow">
-            <table class="w-full table-auto">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="px-4 py-2">Asunto</th>
-                        <th class="px-4 py-2">Contenido</th>
-                        <th class="px-4 py-2">Acciones</th>
+        <div class="overflow-x-auto bg-white rounded shadow">
+            <table class="min-w-full table-auto">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 text-left">#</th>
+                        <th class="px-4 py-2 text-left">Asunto</th>
+                        <th class="px-4 py-2 text-left">Contenido</th>
+                        <th class="px-4 py-2 text-left">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($boletines as $boletin)
-                        <tr>
-                            <td class="px-4 py-2 border">{{ $boletin->asunto }}</td>
-                            <td class="px-4 py-2 border">{{ Str::limit($boletin->contenido, 50) }}</td>
-                            <td class="px-4 py-2 space-x-2 border">
-                                <a href="{{ route('boletines.show', $boletin) }}" class="text-blue-600 hover:underline">Ver</a>
-                                <a href="{{ route('boletines.edit', $boletin) }}" class="text-yellow-600 hover:underline">Editar</a>
-                                <form action="{{ route('boletines.destroy', $boletin) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este boletín?')">
-                                    @csrf @method('DELETE')
-                                    <button class="text-red-600 hover:underline">Eliminar</button>
+                    @forelse ($boletines as $boletin)
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2">{{ $loop->iteration }}</td>
+                            <td class="px-4 py-2 font-semibold">{{ $boletin->asunto }}</td>
+                            <td class="max-w-xs px-4 py-2 text-sm text-gray-600 truncate">
+                                {{ Str::limit($boletin->contenido, 60) }}
+                            </td>
+                            <td class="px-4 py-2 space-x-2">
+                                <a href="{{ route('boletines.show', $boletin) }}"
+                                   class="px-3 py-1 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">Ver</a>
+                                <a href="{{ route('boletines.edit', $boletin) }}"
+                                   class="px-3 py-1 text-sm text-white bg-yellow-500 rounded hover:bg-yellow-600">Editar</a>
+                                <form action="{{ route('boletines.destroy', $boletin) }}" method="POST" class="inline"
+                                      onsubmit="return confirm('¿Estás seguro de que deseas eliminar este boletín?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="px-3 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700">
+                                        Eliminar
+                                    </button>
                                 </form>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="3" class="py-4 text-center">No hay boletines aún.</td></tr>
+                        <tr>
+                            <td colspan="4" class="px-4 py-6 text-center text-gray-500">
+                                No hay boletines registrados aún.
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
-</x-app-layout>
+@endsection

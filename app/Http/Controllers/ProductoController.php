@@ -45,7 +45,7 @@ class ProductoController extends Controller
             'estado' => 'pendiente',
         ]);
 
-        return redirect()->route('admin.productos.index')->with('success', 'Producto creado.');
+        return redirect()->route('productos.index')->with('success', 'Producto creado.');
     }
 
     public function show(Producto $producto)
@@ -71,7 +71,7 @@ class ProductoController extends Controller
 
         $producto->update($request->only('nombre', 'descripcion'));
 
-        return redirect()->route('admin.productos.index')->with('success', 'Producto actualizado.');
+        return redirect()->route('productos.index')->with('success', 'Producto actualizado.');
     }
 
     public function destroy(Producto $producto)
@@ -79,6 +79,6 @@ class ProductoController extends Controller
         $this->authorize('delete', $producto);
         $producto->delete();
 
-        return redirect()->route('admin.productos.index')->with('success', 'Producto eliminado.');
+        return redirect()->route('productos.index')->with('success', 'Producto eliminado.');
     }
 }
