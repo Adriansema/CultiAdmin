@@ -6,11 +6,12 @@
     display: none;
 }
 
-/* En resources/css/app.css */
 @layer utilities {
     .bg-banner {
-        background-image: url('/images/imagen-fondo.png');
+        background-image: url('/public/images/Frame\ 1314.svg');
         background-size: cover;
-        background-position: center;
+    
+        
+        background-repeat: no-repeat; /* Evita que la imagen se repita */
     }
 }

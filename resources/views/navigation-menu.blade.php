@@ -4,7 +4,7 @@
     <!-- Primary Navigation Menu -->
 
     <div class="bg-blue-500  p-2" >
-        <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="" width="500px">
+        <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="" width="100px">
     </div>
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
