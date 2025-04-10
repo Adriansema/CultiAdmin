@@ -1,70 +1,56 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="bg-white rounded-md shadow p-6">
-    <div class="flex justify-between items-center">
-        <h2 class="text-xl font-bold">Usuarios Conectados</h2>
-        <div class="space-x-2" id="filter-buttons">
-    <button onclick="setFilter('hoy')" class="filter-btn">Hoy</button>
-    <button onclick="setFilter('semana')" class="filter-btn active">Semana</button>
-    <button onclick="setFilter('mes')" class="filter-btn">Mes</button>
-    <button onclick="setFilter('año')" class="filter-btn">Año</button>
-</div>
-            
-    </div>
- 
+<main>
 
-<style>
-    .filter-btn {
-        @apply px-4 py-2 rounded bg-green-200 hover:bg-green-400 transition-all;
-    }
-    .filter-btn.active {
-        @apply bg-green-600 text-white;
-    }
-</style>
+    {{-- 🟩 Banner principal con logo y campesino --}}
+    <section id="banner" class="w-full bg-white shadow rounded-lg overflow-hidden">
+    <!-- Aquí va la imagen de fondo, título, logo y campesino -->
+    <div class="relative w-full h-56 md:h-64 bg-banner"> <!-- Usa la clase personalizada aquí -->
+        <!-- Fondo oscuro que se superpone a la imagen -->
+        <div class="absolute inset-0 bg-black bg-opacity-30"></div>
 
+        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between h-full px-6 md:px-12 py-6 md:py-10">
+            {{-- Texto y logo --}}
+            <div class="text-white space-y-2">
+                <h1 class="text-2xl md:text-4xl font-bold">Panel <br class="hidden md:block"> de Administración</h1>
+                <img src="{{ asset('images/logo-cultiva.png') }}" alt="Logo Cultiva Sena" class="h-10 md:h-14 mt-2">
+            </div>
 
-    <div id="chart" class="my-6">
-        <p class="text-center text-gray-500 pt-10">Cargando gráfico...</p>
-    </div>
-
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-        <div>
-            <p class="text-gray-600">Usuarios</p>
-            <p id="users-count" class="text-2xl font-bold">0</p>
-        </div>
-       
-
-        <div>
-            <p class="text-gray-600">Registrados</p>
-            <p id="registered-count" class="text-2xl font-bold">0</p>
-        </div>
-        <div>
-            <p class="text-gray-600">Activos</p>
-            <p id="active-count" class="text-2xl font-bold">0</p>
-        </div>
-        <div>
-            <p class="text-gray-600">Conectados</p>
-            <p id="connected-count" class="text-2xl font-bold">0</p>
+            {{-- Imagen del campesino --}}
+            <div class="mt-4 md:mt-0">
+                <img src="{{ asset('images/campesino.png') }}" alt="Campesino" class="h-40 md:h-52 object-contain">
+            </div>
         </div>
     </div>
-</div>
-@endsection
-
-@section('scripts')
-   
-    <!-- Librería ApexCharts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-    <!-- Definición de la ruta de la API para JS -->
-    <script>
-        const STATISTICS_ROUTE = "{{ route('statistics.index') }}";
-    </script>
-
-    <!-- Carga de tu archivo JS -->
-    <script src="{{ asset('js/dashboard.js') }}"></script>
+   </section>
 
 
 
+    {{--  Sección de gráfica de usuarios conectados --}}
+    <section id="usuarios-conectados" class="bg-white shadow rounded-lg p-6">
+        <!-- Título + filtros + gráfica -->
+    </section>
 
+    {{--  Métricas generales (Usuarios, Registrados, etc) --}}
+    <section id="metricas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- 4 tarjetas métricas -->
+    </section>
+
+    {{--  Novedades y  Boletines --}}
+    <section id="novedades-boletines" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Novedades -->
+        <div id="novedades" class="bg-white shadow rounded-lg p-6 lg:col-span-2">
+            <!-- Aquí van las novedades -->
+        </div>
+
+        <!-- Boletines -->
+        <div id="boletines" class="bg-white shadow rounded-lg p-6">
+            <!-- Aquí van los boletines -->
+        </div>
+
+    </section>
+
+</main>
 @endsection

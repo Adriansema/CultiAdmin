@@ -1,10 +1,11 @@
+
 document.addEventListener("DOMContentLoaded", function () {
     let filtroActual = 'hoy'; // Variable global
+    let porcentajes = [];     // Variable global para los porcentajes
 
     function setFilter(filtro) {
-        filtroActual = filtro; // Actualizamos la variable global
+        filtroActual = filtro;
 
-        // 🔄 Cambiar botón activo visualmente
         const buttons = document.querySelectorAll('#filter-buttons .filter-btn');
         buttons.forEach(btn => btn.classList.remove('active'));
 
@@ -16,79 +17,73 @@ document.addEventListener("DOMContentLoaded", function () {
             activeBtn.classList.add('active');
         }
 
-        // Cargar los datos del filtro seleccionado
         loadData(filtro);
     }
 
     window.setFilter = setFilter;
 
-    console.log("📌 DOM completamente cargado");
-
     const chartElement = document.querySelector("#chart");
-
     if (!chartElement) {
         console.error("No se encontró el elemento #chart");
         return;
     }
 
-    function getWeekNumber(date) {
-        const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-        const pastDaysOfYear = Math.floor((date - firstDayOfYear) / 86400000);
-        return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-    }
-
     function renderChart(data) {
-        let visitas = data.vistas.map(stat => stat.total);
+        let datosOrdenados = [...data.vistas];
 
-        // Calcular porcentaje de cambio respecto al anterior
-        let porcentajes = visitas.map((valor, i, arr) => {
-            if (i === 0) return 0;
-            let anterior = arr[i - 1] || 1;
-            return Math.round(((valor - anterior) / anterior) * 100);
-        });
-        
-        let categorias = data.vistas.map(stat => {
+        switch (filtroActual) {
+            case 'hoy':
+                datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
+                break;
+            case 'semana':
+                const diasSemana = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+                datosOrdenados.sort((a, b) => diasSemana.indexOf(a.grupo.toLowerCase()) - diasSemana.indexOf(b.grupo.toLowerCase()));
+                break;
+            case 'mes':
+                datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
+                break;
+            case 'año':
+                const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+                    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                datosOrdenados.sort((a, b) => meses.indexOf(a.grupo.toLowerCase()) - meses.indexOf(b.grupo.toLowerCase()));
+                break;
+        }
+
+        let visitas = datosOrdenados.map(stat => stat.total);
+        let categorias = datosOrdenados.map(stat => {
             let valor = stat.grupo;
-    
             switch (filtroActual) {
                 case 'hoy':
-                    // valor es la hora en formato 24h (ej: '15'), lo convertimos a 3:00 PM
                     let hora = parseInt(valor);
                     let ampm = hora >= 12 ? 'PM' : 'AM';
                     let hora12 = hora % 12 || 12;
                     return `${hora12}:00 ${ampm}`;
-    
                 case 'semana':
-                    // valor es la fecha en formato 'YYYY-MM-DD', lo convertimos a día de la semana
-                    let fechaSemana = new Date(valor);
-                    return fechaSemana.toLocaleDateString('es-ES', { weekday: 'long' });
-    
+                    return valor;
                 case 'mes':
-                    // valor es el número de semana (ej: '14'), mostramos como Semana 14
                     return `Semana ${valor}`;
-    
                 case 'año':
-                    // valor es el nombre del mes (ej: 'April'), lo pasamos a español
-                    return valor.charAt(0).toUpperCase() + valor.slice(1).toLowerCase();
-    
+                    return valor.charAt(0).toUpperCase() + valor.slice(1);
                 default:
                     return valor;
             }
         });
+
+        porcentajes = visitas.map((valor, i, arr) => {
+            if (i === 0) return 0;
+            const anterior = arr[i - 1];
+            return anterior === 0 ? 0 : ((valor - anterior) / anterior * 100).toFixed(1);
+        });
+
         if (window.chart && typeof window.chart.destroy === "function") {
             window.chart.destroy();
         }
 
         let options = {
             chart: {
-                type: 'line',
-                height: 300,
-                toolbar: { show: false }
+                type: 'line', height: 300, toolbar: { show: false }
             },
-            series: [{
-                name: 'Visitas',
-                data: visitas
-            }],
+            series: [{ name: 'Visitas', data: visitas }],
             xaxis: {
                 categories: categorias,
                 labels: { style: { colors: '#666', fontSize: '12px' } }
@@ -112,21 +107,74 @@ document.addEventListener("DOMContentLoaded", function () {
                     const porcentaje = porcentajes[dataPointIndex];
                     const color = porcentaje >= 0 ? '🟢' : '🔴';
                     const signo = porcentaje >= 0 ? '+' : '';
-            
-                    return `
-                        <div style="padding: 8px; text-align: center">
-                            <strong>${w.globals.labels[dataPointIndex]}</strong><br>
-                            ${valor} visitas<br>
+                    return `<div style="padding: 8px; text-align: center">
+                        <strong>${w.globals.labels[dataPointIndex]}</strong><br>
+                        ${valor} visitas<br>
+                        <span style="font-size: 12px; color: ${porcentaje >= 0 ? '#4CAF50' : '#F44336'}">
                             ${color} ${signo}${porcentaje}%
-                        </div>
-                    `;
+                        </span>
+                    </div>`;
                 }
             }
-            
         };
 
         window.chart = new ApexCharts(chartElement, options);
         window.chart.render();
+    }
+
+    function actualizarPorcentajes(actual, anterior, elementoID) {
+        const cambio = actual - anterior;
+        let porcentaje = 0;
+        if (anterior > 0) {
+            porcentaje = ((cambio / anterior) * 100).toFixed(1);
+        }
+
+        const textoCambio = cambio === 0
+            ? "Sin cambios"
+            : `${cambio > 0 ? "+" : ""}${porcentaje}% ${cambio > 0 ? "más" : "menos"} que ${periodoAnteriorTexto(filtroActual)}`;
+
+        const elemento = document.getElementById(elementoID);
+        if (elemento) {
+            elemento.textContent = textoCambio;
+            elemento.className = `text-sm ${cambio >= 0 ? 'text-green-600' : 'text-red-600'}`;
+        }
+    }
+
+    function actualizarRelacionProporcional(parcial, total, elementoID, tipo = 'usuarios') {
+        const elemento = document.getElementById(elementoID);
+        if (!elemento || total === 0) return;
+
+        const porcentaje = ((parcial / total) * 100).toFixed(1);
+        let texto = "";
+
+        switch (tipo) {
+            case 'registrados':
+                texto = `${porcentaje}% de los usuarios están registrados`;
+                break;
+            case 'activos':
+                texto = `${porcentaje}% de los usuarios están activos`;
+                break;
+            case 'conectados':
+                texto = `${porcentaje}% de los usuarios están conectados`;
+                break;
+            default:
+                texto = `${porcentaje}% del total`;
+        }
+
+        elemento.textContent = texto;
+        elemento.className = 'text-sm text-blue-600';
+    }
+    <script src="{{ mix('js/app.js') }}" defer></script>
+
+
+    function periodoAnteriorTexto(filtro) {
+        switch (filtro) {
+            case 'hoy': return 'ayer';
+            case 'semana': return 'la semana pasada';
+            case 'mes': return 'el mes pasado';
+            case 'año': return 'el año anterior';
+            default: return 'el periodo anterior';
+        }
     }
 
     function loadData(filtro = null) {
@@ -139,15 +187,22 @@ document.addEventListener("DOMContentLoaded", function () {
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Datos recibidos:', data);
                     localStorage.setItem("offline_stats", JSON.stringify(data));
                     renderChart(data);
 
-                    // Actualizar métricas
                     document.getElementById("users-count").textContent = data.usuarios ?? 0;
                     document.getElementById("registered-count").textContent = data.registrados ?? 0;
                     document.getElementById("active-count").textContent = data.activos ?? 0;
                     document.getElementById("connected-count").textContent = data.conectados ?? 0;
+
+                    actualizarPorcentajes(data.usuarios ?? 0, data.usuarios_anteriores ?? 0, "users-change");
+                    actualizarPorcentajes(data.registrados ?? 0, data.registrados_anteriores ?? 0, "registered-change");
+                    actualizarPorcentajes(data.activos ?? 0, data.activos_anteriores ?? 0, "active-change");
+                    actualizarPorcentajes(data.conectados ?? 0, data.conectados_anteriores ?? 0, "connected-change");
+
+                    actualizarRelacionProporcional(data.registrados ?? 0, data.usuarios ?? 1, "registered-percent", "registrados");
+                    actualizarRelacionProporcional(data.activos ?? 0, data.usuarios ?? 1, "active-percent", "activos");
+                    actualizarRelacionProporcional(data.conectados ?? 0, data.usuarios ?? 1, "connected-percent", "conectados");
                 })
                 .catch(() => {
                     const saved = localStorage.getItem("offline_stats");
@@ -168,7 +223,5 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     window.loadData = loadData;
-
-    loadData(); // Carga inicial
+    loadData();
 });
-

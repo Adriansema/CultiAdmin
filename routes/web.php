@@ -7,7 +7,7 @@ use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\Admin\StatsController;
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/admin/stats', [StatsController::class, 'index'])->name('admin.stats');
+
 
 
 // Ruta para acceder a los datos del gráfico
