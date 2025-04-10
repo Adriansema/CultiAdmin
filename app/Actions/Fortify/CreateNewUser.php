@@ -1,13 +1,13 @@
 <?php
 
+//actualizacion 09/04/2025
+
 namespace App\Actions\Fortify;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Fortify\Rules\Password;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
-
 
 
 class CreateNewUser implements CreatesNewUsers
@@ -18,6 +18,8 @@ class CreateNewUser implements CreatesNewUsers
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', 'string', 'in:administrador,operador'],
+            /* 'role' => ['required', 'string', 'exists:roles,name'], */
             /* 'password' => [
                 'required',
                 'string',
@@ -28,7 +30,7 @@ class CreateNewUser implements CreatesNewUsers
                 'regex:/[@$!%*?&]/',  // Al menos un símbolo
                 'confirmed',          // Campo password_confirmation debe coincidir
             ], */
-            'role' => ['required', 'string', 'exists:roles,name'],
+
         ])->validate();
 
         $user = User::create([

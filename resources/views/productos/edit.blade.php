@@ -1,7 +1,7 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-800">Editar Producto</h2>
-    </x-slot>
+    <x-slot name="header"><h2 class="text-xl font-semibold">Editar Producto</h2></x-slot>
+
+<!-- actualizacion 08/04/2025-->
 
     <div class="max-w-4xl py-6 mx-auto">
         <form action="{{ route('productos.update', $producto) }}" method="POST" enctype="multipart/form-data">

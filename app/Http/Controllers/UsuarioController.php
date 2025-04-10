@@ -1,15 +1,18 @@
 <?php
 
-// app/Http/Controllers/UsuarioController.php
+//actualizacion 09/04/2025
 
 namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UsuarioController extends Controller
 {
+
     public function index()
     {
         $usuarios = User::with('roles')->get();
@@ -27,14 +30,14 @@ class UsuarioController extends Controller
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'role'     => 'required|exists:roles,name',
+            'password' => 'required|string|min:8|confirmed',
+            'role'     => 'required|string|exists:roles,name',
         ]);
 
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => Hash::make($request->password),
         ]);
 
         $user->assignRole($request->role);
@@ -53,7 +56,7 @@ class UsuarioController extends Controller
         $request->validate([
             'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $usuario->id,
-            'role'  => 'required|exists:roles,name',
+            'role'  => 'required|string|exists:roles,name',
         ]);
 
         $usuario->update([
@@ -68,7 +71,12 @@ class UsuarioController extends Controller
 
     public function destroy(User $usuario)
     {
+        if ($usuario->id === Auth::id()) {
+            return redirect()->route('usuarios.index')->with('error', 'No puedes eliminar tu propio usuario.');
+        }
+
         $usuario->delete();
-        return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado.');
+
+        return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
     }
 }

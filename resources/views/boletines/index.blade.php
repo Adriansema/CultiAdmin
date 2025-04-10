@@ -8,7 +8,14 @@
             + Nuevo Boletín
         </a>
 
-        <x-success />
+        <!-- actualizacion 09/04/2025 -->
+
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
 
         <div class="p-6 bg-white rounded shadow">
             <table class="w-full table-auto">

@@ -1,27 +1,29 @@
 <?php
 
+//actualizacion 09/04/2025
+
 namespace App\Http\Controllers;
 
 use App\Models\Producto;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 
 class ProductoController extends Controller
 {
-    // Mostrar todos los productos del usuario autenticado
+    use AuthorizesRequests;
+
     public function index()
     {
-        $productos = Producto::where('user_id', auth()->id())->get();
+        $productos = Producto::all();
         return view('productos.index', compact('productos'));
     }
 
-    // Formulario de creación
     public function create()
     {
         return view('productos.create');
     }
 
-    // Guardar nuevo producto
     public function store(Request $request)
     {
         $request->validate([
@@ -39,28 +41,29 @@ class ProductoController extends Controller
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
             'imagen' => $imagen,
-            'user_id' => auth()->id(),
-            'estado' => 'pendiente'
+            'user_id' => Auth::id(),
+            'estado' => 'pendiente',
         ]);
 
-        return redirect()->route('productos.index')->with('success', 'Producto creado.');
+        return redirect()->route('admin.productos.index')->with('success', 'Producto creado.');
     }
 
-    // Ver detalles
     public function show(Producto $producto)
     {
+        $this->authorize('view', $producto);
         return view('productos.show', compact('producto'));
     }
 
-    // Formulario de edición
     public function edit(Producto $producto)
     {
+        $this->authorize('update', $producto);
         return view('productos.edit', compact('producto'));
     }
 
-    // Actualizar producto
     public function update(Request $request, Producto $producto)
     {
+        $this->authorize('update', $producto);
+
         $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'required|string',
@@ -68,48 +71,14 @@ class ProductoController extends Controller
 
         $producto->update($request->only('nombre', 'descripcion'));
 
-        return redirect()->route('productos.index')->with('success', 'Producto actualizado.');
+        return redirect()->route('admin.productos.index')->with('success', 'Producto actualizado.');
     }
 
-    // Eliminar producto
     public function destroy(Producto $producto)
     {
+        $this->authorize('delete', $producto);
         $producto->delete();
-        return redirect()->route('productos.index')->with('success', 'Producto eliminado.');
-    }
 
-    // Vista para operador: productos pendientes
-    public function pendientes()
-    {
-        $productos = Producto::where('estado', 'pendiente')->get();
-        return view('productos.pendientes', compact('productos'));
-    }
-
-    // Validar producto
-    public function validar($id)
-    {
-        $producto = Producto::findOrFail($id);
-        $producto->update([
-            'estado' => 'aprobado',
-            'observaciones' => null,
-        ]);
-
-        return back()->with('success', 'Producto aprobado.');
-    }
-
-    // Rechazar producto
-    public function rechazar(Request $request, $id)
-    {
-        $request->validate([
-            'observaciones' => 'required|string',
-        ]);
-
-        $producto = Producto::findOrFail($id);
-        $producto->update([
-            'estado' => 'rechazado',
-            'observaciones' => $request->observaciones,
-        ]);
-
-        return back()->with('error', 'Producto rechazado.');
+        return redirect()->route('admin.productos.index')->with('success', 'Producto eliminado.');
     }
 }

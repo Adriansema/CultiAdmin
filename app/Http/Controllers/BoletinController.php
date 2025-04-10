@@ -1,16 +1,19 @@
 <?php
 
-// app/Http/Controllers/BoletinController.php
+//actualizacion 09/04/2025
 
 namespace App\Http\Controllers;
 
 use App\Models\Boletin;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class BoletinController extends Controller
 {
+
     public function index()
     {
+        $role = Role::select('name')->get();
         $boletines = Boletin::latest()->get();
         return view('boletines.index', compact('boletines'));
     }
@@ -22,12 +25,12 @@ class BoletinController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'asunto' => 'required|string|max:255',
             'contenido' => 'required|string',
         ]);
 
-        Boletin::create($request->all());
+        Boletin::create($validated);
 
         return redirect()->route('boletines.index')->with('success', 'Boletín creado correctamente.');
     }
@@ -44,12 +47,12 @@ class BoletinController extends Controller
 
     public function update(Request $request, Boletin $boletin)
     {
-        $request->validate([
+        $validated = $request->validate([
             'asunto' => 'required|string|max:255',
             'contenido' => 'required|string',
         ]);
 
-        $boletin->update($request->all());
+        $boletin->update($validated);
 
         return redirect()->route('boletines.index')->with('success', 'Boletín actualizado correctamente.');
     }

@@ -1,10 +1,13 @@
 <?php
 
+//actualizacion 09/04/2025
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Concerns\HasRelationships; // <- Añadido para usar HasRelationships
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
@@ -15,6 +18,7 @@ class User extends Authenticatable
 {
     use HasApiTokens;
     use HasRoles;
+    use HasRelationships; // <- Añadido para usar HasRelationships
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
@@ -66,4 +70,6 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    protected $guard_name = 'web'; // <-- Esto es opcional pero útil
 }
