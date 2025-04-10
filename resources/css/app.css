@@ -5,3 +5,12 @@
 [x-cloak] {
     display: none;
 }
+
+/* En resources/css/app.css */
+@layer utilities {
+    .bg-banner {
+        background-image: url('/images/imagen-fondo.png');
+        background-size: cover;
+        background-position: center;
+    }
+}
