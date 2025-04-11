@@ -17,7 +17,7 @@ class LoginResponse implements LoginResponseContract
         }
 
         if ($user->hasRole('operador')) {
-            return redirect()->route('operador.productos.operador.pendientes'); //Ruta para el operador
+            return redirect()->route('operador.pendientes'); //Ruta para el operador
         }
 
         return redirect()->intended('/dashboard'); //Ruta por defecto

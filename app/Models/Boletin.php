@@ -11,6 +11,6 @@ class Boletin extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['asunto', 'contenido'];
+    protected $fillable = ['asunto', 'contenido', 'estado'];
 }
 

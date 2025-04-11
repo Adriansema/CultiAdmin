@@ -7,6 +7,7 @@ use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\Operador\OperadorProductoController;
 use App\Http\Middleware\Roles_Admin_Opera;
 
@@ -43,10 +44,13 @@ Route::middleware([
         Route::patch('/usuarios/{usuario}/toggle', [UsuarioController::class, 'toggle'])->name('usuarios.toggle');
         Route::delete('/usuarios/{usuario}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
 
+        // Historial
+        Route::get('/historial', [HistorialController::class, 'index'])->name('historial.index');
 
         // Productos
         Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
         Route::get('/productos/create', [ProductoController::class, 'create'])->name('productos.create');
+        Route::get('/productos/historial', [ProductoController::class, 'historial'])->name('productos.historial');
         Route::post('/productos', [ProductoController::class, 'store'])->name('productos.store');
         Route::get('/productos/{producto}', [ProductoController::class, 'show'])->name('productos.show');
         Route::get('/productos/{producto}/edit', [ProductoController::class, 'edit'])->name('productos.edit');
@@ -67,13 +71,23 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | OPERADOR
+        | OPERADOR y en OperadorController.php tambien quiero hacer lo mismo para el, de acuerdo?
         |--------------------------------------------------------------------------
         */
         Route::prefix('operador')->name('operador.')->group(function () {
-            Route::get('/productos/pendientes', [OperadorProductoController::class, 'indexPendientes'])->name('productos.operador.pendientes');
+             // Vista unificada de pendientes para productos y boletines
+            Route::get('/pendientes', [OperadorProductoController::class, 'pendientes'])->name('pendientes');
+
+            // Acciones sobre productos
             Route::post('/productos/{id}/validar', [OperadorProductoController::class, 'validar'])->name('productos.validar');
             Route::post('/productos/{id}/rechazar', [OperadorProductoController::class, 'rechazar'])->name('productos.rechazar');
+
+            // Acciones sobre boletines
+            Route::post('/boletines/{id}/validar', [OperadorProductoController::class, 'validarBoletin'])->name('boletines.validar');
+            Route::post('/boletines/{id}/rechazar', [OperadorProductoController::class, 'rechazarBoletin'])->name('boletines.rechazar');
+
+            // Vista de historial con filtros
+            Route::get('/historial', [OperadorProductoController::class, 'historial'])->name('historial');
         });
     });
 });

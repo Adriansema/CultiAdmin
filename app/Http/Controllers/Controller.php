@@ -4,30 +4,9 @@ namespace App\Http\Controllers;
 
 abstract class Controller
 {
-    public function index()
-{
-    $visits = [
-        ['count' => 3, 'date' => '2025-01-01'],
-        ['count' => 7, 'date' => '2025-02-01'],
-        ['count' => 5, 'date' => '2025-03-01'],
-        ['count' => 9, 'date' => '2025-04-01'],
-        ['count' => 6, 'date' => '2025-05-01'],
-    ];
-
-    $registrations = [
-        ['count' => 1, 'date' => '2025-01-01'],
-        ['count' => 4, 'date' => '2025-02-01'],
-        ['count' => 3, 'date' => '2025-03-01'],
-        ['count' => 6, 'date' => '2025-04-01'],
-        ['count' => 2, 'date' => '2025-05-01'],
-    ];
-
-    return response()->json([
-        'visits' => $visits,
-        'registrations' => $registrations
-    ]);
-}
-
-}
-
-
+/*     Es la clase base que usan todos los controladores de tu aplicación. Meterle lógica
+como index()con visitas o registros es un error grave , porque se propaga a todos los controladores
+que heredan de ahí.
+En PHP, cuando una clase hija sobreescribe un método de la clase padre ( index()en este caso), la firma debe coincidir exactamente .
+Si en el padre es index()sin parámetros, y en el hijo pones index(Request $request), te lanza un error de incompatibilidad.
+ */}
