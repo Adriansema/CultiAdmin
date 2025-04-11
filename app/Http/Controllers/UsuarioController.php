@@ -22,7 +22,8 @@ class UsuarioController extends Controller
     public function create()
     {
         $roles = Role::all();
-        return view('usuarios.create', compact('roles'));
+        $usuario = new user(); // Inicializa la variable $usuario como nueva instancia de User
+        return view('usuarios.create', compact('roles', 'usuario'));
     }
 
     public function store(Request $request)

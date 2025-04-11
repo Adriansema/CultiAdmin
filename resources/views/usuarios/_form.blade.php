@@ -39,7 +39,7 @@
         <option value="">-- Seleccionar rol --</option>
         @foreach($roles as $rol)
             <option value="{{ $rol->name }}"
-                {{ old('role', $usuario->roles->first()->name ?? '') === $rol->name ? 'selected' : '' }}>
+                {{ old('role', optional($usuario)->roles->first()->name ?? '') === $rol->name ? 'selected' : '' }}>
                 {{ ucfirst($rol->name) }}
             </option>
         @endforeach
