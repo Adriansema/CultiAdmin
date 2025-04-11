@@ -12,8 +12,8 @@ use App\Http\Controllers\Operador\HistorialOperadorController;
 use App\Http\Controllers\Operador\OperadorProductoController;
 use App\Http\Middleware\Roles_Admin_Opera;
 
-// Estadísticas
-Route::get('/admin/statistics', [StatisticController::class, 'index'])->name('statistics.index');
+
+ // Estadísticas
 
 
 
@@ -72,8 +72,9 @@ Route::middleware([
         Route::put('/boletines/{boletin}', [BoletinController::class, 'update'])->name('boletines.update');
         Route::delete('/boletines/{boletin}', [BoletinController::class, 'destroy'])->name('boletines.destroy');
 
-        // Estadísticas
-        Route::get('/admin/statistics', [StatisticController::class, 'index'])->name('statistics.index');
+        //Estadistica
+        Route::get('admin/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index');
+
 
         /*
         |--------------------------------------------------------------------------

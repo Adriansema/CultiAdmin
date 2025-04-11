@@ -115,6 +115,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
         window.chart = new ApexCharts(chartElement, options);
         window.chart.render();
+
+        // Actualizar métricas
+        const usersCountEl = document.getElementById("users-count");
+        const registeredCountEl = document.getElementById("registered-count");
+        const activeCountEl = document.getElementById("active-count");
+        const connectedCountEl = document.getElementById("connected-count");
+
+        const registeredPercentEl = document.getElementById("registered-percent");
+        const activePercentEl = document.getElementById("active-percent");
+        const connectedPercentEl = document.getElementById("connected-percent");
+
+        if (usersCountEl) usersCountEl.textContent = data.usuarios;
+        if (registeredCountEl) registeredCountEl.textContent = data.registrados;
+        if (activeCountEl) activeCountEl.textContent = data.activos;
+        if (connectedCountEl) connectedCountEl.textContent = data.conectados;
+
+        if (registeredPercentEl) registeredPercentEl.textContent = `${((data.registrados / data.usuarios) * 100).toFixed(1)}% de los usuarios`;
+        if (activePercentEl) activePercentEl.textContent = `${((data.activos / data.usuarios) * 100).toFixed(1)}% de los usuarios`;
+        if (connectedPercentEl) connectedPercentEl.textContent = `${((data.conectados / data.usuarios) * 100).toFixed(1)}% de los usuarios`;
     }
 
     function loadData(filtro = null) {
@@ -122,31 +141,44 @@ document.addEventListener("DOMContentLoaded", function () {
         if (filtro) {
             url += `?filtro=${filtro}`;
         }
-
+    
+        // Mostrar cargando
+        chartElement.innerHTML = `<div class="text-center text-gray-500 p-4 animate-pulse">Cargando estadísticas...</div>`;
+    
+        const storageKey = `offline_stats_${filtro}`;
+    
         if (navigator.onLine) {
             fetch(url)
-                .then(response => response.json())
+                .then(response => {
+                    // Verifica si la respuesta es exitosa (200)
+                    if (!response.ok) {
+                        throw new Error('Error al cargar las estadísticas');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    localStorage.setItem("offline_stats", JSON.stringify(data));
+                    localStorage.setItem(storageKey, JSON.stringify(data));
                     renderChart(data);
                 })
-                .catch(() => {
-                    const saved = localStorage.getItem("offline_stats");
+                .catch(error => {
+                    console.error("Error al obtener las estadísticas:", error);
+                    const saved = localStorage.getItem(storageKey);
                     if (saved) {
                         renderChart(JSON.parse(saved));
                     } else {
-                        chartElement.innerHTML = "No se pudo cargar la gráfica.";
+                        chartElement.innerHTML = "<div class='text-center text-red-500 p-4'>No se pudo cargar la gráfica.</div>";
                     }
                 });
         } else {
-            const saved = localStorage.getItem("offline_stats");
+            const saved = localStorage.getItem(storageKey);
             if (saved) {
                 renderChart(JSON.parse(saved));
             } else {
-                chartElement.innerHTML = "Sin conexión y sin datos guardados.";
+                chartElement.innerHTML = "<div class='text-center text-orange-500 p-4'>Sin conexión y sin datos guardados.</div>";
             }
         }
     }
+    
 
     window.loadData = loadData;
     loadData();
