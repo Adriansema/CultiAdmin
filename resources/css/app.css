@@ -10,8 +10,6 @@
     .bg-banner {
         background-image: url('/public/images/Frame\ 1314.svg');
         background-size: cover;
-    
-        
         background-repeat: no-repeat; /* Evita que la imagen se repita */
     }
 }

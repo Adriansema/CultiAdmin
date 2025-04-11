@@ -12,6 +12,11 @@ use App\Http\Controllers\Operador\HistorialOperadorController;
 use App\Http\Controllers\Operador\OperadorProductoController;
 use App\Http\Middleware\Roles_Admin_Opera;
 
+// Estadísticas
+Route::get('/admin/statistics', [StatisticController::class, 'index'])->name('statistics.index');
+
+
+
 // Rutas públicas
 Route::get('/', function () {
     return view('welcome');

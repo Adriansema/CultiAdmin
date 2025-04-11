@@ -1,7 +1,6 @@
-
 document.addEventListener("DOMContentLoaded", function () {
-    let filtroActual = 'hoy'; // Variable global
-    let porcentajes = [];     // Variable global para los porcentajes
+    let filtroActual = 'hoy';
+    let porcentajes = [];
 
     function setFilter(filtro) {
         filtroActual = filtro;
@@ -81,16 +80,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let options = {
             chart: {
-                type: 'line', height: 300, toolbar: { show: false }
+                type: 'line',
+                height: 300,
+                toolbar: { show: false }
             },
             series: [{ name: 'Visitas', data: visitas }],
-            xaxis: {
-                categories: categorias,
-                labels: { style: { colors: '#666', fontSize: '12px' } }
-            },
-            yaxis: {
-                labels: { style: { colors: '#666', fontSize: '12px' } }
-            },
+            xaxis: { categories: categorias },
             colors: ['#4CAF50'],
             stroke: { curve: 'smooth', width: 3 },
             markers: {
@@ -122,61 +117,6 @@ document.addEventListener("DOMContentLoaded", function () {
         window.chart.render();
     }
 
-    function actualizarPorcentajes(actual, anterior, elementoID) {
-        const cambio = actual - anterior;
-        let porcentaje = 0;
-        if (anterior > 0) {
-            porcentaje = ((cambio / anterior) * 100).toFixed(1);
-        }
-
-        const textoCambio = cambio === 0
-            ? "Sin cambios"
-            : `${cambio > 0 ? "+" : ""}${porcentaje}% ${cambio > 0 ? "más" : "menos"} que ${periodoAnteriorTexto(filtroActual)}`;
-
-        const elemento = document.getElementById(elementoID);
-        if (elemento) {
-            elemento.textContent = textoCambio;
-            elemento.className = `text-sm ${cambio >= 0 ? 'text-green-600' : 'text-red-600'}`;
-        }
-    }
-
-    function actualizarRelacionProporcional(parcial, total, elementoID, tipo = 'usuarios') {
-        const elemento = document.getElementById(elementoID);
-        if (!elemento || total === 0) return;
-
-        const porcentaje = ((parcial / total) * 100).toFixed(1);
-        let texto = "";
-
-        switch (tipo) {
-            case 'registrados':
-                texto = `${porcentaje}% de los usuarios están registrados`;
-                break;
-            case 'activos':
-                texto = `${porcentaje}% de los usuarios están activos`;
-                break;
-            case 'conectados':
-                texto = `${porcentaje}% de los usuarios están conectados`;
-                break;
-            default:
-                texto = `${porcentaje}% del total`;
-        }
-
-        elemento.textContent = texto;
-        elemento.className = 'text-sm text-blue-600';
-    }
-    <script src="{{ mix('js/app.js') }}" defer></script>
-
-
-    function periodoAnteriorTexto(filtro) {
-        switch (filtro) {
-            case 'hoy': return 'ayer';
-            case 'semana': return 'la semana pasada';
-            case 'mes': return 'el mes pasado';
-            case 'año': return 'el año anterior';
-            default: return 'el periodo anterior';
-        }
-    }
-
     function loadData(filtro = null) {
         let url = STATISTICS_ROUTE;
         if (filtro) {
@@ -189,20 +129,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(data => {
                     localStorage.setItem("offline_stats", JSON.stringify(data));
                     renderChart(data);
-
-                    document.getElementById("users-count").textContent = data.usuarios ?? 0;
-                    document.getElementById("registered-count").textContent = data.registrados ?? 0;
-                    document.getElementById("active-count").textContent = data.activos ?? 0;
-                    document.getElementById("connected-count").textContent = data.conectados ?? 0;
-
-                    actualizarPorcentajes(data.usuarios ?? 0, data.usuarios_anteriores ?? 0, "users-change");
-                    actualizarPorcentajes(data.registrados ?? 0, data.registrados_anteriores ?? 0, "registered-change");
-                    actualizarPorcentajes(data.activos ?? 0, data.activos_anteriores ?? 0, "active-change");
-                    actualizarPorcentajes(data.conectados ?? 0, data.conectados_anteriores ?? 0, "connected-change");
-
-                    actualizarRelacionProporcional(data.registrados ?? 0, data.usuarios ?? 1, "registered-percent", "registrados");
-                    actualizarRelacionProporcional(data.activos ?? 0, data.usuarios ?? 1, "active-percent", "activos");
-                    actualizarRelacionProporcional(data.conectados ?? 0, data.usuarios ?? 1, "connected-percent", "conectados");
                 })
                 .catch(() => {
                     const saved = localStorage.getItem("offline_stats");
