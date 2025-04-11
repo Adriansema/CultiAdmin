@@ -45,6 +45,20 @@ class OperadorProductoController extends Controller
         return back()->with('error', 'Producto rechazado.');
     }
 
+    public function show($tipo, $id)
+    {
+        if ($tipo === 'producto') {
+            $item = Producto::findOrFail($id);
+            return view('operador.show-producto', compact('item'));
+        } elseif ($tipo === 'boletin') {
+            $item = Boletin::findOrFail($id);
+            return view('operador.show-boletin', compact('item'));
+        }
+
+        abort(404);
+    }
+
+
     public function validarBoletin($id)
     {
         $boletin = Boletin::findOrFail($id);

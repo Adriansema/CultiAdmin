@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\HistorialController;
+use App\Http\Controllers\Operador\HistorialOperadorController;
 use App\Http\Controllers\Operador\OperadorProductoController;
 use App\Http\Middleware\Roles_Admin_Opera;
 
@@ -75,7 +76,7 @@ Route::middleware([
         |--------------------------------------------------------------------------
         */
         Route::prefix('operador')->name('operador.')->group(function () {
-             // Vista unificada de pendientes para productos y boletines
+            // Vista unificada de pendientes (productos y boletines)
             Route::get('/pendientes', [OperadorProductoController::class, 'pendientes'])->name('pendientes');
 
             // Acciones sobre productos
@@ -86,9 +87,14 @@ Route::middleware([
             Route::post('/boletines/{id}/validar', [OperadorProductoController::class, 'validarBoletin'])->name('boletines.validar');
             Route::post('/boletines/{id}/rechazar', [OperadorProductoController::class, 'rechazarBoletin'])->name('boletines.rechazar');
 
+            // Vista de detalles (historial) de productos y boletines
+            Route::get('/productos/{producto}', [HistorialOperadorController::class, 'showProducto'])->name('productos.show');
+            Route::get('/boletines/{boletin}', [HistorialOperadorController::class, 'showBoletin'])->name('boletines.show');
+
             // Vista de historial con filtros
-            Route::get('/historial', [OperadorProductoController::class, 'historial'])->name('historial');
+            Route::get('/historial', [HistorialOperadorController::class, 'index'])->name('historial.index');
         });
+
     });
 });
 

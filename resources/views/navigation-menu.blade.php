@@ -162,20 +162,26 @@
                                         </svg>
                                         Historial
                                     </x-nav-link>
+                                @endrole
 
+                                <!-- Mostrar si el usuario es Operador -->
+                                @role('operador')
                                     <x-responsive-nav-link href="{{ route('operador.pendientes') }}" :active="request()->routeIs('operador.pendientes')">
                                         <svg class="inline w-5 h-5 mr-2 text-orange-600" fill="none" stroke="currentColor" stroke-width="2"
-                                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M5 13l4 4L19 7M5 6h14M5 10h14M5 14h9"/>
+                                                d="M5 13l4 4L19 7M5 6h14M5 10h14M5 14h9"/>
                                         </svg>
                                         Validar Productos
                                     </x-responsive-nav-link>
 
+                                    <x-nav-link :href="route('operador.historial.index')" :active="request()->routeIs('historial.index')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Historial
+                                    </x-nav-link>
                                 @endrole
-
-                                <!-- Mostrar si el usuario es Operador -->
-
                             </div>
 
 
