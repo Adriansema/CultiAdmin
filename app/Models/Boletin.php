@@ -1,5 +1,7 @@
 <?php
 
+// app/Models/Boletin.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,7 +11,6 @@ class Boletin extends Model
 {
     use HasFactory;
 
-    protected $table = 'boletines';
-
-    protected $fillable = ['asunto', 'contenido'];
+    protected $fillable = ['asunto', 'contenido', 'estado'];
 }
+

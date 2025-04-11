@@ -1,22 +1,21 @@
 @extends('layouts.app')
 
-@section('content')
-<div class="container">
-    <h1 class="mb-4">Editar Boletín</h1>
+@section('header')
+    <h2 class="text-xl font-semibold">Editar Boletín</h2>
+@endsection
 
-    <form action="{{ route('boletines.update', $boletin->id) }}" method="POST">
-        @csrf
-        @method('PUT')
-        <div class="mb-3">
-            <label for="asunto" class="form-label">Asunto</label>
-            <input type="text" name="asunto" class="form-control" value="{{ $boletin->asunto }}" required>
-        </div>
-        <div class="mb-3">
-            <label for="contenido" class="form-label">Contenido</label>
-            <textarea name="contenido" class="form-control" rows="3" required>{{ $boletin->contenido }}</textarea>
-        </div>
-        <button type="submit" class="btn btn-success">Actualizar</button>
-        <a href="{{ route('boletines.index') }}" class="btn btn-secondary">Volver</a>
-    </form>
-</div>
+@section('content')
+    <div class="max-w-4xl py-6 mx-auto">
+        <form action="{{ route('boletines.update', $boletin) }}" method="POST">
+            @csrf
+            @method('PUT')
+            @include('boletines._form', ['boletin' => $boletin])
+            <x-button class="mt-4">Actualizar</x-button>
+
+            <a href="{{ route('boletines.index') }}"
+                    class="inline-flex items-center px-4 py-2 text-gray-800 transition bg-gray-200 rounded hover:bg-gray-300">
+                   Volver
+            </a>
+        </form>
+    </div>
 @endsection

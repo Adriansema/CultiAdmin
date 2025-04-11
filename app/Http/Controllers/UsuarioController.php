@@ -1,51 +1,100 @@
 <?php
 
+//actualizacion 09/04/2025
+
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
-use App\Models\User;
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UsuarioController extends Controller
 {
 
-public function index()
-{
-    $usuarios = User::with('roles')->get();
-    return view('usuarios.index', compact('usuarios'));
-}
+    public function index()
+    {
+        $usuarios = User::with('roles')->get();
+        return view('usuarios.index', compact('usuarios'));
+    }
 
-public function create()
-{
-    $roles = Role::all();
-    return view('usuarios.create', compact('roles'));
-}
+    public function create()
+    {
+        $roles = Role::all();
+        return view('usuarios.create', compact('roles'));
+    }
 
-public function store(Request $request)
-{
-    $user = User::create($request->only('name', 'email', 'password'));
-    $user->assignRole($request->rol);
-    return redirect()->route('usuarios.index');
-}
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'role'     => 'required|string|exists:roles,name',
+        ]);
 
-public function edit(User $usuario)
-{
-    $roles = Role::all();
-    return view('usuarios.edit', compact('usuario', 'roles'));
-}
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
 
-public function update(Request $request, User $usuario)
-{
-    $usuario->update($request->only('name', 'email'));
-    $usuario->syncRoles($request->rol);
-    return redirect()->route('usuarios.index');
-}
+        $user->assignRole($request->role);
 
-public function destroy(User $usuario)
-{
-    $usuario->delete();
-    return back();
-}
+        return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
+    }
 
+    public function show(User $usuario)
+    {
+        // Este método carga la vista usuarios.showy le pasa al usuario que quiere mostrar.
+        //Ideal para mostrar datos detallados de un solo usuario.
+        return view('usuarios.show', compact('usuario'));
+    }
+
+    public function toggle(User $usuario)
+    {
+        //Cambia el estado del usuario ( activo ↔ inactivo) al contrario del actual.
+        //Guarda el cambio y redirige con un mensaje.
+        $usuario->activo = !$usuario->activo; // Cambia el valor actual por el contrario
+        $usuario->save();
+
+        return redirect()->route('usuarios.index')->with('success', 'Estado actualizado.');
+    }
+
+
+    public function edit(User $usuario)
+    {
+        $roles = Role::all();
+        return view('usuarios.edit', compact('usuario', 'roles'));
+    }
+
+    public function update(Request $request, User $usuario)
+    {
+        $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $usuario->id,
+            'role'  => 'required|string|exists:roles,name',
+        ]);
+
+        $usuario->update([
+            'name'  => $request->name,
+            'email' => $request->email,
+        ]);
+
+        $usuario->syncRoles($request->role);
+
+        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado.');
+    }
+
+    public function destroy(User $usuario)
+    {
+        if ($usuario->id === Auth::id()) {
+            return redirect()->route('usuarios.index')->with('error', 'No puedes eliminar tu propio usuario.');
+        }
+
+        $usuario->delete();
+
+        return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
+    }
 }

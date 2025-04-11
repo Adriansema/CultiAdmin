@@ -1,5 +1,11 @@
+
+
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
+
+    <div class="p-2 bg-blue-500" >
+        <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="" width="100px">
+    </div>
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
@@ -11,10 +17,9 @@
                 </div>
 
                 <!-- Navigation Links -->
+                    <!-- actualizacion 09/04/2025 -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+
                 </div>
             </div>
 
@@ -71,6 +76,7 @@
                     </div>
                 @endif
 
+
                 <!-- Settings Dropdown -->
                 <div class="relative ms-3">
                     <x-dropdown align="right" width="48">
@@ -93,68 +99,119 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <!-- Account Management -->
-                            <div class="block px-4 py-2 text-xs text-gray-400">
-                                {{ __('Manage Account') }}
-                            </div>
-
-                            <x-dropdown-link href="{{ route('profile.show') }}">
-                                {{ __('Profile') }}
-                            </x-dropdown-link>
-
                             @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                                 <x-dropdown-link href="{{ route('api-tokens.index') }}">
                                     {{ __('API Tokens') }}
                                 </x-dropdown-link>
                             @endif
-
                             <div class="border-t border-gray-200"></div>
-                            
-                            <div class="block px-4 py-2 text-xs text-gray-500">
-                                <!-- Dashboard (todos los usuarios) -->
-                                <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                                    Dashboard
-                                </x-responsive-nav-link>
 
-                                <!-- Productos Agrícolas (todos los roles) -->
-                                <x-responsive-nav-link href="{{ route('productos-agricolas.index') }}" :active="request()->routeIs('productos-agricolas.*')">
+                            <!-- MENU HAMBURGUESA -->
+                                <!-- Panel de Administracion -->
+                            <div>
+                                <div class="block px-4 py-2 text-xs text-gray-400">
+                                    {{ __('Dashboard') }}
+                                </div>
+                                <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                                    <svg class="inline w-5 h-5 mr-2 text-gray-700" fill="none" stroke="currentColor" stroke-width="2"
+                                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M3 10h4v11H3zM10 3h4v18h-4zM17 14h4v7h-4z"/>
+                                    </svg>
+                                    Panel
+                                </x-responsive-nav-link>
+                            </div>
+
+                            <div>
+                                    <div class="block px-4 py-2 text-xs text-gray-400">
+                                        {{ __('CRUD') }}
+                                    </div>
+
+                                    <!-- Mostrar si el usuario es Administrador -->
+                                @role('administrador')
+                                <x-responsive-nav-link href="{{ route('productos.index') }}" :active="request()->routeIs('productos.*')">
+                                    <svg class="inline w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M3 10h18M3 6h18M3 14h9m-3 4h6"></path>
+                                    </svg>
                                     Productos Agrícolas
                                 </x-responsive-nav-link>
 
-                                <!-- Boletines (todos los roles) -->
-                                <x-responsive-nav-link href="{{ route('boletines.index') }}" :active="request()->routeIs('boletines.*')">
-                                    Boletines
+                                <x-responsive-nav-link href="{{ route('usuarios.index') }}" :active="request()->routeIs('usuarios.*')">
+                                    <svg class="inline w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M5.121 17.804A4 4 0 019 16h6a4 4 0 013.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    Gestión de Usuarios
                                 </x-responsive-nav-link>
 
-                                <!-- Gestión de Usuarios (solo administrador) -->
-                                @role('administrador')
-                                    <x-responsive-nav-link href="{{ route('usuarios.index') }}" :active="request()->routeIs('usuarios.*')">
-                                        Gestión de Usuarios
+                                    <x-responsive-nav-link href="{{ route('boletines.index') }}" :active="request()->routeIs('boletines.*')">
+                                        <svg class="inline w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" stroke-width="2"
+                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-18 8h18"></path>
+                                        </svg>
+                                        Boletines
                                     </x-responsive-nav-link>
-                                @endrole
 
-                                <!-- Validar Productos (solo operador, pero va a la misma ruta) -->
-                                @role('operador')
-                                    <x-nav-link href="{{ route('productos.pendientes') }}" :active="request()->routeIs('productos.pendientes')">
-                                        Productos por Validar
+                                    <x-nav-link :href="route('historial.index')" :active="request()->routeIs('historial.index')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Historial
                                     </x-nav-link>
                                 @endrole
 
+                                <!-- Mostrar si el usuario es Operador -->
+                                @role('operador')
+                                    <x-responsive-nav-link href="{{ route('operador.pendientes') }}" :active="request()->routeIs('operador.pendientes')">
+                                        <svg class="inline w-5 h-5 mr-2 text-orange-600" fill="none" stroke="currentColor" stroke-width="2"
+                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M5 13l4 4L19 7M5 6h14M5 10h14M5 14h9"/>
+                                        </svg>
+                                        Validar Productos
+                                    </x-responsive-nav-link>
+
+                                    <x-nav-link :href="route('operador.historial.index')" :active="request()->routeIs('historial.index')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Historial
+                                    </x-nav-link>
+                                @endrole
                             </div>
 
 
-                                
-                            <!-- Authentication -->
-                            <form method="POST" action="{{ route('logout') }}" x-data>
-                                @csrf
-                                <div class="block px-4 py-2 text-xs text-gray-400">    
-                                {{ __('Log Out') }}
-                                    <x-dropdown-link href="{{ route('logout') }}"
-                                            @click.prevent="$root.submit();">
-                                        {{ __('Cerrar Sesión') }}
-                                    </x-dropdown-link>
+                            <!-- Configuración -->
+                                <div class="block px-4 py-2 text-xs text-gray-400">
+                                    {{ __('Configuración') }}
+                                    <x-responsive-nav-link href="{{ route('profile.show') }}">
+                                        <svg class="inline w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
+                                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                  d="M5.121 17.804A4 4 0 0 1 8.514 16h6.972a4 4 0 0 1 3.393 1.804M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+                                        </svg>
+                                        Perfil
+                                    </x-responsive-nav-link>
+
+
+                                        <!-- Authentication - Cerrar Sesión -->
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <x-responsive-nav-link href="{{ route('logout') }}"
+                                                                   onclick="event.preventDefault(); this.closest('form').submit();">
+                                                <svg class="inline w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" stroke-width="2"
+                                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"/>
+                                                </svg>
+                                                Cerrar Sesión
+                                            </x-responsive-nav-link>
+                                        </form>
                                 </div>
-                            </form>
                         </x-slot>
                     </x-dropdown>
                 </div>

@@ -9,15 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+    // database/migrations/xxxx_xx_xx_create_boletins_table.php
+
     public function up()
-{
-    Schema::create('boletines', function (Blueprint $table) {
-        $table->id();
-        $table->string('asunto');
-        $table->text('contenido');
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('boletins', function (Blueprint $table) {
+            $table->id();
+            $table->string('asunto');
+            $table->text('contenido');
+            $table->timestamps();
+        });
+    }
+
 
     /**
      * Reverse the migrations.

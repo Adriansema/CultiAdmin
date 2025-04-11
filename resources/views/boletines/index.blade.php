@@ -1,41 +1,66 @@
 @extends('layouts.app')
 
+@section('header')
+    <h2 class="text-xl font-semibold">Listado de Boletines</h2>
+@endsection
+
 @section('content')
-<div class="container">
-    <h1 class="mb-4">Lista de Boletines</h1>
+    <div class="max-w-6xl py-6 mx-auto">
+        @if (session('success'))
+            <div class="p-4 mb-4 text-green-800 bg-green-100 border border-green-300 rounded">
+                {{ session('success') }}
+            </div>
+        @endif
 
-    <a href="{{ route('boletines.create') }}" class="mb-3 btn btn-primary">Agregar Boletín</a>
+        <div class="mb-4">
+            <a href="{{ route('boletines.create') }}" class="inline-block px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
+                + Crear Boletín
+            </a>
+        </div>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Asunto</th>
-                <th>Contenido</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($boletines as $boletin)
-                <tr>
-                    <td>{{ $boletin->id }}</td>
-                    <td>{{ $boletin->asunto }}</td>
-                    <td>{{ $boletin->contenido }}</td>
-                    <td>
-                        <a href="{{ route('boletines.edit', $boletin->id) }}" class="btn btn-warning btn-sm">Editar</a>
-                        <form action="{{ route('boletines.destroy', $boletin->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
+        <div class="overflow-x-auto bg-white rounded shadow">
+            <table class="min-w-full table-auto">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 text-left">#</th>
+                        <th class="px-4 py-2 text-left">Asunto</th>
+                        <th class="px-4 py-2 text-left">Contenido</th>
+                        <th class="px-4 py-2 text-left">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($boletines as $boletin)
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2">{{ $loop->iteration }}</td>
+                            <td class="px-4 py-2 font-semibold">{{ $boletin->asunto }}</td>
+                            <td class="max-w-xs px-4 py-2 text-sm text-gray-600 truncate">
+                                {{ Str::limit($boletin->contenido, 60) }}
+                            </td>
+                            <td class="px-4 py-2 space-x-2">
+                                <a href="{{ route('boletines.show', $boletin) }}"
+                                   class="px-3 py-1 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">Ver</a>
+                                <a href="{{ route('boletines.edit', $boletin) }}"
+                                   class="px-3 py-1 text-sm text-white bg-yellow-500 rounded hover:bg-yellow-600">Editar</a>
+                                <form action="{{ route('boletines.destroy', $boletin) }}" method="POST" class="inline"
+                                      onsubmit="return confirm('¿Estás seguro de que deseas eliminar este boletín?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="px-3 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="px-4 py-6 text-center text-gray-500">
+                                No hay boletines registrados aún.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 @endsection
