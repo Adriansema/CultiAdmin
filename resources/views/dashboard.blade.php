@@ -16,10 +16,10 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <h2 class="text-xl font-bold text-gray-800">Panel de Administración</h2>
             <div class="space-x-2 mt-4 md:mt-0" id="filter-buttons">
-                <button onclick="setFilter('hoy')" class="filter-btn">Hoy</button>
-                <button onclick="setFilter('semana')" class="filter-btn active">Semana</button>
-                <button onclick="setFilter('mes')" class="filter-btn">Mes</button>
-                <button onclick="setFilter('año')" class="filter-btn">Año</button>
+            <button onclick="setFilter('hoy')" class="filter-btn px-4 py-2 rounded-lg text-white bg-gray-700 hover:bg-green-300 transition-colors">Hoy</button>
+    <button onclick="setFilter('semana')" class="filter-btn px-4 py-2 rounded-lg text-white bg-gray-700 hover:bg-green-300 transition-colors active">Semana</button>
+    <button onclick="setFilter('mes')" class="filter-btn px-4 py-2 rounded-lg text-white bg-gray-700 hover:bg-green-300 transition-colors">Mes</button>
+    <button onclick="setFilter('año')" class="filter-btn px-4 py-2 rounded-lg text-white bg-gray-700 hover:bg-green-300 transition-colors">Año</button>
             </div>
         </div>  
         <div id="chart" class="my-6"></div>
@@ -85,4 +85,15 @@
         @apply bg-green-600 text-white;
     }
 </style>
+<style>
+
+.filter-btn {
+    @apply px-4 py-2 rounded-lg text-white bg-gray-700 hover:bg-green-300 transition-colors;
+}
+
+.filter-btn.active {
+    @apply bg-green-600 hover:bg-green-500;
+}
+</style>
+
 @endsection
