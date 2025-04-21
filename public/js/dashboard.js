@@ -1,16 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
     let filtroActual = 'hoy';
     let porcentajes = [];
-
+    
     function setFilter(filtro) {
         filtroActual = filtro;
     
         const buttons = document.querySelectorAll('#filter-buttons .filter-btn');
-        buttons.forEach(btn => {
-            btn.classList.remove('bg-green-600', 'hover:bg-green-500');
-            btn.classList.add('bg-gray-700', 'hover:bg-green-300');
-            btn.classList.remove('active');
-        });
+        buttons.forEach(btn => btn.classList.remove('active'));
     
         const activeBtn = Array.from(buttons).find(btn =>
             btn.textContent.trim().toLowerCase() === filtro.toLowerCase()
@@ -18,12 +14,11 @@ document.addEventListener("DOMContentLoaded", function () {
     
         if (activeBtn) {
             activeBtn.classList.add('active');
-            activeBtn.classList.remove('bg-gray-700', 'hover:bg-green-300');
-            activeBtn.classList.add('bg-green-600', 'hover:bg-green-500');
         }
     
         loadData(filtro);
     }
+    
     
     window.setFilter = setFilter;
 
