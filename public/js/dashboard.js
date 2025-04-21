@@ -1,24 +1,25 @@
 document.addEventListener("DOMContentLoaded", function () {
     let filtroActual = 'hoy';
     let porcentajes = [];
-
+    
     function setFilter(filtro) {
         filtroActual = filtro;
-
+    
         const buttons = document.querySelectorAll('#filter-buttons .filter-btn');
         buttons.forEach(btn => btn.classList.remove('active'));
-
+    
         const activeBtn = Array.from(buttons).find(btn =>
             btn.textContent.trim().toLowerCase() === filtro.toLowerCase()
         );
-
+    
         if (activeBtn) {
             activeBtn.classList.add('active');
         }
-
+    
         loadData(filtro);
     }
-
+    
+    
     window.setFilter = setFilter;
 
     const chartElement = document.querySelector("#chart");
@@ -163,20 +164,73 @@ document.addEventListener("DOMContentLoaded", function () {
                 .catch(error => {
                     console.error("Error al obtener las estadísticas:", error);
                     const saved = localStorage.getItem(storageKey);
+                     // Si hay datos guardados en localStorage, los usa
                     if (saved) {
                         renderChart(JSON.parse(saved));
                     } else {
-                        chartElement.innerHTML = "<div class='text-center text-red-500 p-4'>No se pudo cargar la gráfica.</div>";
+                        // --- DATOS DE PRUEBA ---
+                        const mockData = {
+                        
+                            hoy: {
+                                vistas: [
+                                    { grupo: '0', total: 5 },  // 12 AM
+                                    { grupo: '6', total: 20 },
+                                    { grupo: '9', total: 30 },
+                                    { grupo: '12', total: 50 },
+                                    { grupo: '15', total: 40 },
+                                    { grupo: '18', total: 35 },
+                                    { grupo: '21', total: 25 },
+                                ],
+                            },
+                            semana: {
+                                vistas: [
+                                    { grupo: 'lunes', total: 120 },
+                                    { grupo: 'martes', total: 200 },
+                                    { grupo: 'miércoles', total: 150 },
+                                    { grupo: 'jueves', total: 300 },
+                                    { grupo: 'viernes', total: 400 },
+                                    { grupo: 'sábado', total: 250 },
+                                    { grupo: 'domingo', total: 180 },
+                                ],
+                            },
+                            mes: {
+                                vistas: [
+                                    { grupo: '1', total: 300 },
+                                    { grupo: '2', total: 400 },
+                                    { grupo: '3', total: 350 },
+                                    { grupo: '4', total: 500 },
+                                    
+                                ],
+                            },
+                            año: {
+                                vistas: [
+                                    { grupo: 'enero', total: 1200 },
+                                    { grupo: 'febrero', total: 1100 },
+                                    { grupo: 'marzo', total: 1500 },
+                                    { grupo: 'abril', total: 1400 },
+                                    { grupo: 'mayo', total: 1600 },
+                                    { grupo: 'junio', total: 1300 },
+                                    { grupo: 'julio', total: 1700 },
+                                    { grupo: 'agosto', total: 1200 },
+                                    { grupo: 'septiembre', total: 1500 },
+                                    { grupo: 'octubre', total: 1600 },
+                                    { grupo: 'noviembre', total: 1400 },
+                                    { grupo: 'diciembre', total: 1800 },
+                                ],
+                            },
+                            usuarios: 1000,
+                            registrados: 750,
+                            activos: 600,
+                            conectados: 150
+                        };
+                         // Mostramos mensaje visual de que se están usando datos de prueba
+                        chartElement.innerHTML = "<div class='text-center text-yellow-500 p-4'>Mostrando datos de prueba.</div>";
+                        // Renderiza la gráfica con los datos simulados según el filtro actual
+                        renderChart(mockData[filtroActual]);
                     }
                 });
-        } else {
-            const saved = localStorage.getItem(storageKey);
-            if (saved) {
-                renderChart(JSON.parse(saved));
-            } else {
-                chartElement.innerHTML = "<div class='text-center text-orange-500 p-4'>Sin conexión y sin datos guardados.</div>";
-            }
-        }
+            }        
+                
     }
     
 
