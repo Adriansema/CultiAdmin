@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\HistorialController;
+use App\Http\Controllers\ViewUserController;
 use App\Http\Controllers\Operador\HistorialOperadorController;
 use App\Http\Controllers\Operador\OperadorProductoController;
 use App\Http\Middleware\Roles_Admin_Opera;
@@ -75,6 +76,15 @@ Route::middleware([
         //Estadistica
         Route::get('admin/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index');
 
+        // Vista de Usuarios
+        Route::get('view-user', [ViewUserController::class, 'index'])->name('view-user.index');
+        Route::get('view-user/create', [ViewUserController::class, 'create'])->name('view-user.create');
+        Route::post('view-user', [ViewUserController::class, 'store'])->name('view-user.store');
+        Route::get('view-user/{id}', [ViewUserController::class, 'show'])->name('view-user.show');
+        Route::get('view-user/{id}/edit', [ViewUserController::class, 'edit'])->name('view-user.edit');
+        Route::put('view-user/{id}', [ViewUserController::class, 'update'])->name('view-user.update');
+        Route::delete('view-user/{id}', [ViewUserController::class, 'destroy'])->name('view-user.destroy');
+        Route::get('view-user/{id}/historial', [ViewUserController::class, 'historial'])->name('view-user.historial');
 
         /*
         |--------------------------------------------------------------------------

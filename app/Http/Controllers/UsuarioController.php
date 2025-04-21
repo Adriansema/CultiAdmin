@@ -57,7 +57,7 @@ class UsuarioController extends Controller
     {
         //Cambia el estado del usuario ( activo ↔ inactivo) al contrario del actual.
         //Guarda el cambio y redirige con un mensaje.
-        $usuario->activo = !$usuario->activo; // Cambia el valor actual por el contrario
+        $usuario->estado = !$usuario->estado; // Cambia el valor actual por el contrario
         $usuario->save();
 
         return redirect()->route('usuarios.index')->with('success', 'Estado actualizado.');

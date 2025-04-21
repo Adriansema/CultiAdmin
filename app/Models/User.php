@@ -31,10 +31,24 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+
+    protected $table = 'users';
+
     protected $fillable = [
         'name',
         'email',
         'password',
+        'apellido',
+        'tipo_documento',
+        'documento',
+        'telefono',
+        'token',
+        'intentos_fallidos',
+        'bloqueado_hasta',
+        'codigo_verificacion',
+        'id_finca',
+        'estado',
+        'clave_visible', // Solo para superadmin
     ];
 
     /**
@@ -66,7 +80,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'activo' => 'boolean',
+        'estado' => 'boolean',
     ];
 
     protected $guard_name = 'web'; // <-- Esto es opcional pero útil
