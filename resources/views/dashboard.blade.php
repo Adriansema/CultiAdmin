@@ -6,7 +6,7 @@
 <main>
     
     {{-- Gráfica de usuarios conectados --}}
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="flex-1 p-6 overflow-y-auto">
     <section id="usuarios-conectados" class="bg-white shadow rounded-lg p-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <h2 class="text-xl font-bold text-gray-800">Panel de Administración</h2>

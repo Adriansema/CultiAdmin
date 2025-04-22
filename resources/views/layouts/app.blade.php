@@ -16,7 +16,11 @@
         <!-- Styles -->
         @livewireStyles
     </head>
+<<<<<<< Updated upstream
     <div class="p-1 bg-blue-500" >
+=======
+    <div class="p-2 bg-blue-500" >
+>>>>>>> Stashed changes
         <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="" width="100px">
     </div>
     <body class="font-sans antialiased">
