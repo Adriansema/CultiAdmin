@@ -34,28 +34,25 @@
         <div class="bg-gray-50 rounded-md p-4 shadow-sm">
             <h3 class="text-gray-600 text-sm">Usuarios</h3>
             <p id="users-count" class="text-2xl font-bold text-gray-800">0</p>
-            <p id="users-change" class="text-sm text-green-600">+0% más que ayer</p>
+            <p d="registered-percent" class="text-sm text-gray-800">0% de los 
         </div>
 
         <div class="bg-gray-50 rounded-md p-4 shadow-sm">
             <h3 class="text-gray-600 text-sm">Registrados</h3>
             <p id="registered-count" class="text-2xl font-bold text-gray-800">0</p>
-            <p id="registered-change" class="text-sm text-green-600">+0% más que ayer</p>
-            <p id="registered-percent" class="text-sm text-gray-500">0% de los usuarios</p>
+            <p id="registered-percent" class="text-sm text-gray-800">0% de los usuarios</p>
         </div>
 
         <div class="bg-gray-50 rounded-md p-4 shadow-sm">
             <h3 class="text-gray-600 text-sm">Activos</h3>
             <p id="active-count" class="text-2xl font-bold text-gray-800">0</p>
-            <p id="active-change" class="text-sm text-green-600">+0% más que ayer</p>
-            <p id="active-percent" class="text-sm text-gray-500">0% de los usuarios</p>
+            <p id="active-percent" class="text-sm text-gray-800">0% de los usuarios</p>
         </div>
 
         <div class="bg-gray-50 rounded-md p-4 shadow-sm">
             <h3 class="text-gray-600 text-sm">Conectados</h3>
             <p id="connected-count" class="text-2xl font-bold text-gray-800">0</p>
-            <p id="connected-change" class="text-sm text-green-600">+0% más que ayer</p>
-            <p id="connected-percent" class="text-sm text-gray-500">0% de los usuarios</p>
+            <p id="connected-percent" class="text-sm text-gray-800">0% de los usuarios</p>
         </div>
     </div>
 
