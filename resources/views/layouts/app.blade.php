@@ -8,6 +8,7 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
+<<<<<<< HEAD
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -20,6 +21,16 @@
 
 <body class="flex flex-col h-screen overflow-hidden font-sans antialiased">
     <div class="p-1 bg-blue-500">
+=======
+        <!-- Styles -->
+        @livewireStyles
+    </head>
+<<<<<<< Updated upstream
+    <div class="p-1 bg-blue-500" >
+=======
+    <div class="p-2 bg-blue-500" >
+>>>>>>> Stashed changes
+>>>>>>> 5df863f (actualizando el dashboard)
         <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="" width="100px">
     </div>
     <x-banner />
