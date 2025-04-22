@@ -19,31 +19,30 @@
     <body class="font-sans antialiased">
         <x-banner />
 
-        <div class="min-h-screen bg-gray-100">
-            @livewire('navigation-menu')
+        <div class="flex h-screen"> <!-- Cambio aquí: FLEX layout horizontal -->
 
-            <!-- Page Heading -->
-            @if (isset($header))
-                <header class="bg-white shadow">
-                    <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endif
+            @livewire('navigation-menu') <!-- Sidebar -->
 
-            <!-- Page Content -->
+            <div class="flex flex-col flex-1 ml-64 overflow-y-auto bg-gray-100"> <!-- Contenido del dashboard -->
 
-            <main>
-              @yield('content')
-         </main>
+                @if (isset($header))
+                    <header class="bg-white shadow">
+                        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                            {{ $header }}
+                        </div>
+                    </header>
+                @endif
 
+                <main class="flex-1 p-6">
+                    @yield('content')
+                </main>
+
+            </div>
         </div>
 
         @stack('modals')
-        
         @livewireScripts
         @yield('scripts')
-
-
     </body>
+
 </html>
