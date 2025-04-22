@@ -2,12 +2,6 @@
 
 @section('content')
 
-  <section id="banner" class="w-full bg-white shadow rounded-lg overflow-hidden">
-        <!-- Aquí va la imagen de fondo, título, logo y campesino -->
-        <div class="relative w-full h-80 md:h-100 bg-banner"> <!-- Usa la clase personalizada aquí -->
-            
-        </div>
-    </section>
 
 <main>
     

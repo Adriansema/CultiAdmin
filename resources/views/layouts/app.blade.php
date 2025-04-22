@@ -16,6 +16,9 @@
         <!-- Styles -->
         @livewireStyles
     </head>
+    <div class="p-1 bg-blue-500" >
+        <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="" width="100px">
+    </div>
     <body class="font-sans antialiased">
         <x-banner />
 
