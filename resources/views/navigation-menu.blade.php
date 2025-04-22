@@ -1,7 +1,8 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
 
-    <div class="fixed flex flex-col w-64 h-screen text-white shadow-lg bg-blue-950">
+    <div class="fixed flex flex-col w-64 h-screen text-white shadow-lg" style="background-color: #00304D;">
+
         <!-- Logo -->
         <div class="flex items-center justify-center p-4">
             <a href="{{ route('dashboard') }}">
