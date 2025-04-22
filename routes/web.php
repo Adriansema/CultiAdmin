@@ -63,6 +63,8 @@ Route::middleware([
         Route::get('/productos/{producto}/edit', [ProductoController::class, 'edit'])->name('productos.edit');
         Route::put('/productos/{producto}', [ProductoController::class, 'update'])->name('productos.update');
         Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
+        Route::get('/productos/cafe', [ProductoController::class, 'cafe'])->name('productos.cafe');
+        Route::get('/productos/mora', [ProductoController::class, 'mora'])->name('productos.mora');
 
         // Boletines
         Route::get('/boletines', [BoletinController::class, 'index'])->name('boletines.index');
@@ -72,6 +74,8 @@ Route::middleware([
         Route::get('/boletines/{boletin}/edit', [BoletinController::class, 'edit'])->name('boletines.edit');
         Route::put('/boletines/{boletin}', [BoletinController::class, 'update'])->name('boletines.update');
         Route::delete('/boletines/{boletin}', [BoletinController::class, 'destroy'])->name('boletines.destroy');
+        Route::get('/boletines/cafe', [BoletinController::class, 'cafe'])->name('boletines.cafe');
+        Route::get('/boletines/mora', [BoletinController::class, 'mora'])->name('boletines.mora');
 
         //Estadistica
         Route::get('admin/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index');

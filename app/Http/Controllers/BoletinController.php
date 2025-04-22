@@ -63,4 +63,15 @@ class BoletinController extends Controller
 
         return redirect()->route('boletines.index')->with('success', 'Boletín eliminado.');
     }
+
+    public function cafe()
+    {
+        return view('boletines.cafe');
+    }
+
+    public function mora()
+    {
+        return view('boletines.mora');
+    }
+
 }
