@@ -13,3 +13,8 @@
         background-repeat: no-repeat; /* Evita que la imagen se repita */
     }
 }
+@layer base {
+    :root {
+      --color-gris1: #e6eaed;
+    }
+  }

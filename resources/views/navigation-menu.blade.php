@@ -11,34 +11,33 @@
         </div>
 
         <!-- Navigation Links -->
-        <nav class="flex-1 px-4 py-6 space-y-4 overflow-y-auto">
-
-                <!-- Nueva entrada (simulación de submenú abierto) -->
+        <nav class="flex-1 flex flex-col px-4 py-6 space-y-4 overflow-y-auto">
+            <div class="flex-1 space-y-2.5" >
             <div class="space-y-1">
-                <!-- Botón para abrir el submenú -->
-                <button type="button"
-                    class="flex items-center w-full px-3 py-2 font-medium text-green-600 transition bg-green-100 rounded-md hover:bg-green-200"
-                    data-toggle="submenu"
-                    data-target="#submenu-nueva-entrada">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Nueva Entrada
-                    <svg class="w-4 h-4 ml-auto transition-transform transform" data-icon>
-                        <path fill="currentColor" d="M5 8l4 4 4-4" />
-                    </svg>
-                </button>
+                    <!-- Botón para abrir el submenú -->
+                    <button type="button"
+                        class="flex items-center w-full px-3 py-2 font-medium text-green-600 transition bg-green-100 rounded-md hover:bg-green-200"
+                        data-toggle="submenu"
+                        data-target="#submenu-nueva-entrada">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Nueva Entrada
+                        <svg class="w-4 h-4 ml-auto transition-transform transform" data-icon>
+                            <path fill="currentColor" d="M5 8l4 4 4-4" />
+                        </svg>
+                    </button>
 
-                <!-- Submenú que contiene las opciones Cultivo y Boletín -->
-                <div id="submenu-nueva-entrada" class="hidden pl-6 mt-1 space-y-1">
-                    <a href="/nueva-entrada/cultivo" class="block px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-200">
-                        Cultivo
-                    </a>
-                    <a href="/nueva-entrada/boletin" class="block px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-200">
-                        Boletín
-                    </a>
+                    <!-- Submenú que contiene las opciones Cultivo y Boletín -->
+                    <div id="submenu-nueva-entrada" class="hidden pl-6 mt-1 space-y-1">
+                        <a href="/nueva-entrada/cultivo" class="block px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-200">
+                            Cultivo
+                        </a>
+                        <a href="/nueva-entrada/boletin" class="block px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-200">
+                            Boletín
+                        </a>
+                    </div>
                 </div>
-            </div>
 
                 <!-- Panel -->
                 <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
@@ -97,6 +96,9 @@
                         </x-responsive-nav-link>
                     </div>
                 </div>
+            </div>
+                <!-- Nueva entrada (simulación de submenú abierto) -->
+                
 
                 <x-responsive-nav-link href="{{ route('usuarios.index') }}" :active="request()->routeIs('usuarios.*')">
                     <svg class="inline w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

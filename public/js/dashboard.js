@@ -181,6 +181,10 @@ document.addEventListener("DOMContentLoaded", function () {
                                     { grupo: '18', total: 35 },
                                     { grupo: '21', total: 25 },
                                 ],
+                                usuarios: 100,
+                                registrados: 80,
+                                activos: 60,
+                                conectados: 20
                             },
                             semana: {
                                 vistas: [
@@ -192,6 +196,10 @@ document.addEventListener("DOMContentLoaded", function () {
                                     { grupo: 'sábado', total: 250 },
                                     { grupo: 'domingo', total: 180 },
                                 ],
+                                    usuarios: 500,
+                                    registrados: 400,
+                                    activos: 300,
+                                    conectados: 90
                             },
                             mes: {
                                 vistas: [
@@ -201,6 +209,10 @@ document.addEventListener("DOMContentLoaded", function () {
                                     { grupo: '4', total: 500 },
                                     
                                 ],
+                                usuarios: 800,
+                                registrados: 600,
+                                activos: 500,
+                                conectados: 100
                             },
                             año: {
                                 vistas: [
@@ -217,16 +229,26 @@ document.addEventListener("DOMContentLoaded", function () {
                                     { grupo: 'noviembre', total: 1400 },
                                     { grupo: 'diciembre', total: 1800 },
                                 ],
+                                usuarios: 1000,
+                                registrados: 750,
+                                activos: 600,
+                                conectados: 150
                             },
-                            usuarios: 1000,
-                            registrados: 750,
-                            activos: 600,
-                            conectados: 150
+                           
                         };
                          // Mostramos mensaje visual de que se están usando datos de prueba
                         chartElement.innerHTML = "<div class='text-center text-yellow-500 p-4'>Mostrando datos de prueba.</div>";
                         // Renderiza la gráfica con los datos simulados según el filtro actual
-                        renderChart(mockData[filtroActual]);
+                        const selectedMock = mockData[filtroActual] || {};
+
+                      renderChart({
+                          vistas: selectedMock.vistas || [],
+                           usuarios: selectedMock.usuarios || 0,
+                          registrados: selectedMock.registrados || 0,
+                          activos: selectedMock.activos || 0,
+                            conectados: selectedMock.conectados || 0
+});
+
                     }
                 });
             }        
