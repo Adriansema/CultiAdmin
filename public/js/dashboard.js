@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function renderChart(data) {
+        // ... tu código de ordenación y cálculo de porcentajes …
         let datosOrdenados = [...data.vistas];
 
         switch (filtroActual) {
@@ -81,17 +82,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let options = {
             chart: {
-                type: 'line',
+                type: 'area',
                 height: 300,
                 toolbar: { show: false }
             },
+            dataLabels: { enabled: false },
+            stroke: { curve: 'smooth', width: 3 },
+            fill: {
+              type: 'gradient',
+              gradient: {
+                shadeIntensity: 1,
+                inverseColors: false,
+                opacityFrom: 0.4,
+                opacityTo:   0.1,
+                stops: [0, 100]
+              }
+            },
+
             series: [{ name: 'Visitas', data: visitas }],
             xaxis: { categories: categorias },
+           
+                
             colors: ['#4CAF50'],
-            stroke: { curve: 'smooth', width: 3 },
+            stroke: { 
+                curve: 'smooth',
+                width: 2
+            },
+
+            fill: {             // ← Aquí añades el relleno bajo la curva
+                type: 'gradient',
+                opacity: 0.1,
+                gradient: {
+                  shadeIntensity: 1,
+                  opacityFrom: 0.6,  // más opaco junto a la línea
+                  opacityTo:   0.6,  // más transparente hacia abajo
+                  stops: [0, 100]
+                }
+                // Si prefieres un relleno sólido:
+                // type: 'solid',
+                // opacity: 0.2
+              },
+
             markers: {
-                size: 6,
-                colors: ['#ffffff'],
+                size: 4,
+              
                 strokeColors: ['#4CAF50'],
                 strokeWidth: 2,
                 hover: { size: 8 }

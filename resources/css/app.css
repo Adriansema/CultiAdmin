@@ -18,3 +18,15 @@
       --color-gris1: #e6eaed;
     }
   }
+
+  @layer base {
+    :root {
+      --color-usucone: #00304d;
+  }
+}
+
+@layer base {
+    :root {
+      --color-govco: #3366CC;
+    }
+  }

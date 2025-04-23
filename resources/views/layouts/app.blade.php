@@ -20,9 +20,9 @@
     <body class="flex flex-col h-screen overflow-hidden font-sans antialiased">
 
         <!-- Cinta GOV.CO -->
-        <div class="p-1 bg-blue-500">
-            <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="Logo GOV.CO" width="100px">
-        </div>
+        <div class="p-1 bg-[var(--color-govco)]">
+  <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="Logo GOV.CO" width="100px">
+</div>
 
         <div class="flex flex-1 overflow-hidden">
 
