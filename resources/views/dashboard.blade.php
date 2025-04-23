@@ -3,6 +3,7 @@
 @section('content')
 
 
+
     <section class="flex-1 p-6 overflow-y-auto">
            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-800">Panel de Administración</h2>
@@ -19,7 +20,7 @@
     {{-- Gráfica de usuarios conectados + Métricas --}}
     <div class="flex-1 p-6 overflow-y-auto">
         <section id="usuarios-conectados" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
-            
+            <h2 class="text-xl font-bold text-[var(--color-usucone)]">Usuario Conectados</h2>
             {{-- Gráfica --}}
             <div id="chart" class="my-6"></div>
 
