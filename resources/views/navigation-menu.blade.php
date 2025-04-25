@@ -16,8 +16,8 @@
                     <div class="space-y-1">
                         <!-- Botón con borde superior y laterales -->
                         <button type="button"
-                            class="flex items-center w-full px-3 py-2 font-medium text-green-600 transition bg-green-500 border-t-2 rounded-t-md border-x-2 hover:bg-green-400"
-                            style="border-color: #228B22;"
+                            class="flex items-center w-full px-3 py-2 font-medium text-green-600 transition bg-[var(--color-nuevaentrada)] border-t-2 rounded-t-md border-x-2 hover:bg-green-400"
+                            style="border-color: #39A900;"
                             data-toggle="submenu" data-target="#submenu-nueva-entrada">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />

@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 inverseColors: false,
                 opacityFrom: 0.4,
                 opacityTo:   0.1,
-                stops: [0, 100]
+                stops: [0, 90, 100]
               }
             },
 

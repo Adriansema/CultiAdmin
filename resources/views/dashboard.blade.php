@@ -6,12 +6,17 @@
 
     <section class="flex-1 p-6 overflow-y-auto">
            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                <h2 class="text-xl font-bold text-gray-800">Panel de Administración</h2>
+           <div class="mb-6">
+            <h1 class="text-2xl font-semibold text-gray-800">Panel de Administración</h1>
+              <p class="text-gray-600 mt-2">Visualiza estadística de vistas al sitio, notificación y boletines.</p>
+             </div>
+
                 <div class="space-x-2 mt-4 md:mt-0" id="filter-buttons">
                     <button onclick="setFilter('hoy')" class="filter-btn px-4 py-2 rounded-lg text-green-600 hover:bg-green-700 transition-colors">Hoy</button>
                     <button onclick="setFilter('semana')" class="filter-btn px-4 py-2 rounded-lg text-green-600 hover:bg-green-700 transition-colors active">Semana</button>
                     <button onclick="setFilter('mes')" class="filter-btn px-4 py-2 rounded-lg text-green-600 hover:bg-green-700 transition-colors">Mes</button>
                     <button onclick="setFilter('año')" class="filter-btn px-4 py-2 rounded-lg text-green-600 hover:bg-green-700 transition-colors">Año</button>
+                   
                 </div>
             </div>  
      </section>

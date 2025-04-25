@@ -3,30 +3,38 @@
 @tailwind utilities;
 
 [x-cloak] {
-    display: none;
+  display: none;
 }
 
 @layer utilities {
-    .bg-banner {
-        background-image: url('/public/images/Frame\ 1314.svg');
-        background-size: cover;
-        background-repeat: no-repeat; /* Evita que la imagen se repita */
-    }
-}
-@layer base {
-    :root {
-      --color-gris1: #e6eaed;
-    }
-  }
-
-  @layer base {
-    :root {
-      --color-usucone: #00304d;
+  .bg-banner {
+    background-image: url('/public/images/Frame\ 1314.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    /* Evita que la imagen se repita */
   }
 }
 
 @layer base {
-    :root {
-      --color-govco: #3366CC;
-    }
+  :root {
+    --color-gris1: #e6eaed;
   }
+}
+
+@layer base {
+  :root {
+    --color-usucone: #00304d;
+  }
+}
+
+@layer base {
+  :root {
+    --color-govco: #3366CC;
+  }
+}
+
+@layer base {
+  :root {
+    --color-nuevaentrada: #39A900 ;
+  }
+}
