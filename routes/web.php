@@ -9,6 +9,8 @@ use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\ViewUserController;
+use App\Http\Controllers\CentroAyudaController;
+use App\Http\Controllers\AccesibilidadController;
 use App\Http\Controllers\Operador\HistorialOperadorController;
 use App\Http\Controllers\Operador\OperadorProductoController;
 use App\Http\Middleware\Roles_Admin_Opera;
@@ -89,6 +91,12 @@ Route::middleware([
         Route::put('view-user/{id}', [ViewUserController::class, 'update'])->name('view-user.update');
         Route::delete('view-user/{id}', [ViewUserController::class, 'destroy'])->name('view-user.destroy');
         Route::get('view-user/{id}/historial', [ViewUserController::class, 'historial'])->name('view-user.historial');
+
+        //Centro de Ayuda de la Aplicación
+        Route::get('/ayuda', [CentroAyudaController::class, 'index'])->name('centroAyuda.index');
+
+        //Acesibilidad de la Aplicación
+        Route::get('/accesibilidad', [AccesibilidadController::class, 'index'])->name('accesibilidad.index');
 
         /*
         |--------------------------------------------------------------------------
