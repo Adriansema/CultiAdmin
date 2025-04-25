@@ -24,18 +24,12 @@
                             style="border-color: #39A900;" data-toggle="submenu" data-target="#submenu-nueva-entrada">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2"
                                 viewBox="0 0 24 24">
-                                class="flex items-center w-full px-3 py-2 font-medium text-green-600 transition
-                                bg-[var(--color-nuevaentrada)] border-t-2 rounded-t-md border-x-2 hover:bg-green-400"
-                                style="border-color: #39A900;"
-                                data-toggle="submenu" data-target="#submenu-nueva-entrada">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                </svg>
-                                <span class="text-sm text-white">{{ __('Nueva Entrada') }}</span>
-                                <svg class="w-4 h-4 ml-auto transition-transform transform" data-icon>
-                                    <path fill="currentColor" d="M5 8l4 4 4-4" />
-                                </svg>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span class="text-sm text-white">{{ __('Nueva Entrada') }}</span>
+                            <svg class="w-4 h-4 ml-auto transition-transform transform" data-icon>
+                                <path fill="currentColor" d="M5 8l4 4 4-4" />
+                            </svg>
                         </button>
 
                         <!-- Submenú con borde inferior y laterales -->
