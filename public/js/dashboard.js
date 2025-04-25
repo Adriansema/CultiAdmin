@@ -122,10 +122,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 // type: 'solid',
                 // opacity: 0.2
               },
+              dataLabels: {
+                enabled: true,               // Muestra siempre los valores
+                style: {
+                  fontSize: '11px',
+                  colors: ['##4F4F4F']          // Color del texto
+                },
+                offsetY: -10,                // Para que se vea por encima del marcador
+                background: {
+                  enabled: false             // Sin fondo para que se vea limpio
+                }
+              },
 
             markers: {
                 size: 4,
-              
+             
                 strokeColors: ['#4CAF50'],
                 strokeWidth: 2,
                 hover: { size: 8 }
@@ -276,11 +287,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         const selectedMock = mockData[filtroActual] || {};
 
                       renderChart({
-                          vistas: selectedMock.vistas || [],
+                           vistas: selectedMock.vistas || [],
                            usuarios: selectedMock.usuarios || 0,
-                          registrados: selectedMock.registrados || 0,
-                          activos: selectedMock.activos || 0,
-                            conectados: selectedMock.conectados || 0
+                           registrados: selectedMock.registrados || 0,
+                           activos: selectedMock.activos || 0,
+                           conectados: selectedMock.conectados || 0
 });
 
                     }

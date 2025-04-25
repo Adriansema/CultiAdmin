@@ -20,10 +20,11 @@
     {{-- Gráfica de usuarios conectados + Métricas --}}
     <div class="flex-1 p-6 overflow-y-auto">
         <section id="usuarios-conectados" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
-            <h2 class="text-xl font-bold text-[var(--color-usucone)]">Usuario Conectados</h2>
-            {{-- Gráfica --}}
+           <h2 class="text-xl font-bold text-[var(--color-usucone)]">Usuario Conectados</h2>
+           <div class="bg-white rounded-2xl p-5 shadow-sm">
+           {{-- Gráfica --}}
             <div id="chart" class="my-6"></div>
-
+            </div>
             {{-- Métricas generales --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
                 <div class="bg-gray-50 rounded-md p-4 shadow-sm">
