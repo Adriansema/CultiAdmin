@@ -16,6 +16,22 @@
 
     <!-- Styles -->
     @livewireStyles
+
+    <script>
+        (function() {
+            if (localStorage.getItem('contrastHigh') === 'true') {
+                document.documentElement.classList.add('contrast-high');
+                document.body.classList.add('contrast-high');
+            }
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.documentElement.classList.add('dark-mode');
+                document.body.classList.add('dark-mode');
+            }
+            if (localStorage.getItem('fontSize')) {
+                document.documentElement.style.fontSize = localStorage.getItem('fontSize') + 'px';
+            }
+        })();
+    </script>
 </head>
 
 <body class="flex flex-col h-screen overflow-hidden font-sans antialiased">
@@ -55,6 +71,9 @@
     @stack('modals')
     @livewireScripts
     @yield('scripts')
+
+    <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
+
 
 </body>
 

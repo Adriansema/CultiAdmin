@@ -38,3 +38,71 @@
     --color-nuevaentrada: #39A900 ;
   }
 }
+
+//resource/css/app.css
+
+//accesibilidad.blade.php
+/* Estilo para Contraste Alto */
+.contrast-high {
+    background-color: black;
+    color: grey;
+    font-size: 1.2em; /* Aumenta el tamaño de la fuente */
+    line-height: 1.5; /* Aumenta el espacio entre líneas */
+    font-family: Arial, sans-serif; /* Cambia la fuente a Arial */
+    font-weight: bold; /* Hace el texto más grueso */
+    text-shadow: 1px 1px 2px black; /* Añade sombra al texto */
+}
+
+
+/* Estilo para Modo Oscuro */
+.dark-mode {
+    background-color: #121212;
+    color: white;
+    font-size: 1.2em; /* Aumenta el tamaño de la fuente */
+    line-height: 1.5; /* Aumenta el espacio entre líneas */
+    font-family: Arial, sans-serif; /* Cambia la fuente a Arial */
+    font-weight: bold; /* Hace el texto más grueso */
+    text-shadow: 1px 1px 2px black; /* Añade sombra al texto */
+    border-radius: 5px; /* Bordes redondeados */
+    padding: 10px; /* Espacio interno */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra alrededor del contenedor */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transición suave */
+}
+
+/* Otros ajustes posibles para contraste alto */
+.contrast-high a {
+    color: purple;
+    text-decoration: underline; /* Subraya los enlaces */
+}
+
+/* Estilos para el tamaño de fuente, si es necesario */
+html {
+    font-size: 16px;
+}
+
+//Cetro de ayuda/index.blade.php
+.faq-item {
+    transition: all 0.3s ease-in-out;
+    opacity: 1;
+    max-height: 1000px;
+    overflow: hidden;
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: var(--color-gris1);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: var(--color-usucone);
+
+}
+.faq-item.hide {
+    opacity: 0;
+    max-height: 0;
+    padding: 0;
+    margin: 0;
+}
+
