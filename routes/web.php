@@ -93,11 +93,10 @@ Route::middleware([
         Route::get('view-user/{id}/historial', [ViewUserController::class, 'historial'])->name('view-user.historial');
 
         //Centro de Ayuda de la Aplicación___ routes/web.php
-        Route::get('/ayuda', [CentroAyudaController::class, 'index'])->name('centroAyuda.index');
         Route::get('/centro-ayuda', [CentroAyudaController::class, 'index'])->name('centroAyuda.index');
         Route::get('/search-faq', [CentroAyudaController::class, 'searchFaq'])->name('search.faq');
-        Route::post('/contact-submit', [CentroAyudaController::class, 'submitContact'])->name('contact.submit');
-
+        Route::get('/centro-ayuda/contacto', [CentroAyudaController::class, 'showContactForm'])->name('centroAyuda.contactForm');
+        Route::post('/centro-ayuda/contact-submit', [CentroAyudaController::class, 'submitContact'])->name('contact.submit');
         //Acesibilidad de la Aplicación
         Route::get('/accesibilidad', [AccesibilidadController::class, 'index'])->name('accesibilidad.index');
 

@@ -109,14 +109,4 @@
             <a href="https://tuapp.com/ayuda/historial" target="_blank" class="text-blue-600 underline">Historial de Actividades</a>.
         </p>
     </div>
-
-    <!-- Nota final -->
-    <div class="p-4 mt-12 bg-gray-100 rounded">
-        <p class="text-gray-700">
-            Esta guía está en constante actualización para asegurar que siempre tengas la mejor referencia posible.
-            Si tienes sugerencias de mejora, por favor contáctanos en:
-            <a href="mailto:andresconde45678@gmail.com" class="text-blue-600 underline">andresconde45678@gmail.com</a>.
-        </p>
-    </div>
-
 </div>
