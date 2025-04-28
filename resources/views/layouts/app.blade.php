@@ -51,7 +51,7 @@
         </div>
 
         <!-- Contenido principal -->
-        <div class="flex flex-col flex-1 overflow-hidden bg-gray-100">
+        <div class="flex flex-col flex-1 overflow-hidden bg-gray-2">
 
             @if (isset($header))
             <header class="px-4 py-6 bg-white shadow">
