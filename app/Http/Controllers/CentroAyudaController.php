@@ -11,8 +11,10 @@ class CentroAyudaController extends Controller
 {
     public function index()
     {
-        return view('centroAyuda.index');
+        $faqs = Faq::all();
+        return view('centroAyuda.index', compact('faqs'));
     }
+
 
     // Función para manejar la búsqueda de preguntas frecuentes
     public function searchFaq(Request $request)
@@ -39,6 +41,11 @@ class CentroAyudaController extends Controller
         // Este método podría usarse para mostrar un FAQ individual (opcional)
         $faq = Faq::findOrFail($id);
         return view('centroAyuda.show', compact('faq'));
+    }
+
+    public function showContactForm()
+    {
+        return view('centroAyuda.contactForm');
     }
 
     public function submitContact(Request $request)

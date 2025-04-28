@@ -1,8 +1,7 @@
-<div class="accordion" id="faqAccordion">
+<div class="mt-4 space-y-4 accordion" id="faqAccordion faq-list">
     <!-- FAQ: Preguntas Frecuentes -->
-
     <div class="faq-item" data-question="registro producto">
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class="p-4 bg-gray-200 rounded-lg">
             <h3 class="text-xl font-semibold">¿Cómo registro un nuevo producto en la plataforma?</h3>
             <p class="text-gray-600">
                 Para registrar un nuevo producto:
@@ -12,14 +11,14 @@
                 <li>Haz clic en <em>"Guardar"</em>.</li>
             </ul>
             Puedes ver un tutorial detallado
-            <a href="https://tuapp.com/tutoriales/registro-producto" target="_blank"
+            <a href="https://www.youtube.com/watch?v=n9DmdAwUbxc" target="_blank"
                 class="text-blue-600 underline">aquí</a>.
             </p>
         </div>
     </div>
 
     <div class="faq-item" data-question="roles usuarios">
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class="p-4 bg-gray-200 rounded-lg">
             <h3 class="text-xl font-semibold">¿Cómo asigno roles a los usuarios?</h3>
             <p class="text-gray-600">
                 Para asignar un rol a un usuario:
@@ -30,13 +29,13 @@
                 <li>No olvides hacer clic en <em>"Actualizar"</em> para guardar los cambios.</li>
             </ul>
             Más información sobre roles y permisos
-            <a href="https://tuapp.com/ayuda/roles-permisos" target="_blank" class="text-blue-600 underline">aquí</a>.
+            <a href="https://www.youtube.com/watch?v=VukvyP-Ceqw" target="_blank" class="text-blue-600 underline">aquí</a>.
             </p>
         </div>
     </div>
 
     <div class="faq-item" data-question="estado pendiente productos">
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class="p-4 bg-gray-200 rounded-lg">
             <h3 class="text-xl font-semibold">¿Qué significa el estado "Pendiente" en los productos?</h3>
             <p class="text-gray-600">
                 El estado "Pendiente" indica que el producto aún no ha sido validado por un Operador:
@@ -45,14 +44,14 @@
                 <li>Está a la espera de revisión y aprobación o rechazo.</li>
             </ul>
             Consulta el proceso de validación
-            <a href="https://tuapp.com/ayuda/validacion-productos" target="_blank"
+            <a href="https://www.youtube.com/watch?v=JcD6uCqxK_U" target="_blank"
                 class="text-blue-600 underline">aquí</a>.
             </p>
         </div>
     </div>
 
     <div class="faq-item" data-question="editar producto existente">
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class="p-4 bg-gray-200 rounded-lg">
             <h3 class="text-xl font-semibold">¿Cómo edito un producto ya registrado?</h3>
             <p class="text-gray-600">
                 Para editar un producto existente:
@@ -62,13 +61,13 @@
                 <li>Modifica los campos necesarios y guarda los cambios presionando <em>"Actualizar"</em>.</li>
             </ul>
             Consulta la guía completa de edición de productos
-            <a href="https://tuapp.com/ayuda/editar-producto" target="_blank" class="text-blue-600 underline">aquí</a>.
+            <a href="https://www.youtube.com/watch?v=aQg1yGaBLW8" target="_blank" class="text-blue-600 underline">aquí</a>.
             </p>
         </div>
     </div>
 
     <div class="faq-item" data-question="reactivar producto desactivado">
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class="p-4 bg-gray-200 rounded-lg">
             <h3 class="text-xl font-semibold">¿Cómo reactivo un producto que fue desactivado?</h3>
             <p class="text-gray-600">
                 Si necesitas reactivar un producto:
@@ -78,14 +77,14 @@
                 <li>Haz clic en el botón <em>Reactivar</em> junto al producto que deseas volver a habilitar.</li>
             </ul>
             Conoce más sobre la gestión de productos activos e inactivos
-            <a href="https://tuapp.com/ayuda/reactivar-producto" target="_blank"
+            <a href="https://www.youtube.com/watch?v=4gttn-m_Yqg" target="_blank"
                 class="text-blue-600 underline">aquí</a>.
             </p>
         </div>
     </div>
 
     <div class="faq-item" data-question="eliminar producto permanentemente">
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class="p-4 bg-gray-200 rounded-lg">
             <h3 class="text-xl font-semibold">¿Puedo eliminar un producto de forma permanente?</h3>
             <p class="text-gray-600">
                 Sí, pero ten en cuenta:
@@ -95,14 +94,14 @@
                 <li>La acción no se puede deshacer, asegúrate de estar completamente seguro antes de confirmar.</li>
             </ul>
             Aprende sobre las políticas de eliminación
-            <a href="https://tuapp.com/ayuda/eliminar-producto" target="_blank"
+            <a href="https://www.youtube.com/watch?v=BTJcvDIQxN0" target="_blank"
                 class="text-blue-600 underline">aquí</a>.
             </p>
         </div>
     </div>
 
     <div class="faq-item" data-question="cambiar rol usuario existente">
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class="p-4 bg-gray-200 rounded-lg">
             <h3 class="text-xl font-semibold">¿Cómo cambio el rol de un usuario ya registrado?</h3>
             <p class="text-gray-600">
                 Para modificar el rol de un usuario:
@@ -112,13 +111,13 @@
                 <li>En el formulario de edición, cambia el rol en la sección correspondiente y guarda los cambios.</li>
             </ul>
             Puedes ver una guía paso a paso
-            <a href="https://tuapp.com/ayuda/cambiar-rol" target="_blank" class="text-blue-600 underline">aquí</a>.
+            <a href="https://www.youtube.com/watch?v=HSeGs1PgHdo&t=1641s" target="_blank" class="text-blue-600 underline">aquí</a>.
             </p>
         </div>
     </div>
 
     <div class="faq-item" data-question="registrar nuevo producto">
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class="p-4 bg-gray-200 rounded-lg">
             <h3 class="text-xl font-semibold">¿Cómo registro un nuevo producto?</h3>
             <p class="text-gray-600">
                 Para agregar un nuevo producto al sistema:
@@ -128,13 +127,13 @@
                 <li>Haz clic en <em>Guardar</em> para registrar el nuevo producto.</li>
             </ul>
             Descubre recomendaciones para crear productos exitosos
-            <a href="https://tuapp.com/ayuda/crear-producto" target="_blank" class="text-blue-600 underline">aquí</a>.
+            <a href="https://www.youtube.com/watch?v=bk6Xst6euQk" target="_blank" class="text-blue-600 underline">aquí</a>.
             </p>
         </div>
     </div>
 
     <div class="faq-item" data-question="desactivar usuario temporalmente">
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class="p-4 bg-gray-200 rounded-lg">
             <h3 class="text-xl font-semibold">¿Cómo desactivo temporalmente a un usuario?</h3>
             <p class="text-gray-600">
                 Para suspender un usuario sin eliminarlo:
@@ -144,14 +143,14 @@
                 <li>El usuario permanecerá inactivo hasta que decidas reactivarlo.</li>
             </ul>
             Lee más sobre control de acceso de usuarios
-            <a href="https://tuapp.com/ayuda/desactivar-usuario" target="_blank"
+            <a href="https://www.youtube.com/watch?v=wmLglB2S-h0o" target="_blank"
                 class="text-blue-600 underline">aquí</a>.
             </p>
         </div>
     </div>
 
     <div class="faq-item" data-question="ver historial producto">
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class="p-4 bg-gray-200 rounded-lg">
             <h3 class="text-xl font-semibold">¿Dónde veo el historial de cambios de un producto?</h3>
             <p class="text-gray-600">
                 Puedes consultar el historial de un producto:
@@ -161,14 +160,14 @@
                 <li>Allí verás registros de ediciones, cambios de estado, y movimientos recientes.</li>
             </ul>
             Aprende más sobre auditorías de productos
-            <a href="https://tuapp.com/ayuda/historial-producto" target="_blank"
+            <a href="https://www.youtube.com/watch?v=c0-hvjV2A5Y" target="_blank"
                 class="text-blue-600 underline">aquí</a>.
             </p>
         </div>
     </div>
 
     <div class="faq-item" data-question="recuperar usuario desactivado">
-        <div class="p-4 bg-gray-100 rounded-lg">
+        <div class="p-4 bg-gray-200 rounded-lg">
             <h3 class="text-xl font-semibold">¿Cómo recupero un usuario desactivado?</h3>
             <p class="text-gray-600">
                 Para reactivar un usuario previamente suspendido:
@@ -178,7 +177,7 @@
                 <li>Presiona <em>Reactivar</em> en el usuario deseado.</li>
             </ul>
             Encuentra instrucciones detalladas
-            <a href="https://tuapp.com/ayuda/reactivar-usuario" target="_blank"
+            <a href="https://www.youtube.com/watch?v=H_rBR8FeFlA" target="_blank"
                 class="text-blue-600 underline">aquí</a>.
             </p>
         </div>
