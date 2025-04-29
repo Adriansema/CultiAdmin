@@ -48,16 +48,16 @@
     <section id="usuarios-conectados" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
         
         <!-- Agrupamos el icono y el texto en un div flex -->
-        <div class="flex items-center space-x-2 mb-2">
+        <div class="flex items-center space-x-2 mb-3">
     <!-- Fondo circular para el icono -->
-    <div class="bg-[var(--color-ICONOESTA)] p-0 rounded-full">
+    <div class="bg-[var(--color-ICONOESTA)]  p-0 rounded-full relative -top-1">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16l5-5 3 3 7-7M5 h12" />
         </svg>
     </div>
 
             <!-- Título -->
-            <h2 class="text-xl font-bold text-[var(--color-usucone)]">Usuarios Conectados</h2>
+            <h2 class="text-xl font-bold text-[var(--color-usucone)] -mt-3" >Usuarios Conectados</h2>
         </div>
 
         <div class="p-5 bg-white shadow-sm rounded-2xl">
@@ -66,33 +66,69 @@
         </div>
             {{-- Métricas generales --}}
             <div class="grid grid-cols-1 gap-6 mt-8 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="p-4 rounded-md shadow-sm bg-gray-50">
+                <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
+                        <!-- Ícono en la esquina superior derecha -->
+                        <div class="absolute top-3 right-3 bg-[var(--color-iconos)] p-2 rounded-full">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.121 17.804A9.97 9.97 0 0112 15c2.21 0 4.244.717 5.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                      </div>
+                    
                     <h3 class="text-sm text-gray-600">Usuarios</h3>
                     <p id="users-count" class="text-2xl font-bold text-gray-800">0</p>
                     <p id="users-change" class="text-sm text-green-600">+0% más que ayer</p>
-                </div>
-
-                <div class="p-4 rounded-md shadow-sm bg-gray-50">
-                    <h3 class="text-sm text-gray-600">Registrados</h3>
-                    <p id="registered-count" class="text-2xl font-bold text-gray-800">0</p>
-                    <p id="registered-change" class="text-sm text-green-600">+0% más que ayer</p>
                     <p id="registered-percent" class="text-sm text-gray-500">0% de los usuarios</p>
-                </div>
+                </div>  
 
-                <div class="p-4 rounded-md shadow-sm bg-gray-50">
-                    <h3 class="text-sm text-gray-600">Activos</h3>
-                    <p id="active-count" class="text-2xl font-bold text-gray-800">0</p>
-                    <p id="active-change" class="text-sm text-green-600">+0% más que ayer</p>
-                    <p id="active-percent" class="text-sm text-gray-500">0% de los usuarios</p>
-                </div>
+                {{-- Registrados --}}
+           <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
+             
+              <div class="absolute top-3 right-3 bg-[var(--color-iconos3)] p-2 rounded-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                             d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-4.5 6A6.5 6.5 0 1117 8.5a6.48 6.48 0 01-6.5 6.5z" />
+                      </svg>
+             </div>
+        
+                  <div class="p-4 rounded-md shadow-sm bg-gray-50">
+                       <h3 class="text-sm text-gray-600">Registrados</h3>
+                        <p id="registered-count" class="text-2xl font-bold text-gray-800">0</p>
+                        <p id="registered-change" class="text-sm text-green-600">+0% más que ayer</p>
+                        <p id="registered-percent" class="text-sm text-gray-500">0% de los usuarios</p>
+                   </div>
+         </div>
 
-                <div class="p-4 rounded-md shadow-sm bg-gray-50">
-                    <h3 class="text-sm text-gray-600">Conectados</h3>
-                    <p id="connected-count" class="text-2xl font-bold text-gray-800">0</p>
-                    <p id="connected-change" class="text-sm text-green-600">+0% más que ayer</p>
-                    <p id="connected-percent" class="text-sm text-gray-500">0% de los usuarios</p>
-                </div>
-            </div>
+
+
+                 <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
+                 <!-- Ícono -->
+                      <div class="absolute top-3 right-3 bg-[var(--color-iconos2)] p-2 rounded-full">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M13 10V3L4 14h7v7l9-11h-7z" />
+                         </svg>
+                     </div>
+
+                           <h3 class="text-sm text-gray-600">Activos</h3>
+                           <p id="active-count" class="text-2xl font-bold text-gray-800">0</p>
+                           <p id="active-change" class="text-sm text-green-600">+0% más que ayer</p>
+                           <p id="active-percent" class="text-sm text-gray-500">0% de los usuarios</p>
+                     </div>
+
+                          <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
+                             <!-- Ícono -->
+                             <div class="absolute top-3 right-3 bg-[var(--color-iconos4)] p-2 rounded-full">
+                                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                       d="M3 9l9 6 9-6M3 15l9 6 9-6M3 3l9 6 9-6" />
+                                      </svg>
+                             </div>
+
+                           <h3 class="text-sm text-gray-600">Conectados</h3>
+                           <p id="connected-count" class="text-2xl font-bold text-gray-800">0</p>
+                           <p id="connected-change" class="text-sm text-green-600">+0% más que ayer</p>
+                           <p id="connected-percent" class="text-sm text-gray-500">0% de los usuarios</p>
+                   </div>
         </section>
 </main>
 <div class="flex-1 p-6 overflow-y-auto">
