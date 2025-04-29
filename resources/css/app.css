@@ -110,3 +110,12 @@ html {
     --color-ICONOESTA: #00304D;
   }
 }
+
+@layer base {
+  :root {
+    --color-iconos: #00304D;
+    --color-iconos2: #287800 ;
+    --color-iconos3: #5C1759;
+    --color-iconos4: #39A900;
+  }
+}
