@@ -4,49 +4,59 @@
     <div class="fixed flex flex-col w-64 h-screen text-white shadow-lg" style="background-color: #00304D;">
 
         <!-- Logo -->
-        <div class="flex items-center justify-center p-4">
-            <a href="{{ route('dashboard') }}">
-                <x-application-mark class="w-auto h-9" />
+        <div class="flex items-center justify-center p-1 w-72">
+            <a href="{{ route('dashboard') }}" class="flex items-center justify-center w-full">
+                <x-application-mark class="w-32 h-auto" />
             </a>
         </div>
 
         @role('administrador')
         <!-- Navigation Links -->
-        <nav class="flex flex-col flex-1 px-4 py-6 space-y-4 overflow-y-auto">
-            <div class="px-6 py-1">
+        <nav class="flex flex-col flex-1 px-4 py-0.5 space-y-4 overflow-y-auto">
+            <div class="py-1 px-7">
                 <!-- "px significa padding horizontal (izquierda y derecha)" -->
                 <!-- "py significa padding vertical (arriba y abajo)" -->
                 <div class="flex-1 space-y-2">
                     <div class="space-y-1">
                         <!-- Botón con borde superior y laterales -->
                         <button type="button"
-                            class="flex items-center w-full px-4 py-2 font-medium transition bg-green-600 border-t-2 rounded-full border-x-2 hover:bg-green-800"
-                            style="border-color: #39A900;" data-toggle="submenu" data-target="#submenu-nueva-entrada">
-                            <svg class="w-5 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                            </svg>
+                            class="flex items-center w-full px-4 py-2 font-medium transition bg-[#39A900] border-transparent rounded-full border-x-2 hover:bg-[#61BA33]"
+                            data-toggle="submenu" data-target="#submenu-nueva-entrada">
+                            <img src="{{ asset('images/signo.svg') }}" alt="Signo del (+)" class="w-3 h-3 mr-2" />
                             <span class="text-sm text-white">{{ __('Nueva Entrada') }}</span>
-                            <svg class="w-4 h-4 ml-auto transition-transform transform" data-icon>
-                                <path fill="currentColor" d="M5 8l4 4 4-4" />
-                            </svg>
+                            <img src="{{ asset('images/flecha.svg') }}" alt="Flecha"
+                                class="w-3 h-3 ml-auto transition-transform transform" data-icon />
                         </button>
 
                         <!-- Submenú con borde inferior y laterales -->
                         <div id="submenu-nueva-entrada"
-                            class="hidden pl-0 mt-1 space-y-0 border-b-2 rounded-b-3xl border-x-2"
-                            style="border-color: #228B22;">
-                            <a href="/nueva-entrada/cultivo"
-                                class="block px-3 py-2 text-sm text-center text-white rounded-full hover:bg-green-500">
-                                {{ __('Cultivos') }}
-                            </a>
-                            <a href="/nueva-entrada/boletin"
-                                class="block px-3 py-2 text-sm text-center text-white rounded-full hover:bg-green-500">
-                                {{ __('Boletines') }}
-                            </a>
+                            class="hidden pl-0 mt-0 space-y-0 border-b-2 rounded-b-3xl border-x-2"
+                            style="border-color: #39A900;">
+                            <x-responsive-nav-link href="{{ route('dashboard') }}"
+                                :active="request()->routeIs('dashboard')"
+                                class="flex items-center px-3 py-2 text-sm text-gray-400 border-2 border-transparent rounded-full hover:bg-[#39A900] hover:text-[#ffffff] transition-all duration-75">
+                                <div class="relative flex justify-center w-full">
+                                    <img src="{{ asset('images/hoja.svg') }}" alt="Boletines"
+                                        class="absolute left-0 w-4 h-4 ml-2 -translate-y-1/2 top-1/2" />
+                                    <span class="text-center">
+                                        {{ __(' Cultivos ') }}
+                                    </span>
+                                </div>
+                            </x-responsive-nav-link>
+
+                            <x-responsive-nav-link href="{{ route('dashboard') }}"
+                                :active="request()->routeIs('dashboard')"
+                                class="flex items-center px-3 py-2 text-sm text-gray-400 rounded-full border-2 border-transparent hover:bg-[#39A900] hover:text-[#ffffff] transition-all duration-300">
+                                <div class="relative flex justify-center w-full">
+                                    <img src="{{ asset('images/form.svg') }}" alt="Boletines"
+                                        class="absolute left-0 w-4 h-4 ml-2 -translate-y-1/2 top-1/2" />
+                                    <span class="text-center">
+                                        {{ __(' Boletines ') }}
+                                    </span>
+                                </div>
+                            </x-responsive-nav-link>
                         </div>
                     </div>
-
                 </div>
             </div>
 
@@ -54,21 +64,11 @@
                 <div class="flex-1 space-y-3">
                     <div class="space-y-3">
                         <!-- Panel -->
-                        <x-responsive-nav-link
-                            href="{{ route('dashboard') }}"
-                            :active="request()->routeIs('dashboard')"
+                        <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')"
                             class="flex items-center px-3 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] group">
 
                             <!-- Ícono de casa -->
-                            <svg class="w-5 h-5 mr-2 transition
-                                {{ request()->routeIs('dashboard')
-                                    ? 'text-gray-100'
-                                    : 'text-green-50' }}"
-                                fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h5m4 0h5a1 1 0 001-1V10" />
-                            </svg>
+                            <img src="{{ asset('images/casa.svg') }}" alt="Inicio" class="w-5 h-5 mr-2" />
 
                             <!-- Texto -->
                             <span class="text-sm transition
@@ -79,51 +79,32 @@
                             </span>
                         </x-responsive-nav-link>
 
-
-
                         <button type="button"
                             class="flex items-center w-full px-3 py-2 font-medium transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]"
                             data-toggle="submenu" data-target="#submenu-productos">
-                            <svg class="w-5 h-5 mr-2 transition-colors text-green-50 group-hover:text-green-900"
-                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 13c-1.5-3-5-4-9-4 0 6 3 9 6 9s3-3 3-5zm0 0c1.5-3 5-4 9-4 0 6-3 9-6 9s-3-3-3-5z" />
-                                <line x1="12" y1="13" x2="12" y2="21" stroke="currentColor" stroke-linecap="round" />
-                            </svg>
+                            <img src="{{ asset('images/plant.svg') }}" alt="Cultivos" class="w-5 h-5 mr-2" />
                             <span class="text-sm text-white">{{ __('Cultivos') }}</span>
-                            <svg class="w-4 h-4 ml-auto transition-transform transform" data-icon>
-                                <path fill="currentColor" d="M5 8l4 4 4-4" />
-                            </svg>
+                            <img src="{{ asset('images/flecha.svg') }}" alt="Flecha"
+                                class="w-3 h-3 ml-auto transition-transform transform" data-icon />
                         </button>
 
                         <div id="submenu-productos" class="hidden mt-1 ml-6 space-y-1">
                             <x-responsive-nav-link href="{{ route('productos.cafe') }}"
-                                class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#39A900] transition-all duration-300">
+                                class="flex items-center px-3 py-2 text-sm text-gray-400 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#ffffff] transition-all duration-300">
 
-                                <!-- Icono de café -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 21h8M12 3v18m9-9a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-
+                                <!-- Icono de flechita -->
+                                <img src="{{ asset('images/flechita.svg') }}" alt="Café" class="w-4 h-4 mr-2.5" />
                                 <span>{{ __('Café') }}</span>
                             </x-responsive-nav-link>
 
                             <x-responsive-nav-link href="{{ route('productos.mora') }}"
-                                class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#39A900] transition-all duration-100">
+                                class="flex items-center px-3 py-2 text-sm text-gray-400 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#ffffff] transition-all duration-100">
 
-                                <!-- Icono de mora (usaré uno genérico de fruta por ahora) -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14l-4-4h8l-4 4z" />
-                                </svg>
+                                <!-- Icono de flechita -->
+                                <img src="{{ asset('images/flechita.svg') }}" alt="Café" class="w-4 h-4 mr-2.5" />
 
                                 <span>{{ __('Mora') }}</span>
                             </x-responsive-nav-link>
-
                         </div>
                     </div>
 
@@ -132,41 +113,29 @@
                         <button type="button"
                             class="flex items-center w-full px-3 py-2 font-medium transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]"
                             data-toggle="submenu" data-target="#submenu-boletines">
-                            <svg class="w-5 h-5 mr-2 text-blue-50" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M8 7V5a2 2 0 012-2h6a2 2 0 012 2v10a2 2 0 01-2 2H14m-6 0a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v10a2 2 0 01-2 2H8z" />
-                            </svg>
+
+                            <img src="{{ asset('images/files.svg') }}" alt="Boletines" class="w-5 h-5 mr-2" />
 
                             <span class="text-sm text-white">{{ __('Boletines') }}</span>
-                            <svg class="w-4 h-4 ml-auto transition-transform transform" data-icon>
-                                <path fill="currentColor" d="M5 8l4 4 4-4" />
-                            </svg>
+                            <img src="{{ asset('images/flecha.svg') }}" alt="Flecha"
+                                class="w-3 h-3 ml-auto transition-transform transform" data-icon />
                         </button>
 
                         <div id="submenu-boletines" class="hidden mt-1 ml-6 space-y-1">
                             <x-responsive-nav-link href="{{ route('productos.cafe') }}"
-                                class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#39A900] transition-all duration-300">
+                                class="flex items-center px-3 py-2 text-sm text-gray-400 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#ffffff] transition-all duration-300">
 
-                                <!-- Icono de café -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 21h8M12 3v18m9-9a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                                <!-- Icono de flechita-->
+                                <img src="{{ asset('images/flechita.svg') }}" alt="Café" class="w-4 h-4 mr-2.5" />
 
                                 <span>{{ __('Café') }}</span>
                             </x-responsive-nav-link>
 
                             <x-responsive-nav-link href="{{ route('productos.mora') }}"
-                                class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#39A900] transition-all duration-300">
+                                class="flex items-center px-3 py-2 text-sm text-gray-400 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#ffffff] transition-all duration-300">
 
-                                <!-- Icono de mora (usaré uno genérico de fruta por ahora) -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14l-4-4h8l-4 4z" />
-                                </svg>
+                                <!-- Icono de flechita -->
+                                <img src="{{ asset('images/flechita.svg') }}" alt="Café" class="w-4 h-4 mr-2.5" />
 
                                 <span>{{ __('Mora') }}</span>
                             </x-responsive-nav-link>
@@ -187,37 +156,14 @@
                         :active="request()->routeIs('usuarios.*')"
                         class="block px-3 py-2 text-sm text-gray-600 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] group">
 
-                        <span class="relative inline-flex items-center mr-2">
-                            <!-- Ícono "+" -->
-                            <svg class="absolute w-2.5 h-3 translate-x-1 -left-3 transition
-                                {{ request()->routeIs('usuarios.*')
-                                    ? 'text-gray-100'
-                                    : 'text-purple-50 ' }}"
-                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                            </svg>
-
-                            <!-- Ícono de dos usuarios -->
-                            <svg class="w-3.5 h-3 transition
-                                {{ request()->routeIs('usuarios.*')
-                                    ? 'text-gray-100'
-                                    : 'text-purple-50 ' }}"
-                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M17 20v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" />
-                                <circle cx="9" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" />
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M23 20v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
-                            </svg>
-                        </span>
-
-                        <!-- Texto -->
-                        <span class="text-sm transition
-                            {{ request()->routeIs('usuarios.*')
-                                ? 'text-gray-100'
-                                : 'text-white ' }}">
-                            {{ __('Gestión de Usuarios') }}
-                        </span>
+                        <!-- Ícono de dos usuarios -->
+                        <div class="relative flex justify-center w-full">
+                            <img src="{{ asset('images/add.svg') }}" alt="Boletines"
+                                class="absolute left-0 w-4 h-4 ml-0 -translate-y-2/3 top-2/3" />
+                            <span class="text-center text-white">
+                                {{ __(' Gestion de Usuarios ') }}
+                            </span>
+                        </div>
                     </x-responsive-nav-link>
 
 
@@ -226,26 +172,25 @@
                         :active="request()->routeIs('accesibilidad')"
                         class="block px-3 py-2 text-sm text-gray-600 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]">
                         <!-- Ícono de accesibilidad (persona con brazos extendidos) -->
-                        <svg class="inline w-5 h-5 mr-2 text-green-50" fill="none" stroke="currentColor"
-                            stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img"
-                            aria-labelledby="accesibilidad-icon">
-                            <title id="accesibilidad-icon">Accesibilidad de la aplicación</title>
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm-6.364 3.05a1 1 0 0 1 1.414 0l3.536 3.536a1 1 0 0 0 .707.293h1.414a1 1 0 0 0 .707-.293l3.536-3.536a1 1 0 1 1 1.414 1.414l-3.536 3.536a3 3 0 0 1-2.121.879h-1.414a3 3 0 0 1-2.121-.879L4.222 8.464a1 1 0 0 1 0-1.414zM9 20a1 1 0 0 1-1-1v-6h2v6a1 1 0 0 1-1 1zm6 0a1 1 0 0 1-1-1v-6h2v6a1 1 0 0 1-1 1z" />
-                        </svg>
-                        <span class="text-sm text-white">{{ __('Accesibilidad') }}</span>
+                        <div class="relative flex w-full justify-evenly">
+                            <img src="{{ asset('images/accesi.svg') }}" alt="Accesibilidad"
+                                class="absolute left-0 w-4 h-4 ml-0 -translate-y-2/3 top-2/3" />
+                            <span class="text-white ">
+                                {{ __(' Accesibilidad ') }}
+                            </span>
+                        </div>
                     </x-responsive-nav-link>
 
                     <!-- Boton de Centro de Ayuda -->
                     <x-responsive-nav-link href="{{ route('centroAyuda.index') }}"
                         class="block px-3 py-2 text-sm text-gray-600 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]">
-                        <svg class="inline w-5 h-5 mr-2 text-blue-50" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img"
-                            aria-label="Centro de Ayuda">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 18h.01M12 10a2 2 0 1 0-2-2m2 2v2m0 10a9 9 0 1 0 0-18 9 9 0 0 0 0 18z" />
-                        </svg>
-                        <span class="text-sm text-white">{{ __('Centro de Ayuda') }}</span>
+                        <div class="relative flex justify-center w-full">
+                            <img src="{{ asset('images/preg.svg') }}" alt="Ayuda de la aplicación"
+                                class="absolute left-0 w-4 h-4 ml-0 -translate-y-2/3 top-2/3" />
+                            <span class="text-white ">
+                                {{ __(' Centro de Ayuda ') }}
+                            </span>
+                        </div>
                     </x-responsive-nav-link>
 
                     <!-- Botón de cerrar sesión -->
@@ -254,14 +199,13 @@
                         <x-responsive-nav-link href="{{ route('logout') }}"
                             onclick="event.preventDefault(); this.closest('form').submit();"
                             class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]">
-                            <svg class="inline w-5 h-5 mr-2 text-red-50" fill="none" stroke="currentColor"
-                                stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <!-- Palito separado, ajustado para bajar un poco más -->
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v6" />
-                                <!-- Semicírculo en forma de U -->
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5.5 11a7 7 0 1 0 13 0" />
-                            </svg>
-                            <span class="text-sm text-white">{{ __('Cerrar Sesión') }}</span>
+                            <div class="relative flex justify-center w-full">
+                                <img src="{{ asset('images/off.svg') }}" alt="Cerrar Sesión"
+                                    class="absolute left-0 w-4 h-4 ml-0 -translate-y-2/3 top-2/3" />
+                                <span class="text-white ">
+                                    {{ __(' Cerrar Sesión ') }}
+                                </span>
+                            </div>
                         </x-responsive-nav-link>
                     </form>
                 </div>
