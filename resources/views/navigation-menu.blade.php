@@ -62,8 +62,8 @@
                             <!-- Ícono de casa -->
                             <svg class="w-5 h-5 mr-2 transition
                                 {{ request()->routeIs('dashboard')
-                                    ? 'text-gray-700'
-                                    : 'text-green-50 group-hover:text-gray-600' }}"
+                                    ? 'text-gray-100'
+                                    : 'text-green-50' }}"
                                 fill="none" stroke="currentColor" stroke-width="2"
                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -73,8 +73,8 @@
                             <!-- Texto -->
                             <span class="text-sm transition
                                 {{ request()->routeIs('dashboard')
-                                    ? 'text-gray-700'
-                                    : 'text-white group-hover:text-gray-600' }}">
+                                    ? 'text-gray-100'
+                                    : 'text-white' }}">
                                 {{ __('Inicio') }}
                             </span>
                         </x-responsive-nav-link>
@@ -191,8 +191,8 @@
                             <!-- Ícono "+" -->
                             <svg class="absolute w-2.5 h-3 translate-x-1 -left-3 transition
                                 {{ request()->routeIs('usuarios.*')
-                                    ? 'text-gray-700'
-                                    : 'text-purple-50 group-hover:text-gray-700' }}"
+                                    ? 'text-gray-100'
+                                    : 'text-purple-50 ' }}"
                                 fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                             </svg>
@@ -200,8 +200,8 @@
                             <!-- Ícono de dos usuarios -->
                             <svg class="w-3.5 h-3 transition
                                 {{ request()->routeIs('usuarios.*')
-                                    ? 'text-gray-700'
-                                    : 'text-purple-50 group-hover:text-gray-700' }}"
+                                    ? 'text-gray-100'
+                                    : 'text-purple-50 ' }}"
                                 fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M17 20v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" />
@@ -214,8 +214,8 @@
                         <!-- Texto -->
                         <span class="text-sm transition
                             {{ request()->routeIs('usuarios.*')
-                                ? 'text-gray-700'
-                                : 'text-white group-hover:text-gray-700' }}">
+                                ? 'text-gray-100'
+                                : 'text-white ' }}">
                             {{ __('Gestión de Usuarios') }}
                         </span>
                     </x-responsive-nav-link>
