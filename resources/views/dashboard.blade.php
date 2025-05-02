@@ -69,84 +69,117 @@
                 <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
                         <!-- Ícono en la esquina superior derecha -->
                         <div class="absolute top-3 right-3 bg-[var(--color-iconos)] p-2 rounded-full">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.121 17.804A9.97 9.97 0 0112 15c2.21 0 4.244.717 5.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
+                          <img src="{{asset('images/Icon.svg') }}" alt="usuario">
                       </div>
                     
-                    <h3 class="text-sm text-gray-600">Usuarios</h3>
-                    <p id="users-count" class="text-2xl font-bold text-gray-800">0</p>
-                    <p id="users-change" class="text-sm text-green-600">+0% más que ayer</p>
-                    <p id="registered-percent" class="text-sm text-gray-500">0% de los usuarios</p>
+                    <h3 class="text-2xl text-[var(--color-iconos)]">Usuarios</h3>
+                    <p id="users-count" class="text-3xl font-bold text-gray-800">0</p>
+                    <p id="registered-percent" class="text-sm text-gray-800">0% de los usuarios</p>
                 </div>  
 
                 {{-- Registrados --}}
-           <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
-             
-              <div class="absolute top-3 right-3 bg-[var(--color-iconos3)] p-2 rounded-full">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                             d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-4.5 6A6.5 6.5 0 1117 8.5a6.48 6.48 0 01-6.5 6.5z" />
-                      </svg>
-             </div>
-        
-                  <div class="p-4 rounded-md shadow-sm bg-gray-50">
-                       <h3 class="text-sm text-gray-600">Registrados</h3>
-                        <p id="registered-count" class="text-2xl font-bold text-gray-800">0</p>
-                        <p id="registered-change" class="text-sm text-green-600">+0% más que ayer</p>
-                        <p id="registered-percent" class="text-sm text-gray-500">0% de los usuarios</p>
-                   </div>
-         </div>
+                <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
+    
+    <!-- Ícono en la esquina superior derecha -->
+    <div class="absolute top-3 right-3 bg-[var(--color-iconos3)] p-2 rounded-full">
+        <img src="{{asset('images/regis.svg') }}" alt="registro"> 
+    </div>
 
+    <!-- Contenido interno, sin fondo ni sombra duplicados -->
+    <div>
+        <h3 class="text-2xl text-[var(--color-iconos)]">Registrados</h3>
+        <p id="registered-count" class="text-3xl font-bold text-gray-800">0</p>
+        <p id="registered-percent" class="text-sm text-gray-800">0% de los usuarios</p>
+    </div>
 
+</div>
 
                  <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
                  <!-- Ícono -->
                       <div class="absolute top-3 right-3 bg-[var(--color-iconos2)] p-2 rounded-full">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                  d="M13 10V3L4 14h7v7l9-11h-7z" />
-                         </svg>
+                      <img src="{{asset('images/activos.svg') }}" alt="activos"> 
                      </div>
 
-                           <h3 class="text-sm text-gray-600">Activos</h3>
-                           <p id="active-count" class="text-2xl font-bold text-gray-800">0</p>
-                           <p id="active-change" class="text-sm text-green-600">+0% más que ayer</p>
-                           <p id="active-percent" class="text-sm text-gray-500">0% de los usuarios</p>
+                           <h3 class="text-2xl text-[var(--color-iconos)]">Activos</h3>
+                           <p id="active-count" class="text-3xl font-bold text-gray-800">0</p>
+                           <p id="active-percent" class="text-sm text-gray-800">0% de los usuarios</p>
                      </div>
 
                           <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
                              <!-- Ícono -->
                              <div class="absolute top-3 right-3 bg-[var(--color-iconos4)] p-2 rounded-full">
-                                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                       d="M3 9l9 6 9-6M3 15l9 6 9-6M3 3l9 6 9-6" />
-                                      </svg>
+                                   <img src="{{asset('images/conectados.svg') }}" alt="conectados"> 
                              </div>
 
-                           <h3 class="text-sm text-gray-600">Conectados</h3>
-                           <p id="connected-count" class="text-2xl font-bold text-gray-800">0</p>
-                           <p id="connected-change" class="text-sm text-green-600">+0% más que ayer</p>
-                           <p id="connected-percent" class="text-sm text-gray-500">0% de los usuarios</p>
-                   </div>
+                                 <h3 class="text-2xl text-[var(--color-iconos)]">Conectados</h3>
+                                  <p id="connected-count" class="text-3xl font-bold text-gray-800">0</p>
+                                  <p id="connected-percent" class="text-sm text-gray-800">0% de los usuarios</p>
+                         </div>
         </section>
 </main>
 <div class="flex-1 p-6 overflow-y-auto">
         {{-- Novedades y Boletines --}}
-        <section id="novedades-boletines" class="grid gap-6 mt-8 md:grid-cols-2">
+        <section id="novedades-boletines" class=" relative grid gap-6 mt-8 md:grid-cols-2">
           
-            <section id="Novedades" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">    
-                    <div id="novedades" class="p-6 bg-white rounded-lg shadow ">
-                        <!-- Aquí van las novedades -->
-                        <p class="text-gray-500">No hay novedades por ahora.</p>
-                    </div>
+        <section id="boletines" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
+             <!-- Encabezado con ícono y título -->
+                    <div class="flex items-center justify-between mb-4">
+                         <div class="flex items-center space-x-2">
+                    <div class="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--color-iconos)] text-white">
+                          <img src="{{ asset('images/campanita.svg') }}" alt="boletines" class="w-5 h-5">
+                     </div>
+                          <h2 class="text-lg font-semibold text-[var(--color-iconos)]">Mensajes</h2>
+                      </div>
+                         <x-responsive-nav-link href="{{ route('accesibilidad.index') }}"
+                                 :active="request()->routeIs('accesibilidad')"
+                                 class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]">
+                                <!-- Ícono de accesibilidad (persona con brazos extendidos) -->
+                                   <div class="relative flex w-full justify-evenly">
+                           
+                                     <span class=" text-ms">
+                                        {{ __(' ver todo ↗') }}
+                                   </span>
+                                  </div>
+                                </x-responsive-nav-link>
+                             </div>
+
+                             <!-- Lista de boletines o mensaje -->
+                         <div id="novedades" class="p-4 bg-white rounded-lg shadow">
+                              <p class="text-gray-500">No hay novedades por ahora.</p>
+                           </div>
                 </section>
+
             
-                <section id="boletines" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">    
-                    <div id="boletines" class="p-6 bg-white rounded-lg shadow">
-                        <!-- Aquí van los boletines -->
-                        <p class="text-gray-500">No hay boletines disponibles.</p>
+                <section id="boletines" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
+                            <!-- Encabezado con ícono y título -->
+                         <div class="flex items-center justify-between mb-4">
+                               <div class="flex items-center space-x-2">
+                                    <div class="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--color-iconos)] text-white">
+                                       <img src="{{ asset('images/boletin.svg') }}" alt="boletines" class="w-5 h-5">
+                                  </div>
+                                <h2 class="text-lg font-semibold text-[var(--color-iconos)]">Boletines</h2>
+                              </div>
+                      <x-responsive-nav-link href="{{ route('accesibilidad.index') }}"
+                                 :active="request()->routeIs('accesibilidad')"
+                                   class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]">
+                                  <!-- Ícono de accesibilidad (persona con brazos extendidos) -->
+                                 <div class="relative flex w-full justify-evenly">
+                            
+                                           <span class=" text-ms ">
+                                                 {{ __(' ver todo ↗') }}
+                                          </span>
+                                  </div>
+             </x-responsive-nav-link>
+       </div>
+
+                      <!-- Lista de boletines o mensaje -->
+                 <div id="novedades" class="p-4 bg-white rounded-lg shadow">
+                      <p class="text-gray-500">No hay novedades por ahora.</p>
                     </div>
+         </section>
+
+
+
                 </section>
         </section>
 </div>
