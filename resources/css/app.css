@@ -119,3 +119,9 @@ html {
     --color-iconos4: #39A900;
   }
 }
+
+@layer base {
+    :root {
+        --color-sidebarhoverbtn: #547488;
+    }
+}
