@@ -84,28 +84,7 @@
                             data-toggle="submenu" data-target="#submenu-productos">
                             <img src="{{ asset('images/plant.svg') }}" alt="Cultivos" class="w-5 h-5 mr-2" />
                             <span class="text-sm text-white">{{ __('Cultivos') }}</span>
-                            <img src="{{ asset('images/flecha.svg') }}" alt="Flecha"
-                                class="w-3 h-3 ml-auto transition-transform transform" data-icon />
                         </button>
-
-                        <div id="submenu-productos" class="hidden mt-1 ml-6 space-y-1">
-                            <x-responsive-nav-link href="{{ route('productos.cafe') }}"
-                                class="flex items-center px-3 py-2 text-sm text-gray-400 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#ffffff] transition-all duration-300">
-
-                                <!-- Icono de flechita -->
-                                <img src="{{ asset('images/flechita.svg') }}" alt="Café" class="w-4 h-4 mr-2.5" />
-                                <span>{{ __('Café') }}</span>
-                            </x-responsive-nav-link>
-
-                            <x-responsive-nav-link href="{{ route('productos.mora') }}"
-                                class="flex items-center px-3 py-2 text-sm text-gray-400 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#ffffff] transition-all duration-100">
-
-                                <!-- Icono de flechita -->
-                                <img src="{{ asset('images/flechita.svg') }}" alt="Café" class="w-4 h-4 mr-2.5" />
-
-                                <span>{{ __('Mora') }}</span>
-                            </x-responsive-nav-link>
-                        </div>
                     </div>
 
                     <!-- Boletines con submenú -->
@@ -117,30 +96,7 @@
                             <img src="{{ asset('images/files.svg') }}" alt="Boletines" class="w-5 h-5 mr-2" />
 
                             <span class="text-sm text-white">{{ __('Boletines') }}</span>
-                            <img src="{{ asset('images/flecha.svg') }}" alt="Flecha"
-                                class="w-3 h-3 ml-auto transition-transform transform" data-icon />
                         </button>
-
-                        <div id="submenu-boletines" class="hidden mt-1 ml-6 space-y-1">
-                            <x-responsive-nav-link href="{{ route('productos.cafe') }}"
-                                class="flex items-center px-3 py-2 text-sm text-gray-400 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#ffffff] transition-all duration-300">
-
-                                <!-- Icono de flechita-->
-                                <img src="{{ asset('images/flechita.svg') }}" alt="Café" class="w-4 h-4 mr-2.5" />
-
-                                <span>{{ __('Café') }}</span>
-                            </x-responsive-nav-link>
-
-                            <x-responsive-nav-link href="{{ route('productos.mora') }}"
-                                class="flex items-center px-3 py-2 text-sm text-gray-400 rounded-xl border-2 border-transparent hover:border-[#39A900] hover:text-[#ffffff] transition-all duration-300">
-
-                                <!-- Icono de flechita -->
-                                <img src="{{ asset('images/flechita.svg') }}" alt="Café" class="w-4 h-4 mr-2.5" />
-
-                                <span>{{ __('Mora') }}</span>
-                            </x-responsive-nav-link>
-
-                        </div>
                     </div>
                 </div>
             </div>
