@@ -16,11 +16,47 @@
 
         <!-- Styles -->
         @livewireStyles
+
+        <style>
+            body {
+                background-image: url('{{ asset('images/MORA 1 1.png') }}');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1rem;
+            }
+
+            .login-card {
+                background-color: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(8px);
+                border-radius: 1rem;
+                padding: 2rem;
+                width: 100%;
+                max-width: 420px;
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+            }
+
+            .login-logo {
+                display: block;
+                margin: 0 auto 1rem auto;
+                max-width: 200px;
+            }
+
+            .login-footer {
+                text-align: center;
+                margin-top: 1.5rem;
+            }
+        </style>
     </head>
     <body>
-        <div class="font-sans text-gray-900 antialiased">
-            {{ $slot }}
-        </div>
+        <main class="flex-1 p-6 overflow-y-auto">
+            @yield('content')
+        </main>
 
         @livewireScripts
     </body>

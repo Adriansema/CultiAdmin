@@ -1,4 +1,4 @@
-<div class="container py-8">
+<div class="container flex flex-col py-8">
 
     <!-- Verifica si hay un mensaje de éxito -->
     @if (session('success'))
@@ -12,9 +12,9 @@
     </div>
     @endif
 
-    <div class="p-6 text-gray-700 bg-white rounded-lg shadow-md">
-        <h1 class="mb-6 text-3xl font-bold">Contacto</h1>
-        <p class="mb-4 text-lg ">Si necesitas asistencia personalizada o tienes alguna duda que no hayas podido resolver
+    <div class="p-6 text-black bg-black shadow-md rounded-3xl">
+        <h1 class="mb-6 text-3xl font-bold text-white">Contacto</h1>
+        <p class="mb-4 text-lg text-white">Si necesitas asistencia personalizada o tienes alguna duda que no hayas podido resolver
             a través del Centro de Ayuda, no dudes en contactarnos. Nuestro equipo de soporte está aquí para ayudarte.
         </p>
 
@@ -24,22 +24,19 @@
             @csrf
 
             <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-gray-500">Nombre</label>
-                <input type="text" id="name" name="name"
+                <input type="text" id="name" name="name" placeholder="nombre"
                     class="block w-full px-4 py-2 mt-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-200"
                     required>
             </div>
 
             <div class="mb-4">
-                <label for="email" class="block text-sm font-medium text-gray-500">Correo Electrónico</label>
-                <input type="email" id="email" name="email"
+                <input type="email" id="email" name="email" placeholder="Correo Electrónico"
                     class="block w-full px-4 py-2 mt-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-200"
                     required>
             </div>
 
             <div class="mb-4">
-                <label for="message" class="block text-sm font-medium text-gray-500">Mensaje</label>
-                <textarea id="message" name="message" rows="4"
+                <textarea id="message" name="message" rows="4" placeholder="Mensaje"
                     class="block w-full px-4 py-2 mt-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-200"
                     required></textarea>
             </div>
@@ -53,9 +50,9 @@
         </form>
 
         <div class="mt-6 text-center">
-            <p class="text-gray-600">O contáctanos directamente a:</p>
-            <p class="text-blue-600">
-                <a href="mailto:andresconde45678@gmail.com">andresconde45678@gmail.com</a>
+            <p class="text-gray-200">O contáctanos directamente a:</p>
+            <p class="text-blue-600 transition duration-300 ease-in-out hover:text-green-400 hover:underline hover:font-semibold">
+                <a href="mailto:andresconde45678@gmail.com">soporteayuda2025@gmail.com</a>
             </p>
         </div>
     </div>

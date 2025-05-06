@@ -3,11 +3,21 @@
 
     <div class="fixed flex flex-col w-64 h-screen text-white shadow-lg" style="background-color: #00304D;">
 
+        <div class="flex items-center justify-between px-4 py-6 ">
         <!-- Logo -->
         <div class="flex items-center justify-center p-1 w-72">
             <a href="{{ route('dashboard') }}" class="flex items-center justify-center w-full">
                 <x-application-mark class="w-32 h-auto" />
             </a>
+        </div>
+
+            <button @click="sidebarOpen = !sidebarOpen" class="p-0 ml-0 text-white rounded hover:bg-white/10"
+                :class="!sidebarOpen && 'rotate-180 mx-auto'">
+                <svg class="w-4 h-5 transition-transform duration-300 ease-in-out hover:-translate-x-1" fill="none"
+                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
         </div>
 
         @role('administrador')

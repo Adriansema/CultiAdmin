@@ -1,4 +1,4 @@
-<footer class="w-full py-6 text-white transition-all duration-300 ease-in-out bg-black">
+{{-- <footer class="w-full py-6 text-white transition-all duration-300 ease-in-out bg-black">
     <div class="px-4 mx-auto max-w-7xl">
         <div class="flex flex-col items-start justify-between md:flex-row md:items-center">
             <div class="flex flex-col items-start mb-4 md:mb-0">
@@ -93,3 +93,4 @@
     });
     </script>
 
+ --}}

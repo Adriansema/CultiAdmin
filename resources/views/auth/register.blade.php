@@ -1,4 +1,4 @@
-<x-guest-layout>
+{{-- <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
             <x-authentication-card-logo />
@@ -29,7 +29,7 @@
 
             <!-- actualizacion 09/04/2025 -->
 
-                {{-- Campo de Contraseña --}}
+                {{-- Campo de Contraseña 
                 <div class="relative mt-4">
                     <x-label for="password" value="Contraseña" />
                     <x-input id="password" class="block w-full pr-10 mt-1" type="password" name="password" required autocomplete="new-password" />
@@ -46,7 +46,7 @@
                     </button>
                 </div>
 
-                {{-- Confirmación --}}
+                {{-- Confirmación
                 <div class="relative mt-4">
                     <x-label for="password_confirmation" value="Confirmar Contraseña" />
                     <x-input id="password_confirmation" class="block w-full pr-10 mt-1" type="password" name="password_confirmation" required autocomplete="new-password" />
@@ -109,3 +109,4 @@
         </form>
     </x-authentication-card>
 </x-guest-layout>
+ --}}

@@ -11,36 +11,7 @@ class CentroAyudaController extends Controller
 {
     public function index()
     {
-        $faqs = Faq::all();
-        return view('centroAyuda.index', compact('faqs'));
-    }
-
-
-    // Función para manejar la búsqueda de preguntas frecuentes
-    public function searchFaq(Request $request)
-    {
-        // Validamos el parámetro de búsqueda
-        $request->validate([
-            'query' => 'nullable|string|max:255', // Se valida que sea una cadena de texto
-        ]);
-
-        $searchTerm = $request->input('query');
-
-        // Si hay un término de búsqueda, lo usamos para filtrar las FAQ
-        $faqs = Faq::query()
-            ->where('question', 'like', '%' . $searchTerm . '%') // Filtramos por la pregunta
-            ->orWhere('answer', 'like', '%' . $searchTerm . '%') // También podemos filtrar por la respuesta
-            ->get();
-
-        // Devolvemos los resultados en formato JSON
-        return response()->json($faqs);
-    }
-
-    public function show($id)
-    {
-        // Este método podría usarse para mostrar un FAQ individual (opcional)
-        $faq = Faq::findOrFail($id);
-        return view('centroAyuda.show', compact('faq'));
+        return view('centroAyuda.index');
     }
 
     public function showContactForm()

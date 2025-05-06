@@ -18,7 +18,7 @@
         </p>
     </div>
 
-    <!-- Sección: Registro de Productos -->
+    {{-- <!-- Sección: Registro de Productos -->
     <div class="mb-8">
         <h3 class="mb-2 text-xl font-semibold">2. Registro de Productos</h3>
         <p>
@@ -108,5 +108,5 @@
             Más información sobre trazabilidad:
             <a href="https://tuapp.com/ayuda/historial" target="_blank" class="text-blue-600 underline">Historial de Actividades</a>.
         </p>
-    </div>
+    </div> --}}
 </div>

@@ -41,30 +41,31 @@
         <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="Logo GOV.CO" width="100px">
 
     </div>
+
     <x-banner />
 
     <div class="flex flex-1 overflow-hidden">
 
         <!-- Sidebar con scroll interno -->
-        <div class="w-64 bg-[#00304D] text-white flex-shrink-0 overflow-y-auto">
+        {{-- <div class="w-64 bg-[#00304D] text-white flex-shrink-0 overflow-y-auto">
             @livewire('navigation-menu')
-        </div>
+        </div> --}}
 
         <!-- Contenido principal -->
-        <div class="flex flex-col flex-1 overflow-hidden bg-gray-2">
+         <div class="flex flex-col flex-1 overflow-hidden bg-gray-2">
+            <x-sidebar>
+                @if (isset($header))
+                <header class="px-4 py-6 bg-white shadow">
+                    <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+                @endif
 
-            @if (isset($header))
-            <header class="px-4 py-6 bg-white shadow">
-                <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
-            @endif
-
-            <main class="flex-1 p-6 overflow-y-auto">
-                @yield('content')
-            </main>
-
+                <main class="flex-1 h-full p-6 overflow-y-auto" :class="sidebarOpen ? 'pl-64' : 'pl-16'">
+                    @yield('content')
+                </main>
+            </x-sidebar>
         </div>
     </div>
 
@@ -73,8 +74,6 @@
     @yield('scripts')
 
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
-
-
 </body>
 
 </html>

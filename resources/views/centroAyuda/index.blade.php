@@ -4,14 +4,14 @@
 <div class="container py-8 mx-auto">
     <h1 class="mb-8 text-4xl font-extrabold text-gray-800">Centro de Ayuda</h1>
 
-    @if(session('success'))
+    {{-- @if(session('success'))
     <div class="flex items-center p-4 mb-6 text-green-800 bg-green-100 border-l-4 border-green-500 rounded-lg shadow">
         <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2l4-4" />
         </svg>
         <span class="font-semibold">{{ session('success') }}</span>
     </div>
-    @endif
+    @endif --}}
 
     <!-- Barra de búsqueda -->
     <div class="flex items-center w-full max-w-2xl px-4 py-2 mx-auto mb-8 bg-gray-100 rounded-full shadow-inner">
@@ -54,87 +54,39 @@
         <div class="tab-pane fade" id="guide" role="tabpanel" aria-labelledby="guide-tab">
             @include('centroAyuda.partials.guide')
         </div>
+        <div class="flex justify-center tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+            @include('centroAyuda.partials.contact')
+        </div>
+        <div class="flex justify-center tab-pane fade" id="links" role="tabpanel" aria-labelledby="links-tab">
+            @include('centroAyuda.partials.links')
+        </div>
     </div>
 </div>
-
-<!-- Sección de footer -->
-<div class="w-full">
-    @include('centroAyuda.partials.footer')
-</div>
-
 @endsection
 
 @section('scripts')
 <script>
-    // Debounce mejorado
-let debounceTimeout;
-function debounce(callback, delay) {
-    clearTimeout(debounceTimeout);
-    debounceTimeout = setTimeout(callback, delay);
-}
+    function filterQuestions() {
+        const input = document.getElementById('search').value.toLowerCase();
+        const activeTab = document.querySelector('[role="tab"][aria-selected="true"]');
+        const activeTargetId = activeTab?.getAttribute('data-bs-target')?.replace('#', '');
+        const activePanel = document.getElementById(activeTargetId);
 
-function filterQuestions() {
-    debounce(async () => {
-        const term = encodeURIComponent(document.getElementById('search').value.trim());
-        const list = document.getElementById('faq-list');
-        if (!list) return;
+        if (!activePanel) return;
 
-        if (term === '') {
-            list.innerHTML = '<p class="text-center text-gray-400">Empieza a escribir para buscar preguntas.</p>';
-            return;
-        }
+        const questions = activePanel.querySelectorAll('.question-item');
 
-        try {
-            const response = await fetch(`/search-faq?query=${term}`);
-            const faqs = await response.json();
+        questions.forEach(question => {
+            const textContent = question.textContent.toLowerCase();
+            const dataAttr = question.getAttribute('data-question')?.toLowerCase() || '';
 
-            list.innerHTML = '';
-
-            if (faqs.length === 0) {
-                list.innerHTML = '<p class="text-center text-gray-500">No se encontraron resultados.</p>';
-                return;
+            if (textContent.includes(input) || dataAttr.includes(input)) {
+                question.style.display = '';
+            } else {
+                question.style.display = 'none';
             }
-
-            faqs.forEach(faq => {
-                const div = document.createElement('div');
-                div.className = 'p-4 bg-white rounded-lg shadow';
-                div.innerHTML = `
-                    <h3 class="mb-2 text-lg font-semibold text-gray-800">${faq.question}</h3>
-                    <p class="text-gray-600">${faq.answer}</p>
-                `;
-                list.appendChild(div);
-            });
-        } catch (error) {
-            console.error('Error al filtrar preguntas:', error);
-            list.innerHTML = '<p class="text-center text-red-500">Error al buscar preguntas.</p>';
-        }
-    }, 300);
-
-    document.getElementById('search').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        filterQuestions();
-    }
-});
-
-}
-
-
-    // Recordar pestaña activa
-    document.addEventListener('DOMContentLoaded', () => {
-        const tabs = document.querySelectorAll('button[data-bs-toggle="tab"]');
-        tabs.forEach(tab => {
-            tab.addEventListener('shown.bs.tab', e => {
-                localStorage.setItem('activeHelpTab', e.target.getAttribute('data-bs-target'));
-            });
         });
-
-        const activeTab = localStorage.getItem('activeHelpTab');
-        if (activeTab) {
-            const trigger = document.querySelector(`button[data-bs-target="${activeTab}"]`);
-            if (trigger) {
-                new bootstrap.Tab(trigger).show();
-            }
-        }
-    });
+    }
 </script>
+
 @endsection

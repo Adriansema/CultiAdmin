@@ -1,4 +1,4 @@
-@extends('layouts.login-layout')
+@extends('layouts.guest')
 
 @section('content')
     {{-- Fondo de logos superpuestos --}}
