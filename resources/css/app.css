@@ -125,3 +125,16 @@ html {
         --color-sidebarhoverbtn: #547488;
     }
 }
+
+@layer base {
+    :root {
+        --color-ajustes: #D1D1D1;
+    }
+}
+
+@layer base {
+    :root {
+        --color-profile: #F6F6F6;
+        --color-text: #F6F6F6;
+    }
+}

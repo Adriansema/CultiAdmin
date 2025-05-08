@@ -8,7 +8,7 @@
                         {{
                             $producto->estado === 'aprobado' ? 'bg-green-100 text-green-800' :
                             ($producto->estado === 'rechazado' ? 'bg-red-100 text-red-800' :
-                            'bg-yellow-100 text-yellow-800')
+                            'bg-yellow-100 text-red-800')
                         }}">
                         {{ ucfirst($producto->estado) }}
                     </span>

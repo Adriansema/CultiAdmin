@@ -1,9 +1,5 @@
 @extends('layouts.app')
 
-@section('header')
-    <h2 class="text-xl font-semibold">Elementos Pendientes</h2>
-@endsection
-
 @section('content')
 <div class="py-6 mx-auto max-w-7xl">
 
@@ -16,10 +12,10 @@
     {{-- Productos Pendientes --}}
     <div class="mb-10">
         <h3 class="mb-3 text-lg font-bold">Productos Pendientes</h3>
-        <div class="p-6 bg-white rounded shadow">
+        <div class="p-6 bg-green-100 rounded shadow">
             <table class="w-full table-auto">
                 <thead>
-                    <tr class="bg-gray-100">
+                    <tr class="bg-gray-200">
                         <th class="px-4 py-2">Nombre</th>
                         <th class="px-4 py-2">Descripción</th>
                         <th class="px-4 py-2">Imagen</th>
@@ -81,10 +77,10 @@
     {{-- Boletines Pendientes --}}
     <div>
         <h3 class="mb-3 text-lg font-bold">Boletines Pendientes</h3>
-        <div class="p-6 bg-white rounded shadow">
+        <div class="p-6 bg-green-100 rounded shadow">
             <table class="w-full table-auto">
                 <thead>
-                    <tr class="bg-gray-100">
+                    <tr class="bg-gray-200">
                         <th class="px-4 py-2">Asunto</th>
                         <th class="px-4 py-2">Contenido</th>
                         <th class="px-4 py-2">Acciones</th>

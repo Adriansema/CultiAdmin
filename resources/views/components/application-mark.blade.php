@@ -5,12 +5,12 @@
  --}}
 
 
- <div class="flex items-center justify-center w-full px-1 py-1">
+ <div class="flex items-center justify-center w-56 px-1 py-3">
     <!-- Logo completo cuando sidebar está abierto -->
     <img x-show="sidebarOpen"
          src="{{ asset('images/Loogoo.svg') }}"
          alt="Logo Completo"
-         class="w-auto h-10 transition-all duration-300" />
+         class="w-64 h-10 ml-12 transition-all duration-300" />
 
     <!-- Solo la letra C cuando sidebar está cerrado -->
     <img x-show="!sidebarOpen"

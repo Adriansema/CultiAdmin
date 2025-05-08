@@ -5,6 +5,7 @@
 namespace App\Actions\Fortify;
 
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
+use App\Providers\RouteServiceProvider;
 
 class LoginResponse implements LoginResponseContract
 {
@@ -13,14 +14,14 @@ class LoginResponse implements LoginResponseContract
         $user = $request->user();
 
         if ($user->hasRole('administrador')) {  //Ruta para el administrador
-            return redirect()->route('productos.index');
+            return redirect()->route('dashboard');
         }
 
         if ($user->hasRole('operador')) {
-            return redirect()->route('operador.pendientes'); //Ruta para el operador
+            return redirect()->route('dashboard'); //Ruta para el operador
         }
 
-        return redirect()->intended('/dashboard'); //Ruta por defecto
+        return redirect()->intended(RouteServiceProvider::HOME); //Ruta por defecto
         // Puedes personalizar la redirección según tus necesidades
     }
 }

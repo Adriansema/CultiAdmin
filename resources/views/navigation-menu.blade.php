@@ -1,29 +1,23 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
 
+    <!-- Maneja la barra lateral y da el color -->
     <div class="fixed flex flex-col w-64 h-screen text-white shadow-lg" style="background-color: #00304D;">
 
         <div class="flex items-center justify-between px-4 py-6 ">
-        <!-- Logo -->
-        <div class="flex items-center justify-center p-1 w-72">
-            <a href="{{ route('dashboard') }}" class="flex items-center justify-center w-full">
-                <x-application-mark class="w-32 h-auto" />
-            </a>
-        </div>
-
-            <button @click="sidebarOpen = !sidebarOpen" class="p-0 ml-0 text-white rounded hover:bg-white/10"
-                :class="!sidebarOpen && 'rotate-180 mx-auto'">
-                <svg class="w-4 h-5 transition-transform duration-300 ease-in-out hover:-translate-x-1" fill="none"
-                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
+            <!-- Logo de la barra lateral -->
+            <!-- Logo -->
+            <div class="flex items-center justify-center p-1 w-72">
+                <a href="{{ route('dashboard') }}" class="flex items-center justify-center w-full">
+                    <x-application-mark class="w-32 h-auto" />
+                </a>
+            </div>
         </div>
 
         @role('administrador')
         <!-- Navigation Links -->
         <nav class="flex flex-col flex-1 px-4 py-0.5 space-y-4 overflow-y-auto">
             <div class="py-1 px-7">
+                <!-- Nueva Entrada -->
                 <!-- "px significa padding horizontal (izquierda y derecha)" -->
                 <!-- "py significa padding vertical (arriba y abajo)" -->
                 <div class="flex-1 space-y-2">
@@ -71,6 +65,7 @@
             </div>
 
             <div class="py-8 px-7">
+                <!-- Panel/Cultivos/Boletines -->
                 <div class="flex-1 space-y-3">
                     <div class="space-y-3">
                         <!-- Panel -->
@@ -112,11 +107,12 @@
             </div>
 
             <div class="px-5 py-3">
+                <!-- Título de Ajuste-->
                 <div class="block px-4 py-2 text-xs text-gray-400">
                     {{ __('Ajustes') }}
                 </div>
 
-
+                <!-- Botón de Gestion de Usuario/Accesibilidad/Centro de Ayuda/Cerrar Sesión -->
                 <div class="flex-1 space-y-2.5">
                     <x-responsive-nav-link href="{{ route('usuarios.index') }}"
                         :active="request()->routeIs('usuarios.*')"
@@ -177,8 +173,7 @@
                 </div>
             </div>
 
-            {{-- Foto de perfil y nombre --}}
-            <div class="py-2">
+            <div class="py-2"> {{-- Foto de perfil y nombre --}}
                 <x-responsive-nav-link href="{{ route('profile.show') }}"
                     class="block px-3 py-2 text-sm text-gray-500 hover:bg-[var(--color-sidebarhoverbtn)] rounded-xl">
                     <div
@@ -202,6 +197,7 @@
         </nav>
 
         <script>
+            // Función para girar la flechita a 180° grados
             document.querySelectorAll('[data-toggle="submenu"]').forEach(button => {
                 button.addEventListener('click', () => {
                     const submenu = document.querySelector(button.getAttribute('data-target'));
@@ -216,7 +212,7 @@
     @endrole
 
     @role('operador')
-    <div class="px-4 py-3">
+    <div class="px-4 py-3"> {{-- Inicio --}} {{-- Validar Productos --}} {{-- Historial --}}
         <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')"
             class="flex items-center px-3 py-2 transition rounded-md hover:bg-orange-300">
             <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" stroke-width="2"
@@ -255,7 +251,7 @@
         </x-responsive-nav-link>
     </div>
 
-    <div class="px-4 py-3">
+    <div class="px-4 py-3"> {{-- Cerrar Sesion --}}
         <form method="POST" action="{{ route('logout') }}" class="mt-2">
             @csrf
             <x-responsive-nav-link href="{{ route('logout') }}"
@@ -272,8 +268,8 @@
         </form>
     </div>
 
-    {{-- Foto de perfil y nombre --}}
-    <div class="px-4 py-3">
+
+    <div class="px-4 py-3"> {{-- Foto de perfil y nombre --}}
         <div class="flex items-center space-x-3">
             <div class="text-sm font-medium text-gray-700">
                 <x-responsive-nav-link href="{{ route('profile.show') }}">

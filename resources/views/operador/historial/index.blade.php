@@ -9,13 +9,13 @@
         <ul class="flex -mb-px text-sm font-medium text-center">
             <li>
                 <a href="{{ route('operador.historial.index', array_merge(request()->except('tipo'), ['tipo' => 'producto'])) }}"
-                   class="inline-block p-4 border-b-2 {{ $tipo === 'producto' ? 'border-blue-500 text-blue-600' : 'border-transparent' }}">
+                   class="inline-block p-4 border-b-2 {{ $tipo === 'producto' ? 'border-blue-300 text-blue-700' : 'border-transparent' }}">
                     Productos
                 </a>
             </li>
             <li>
                 <a href="{{ route('operador.historial.index', array_merge(request()->except('tipo'), ['tipo' => 'boletin'])) }}"
-                   class="inline-block p-4 border-b-2 {{ $tipo === 'boletin' ? 'border-blue-500 text-blue-600' : 'border-transparent' }}">
+                   class="inline-block p-4 border-b-2 {{ $tipo === 'boletin' ? 'border-blue-300 text-blue-700' : 'border-transparent' }}">
                     Boletines
                 </a>
             </li>
