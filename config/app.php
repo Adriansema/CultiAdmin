@@ -1,6 +1,8 @@
 <?php
 
+
 return [
+
 
     /*
     |--------------------------------------------------------------------------
@@ -117,6 +119,7 @@ return [
     | Supported drivers: "file", "cache"
     |
     */
+    App\Providers\EventServiceProvider::class,
 
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),

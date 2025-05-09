@@ -3,16 +3,16 @@
 @section('content')
 <main>
 <!-- Contenedor del Buscador -->
-    
+
     <div class="flex justify-end">
         <div class="relative w-full max-w-sm"> <!-- Cambiado a max-w-sm -->
-            <input 
+            <input
                 type="text"
                 placeholder="Buscar"
-                class="w-full border border-gray-300 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="absolute text-gray-400 transform -translate-y-1/2 left-3 top-1/2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z" />
                 </svg>
@@ -20,11 +20,9 @@
         </div>
     </div>
 
-  <hr class="my-8 border-gray-200">
+  <hr class="my-4 border-gray-200">
 
-
-
-    <section class="flex-1 p-6 overflow-y-auto">
+    <section class="flex-1 p-1 overflow-y-auto">
            <div class="flex flex-col mb-6 md:flex-row md:items-center md:justify-between">
            <div class="mb-6">
             <h1 class="text-2xl font-semibold text-gray-800">Panel de Administración</h1>
@@ -32,7 +30,7 @@
              </div>
 
                 <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
-                    <button onclick="setFilter('hoy')" class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700">Hoy</button>
+                    <button onclick="setFilter('ultimos3dias')" class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700">Ultimos 3 dias</button>
                     <button onclick="setFilter('semana')" class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700 active">Semana</button>
                     <button onclick="setFilter('mes')" class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700">Mes</button>
                     <button onclick="setFilter('año')" class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700">Año</button>
@@ -40,18 +38,18 @@
             </div>
      </section>
 
-     
+
 
 
     {{-- Gráfica de usuarios conectados + Métricas --}}
-    <div class="flex-1 p-6 overflow-y-auto">
+    <div class="flex-1 p-1 overflow-y-auto">
     <section id="usuarios-conectados" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
-        
+
         <!-- Agrupamos el icono y el texto en un div flex -->
-        <div class="flex items-center space-x-2 mb-3">
+        <div class="flex items-center mb-3 space-x-2">
     <!-- Fondo circular para el icono -->
     <div class="bg-[var(--color-ICONOESTA)]  p-0 rounded-full relative -top-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16l5-5 3 3 7-7M5 h12" />
         </svg>
     </div>
@@ -71,18 +69,18 @@
                         <div class="absolute top-3 right-3 bg-[var(--color-iconos)] p-2 rounded-full">
                           <img src="{{asset('images/Icon.svg') }}" alt="usuario">
                       </div>
-                    
+
                     <h3 class="text-2xl text-[var(--color-iconos)]">Usuarios</h3>
                     <p id="users-count" class="text-3xl font-bold text-gray-800">0</p>
                     <p id="registered-percent" class="text-sm text-gray-800">0% de los usuarios</p>
-                </div>  
+                </div>
 
                 {{-- Registrados --}}
                 <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
-    
+
     <!-- Ícono en la esquina superior derecha -->
     <div class="absolute top-3 right-3 bg-[var(--color-iconos3)] p-2 rounded-full">
-        <img src="{{asset('images/regis.svg') }}" alt="registro"> 
+        <img src="{{asset('images/regis.svg') }}" alt="registro">
     </div>
 
     <!-- Contenido interno, sin fondo ni sombra duplicados -->
@@ -97,7 +95,7 @@
                  <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
                  <!-- Ícono -->
                       <div class="absolute top-3 right-3 bg-[var(--color-iconos2)] p-2 rounded-full">
-                      <img src="{{asset('images/activos.svg') }}" alt="activos"> 
+                      <img src="{{asset('images/activos.svg') }}" alt="activos">
                      </div>
 
                            <h3 class="text-2xl text-[var(--color-iconos)]">Activos</h3>
@@ -108,7 +106,7 @@
                           <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
                              <!-- Ícono -->
                              <div class="absolute top-3 right-3 bg-[var(--color-iconos4)] p-2 rounded-full">
-                                   <img src="{{asset('images/conectados.svg') }}" alt="conectados"> 
+                                   <img src="{{asset('images/conectados.svg') }}" alt="conectados">
                              </div>
 
                                  <h3 class="text-2xl text-[var(--color-iconos)]">Conectados</h3>
@@ -117,10 +115,10 @@
                          </div>
         </section>
 </main>
-<div class="flex-1 p-6 overflow-y-auto">
+<div class="flex-1 p-1 overflow-y-auto">
         {{-- Novedades y Boletines --}}
-        <section id="novedades-boletines" class=" relative grid gap-6 mt-8 md:grid-cols-2">
-          
+        <section id="novedades-boletines" class="relative grid gap-6 mt-8 md:grid-cols-2">
+
         <section id="boletines" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
              <!-- Encabezado con ícono y título -->
                     <div class="flex items-center justify-between mb-4">
@@ -135,7 +133,7 @@
                                  class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]">
                                 <!-- Ícono de accesibilidad (persona con brazos extendidos) -->
                                    <div class="relative flex w-full justify-evenly">
-                           
+
                                      <span class=" text-ms">
                                         {{ __(' ver todo ↗') }}
                                    </span>
@@ -149,7 +147,7 @@
                            </div>
                 </section>
 
-            
+
                 <section id="boletines" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
                             <!-- Encabezado con ícono y título -->
                          <div class="flex items-center justify-between mb-4">
@@ -164,8 +162,8 @@
                                    class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]">
                                   <!-- Ícono de accesibilidad (persona con brazos extendidos) -->
                                  <div class="relative flex w-full justify-evenly">
-                            
-                                           <span class=" text-ms ">
+
+                                           <span class=" text-ms">
                                                  {{ __(' ver todo ↗') }}
                                           </span>
                                   </div>
