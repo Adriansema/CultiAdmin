@@ -70,6 +70,43 @@ class UsuarioController extends Controller
         return view('usuarios.edit', compact('usuario', 'roles'));
     }
 
+    public function importarCsv(Request $request)
+    {
+        $request->validate([
+            'archivo' => 'required|file|mimes:csv,txt|max:2048',
+        ]);
+
+        $archivo = $request->file('archivo');
+        $contenido = array_map('str_getcsv', file($archivo->getRealPath()));
+        $encabezados = array_map('strtolower', array_shift($contenido));
+
+        foreach ($contenido as $fila) {
+            $datos = array_combine($encabezados, $fila);
+
+            if (!isset($datos['email'], $datos['name'], $datos['rol'])) {
+                continue; // saltar si faltan campos esenciales
+            }
+
+            // Crear o actualizar usuario
+            $usuario = User::updateOrCreate(
+                ['email' => $datos['email']],
+                [
+                    'name' => $datos['name'],
+                    'password' => isset($datos['password']) ? Hash::make($datos['password']) : Hash::make('12345678'),
+                ]
+            );
+
+            // Asignar rol dinámicamente
+            $rol = strtolower(trim($datos['rol']));
+
+            if (in_array($rol, ['administrador', 'operador'])) {
+                $usuario->syncRoles([$rol]); // elimina roles previos y asigna el nuevo
+            }
+        }
+
+        return back()->with('success', 'Usuarios importados y roles asignados correctamente.');
+    }
+
     public function update(Request $request, User $usuario)
     {
         $request->validate([

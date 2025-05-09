@@ -8,6 +8,8 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\HistorialController;
+use App\Http\Controllers\ExportarCsvController;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ViewUserController;
 use App\Http\Controllers\CentroAyudaController;
 use App\Http\Controllers\AccesibilidadController;
@@ -46,6 +48,7 @@ Route::middleware([
         // Usuarios
         Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
         Route::get('/usuarios/create', [UsuarioController::class, 'create'])->name('usuarios.create');
+        Route::post('/usuarios/importar-csv', [UsuarioController::class, 'importarCsv'])->name('usuarios.importarCsv');
         Route::post('/usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
         Route::get('/usuarios/{usuario}', [UsuarioController::class, 'show'])->name('usuarios.show');
         Route::get('/usuarios/{usuario}/edit', [UsuarioController::class, 'edit'])->name('usuarios.edit');
@@ -97,8 +100,12 @@ Route::middleware([
         Route::get('/search-faq', [CentroAyudaController::class, 'searchFaq'])->name('search.faq');
         Route::get('/centro-ayuda/contacto', [CentroAyudaController::class, 'showContactForm'])->name('centroAyuda.contactForm');
         Route::post('/centro-ayuda/contact-submit', [CentroAyudaController::class, 'submitContact'])->name('contact.submit');
+
         //Acesibilidad de la Aplicación
         Route::get('/accesibilidad', [AccesibilidadController::class, 'index'])->name('accesibilidad.index');
+
+        //Generador de archivo csv
+        Route::get('/generar-csv', [ExportarCsvController::class, 'generarCsv'])->middleware('auth');
 
         /*
         |--------------------------------------------------------------------------

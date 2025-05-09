@@ -36,9 +36,3 @@
         </main>
     </div>
 </div>
-
-<!--
-manteniendo toda la lógica de colapsar el sidebar (x-data, sidebarOpen, etc.)
- dentro de cada uno, de modo que puedan operar de forma independiente y seguir
- funcionando igual de bien.
--->

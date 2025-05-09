@@ -42,8 +42,8 @@
                                 <form action="{{ route('usuarios.toggle', $usuario) }}" method="POST" class="inline-block mt-1">
                                     @csrf
                                     @method('PATCH')
-                                    <button class="px-3 py-1 text-sm rounded text-white {{ $usuario->activo ? 'bg-red-500' : 'bg-green-500' }}">
-                                        {{ $usuario->activo ? 'Desactivar' : 'Activar' }}
+                                    <button class="px-3 py-1 text-sm rounded text-white {{ $usuario->estado ? 'bg-red-500' : 'bg-green-500' }}">
+                                        {{ $usuario->estado ? 'Desactivar' : 'Activar' }}
                                     </button>
                                 </form>
 

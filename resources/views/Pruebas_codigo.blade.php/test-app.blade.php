@@ -42,14 +42,3 @@
 
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
 </body>
-
-<!--
- ¿Qué cambia?
-Se elimina el wrapper <x-sidebar> antiguo.
-
-Se insertan condicionalmente <x-sidebar-admin /> o <x-sidebar-operador />.
-
-El x-data="{ open, sidebarOpen }" se pone en el <body>, como antes, para que los componentes hijos puedan usar sidebarOpen y open.
-
-Se conserva tu sistema GOV.CO y todo el diseño base, sin romper estructura.
--->

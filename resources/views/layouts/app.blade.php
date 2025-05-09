@@ -39,35 +39,31 @@
     <!-- Cinta GOV.CO -->
     <div class="p-1 bg-blue-500">
         <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="Logo GOV.CO" width="100px">
-
     </div>
 
     <x-banner />
 
-    <div class="flex flex-1 overflow-hidden">
-
-        <!-- Sidebar con scroll interno -->
-        {{-- <div class="w-64 bg-[#00304D] text-white flex-shrink-0 overflow-y-auto">
-            @livewire('navigation-menu')
-        </div> --}}
+        <!-- Sidebar dinámico según el rol -->
+        @role('administrador')
+            <x-sidebar-admin />
+        @elserole('operador')
+            <x-sidebar-operador />
+        @endrole
 
         <!-- Contenido principal -->
-         <div class="flex flex-col flex-1 overflow-hidden bg-gray-2">
-            <x-sidebar>
-                @if (isset($header))
-                <header class="px-4 py-6 bg-white shadow">
-                    <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-                @endif
+        <div class="flex flex-col flex-1 overflow-hidden bg-gray-2">
+            @if (isset($header))
+            <header class="px-4 py-6 bg-white shadow">
+                <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {{ $header }}
+                </div>
+            </header>
+            @endif
 
-                <main class="flex-1 h-full p-6 overflow-y-auto" :class="sidebarOpen ? 'pl-64' : 'pl-16'">
-                    @yield('content')
-                </main>
-            </x-sidebar>
+            <main class="flex-1 h-full p-6 overflow-y-auto" :class="sidebarOpen ? 'pl-64' : 'pl-16'">
+                @yield('content')
+            </main>
         </div>
-    </div>
 
     @stack('modals')
     @livewireScripts
