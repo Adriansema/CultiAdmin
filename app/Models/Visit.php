@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Visit extends Model
 {
     use HasFactory;
-    public $timestamps = false; 
+    public $timestamps = false;
 
-    protected $fillable = ['page', 'ip'];
+    protected $table = 'visits';
+
+    protected $fillable = ['page', 'ip','created_at',];
 }

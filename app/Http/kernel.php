@@ -6,6 +6,7 @@ namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
+
 class Kernel extends HttpKernel
 {
     protected $middleware = [
@@ -16,6 +17,8 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \Illuminate\Foundation\Http\Middleware\TrimStrings::class,
+        \App\Http\Middleware\RegisterVisit::class,
+
     ];
 
     protected $middlewareGroups = [
