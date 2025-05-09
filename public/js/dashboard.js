@@ -45,10 +45,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
                 break;
         }
+        console.log("DEBUG data recibida:", data);
+
+// ✅ Validar si hay datos antes de mapear
+if (!data.vistas || data.vistas.length === 0) {
+    const chartElement = document.querySelector("#chart");
+    chartElement.innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos suficientes para mostrar la gráfica.</div>`;
+    return;
+}
 
         let visitas = datosOrdenados.map(stat => parseInt(stat.total) || 0);
+        console.log("DEBUG data recibida:", data);
+
         let categorias = datosOrdenados.map(stat => stat.grupo);
         console.log("Datos para la gráfica:", visitas, categorias);
+
         // Calcular los porcentajes de cambio entre los valores
         porcentajes = visitas.map((valor, i, arr) => {
             if (i === 0) return 0;
