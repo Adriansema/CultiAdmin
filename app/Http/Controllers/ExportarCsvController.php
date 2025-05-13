@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+//crea lo usuarios automaticamente dependiendo los roles(solo para pruebas)
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Faker\Factory as Faker;
 

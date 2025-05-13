@@ -54,13 +54,42 @@
         <div class="tab-pane fade" id="guide" role="tabpanel" aria-labelledby="guide-tab">
             @include('centroAyuda.partials.guide')
         </div>
-        <div class="flex justify-center tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+        {{-- <div class="flex justify-center tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
             @include('centroAyuda.partials.contact')
-        </div>
+        </div> --}}
         <div class="flex justify-center tab-pane fade" id="links" role="tabpanel" aria-labelledby="links-tab">
             @include('centroAyuda.partials.links')
         </div>
     </div>
+
+    <!-- Botón para abrir el modal -->
+    <button id="openModalBtn" class="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none">
+        Contáctenos
+    </button>
+
+    <!-- Modal (Oculto por defecto) -->
+    <div id="contactModal" class="fixed inset-0 hidden bg-black z-[80] bg-opacity-60">
+        <div class="flex items-center justify-between">
+            <div class="w-full h-full mt-4">
+                @include('centroAyuda.partials.contact')
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="successModal" class="fixed inset-0 z-30 hidden bg-black bg-opacity-50">
+        <div class="relative px-6 py-4 mx-auto my-40 text-center bg-white rounded-lg shadow-lg w-80">
+            <button id="closeSuccessBtn" class="absolute text-gray-500 top-3 right-3 hover:text-gray-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="mb-2 text-lg font-semibold text-green-700">¡Se ha enviado correctamente!</h2>
+            <p class="text-sm text-gray-600">Gracias por contactarnos.</p>
+        </div>
+    </div>
+
 </div>
 @endsection
 

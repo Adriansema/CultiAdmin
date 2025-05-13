@@ -11,6 +11,10 @@
     <p><strong>Teléfono:</strong> {{ $usuario->telefono }}</p>
     <p><strong>Estado:</strong> {{ $usuario->estado }}</p>
     <p><strong>Rol:</strong> {{ $usuario->roles->pluck('name')->join(', ') }}</p>
+    <a href="{{ route('view-user.index') }}"
+        class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">
+        ← Volver a la lista
+    </a>
 </div>
 @endsection
 

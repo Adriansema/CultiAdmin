@@ -5,7 +5,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; // ¡Importa la clase Request!
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -13,9 +13,36 @@ use Illuminate\Support\Facades\Auth;
 class UsuarioController extends Controller
 {
 
-    public function index()
+    public function index(Request $request) // <-- Paso 1: Recibe el objeto Request
     {
-        $usuarios = User::with('roles')->get();
+        $query = $request->input('q'); // Obtiene el parámetro de búsqueda 'q' (del formulario)
+        // Obtiene el número de elementos por página del request, por defecto 10.
+        // Las opciones deben ser las mismas que definas en el select de tu Blade.
+        $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100]) ? $request->input('per_page') : 10;
+
+
+        // Paso 2: Inicia la consulta de usuarios con los roles
+        $usuarios = User::with('roles');
+
+        // Paso 3: Aplica el filtro de búsqueda si existe una 'query'
+        if ($query) {
+            $usuarios->where('name', 'like', '%' . $query . '%')
+                     ->orWhere('email', 'like', '%' . $query . '%');
+        }
+
+        // Paso 4: Aplica la paginación al final de la consulta
+        // El método paginate() devuelve un objeto Paginator, resolviendo el error hasPages()
+        $usuarios = $usuarios->paginate($perPage)->withQueryString(); // <-- ¡Clave para la paginación!
+        // withQueryString() es importante para que los parámetros de búsqueda ('q', 'per_page') se mantengan
+        // cuando se navega entre páginas de la paginación.
+
+        // Paso 5: Lógica para mostrar el mensaje "no encontrado" si la búsqueda no arroja resultados
+        if ($usuarios->isEmpty() && $query) { // Solo si hay una búsqueda y no hay resultados
+            $message = '¡Vaya! No se encontraron usuarios que coincidan con su búsqueda: "' . htmlspecialchars($query) . '". Por favor, intente con otro término o verifique la ortografía.';
+            return view('usuarios.index', compact('usuarios'))->with('error', $message);
+        }
+
+        // Paso 6: Devuelve la vista con la colección de usuarios paginada
         return view('usuarios.index', compact('usuarios'));
     }
 
