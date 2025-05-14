@@ -17,11 +17,6 @@ use App\Http\Controllers\Operador\HistorialOperadorController;
 use App\Http\Controllers\Operador\OperadorProductoController;
 use App\Http\Middleware\Roles_Admin_Opera;
 
-
- // Estadísticas
-
-
-
 // Rutas públicas
 Route::get('/', function () {
     return view('welcome');
@@ -62,7 +57,6 @@ Route::middleware([
         // Productos
         Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
         Route::get('/productos/create', [ProductoController::class, 'create'])->name('productos.create');
-        Route::get('/productos/historial', [ProductoController::class, 'historial'])->name('productos.historial');
         Route::post('/productos', [ProductoController::class, 'store'])->name('productos.store');
         Route::get('/productos/{producto}', [ProductoController::class, 'show'])->name('productos.show');
         Route::get('/productos/{producto}/edit', [ProductoController::class, 'edit'])->name('productos.edit');

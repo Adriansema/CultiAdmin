@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Actions\Fortify\LoginResponse;
+use Illuminate\Pagination\Paginator;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Paginator::useTailwind();
     }
 }

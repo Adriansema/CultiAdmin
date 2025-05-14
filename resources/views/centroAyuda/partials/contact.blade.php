@@ -12,15 +12,26 @@
     </div>
     @endif
 
-    <div class="p-6 text-black bg-black shadow-md rounded-3xl">
-        <h1 class="mb-6 text-3xl font-bold text-white">Contacto</h1>
-        <p class="mb-4 text-lg text-white">Si necesitas asistencia personalizada o tienes alguna duda que no hayas podido resolver
+    <div id="closeModal" class="relative w-full max-w-md p-6 transition duration-300 bg-white rounded-3xl group shadow-sombra hover:bg-black">
+        <!-- Botón de cierre "X" -->
+        <button id="closeModalBtn" class="absolute text-black transition duration-300 top-4 right-4 group-hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Título -->
+        <h1 class="mb-6 text-3xl font-bold text-black transition duration-300 group-hover:text-white">Contacto</h1>
+
+        <!-- Descripción -->
+        <p class="mb-4 text-lg text-black transition duration-300 group-hover:text-white">
+            Si necesitas asistencia personalizada o tienes alguna duda que no hayas podido resolver
             a través del Centro de Ayuda, no dudes en contactarnos. Nuestro equipo de soporte está aquí para ayudarte.
         </p>
 
-        <h2 class="mb-4 text-2xl font-semibold">Formulario de Contacto</h2>
-
-        <form action="{{ route('contact.submit') }}" method="POST">
+        <form id="contactForm" action="{{ route('contact.submit') }}" method="POST" class="w-full h-full space-y-3">
+            <!-- CSRF Token -->
             @csrf
 
             <div class="mb-4">
@@ -50,7 +61,7 @@
         </form>
 
         <div class="mt-6 text-center">
-            <p class="text-gray-200">O contáctanos directamente a:</p>
+            <p class="mb-4 text-lg text-black transition duration-300 group-hover:text-white">O contáctanos directamente a:</p>
             <p class="text-blue-600 transition duration-300 ease-in-out hover:text-green-400 hover:underline hover:font-semibold">
                 <a href="mailto:andresconde45678@gmail.com">soporteayuda2025@gmail.com</a>
             </p>
