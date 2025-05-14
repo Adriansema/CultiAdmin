@@ -2,6 +2,42 @@ document.addEventListener("DOMContentLoaded", function () {
     let filtroActual = 'ultimos3dias';
     let porcentajes = [];
 
+     // 📌 Agrega aquí las funciones para calcular la semana pasada:
+     function getStartOfLastWeek() {
+        const date = new Date();
+        const dayOfWeek = date.getDay();
+        const diff = dayOfWeek + 6; // (0 = domingo, queremos ir al lunes de la semana anterior)
+        date.setDate(date.getDate() - diff);
+        date.setHours(0, 0, 0, 0); // Inicio del día
+        return date;
+    }
+
+    function getEndOfLastWeek() {
+        const date = getStartOfLastWeek();
+        date.setDate(date.getDate() + 6); // Domingo de la semana pasada
+        date.setHours(23, 59, 59, 999); // Fin del día
+        return date;
+    }
+
+    function filterDataForLastWeek(data) {
+        const startOfLastWeek = getStartOfLastWeek();
+        const endOfLastWeek = getEndOfLastWeek();
+
+        return data.filter(item => {
+            const itemDate = new Date(item.fecha);
+            return itemDate >= startOfLastWeek && itemDate <= endOfLastWeek;
+        });
+    }
+
+    function mostrarMensajeError(msg) {
+        const mensaje = document.getElementById('mensaje-error');
+        if (mensaje) {
+            mensaje.textContent = msg;
+            mensaje.style.display = 'block';
+        }
+    }
+
+
     // Cambiar el filtro y cargar datos
     function setFilter(filtro) {
         filtroActual = filtro;
@@ -20,21 +56,70 @@ document.addEventListener("DOMContentLoaded", function () {
         loadData(filtro);
     }
 
+    function getLast7Days() {
+        const days = [];
+        const today = new Date();
+
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            const formatted = d.toISOString().slice(0, 10); // YYYY-MM-DD
+            days.push(formatted);
+        }
+
+        return days;
+    }
+
+    function completarDiasFaltantes(vistas) {
+        const dias = getLast7Days();
+        const mapa = {};
+
+        // Crear mapa base con 0 visitas
+        dias.forEach(dia => {
+            mapa[dia] = 0;
+        });
+
+        // Reemplazar con los datos reales
+        vistas.forEach(item => {
+            mapa[item.grupo] = item.total;
+        });
+
+        // Devolver como array ordenado
+        return dias.map(dia => ({
+            grupo: dia,
+            total: mapa[dia]
+        }));
+    }
+
+
+
     // Función para renderizar la gráfica con los datos
     function renderChart(data) {
-        let datosOrdenados = [...data.vistas];
+        if (!Array.isArray(data.vistas)) {
+          console.error("Los datos de 'vistas' no son válidos:", data.vistas);
+          return;
+        }
+
+         // Asignar data.vistas como base
+    let datosOrdenados = [...data.vistas];
 
         // Filtrar y ordenar los datos según el filtro seleccionado
         switch (filtroActual) {
             case 'ultimos3dias':
                 datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
                 break;
-            case 'semana':
-                const diasSemana = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
-                datosOrdenados.sort((a, b) =>
-                    diasSemana.indexOf(a.grupo.toLowerCase()) - diasSemana.indexOf(b.grupo.toLowerCase())
-                );
-                break;
+                case 'semana':
+                    const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+                    datosOrdenados.sort((a, b) =>
+                        diasSemana.indexOf(
+                            a.grupo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+                        ) -
+                        diasSemana.indexOf(
+                            b.grupo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+                        )
+                    );
+                    break;
+
             case 'mes':
                 datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
                 break;
@@ -48,24 +133,50 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("DEBUG data recibida:", data);
 
 // ✅ Validar si hay datos antes de mapear
-if (!data.vistas || data.vistas.length === 0) {
-    const chartElement = document.querySelector("#chart");
-    chartElement.innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos suficientes para mostrar la gráfica.</div>`;
+// Después (más permisivo)
+if (!Array.isArray(data.vistas) || data.vistas.length === 0) {
+    document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">Los datos no son válidos.</div>`;
     return;
 }
 
-        let visitas = datosOrdenados.map(stat => parseInt(stat.total) || 0);
-        console.log("DEBUG data recibida:", data);
+// Validar que cada entrada tenga grupo y total numérico
+datosOrdenados = datosOrdenados.filter(stat => {
+    return stat.grupo !== undefined && !isNaN(parseInt(stat.total));
+});
 
-        let categorias = datosOrdenados.map(stat => stat.grupo);
-        console.log("Datos para la gráfica:", visitas, categorias);
+// Mostrar lo que se recibe en consola
+console.log("DEBUG data.vistas recibida:", JSON.stringify(data.vistas));
+
+// Verificar si hay datos válidos
+if (datosOrdenados.length === 0) {
+    // Mostrar la gráfica con un solo punto "Sin datos"
+    datosOrdenados = [{
+        grupo: 'Sin datos',
+        total: 0
+    }];
+}
+
+
+// Procesar los datos limpios
+
+let seriesData = datosOrdenados.map(stat => ({
+    x: stat.grupo || "Sin etiqueta",
+    y: parseInt(stat.total)
+}));
+
+
+console.log("Datos para la gráfica:", seriesData);
+
+
+
 
         // Calcular los porcentajes de cambio entre los valores
-        porcentajes = visitas.map((valor, i, arr) => {
+        porcentajes = seriesData.map((p, i, arr) => {
             if (i === 0) return 0;
-            const anterior = arr[i - 1];
-            return anterior === 0 ? 0 : ((valor - anterior) / anterior * 100).toFixed(1);
+            const anterior = arr[i - 1].y;
+            return anterior === 0 ? 0 : ((p.y - anterior) / anterior * 100).toFixed(1);
         });
+
 
         // Verificar si existe una instancia anterior de ApexCharts y destruirla
         if (window.chart && typeof window.chart.destroy === "function") {
@@ -74,48 +185,48 @@ if (!data.vistas || data.vistas.length === 0) {
 
         const options = {
             chart: {
-                type: 'area',
-                height: 300,
-                toolbar: { show: false }
-            },
-            dataLabels: { enabled: false },
-            stroke: { curve: 'smooth', width: 3 },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shadeIntensity: 1,
-                    inverseColors: false,
-                    opacityFrom: 0.4,
-                    opacityTo: 0.1,
-                    stops: [0, 90, 100]
+                type: 'line',
+                height: 350,
+                toolbar: {
+                  show: false
                 }
+              },
+
+            series: [{
+              name: 'Visitas',
+              data: seriesData
+            }],
+            stroke: {
+                curve: 'smooth'
+
             },
-            series: [{ name: 'Visitas', data: visitas }],
-            xaxis: { categories: categorias },
-            colors: ['#4CAF50'],
-            markers: {
-                size: 4,
-                strokeColors: ['#4CAF50'],
-                strokeWidth: 2,
-                hover: { size: 8 }
+            xaxis: {
+              type: 'category'
             },
             tooltip: {
-                theme: 'dark',
-                custom: function({ series, seriesIndex, dataPointIndex, w }) {
-                    const valor = series[seriesIndex][dataPointIndex];
-                    const porcentaje = porcentajes[dataPointIndex];
-                    const color = porcentaje >= 0 ? '🟢' : '🔴';
-                    const signo = porcentaje >= 0 ? '+' : '';
-                    return `<div style="padding: 8px; text-align: center">
-                        <strong>${w.globals.labels[dataPointIndex]}</strong><br>
-                        ${valor} visitas<br>
-                        <span style="font-size: 12px; color: ${porcentaje >= 0 ? '#4CAF50' : '#F44336'}">
-                            ${color} ${signo}${porcentaje}%
-                        </span>
-                    </div>`;
+              custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                const valorActual = series[seriesIndex][dataPointIndex];
+                let porcentaje = 0;
+                if (dataPointIndex > 0) {
+                  const anterior = series[seriesIndex][dataPointIndex - 1];
+                  porcentaje = anterior === 0 ? 0 : ((valorActual - anterior) / anterior * 100).toFixed(1);
                 }
+                return `<div class="p-2">
+                  <strong>${w.globals.labels[dataPointIndex]}</strong><br>
+                  Visitas: <strong>${valorActual}</strong><br>
+                  Cambio: <strong>${porcentaje}%</strong>
+                </div>`;
+              }
             }
-        };
+          };
+
+
+          if (!Array.isArray(seriesData) || seriesData.length === 0 || seriesData.some(v => isNaN(v.y))) {
+            document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos numéricos válidos para graficar.</div>`;
+            return;
+        }
+
+
 
         // Inicializar y renderizar el gráfico
         window.chart = new ApexCharts(document.querySelector("#chart"), options);

@@ -12,12 +12,13 @@
     "The provided two factor authentication code was invalid.": "El código de autenticación de dos factores proporcionado no es válido.",
     "The provided two factor recovery code was invalid.": "El código de recuperación de dos factores proporcionado no es válido.",
 
-    "Manage Account": "Administrar Cuenta",
+    "ManageAccount": "Administrar Cuenta",
     "Profile": "Perfil",
-    "Log Out": "Cerrar Sesión",
+    "LogOut": "Cerrar Sesión",
     "CRUD": "Gestión",
     "Information": "Información",
     "Boletines": "Boletines",
     "Comentarios": "Comentarios",
-    "Clients": "Clientes"
+    "Clients": "Clientes",
+     "Register": "Registro"
 }

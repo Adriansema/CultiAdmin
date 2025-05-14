@@ -85,7 +85,7 @@
 
     <!-- Contenido interno, sin fondo ni sombra duplicados -->
     <div>
-        <h3 class="text-2xl text-[var(--color-iconos)]">Registrados</h3>
+        <h3 class="text-2xl text-[var(--color-iconos)]">{{ __('message.Register') }}</h3>
         <p id="registered-count" class="text-3xl font-bold text-gray-800">0</p>
         <p id="registered-percent" class="text-sm text-gray-800">0% de los usuarios</p>
     </div>
