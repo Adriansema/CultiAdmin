@@ -7,6 +7,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 use App\Console\Commands\LimpiarComentarios;
 use App\Console\Commands\MakeBladeCrud;
+use App\Console\Commands\ResetUsuarios;
 
 class Kernel extends ConsoleKernel
 {
@@ -16,6 +17,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         LimpiarComentarios::class,
         MakeBladeCrud::class,
+        ResetUsuarios::class,
     ];
 
     /**

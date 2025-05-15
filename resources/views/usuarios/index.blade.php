@@ -69,7 +69,7 @@
                     <th class="px-6 py-3 font-medium text-left text-gray-600">Rol</th>
                     <th class="px-6 py-3 font-medium text-left text-gray-600">Nombre</th>
                     <th class="px-6 py-3 font-medium text-left text-gray-600">Email</th>
-                    <th class="px-6 py-3 font-medium text-left text-gray-600">Estados</th>
+                    <th class="px-6 py-3 font-medium text-left text-gray-600">Estado</th>
                 </tr>
             </thead>
             <tbody>
@@ -95,13 +95,21 @@
                     <td class="px-6 py-4">{{ $usuario->email }}
                         <img src="{{ asset('images/lapiz.svg') }}" class="w-4 h-4" alt="editar">
                     </td>
-                    <td class="flex items-center px-6 py-4">
-                        <form action="{{ route('usuarios.toggle', $usuario) }}" method="POST" class="inline-block mt-1">
+                    <td class="px-6 py-4">
+                        <form action="{{ route('usuarios.toggle', $usuario) }}" method="POST" class="inline-block">
                             @csrf
                             @method('PATCH')
+
                             <button
-                                class="px-3 py-1 text-sm rounded text-white {{ $usuario->estado ? 'bg-red-500' : 'bg-green-500' }}">
-                                {{ $usuario->estado ? 'Desactivar' : 'Activar' }}
+                                class="px-3 py-1 text-sm rounded text-white transition-colors duration-700
+                                    @if($usuario->estado === 'activo')
+                                        bg-green-600 hover:bg-red-600 hover:text-white
+                                    @else
+                                        bg-gray-400 hover:bg-yellow-300 hover:text-black
+                                    @endif"
+                                title="{{ $usuario->estado === 'activo' ? 'Desactivar' : 'Activar' }}"
+                            >
+                                {{ ucfirst($usuario->estado) }}
                             </button>
                         </form>
                     </td>
