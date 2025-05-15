@@ -2,8 +2,11 @@
 
 @section('content')
 <div class="inline-block px-8 py-10">
-    <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-3" alt="Icono Nuevo Usuario">
-    <h1><b class="text-3xl whitespace-nowrap">Gestión de Usuarios</b></h1>
+    <div class="flex items-center space-x-2">
+        <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
+        <h1 class="text-3xl whitespace-nowrap font-bold">Gestión de Usuarios</h1>
+    </div>
+    {!! Breadcrumbs::render('usuarios.index') !!}
 </div>
 
 <div class="w-full max-w-6xl px-6 py-1 mx-auto bg-gray-200 rounded-2xl">

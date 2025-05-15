@@ -1,6 +1,12 @@
 <x-form-section submit="updateProfileInformation">
     <x-slot name="title">
-        {{ __('Profile Information') }}
+        <div class="inline-block px-8 py-10">
+            <div class="flex items-center space-x-2">
+                <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
+                <h1 class="text-3xl whitespace-nowrap font-bold">Profile information</h1>
+            </div>
+            {!! Breadcrumbs::render('usuarios.index') !!}
+        </div>
     </x-slot>
 
     <x-slot name="description">
@@ -10,9 +16,10 @@
     <x-slot name="form">
         <!-- Profile Photo -->
         @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
-        <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
-            <!-- Profile Photo File Input -->
-            <input type="file" id="photo" class="hidden" wire:model.live="photo" x-ref="photo" x-on:change="
+            <div x-data="{ photoName: null, photoPreview: null }" class="col-span-6 sm:col-span-4">
+                <!-- Profile Photo File Input -->
+                <input type="file" id="photo" class="hidden" wire:model.live="photo" x-ref="photo"
+                    x-on:change="
                                     photoName = $refs.photo.files[0].name;
                                     const reader = new FileReader();
                                     reader.onload = (e) => {
@@ -21,9 +28,9 @@
                                     reader.readAsDataURL($refs.photo.files[0]);
                             " />
 
-            <x-label for="photo" value="{{ __('Photo') }}" />
+                <x-label for="photo" value="{{ __('Photo') }}" />
 
-            <!-- Current Profile Photo -->
+                <!-- Current Profile Photo -->
                 <div class="mt-2 " x-show="! photoPreview">
                     <div class="relative w-20 h-20 overflow-hidden transition-all duration-300 border-2 border-gray-300 rounded-full shadow-lg cursor-pointer group hover:shadow-2xl"
                         x-on:click.prevent="$refs.photo.click()">
@@ -38,22 +45,22 @@
                     </div>
                 </div>
 
-            <!-- New Profile Photo Preview -->
-            <div class="mt-2" x-show="photoPreview" style="display: none;">
-                <span class="block bg-center bg-no-repeat bg-cover rounded-full size-20"
-                    x-bind:style="'background-image: url(\'' + photoPreview + '\');'">
-                </span>
-            </div>
+                <!-- New Profile Photo Preview -->
+                <div class="mt-2" x-show="photoPreview" style="display: none;">
+                    <span class="block bg-center bg-no-repeat bg-cover rounded-full size-20"
+                        x-bind:style="'background-image: url(\'' + photoPreview + '\');'">
+                    </span>
+                </div>
 
                 @if ($this->user->profile_photo_path)
-                <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
-                    {{ __('Remove Photo') }}
-                </x-secondary-button>
+                    <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
+                        {{ __('Remove Photo') }}
+                    </x-secondary-button>
                 @endif
 
 
-            <x-input-error for="photo" class="mt-2" />
-        </div>
+                <x-input-error for="photo" class="mt-2" />
+            </div>
         @endif
 
         <!-- Name -->
@@ -71,23 +78,23 @@
                 autocomplete="username" />
             <x-input-error for="email" class="mt-2" />
 
-            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) && !
-            $this->user->hasVerifiedEmail())
-            <p class="mt-2 text-sm">
-                {{ __('Your email address is unverified.') }}
+            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) &&
+                    !$this->user->hasVerifiedEmail())
+                <p class="mt-2 text-sm">
+                    {{ __('Your email address is unverified.') }}
 
-                <button type="button"
-                    class="text-sm text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    wire:click.prevent="sendEmailVerification">
-                    {{ __('Click here to re-send the verification email.') }}
-                </button>
-            </p>
+                    <button type="button"
+                        class="text-sm text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        wire:click.prevent="sendEmailVerification">
+                        {{ __('Click here to re-send the verification email.') }}
+                    </button>
+                </p>
 
-            @if ($this->verificationLinkSent)
-            <p class="mt-2 text-sm font-medium text-green-600">
-                {{ __('A new verification link has been sent to your email address.') }}
-            </p>
-            @endif
+                @if ($this->verificationLinkSent)
+                    <p class="mt-2 text-sm font-medium text-green-600">
+                        {{ __('A new verification link has been sent to your email address.') }}
+                    </p>
+                @endif
             @endif
         </div>
     </x-slot>

@@ -12,8 +12,18 @@
             </div>
         @endif
 
+        <div class="inline-block px-8 py-10">
+            <div class="flex items-center space-x-2">
+                <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
+                <h1 class="text-3xl whitespace-nowrap font-bold">Boletines</h1>
+            </div>
+            {!! Breadcrumbs::render('boletines.index') !!}
+        </div>
+
+
         <div class="mb-4">
-            <a href="{{ route('boletines.create') }}" class="inline-block px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
+            <a href="{{ route('boletines.create') }}"
+                class="inline-block px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
                 + Crear Boletín
             </a>
         </div>
@@ -38,15 +48,15 @@
                             </td>
                             <td class="px-4 py-2 space-x-2">
                                 <a href="{{ route('boletines.show', $boletin) }}"
-                                   class="px-3 py-1 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">Ver</a>
+                                    class="px-3 py-1 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">Ver</a>
                                 <a href="{{ route('boletines.edit', $boletin) }}"
-                                   class="px-3 py-1 text-sm text-white bg-yellow-500 rounded hover:bg-yellow-600">Editar</a>
+                                    class="px-3 py-1 text-sm text-white bg-yellow-500 rounded hover:bg-yellow-600">Editar</a>
                                 <form action="{{ route('boletines.destroy', $boletin) }}" method="POST" class="inline"
-                                      onsubmit="return confirm('¿Estás seguro de que deseas eliminar este boletín?')">
+                                    onsubmit="return confirm('¿Estás seguro de que deseas eliminar este boletín?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"
-                                            class="px-3 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700">
+                                        class="px-3 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700">
                                         Eliminar
                                     </button>
                                 </form>
