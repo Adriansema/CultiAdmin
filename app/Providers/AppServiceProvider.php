@@ -17,6 +17,10 @@ class AppServiceProvider extends ServiceProvider
     {
         // Inyectamos la respuesta personalizada al login
         $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
+         // Registrar el IDE Helper solo en entorno local
+         if ($this->app->environment('local')) {
+            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+        }
     }
 
     /**
@@ -26,4 +30,6 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useTailwind();
     }
+
+
 }

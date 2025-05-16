@@ -185,23 +185,69 @@ console.log("Datos para la gráfica:", seriesData);
 
         const options = {
             chart: {
-                type: 'line',
+                type: 'area',
                 height: 350,
                 toolbar: {
                   show: false
                 }
               },
 
+              colors: ['#9'],
+
+
             series: [{
               name: 'Visitas',
               data: seriesData
             }],
             stroke: {
-                curve: 'smooth'
+                curve: 'smooth',
+                width: 3,
 
             },
+            fill: {
+                type: 'gradient',
+                    gradient: {
+                    shade: 'light',
+                    type: 'vertical',
+                    shadeIntensity: 0,
+                    gradientToColors: ['#bbf7d0'], // Verde claro abajo
+                    inverseColors: false,
+                    opacityFrom: 0.8, // Inicio del degradado (más fuerte)
+                    opacityTo: 0.3,     // Final del degradado (transparente)
+                    stops: [0, 90]
+                    }
+              },
+              markers: {
+                size: 6,
+                colors: ['#ffffff'],
+                strokeColors: '#22c55e',
+                strokeWidth: 3,
+                hover: {
+                  size: 8
+                }
+              },
+              dataLabels: {
+                enabled: true,
+                style: {
+                  colors: ['#ffffff'],
+                  fontWeight: 'bold'
+                },
+                background: {
+                  enabled: true,
+                  foreColor: '#ffffff',
+                  borderRadius: 4,
+                  padding: 6,
+                  backgroundColor: '#22c55e' // Fondo del número encima del punto
+                }
+              },
+
             xaxis: {
-              type: 'category'
+              type: 'category',
+              labels: {
+                style: {
+                    color:'#000'
+                }
+              }
             },
             tooltip: {
               custom: function({ series, seriesIndex, dataPointIndex, w }) {
