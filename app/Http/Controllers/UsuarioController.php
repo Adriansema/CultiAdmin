@@ -75,21 +75,19 @@ class UsuarioController extends Controller
 
     public function show(User $usuario)
     {
-        // Este método carga la vista usuarios.showy le pasa al usuario que quiere mostrar.
+        //Este método carga la vista usuarios.showy le pasa al usuario que quiere mostrar.
         //Ideal para mostrar datos detallados de un solo usuario.
         return view('usuarios.show', compact('usuario'));
     }
 
     public function toggle(User $usuario)
     {
-        //Cambia el estado del usuario ( activo ↔ inactivo) al contrario del actual.
-        //Guarda el cambio y redirige con un mensaje.
-        $usuario->estado = !$usuario->estado; // Cambia el valor actual por el contrario
+        // Alternar entre 'activo' e 'inactivo'
+        $usuario->estado = $usuario->estado === 'activo' ? 'inactivo' : 'activo';
         $usuario->save();
 
         return redirect()->route('usuarios.index')->with('success', 'Estado actualizado.');
     }
-
 
     public function edit(User $usuario)
     {

@@ -80,7 +80,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'estado' => 'boolean',
+        'estado' => 'string',
     ];
 
     protected $guard_name = 'web'; // <-- Esto es opcional pero útil

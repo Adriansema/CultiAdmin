@@ -25,7 +25,7 @@ class ExportarCsvController extends Controller
         }
 
         // 70 operadores
-        for ($i = 0; $i < 7; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $usuarios[] = [
                 'name' => $faker->name,
                 'email' => $faker->unique()->safeEmail,
