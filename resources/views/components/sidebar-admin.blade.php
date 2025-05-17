@@ -138,24 +138,6 @@
                     {{ __('Ajustes') }}
                 </div>
 
-                <div :class="sidebarOpen
-                    ? 'flex pl-2 py-2 ml-[20px] transition rounded-xl  hover:bg-[var(--color-sidebarhoverbtn)]'
-                    : 'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]'">
-
-                    <x-responsive-nav-link href="{{ route('view-user.index') }}"
-                        class="flex items-center transition-all duration-300 ease-in-out"
-                        :active="request()->routeIs('usuarios.*')">
-
-                        <img src="{{ asset('images/corre.svg') }}" class="w-4 h-4" alt="Usuarios">
-
-                        <span x-show="sidebarOpen" x-transition
-                            class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
-                            {{ __('Vista de Usuarios') }}
-                        </span>
-                    </x-responsive-nav-link>
-                </div>
-
-
                 {{-- Gestión de Usuarios --}}
                 <div :class="sidebarOpen
                     ? 'flex pl-2 py-2 ml-[20px] transition rounded-xl  hover:bg-[var(--color-sidebarhoverbtn)]'
@@ -173,7 +155,6 @@
                         </span>
                     </x-responsive-nav-link>
                 </div>
-
 
                 {{-- Accesibilidad --}}
                 <div :class="sidebarOpen

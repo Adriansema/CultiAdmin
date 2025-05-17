@@ -9,7 +9,7 @@
     <title>{{ config('app.name', 'Cultiva Sena') }}</title> <!-- SE CAMBIO EL NOMBRE DE LA PESTAÑA DE NAVEGACION POR "Cultiva Sena" -->
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset('images/favicon.svg') }}"> <!-- SE AGREGA ESTA LINEA PARA QUE MUESTRE EL ICONO DE LA PESTAÑA DE NAVEGACIÓN -->
+    <link rel="icon" href="{{ asset('images/Favicon.svg') }}"> <!-- SE AGREGA ESTA LINEA PARA QUE MUESTRE EL ICONO DE LA PESTAÑA DE NAVEGACIÓN -->
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

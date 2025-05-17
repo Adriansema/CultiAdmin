@@ -9,21 +9,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Añadimos la columna con default
+        // Añadir columna 'estado' justo después de 'email' con valor por defecto
         Schema::table('users', function (Blueprint $table) {
-            $table->string('estado', 20)->default('activo')->after('email'); // O colócala donde prefieras
+            $table->string('estado', 20)->default('activo')->after('email');
         });
 
-        // Agregamos la restricción CHECK para asegurar valores válidos
+        // Agregar restricción CHECK para que solo permita 'activo' o 'inactivo'
         DB::statement("ALTER TABLE users ADD CONSTRAINT estado_check CHECK (estado IN ('activo', 'inactivo'))");
     }
 
     public function down(): void
     {
-        // Quitamos la restricción primero
+        // Primero quitamos la restricción CHECK si existe
         DB::statement("ALTER TABLE users DROP CONSTRAINT IF EXISTS estado_check");
 
-        // Eliminamos la columna
+        // Luego eliminamos la columna
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('estado');
         });

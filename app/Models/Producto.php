@@ -5,13 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-
 class Producto extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'nombre', 'descripcion', 'imagen', 'estado', 'observaciones', 'user_id'
+        'imagen',
+        'estado',
+        'observaciones',
+        'user_id',
+        'tipo',
+        'detalles_json',
+    ];
+
+    protected $casts = [
+        'detalles_json' => 'array', // transforma JSON <=> array automáticamente
     ];
 
     public function user()
@@ -19,3 +27,4 @@ class Producto extends Model
         return $this->belongsTo(User::class);
     }
 }
+

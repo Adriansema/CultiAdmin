@@ -3,35 +3,78 @@
 @section('title', 'Detalle del Producto')
 
 @section('content')
-<div class="container max-w-4xl py-6 mx-auto">
-    <div class="p-6 bg-white rounded shadow">
-        <h3 class="text-xl font-bold">{{ $producto->nombre }}</h3>
-        <p class="mt-2 text-gray-700 whitespace-pre-line">{{ $producto->descripcion }}</p>
-
-        @if($producto->imagen)
-            <img src="{{ asset('storage/' . $producto->imagen) }}" alt="Imagen del producto" class="mt-4 rounded shadow w-96">
-        @endif
-
-        <div class="mt-4">
-            @php
-                $estadoColor = match($producto->estado) {
-                    'pendiente' => 'bg-yellow-500',
-                    'validado' => 'bg-green-600',
-                    'rechazado' => 'bg-red-600',
-                    default => 'bg-gray-400',
-                };
-            @endphp
-            <span class="px-2 py-1 text-white rounded {{ $estadoColor }}">
-                {{ ucfirst($producto->estado) }}
-            </span>
+    <div class="inline-block px-8 py-10">
+        <div class="flex items-center space-x-2">
+            <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
+            <h1 class="text-3xl whitespace-nowrap font-bold">Detalles del Producto</h1>
         </div>
+        {!! Breadcrumbs::render('productos.show', $producto) !!} 
+    </div>
 
-        @if($producto->observaciones)
-            <div class="p-4 mt-4 border border-red-200 rounded bg-red-50">
-                <h4 class="font-semibold text-red-600">Observaciones del operador:</h4>
-                <p class="mt-2 text-red-800">{{ $producto->observaciones }}</p>
+    <div class="container max-w-4xl py-6 mx-auto">
+        @php
+            $campos = [
+                'que_es' => '¿Qué es?',
+                'historia' => 'Historia del cultivo',
+                'variedad' => 'Variedad',
+                'especies' => 'Especies',
+                'caracteristicas' => 'Características',
+                'clima' => 'Condiciones del clima',
+                'suelo' => 'Tipo de suelo ideal',
+                'riego' => 'Requerimientos de riego',
+                'cosecha' => 'Época de cosecha',
+                'postcosecha' => 'Proceso postcosecha',
+                'plagas' => 'Plagas y enfermedades comunes',
+                'usos' => 'Usos y aplicaciones',
+                'valor_nutricional' => 'Valor nutricional',
+                'impacto_economico' => 'Impacto económico',
+                'tecnicas_cultivo' => 'Técnicas de cultivo',
+                'certificaciones' => 'Certificaciones disponibles',
+                'ubicacion_geografica' => 'Ubicación geográfica óptima',
+                'nombre_cientifico' => 'Nombre científico',
+            ];
+
+            $detalles = json_decode($producto->detalles_json, true) ?? [];
+        @endphp
+
+        <!-- Imagen -->
+        @if ($producto->imagen)
+            <div class="mb-6">
+                <img src="{{ asset('storage/' . $producto->imagen) }}" alt="Imagen del producto"
+                    class="w-full rounded shadow">
             </div>
         @endif
+
+        <!-- Tipo -->
+        <div class="mb-4">
+            <h3 class="text-sm font-semibold text-gray-600">Tipo de producto</h3>
+            <p class="text-lg text-gray-800">{{ ucfirst($producto->tipo) }}</p>
+        </div>
+
+        <!-- Observaciones -->
+        @if ($producto->observaciones)
+            <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-600">Observaciones</h3>
+                <p class="text-gray-800">{{ $producto->observaciones }}</p>
+            </div>
+        @endif
+
+        <!-- Detalles -->
+        @foreach ($campos as $key => $label)
+            @if (!empty($detalles[$key]))
+                <div class="mb-4">
+                    <h3 class="text-sm font-semibold text-gray-600">{{ $label }}</h3>
+                    <p class="text-gray-800 whitespace-pre-line">{{ $detalles[$key] }}</p>
+                </div>
+            @endif
+        @endforeach
+
+        <!-- Botón volver -->
+        <div class="mt-6">
+            <a href="{{ route('productos.index') }}"
+                class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">
+                Volver al listado
+            </a>
+        </div>
     </div>
-</div>
 @endsection

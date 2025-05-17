@@ -9,42 +9,60 @@ use Illuminate\Http\Request; // ¡Importa la clase Request!
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response; //para exportar la tabla
 
 class UsuarioController extends Controller
 {
 
-    public function index(Request $request) // <-- Paso 1: Recibe el objeto Request
+    public function index(Request $request)
     {
-        $query = $request->input('q'); // Obtiene el parámetro de búsqueda 'q' (del formulario)
-        // Obtiene el número de elementos por página del request, por defecto 10.
-        // Las opciones deben ser las mismas que definas en el select de tu Blade.
-        $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100]) ? $request->input('per_page') : 10;
+        // Paso 1: Obtener los parámetros del formulario
+        $query = $request->input('q');              // Para buscar por nombre o email
+        $estado = $request->input('estado');        // Para filtrar por estado (activo/inactivo)
+        $rol = $request->input('rol');              // Para filtrar por rol (administrador/operador)
+        $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100])
+                ? $request->input('per_page')
+                : 5; // Número de registros por página
 
-
-        // Paso 2: Inicia la consulta de usuarios con los roles
+        // Paso 2: Empezamos la consulta con relación de roles
         $usuarios = User::with('roles');
 
-        // Paso 3: Aplica el filtro de búsqueda si existe una 'query'
+        // Paso 3: Filtro por nombre o correo
         if ($query) {
-            $usuarios->where('name', 'like', '%' . $query . '%')
-                     ->orWhere('email', 'like', '%' . $query . '%');
+            $usuarios->where(function($q2) use ($query) {
+                $q2->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%'])
+                ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($query) . '%']);
+            });
         }
 
-        // Paso 4: Aplica la paginación al final de la consulta
-        // El método paginate() devuelve un objeto Paginator, resolviendo el error hasPages()
-        $usuarios = $usuarios->paginate($perPage)->withQueryString(); // <-- ¡Clave para la paginación!
-        // withQueryString() es importante para que los parámetros de búsqueda ('q', 'per_page') se mantengan
-        // cuando se navega entre páginas de la paginación.
 
-        // Paso 5: Lógica para mostrar el mensaje "no encontrado" si la búsqueda no arroja resultados
-        if ($usuarios->isEmpty() && $query) { // Solo si hay una búsqueda y no hay resultados
-            $message = '¡Vaya! No se encontraron usuarios que coincidan con su búsqueda: "' . htmlspecialchars($query) . '". Por favor, intente con otro término o verifique la ortografía.';
-            return view('usuarios.index', compact('usuarios'))->with('error', $message);
+        // Paso 4: Filtro por estado (si se envió)
+        if ($estado === 'estado') {
+            $usuarios->where('estado', 'activo');
+        } elseif ($estado === 'inactivo') {
+            $usuarios->where('estado', 'inactivo');
         }
 
-        // Paso 6: Devuelve la vista con la colección de usuarios paginada
+        // Paso 5: Filtro por rol (si se envió)
+        if ($rol) {
+            $usuarios->whereHas('roles', function($q3) use ($rol) {
+                $q3->where('name', $rol);
+            });
+        }
+
+        // Paso 6: Paginación con parámetros conservados
+        $usuarios = $usuarios->paginate($perPage)->withQueryString();
+
+        // Paso 7: Si se hizo búsqueda pero no hay resultados, mostrar mensaje
+        if ($usuarios->isEmpty() && ($query || $estado || $rol)) {
+            $mensaje = 'No se encontraron usuarios con los filtros seleccionados.';
+            return view('usuarios.index', compact('usuarios'))->with('error', $mensaje);
+        }
+
+        // Paso 8: Retornar vista con los usuarios filtrados
         return view('usuarios.index', compact('usuarios'));
     }
+
 
     public function create()
     {
@@ -93,6 +111,63 @@ class UsuarioController extends Controller
     {
         $roles = Role::all();
         return view('usuarios.edit', compact('usuario', 'roles'));
+    }
+
+    public function exportarCSV(Request $request)
+    {
+        $query = $request->input('q');
+        $rol = $request->input('rol');
+        $estado = $request->input('estado'); // nuevo filtro
+
+        $usuarios = User::with('roles');
+
+        if ($query) {
+            $usuarios->where(function($q2) use ($query) {
+                $q2->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%'])
+                ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($query) . '%']);
+            });
+        }
+
+        if ($rol) {
+            $usuarios->whereHas('roles', function($q3) use ($rol) {
+                $q3->where('name', $rol);
+            });
+        }
+
+        if ($estado) {
+            $usuarios->where('estado', $estado);
+        }
+
+        $usuarios = $usuarios->get();
+
+        $nombreArchivo = 'usuarios_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$nombreArchivo\"",
+        ];
+
+        $columnas = ['ID', 'Nombre', 'Correo', 'Rol', 'Estado', 'Creado'];
+
+        $callback = function () use ($usuarios, $columnas) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columnas);
+
+            foreach ($usuarios as $usuario) {
+                fputcsv($file, [
+                    $usuario->id,
+                    $usuario->name,
+                    $usuario->email,
+                    $usuario->roles->pluck('name')->implode(', '),
+                    $usuario->estado, // acá ya es texto, 'Activo' o 'Inactivo'
+                    $usuario->created_at->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return Response::stream($callback, 200, $headers);
     }
 
     public function importarCsv(Request $request)

@@ -15,11 +15,10 @@ use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\ExportarCsvController;
 use App\Http\Controllers\CentroAyudaController;
 use App\Http\Controllers\AccesibilidadController;
-use App\Http\Controllers\Operador\HistorialOperadorController;
 use App\Http\Controllers\Operador\OperadorProductoController;
 
 // Rutas públicas
-Route::get('/', function () { 
+Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
@@ -50,6 +49,7 @@ Route::middleware([
             Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
             Route::get('/usuarios/create', [UsuarioController::class, 'create'])->name('usuarios.create');
             Route::post('/usuarios/importar-csv', [UsuarioController::class, 'importarCsv'])->name('usuarios.importarCsv');
+            Route::get('/usuarios/exportar', [UsuarioController::class, 'exportarCSV'])->name('usuarios.exportar');
             Route::post('/usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
             Route::get('/usuarios/{usuario}', [UsuarioController::class, 'show'])->name('usuarios.show');
             Route::get('/usuarios/{usuario}/edit', [UsuarioController::class, 'edit'])->name('usuarios.edit');
@@ -107,29 +107,23 @@ Route::middleware([
             //Generador de archivo csv
             Route::get('/generar-csv', [ExportarCsvController::class, 'generarCsv'])->middleware('auth');
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | OPERADOR y en OperadorController.php tambien quiero hacer lo mismo para el, de acuerdo?
         |--------------------------------------------------------------------------
         */
             Route::prefix('operador')->name('operador.')->group(function () {
-                // Vista unificada de pendientes (productos y boletines)
                 Route::get('/pendientes', [OperadorProductoController::class, 'pendientes'])->name('pendientes');
 
-                // Acciones sobre productos
-                Route::post('/productos/{id}/validar', [OperadorProductoController::class, 'validar'])->name('productos.validar');
-                Route::post('/productos/{id}/rechazar', [OperadorProductoController::class, 'rechazar'])->name('productos.rechazar');
+                Route::get('/productos/{producto}', [OperadorProductoController::class, 'showProducto'])->name('productos.show');
 
-                // Acciones sobre boletines
-                Route::post('/boletines/{id}/validar', [OperadorProductoController::class, 'validarBoletin'])->name('boletines.validar');
-                Route::post('/boletines/{id}/rechazar', [OperadorProductoController::class, 'rechazarBoletin'])->name('boletines.rechazar');
+                Route::get('/boletines/{boletin}', [OperadorProductoController::class, 'showBoletin'])->name('boletines.show');
 
-                // Vista de detalles (historial) de productos y boletines
-                Route::get('/productos/{producto}', [HistorialOperadorController::class, 'showProducto'])->name('productos.show');
-                Route::get('/boletines/{boletin}', [HistorialOperadorController::class, 'showBoletin'])->name('boletines.show');
+                Route::post('/productos/{producto}/validar', [OperadorProductoController::class, 'validar'])->name('productos.validar');
+                Route::post('/productos/{producto}/rechazar', [OperadorProductoController::class, 'rechazar'])->name('productos.rechazar');
 
-                // Vista de historial con filtros
-                Route::get('/historial', [HistorialOperadorController::class, 'index'])->name('historial.index');
+                Route::post('/boletines/{boletin}/validar', [OperadorProductoController::class, 'validarBoletin'])->name('boletines.validar');
+                Route::post('/boletines/{boletin}/rechazar', [OperadorProductoController::class, 'rechazarBoletin'])->name('boletines.rechazar');
             });
         });
     });

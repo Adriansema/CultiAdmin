@@ -5,14 +5,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Producto;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProductoController extends Controller
 {
-    use AuthorizesRequests;
-
     public function index()
     {
         $productos = Producto::all();
@@ -27,9 +24,10 @@ class ProductoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'required|string',
+            'detalles' => 'required|array',
+            'tipo' => 'required|string',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'observaciones' => 'nullable|string',
         ]);
 
         $imagen = null;
@@ -38,45 +36,59 @@ class ProductoController extends Controller
         }
 
         Producto::create([
-            'nombre' => $request->nombre,
-            'descripcion' => $request->descripcion,
-            'imagen' => $imagen,
             'user_id' => Auth::id(),
+            'detalles_json' => json_encode($request->detalles, JSON_UNESCAPED_UNICODE),
             'estado' => 'pendiente',
+            'observaciones' => $request->observaciones,
+            'imagen' => $imagen,
+            'tipo' => $request->tipo,
         ]);
 
-        return redirect()->route('productos.index')->with('success', 'Producto creado.');
+        return redirect()->route('productos.index')->with('success', 'Producto creado con éxito.');
     }
+
 
     public function show(Producto $producto)
     {
-        $this->authorize('view', $producto);
         return view('productos.show', compact('producto'));
     }
 
     public function edit(Producto $producto)
     {
-        $this->authorize('update', $producto);
         return view('productos.edit', compact('producto'));
     }
 
     public function update(Request $request, Producto $producto)
     {
-        $this->authorize('update', $producto);
-
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'required|string',
+            'detalles' => 'required|array',
+            'tipo' => 'required|string',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'observaciones' => 'nullable|string',
         ]);
 
-        $producto->update($request->only('nombre', 'descripcion'));
+        // Actualizar imagen si viene una nueva
+        if ($request->hasFile('imagen')) {
+            // Opcional: eliminar imagen anterior si querés
+            // Storage::disk('public')->delete($producto->imagen);
 
-        return redirect()->route('productos.index')->with('success', 'Producto actualizado.');
+            $imagen = $request->file('imagen')->store('productos', 'public');
+            $producto->imagen = $imagen;
+        }
+
+        // Actualizar los demás campos
+        $producto->tipo = $request->tipo;
+        $producto->detalles_json = json_encode($request->detalles, JSON_UNESCAPED_UNICODE);
+        $producto->observaciones = $request->observaciones;
+
+        $producto->save();
+
+        return redirect()->route('productos.index')->with('success', 'Producto actualizado con éxito.');
     }
+
 
     public function destroy(Producto $producto)
     {
-        $this->authorize('delete', $producto);
         $producto->delete();
 
         return redirect()->route('productos.index')->with('success', 'Producto eliminado.');

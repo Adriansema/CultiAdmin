@@ -1,4 +1,4 @@
-{{-- CON ENLACE --}}
+{{-- FUNCIÓN DE ENLACE Y DISEÑO QUE SE VE EN CADA VISTA DE LA APLICACION --}}
  <div class="breadcrumb flex items-center">
     @foreach ($breadcrumbs as $key => $breadcrumb)
         @if ($key < count($breadcrumbs) - 1)

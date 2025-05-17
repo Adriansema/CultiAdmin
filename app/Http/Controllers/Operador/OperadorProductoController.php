@@ -45,19 +45,27 @@ class OperadorProductoController extends Controller
         return back()->with('error', 'Producto rechazado.');
     }
 
-    public function show($tipo, $id)
+    public function showProducto($id)
     {
-        if ($tipo === 'producto') {
-            $item = Producto::findOrFail($id);
-            return view('operador.show-producto', compact('item'));
-        } elseif ($tipo === 'boletin') {
-            $item = Boletin::findOrFail($id);
-            return view('operador.show-boletin', compact('item'));
+        $producto = Producto::findOrFail($id);
+
+        if ($producto->estado !== 'pendiente') {
+            abort(403, 'Este producto ya fue procesado.');
         }
 
-        abort(404);
+        return view('operador.productos.show', compact('producto'));
     }
 
+    public function showBoletin($id)
+    {
+        $boletin = Boletin::findOrFail($id);
+
+        if ($boletin->estado !== 'pendiente') {
+            abort(403, 'Este boletín ya fue procesado.');
+        }
+
+        return view('operador.boletines.show', compact('boletin'));
+    }
 
     public function validarBoletin($id)
     {
@@ -85,35 +93,4 @@ class OperadorProductoController extends Controller
         return back()->with('error', 'Boletín rechazado.');
     }
 
-    public function historial(Request $request)
-    {
-        $estado = $request->input('estado');
-        $tipo = $request->input('tipo');
-        $fechaInicio = $request->input('fecha_inicio');
-        $fechaFin = $request->input('fecha_fin');
-
-        $productos = Producto::query()->whereIn('estado', ['aprobado', 'rechazado']);
-        $boletines = Boletin::query()->whereIn('estado', ['aprobado', 'rechazado']);
-
-        if ($estado) {
-            $productos->where('estado', $estado);
-            $boletines->where('estado', $estado);
-        }
-
-        if ($fechaInicio) {
-            $productos->whereDate('updated_at', '>=', $fechaInicio);
-            $boletines->whereDate('updated_at', '>=', $fechaInicio);
-        }
-
-        if ($fechaFin) {
-            $productos->whereDate('updated_at', '<=', $fechaFin);
-            $boletines->whereDate('updated_at', '<=', $fechaFin);
-        }
-
-        // Si el usuario filtra por tipo
-        $historialProductos = $tipo === 'boletin' ? collect() : $productos->latest()->paginate(5)->withQueryString();
-        $historialBoletines = $tipo === 'producto' ? collect() : $boletines->latest()->paginate(5)->withQueryString();
-
-        return view('operador.historial', compact('historialProductos', 'historialBoletines'));
     }
-}
