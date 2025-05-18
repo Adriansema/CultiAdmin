@@ -22,6 +22,7 @@
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",
         "fakerphp/faker": "^1.23",
+        "kitloong/laravel-migrations-generator": "^7.1",
         "laravel-lang/lang": "^12.17",
         "laravel-lang/publisher": "^16.6",
         "laravel/pail": "^1.2.2",
