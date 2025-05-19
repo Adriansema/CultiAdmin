@@ -4,6 +4,7 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
 use App\Actions\Fortify\LoginResponse;
 use Illuminate\Pagination\Paginator;
@@ -29,7 +30,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useTailwind();
+        Carbon::setLocale('es');
+        setlocale(LC_TIME, 'es_ES.UTF-8');
+
     }
-
-
 }

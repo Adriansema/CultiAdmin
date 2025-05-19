@@ -21,7 +21,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Route::middleware('role:administrador');
+        /* Route::middleware('role:administrador'); */
 
         $this->routes(function () {
             Route::middleware('web')

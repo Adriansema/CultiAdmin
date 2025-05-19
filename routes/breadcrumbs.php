@@ -141,11 +141,11 @@ Breadcrumbs::for('operador.pendientes', function ($trail) {
 // Detalle del producto pendiente
 Breadcrumbs::for('operador.productos.show', function ($trail, $producto) {
     $trail->parent('operador.pendientes');
-    $trail->push('Producto: ' . $producto->nombre, route('operador.productos.show', $producto));
+    $trail->push('Producto', route('operador.productos.show', $producto));
 });
 
 // Detalle del boletín pendiente
 Breadcrumbs::for('operador.boletines.show', function ($trail, $boletin) {
     $trail->parent('operador.pendientes');
-    $trail->push('Boletín: ' . $boletin->asunto, route('operador.boletines.show', $boletin));
+    $trail->push('Boletines', route('operador.boletines.show', $boletin));
 });

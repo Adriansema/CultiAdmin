@@ -60,16 +60,22 @@ Route::middleware([
             // Historial
             Route::get('/historial', [HistorialController::class, 'index'])->name('historial.index');
 
-            // Productos
+            // Productos rutas sin parámetros
             Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
             Route::get('/productos/create', [ProductoController::class, 'create'])->name('productos.create');
             Route::post('/productos', [ProductoController::class, 'store'])->name('productos.store');
-            Route::get('/productos/{producto}', [ProductoController::class, 'show'])->name('productos.show');
-            Route::get('/productos/{producto}/edit', [ProductoController::class, 'edit'])->name('productos.edit');
-            Route::put('/productos/{producto}', [ProductoController::class, 'update'])->name('productos.update');
-            Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
+
+            // Rutas específicas fijas antes que las dinámicas
             Route::get('/productos/cafe', [ProductoController::class, 'cafe'])->name('productos.cafe');
             Route::get('/productos/mora', [ProductoController::class, 'mora'])->name('productos.mora');
+            Route::post('/productos/importar-csv', [ProductoController::class, 'importarCSV'])->name('productos.importar.csv');
+            Route::get('/productos/generar-csv', [ProductoController::class, 'generarCSV'])->name('productos.generarCSV');
+
+            // Rutas con parámetros al final
+            Route::get('/productos/{producto}/edit', [ProductoController::class, 'edit'])->name('productos.edit');
+            Route::get('/productos/{producto}', [ProductoController::class, 'show'])->name('productos.show');
+            Route::put('/productos/{producto}', [ProductoController::class, 'update'])->name('productos.update');
+            Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
 
             // Boletines
             Route::get('/boletines', [BoletinController::class, 'index'])->name('boletines.index');

@@ -68,3 +68,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+//resources/views/operador/partials/productos y boletines.blade.php : estos son los script/funciones para utilizar los modales
+window.mostrarModal = function(tipo, id) {
+    const modal = document.getElementById(`modal-${tipo}-${id}`);
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+window.ocultarModal = function(tipo, id) {
+    const modal = document.getElementById(`modal-${tipo}-${id}`);
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}

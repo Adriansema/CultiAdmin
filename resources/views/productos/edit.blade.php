@@ -81,12 +81,15 @@
                 @enderror
             </div>
 
-            <button type="submit" class="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700">Actualizar</button>
-            <!-- Botón volver -->
-            <a href="{{ route('productos.index') }}"
-                class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">
-                Volver al listado
-            </a>
+            <div class="flex justify-between items-center mb-6">
+                <a href="{{ route('productos.index') }}"
+                    class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">
+                    Volver al listado
+                </a>
+                <button type="submit" class="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700">
+                    Actualizar
+                </button>
+            </div>
         </form>
     </div>
 @endsection
