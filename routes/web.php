@@ -78,15 +78,23 @@ Route::middleware([
             Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
 
             // Boletines
-            Route::get('/boletines', [BoletinController::class, 'index'])->name('boletines.index');
-            Route::get('/boletines/create', [BoletinController::class, 'create'])->name('boletines.create');
-            Route::post('/boletines', [BoletinController::class, 'store'])->name('boletines.store');
-            Route::get('/boletines/{boletin}', [BoletinController::class, 'show'])->name('boletines.show');
-            Route::get('/boletines/{boletin}/edit', [BoletinController::class, 'edit'])->name('boletines.edit');
-            Route::put('/boletines/{boletin}', [BoletinController::class, 'update'])->name('boletines.update');
-            Route::delete('/boletines/{boletin}', [BoletinController::class, 'destroy'])->name('boletines.destroy');
-            Route::get('/boletines/cafe', [BoletinController::class, 'cafe'])->name('boletines.cafe');
-            Route::get('/boletines/mora', [BoletinController::class, 'mora'])->name('boletines.mora');
+          // Primero las rutas específicas
+Route::get('/boletines/importar', [BoletinController::class, 'formImportar'])->name('boletines.formImportar');
+Route::post('/boletines/importar', [BoletinController::class, 'importarPdf'])->name('boletines.importarPdf');
+Route::get('/boletines/cafe', [BoletinController::class, 'cafe'])->name('boletines.cafe');
+Route::get('/boletines/mora', [BoletinController::class, 'mora'])->name('boletines.mora');
+
+// Luego las rutas estándar
+Route::get('/boletines', [BoletinController::class, 'index'])->name('boletines.index');
+Route::get('/boletines/create', [BoletinController::class, 'create'])->name('boletines.create');
+Route::post('/boletines', [BoletinController::class, 'store'])->name('boletines.store');
+
+// Finalmente, las rutas con parámetros dinámicos (al final SIEMPRE)
+Route::get('/boletines/{boletin}/edit', [BoletinController::class, 'edit'])->name('boletines.edit');
+Route::put('/boletines/{boletin}', [BoletinController::class, 'update'])->name('boletines.update');
+Route::delete('/boletines/{boletin}', [BoletinController::class, 'destroy'])->name('boletines.destroy');
+Route::get('/boletines/{boletin}', [BoletinController::class, 'show'])->name('boletines.show');
+
 
             //Estadistica
             Route::get('admin/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index');

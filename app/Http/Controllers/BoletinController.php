@@ -7,6 +7,8 @@ namespace App\Http\Controllers;
 use App\Models\Boletin;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Smalot\PdfParser\Parser;
+
 
 class BoletinController extends Controller
 {
@@ -73,5 +75,53 @@ class BoletinController extends Controller
     {
         return view('boletines.mora');
     }
+
+    public function importarPdf(Request $request)
+{
+    $request->validate([
+        'archivo' => 'required|file|mimes:pdf|max:5120', // Máx. 5MB
+    ]);
+
+    $archivo = $request->file('archivo');
+
+    $parser = new Parser();
+    $pdf = $parser->parseFile($archivo->getRealPath());
+    $texto = $pdf->getText();
+
+    // Separar boletines por '===' como separador
+    $bloques = preg_split('/===+/', $texto);
+
+    foreach ($bloques as $bloque) {
+        $lineas = array_filter(array_map('trim', explode("\n", $bloque)));
+
+        $asunto = '';
+        $contenido = '';
+
+        foreach ($lineas as $linea) {
+            if (stripos($linea, 'asunto:') === 0) {
+                $asunto = trim(substr($linea, 7));
+            } elseif (stripos($linea, 'contenido:') === 0) {
+                $contenido = trim(substr($linea, 10));
+            } else {
+                $contenido .= ' ' . $linea;
+            }
+        }
+
+        if ($asunto && $contenido) {
+            Boletin::create([
+                'asunto' => $asunto,
+                'contenido' => $contenido,
+            ]);
+        }
+    }
+
+      return back()->with('success', 'Boletines importados correctamente desde el PDF.');
+   }
+
+        public function formImportar()
+           {
+            return view('boletines.importar-pdf');
+           }
+
 
 }

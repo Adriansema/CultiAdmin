@@ -15,7 +15,7 @@
         <div class="inline-block px-8 py-10">
             <div class="flex items-center space-x-2">
                 <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-                <h1 class="text-3xl whitespace-nowrap font-bold">Boletines</h1>
+                <h1 class="text-3xl font-bold whitespace-nowrap">Boletines</h1>
             </div>
             {!! Breadcrumbs::render('boletines.index') !!}
         </div>
@@ -23,7 +23,7 @@
 
         <div class="mb-4">
             <a href="{{ route('boletines.create') }}"
-                class="inline-block px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
+                class="px-4 py-2 text-white bg-green-600 rounded-3xl hover:bg-green-700">
                 + Crear Boletín
             </a>
         </div>
@@ -32,9 +32,10 @@
             <table class="min-w-full table-auto">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th class="px-4 py-2 text-left">#</th>
+                        <th class="px-4 py-2 text-left">id</th>
                         <th class="px-4 py-2 text-left">Asunto</th>
                         <th class="px-4 py-2 text-left">Contenido</th>
+                        <th class="px-4 py-2 text-left">Fechas</th>
                         <th class="px-4 py-2 text-left">Acciones</th>
                     </tr>
                 </thead>
@@ -46,6 +47,7 @@
                             <td class="max-w-xs px-4 py-2 text-sm text-gray-600 truncate">
                                 {{ Str::limit($boletin->contenido, 60) }}
                             </td>
+                            <td class="px-4 py-2 text-gray-600">{{ $boletin->updated_at->format('d/m/Y H:i') }}</td>
                             <td class="px-4 py-2 space-x-2">
                                 <a href="{{ route('boletines.show', $boletin) }}"
                                     class="px-3 py-1 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">Ver</a>

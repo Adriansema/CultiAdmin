@@ -1,5 +1,10 @@
 @csrf
 
+<a href="{{ route('boletines.formImportar') }}"
+   class="inline-block px-4 py-2 mb-4 font-bold text-white bg-green-600 rounded hover:bg-green-700">
+   Importar desde PDF
+</a>
+
 <div class="mb-4">
     <x-label for="asunto" :value="'Asunto'" />
     <x-input id="asunto" name="asunto" type="text" class="w-full"
