@@ -11,7 +11,7 @@
             <p class="mt-4 text-gray-700 whitespace-pre-line">{{ $boletin->contenido }}</p>
 
             <div class="mt-6">
-                <a href="{{ route('boletines.edit', $boletin) }}"
+              <a href="{{ route('boletines.edit', ['boletin' => $boletin->id]) }}"
                    class="inline-block px-4 py-2 text-white bg-yellow-500 rounded hover:bg-yellow-600">Editar</a>
                 <a href="{{ route('boletines.index') }}"
                    class="inline-block px-4 py-2 ml-2 text-white bg-gray-500 rounded hover:bg-gray-600">Volver</a>
