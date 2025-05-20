@@ -11,22 +11,18 @@ return new class extends Migration
      */
     // database/migrations/xxxx_xx_xx_create_boletins_table.php
 
-    public function up()
-    {
-        Schema::create('boletins', function (Blueprint $table) {
-            $table->id();
-            $table->string('asunto');
-            $table->text('contenido');
-            $table->timestamps();
-        });
-    }
+   public function up()
+{
+    Schema::table('boletines', function (Blueprint $table) {
+        $table->string('archivo')->nullable()->after('contenido');
+    });
+}
 
+public function down()
+{
+    Schema::table('boletines', function (Blueprint $table) {
+        $table->dropColumn('archivo');
+    });
+}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('boletins');
-    }
 };
