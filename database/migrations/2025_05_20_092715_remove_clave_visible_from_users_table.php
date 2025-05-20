@@ -9,20 +9,22 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('activo')->default(true);
+            $table->dropColumn('clave_visible');
         });
     }
+
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('activo'); // Elimina la columna si se revierte
+            $table->string('clave_visible')->nullable();
         });
     }
+
 };

@@ -13,6 +13,7 @@ class UpdateUserOnlineStatus
 
         if ($event instanceof Login) {
             $user->is_online = true;
+            $user->last_login_at = now(); // Aquí registramos la última conexión
         }
 
         if ($event instanceof Logout) {
