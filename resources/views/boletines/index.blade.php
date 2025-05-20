@@ -90,7 +90,12 @@
                         <td class="max-w-xs px-4 py-2 text-sm text-gray-600 truncate">
                             {{ Str::limit($boletin->contenido, 60) }}
                         </td>
-                        <td class="px-4 py-2 text-gray-600">{{ $boletin->updated_at->format('d/m/Y H:i') }}</td>
+
+                        <td class="px-4 py-2 text-gray-600">
+                                {{ $boletin->created_at->locale('es')->translatedFormat('d \d\e F \d\e\l Y h:i a') . ' (' . $boletin->created_at->diffForHumans() . ')' }}
+                            </td>
+
+                        
                         <td class="px-4 py-2 space-x-2">
                             <a href="{{ route('boletines.show', $boletin) }}"
                                 class="px-3 py-1 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700">Ver</a>
