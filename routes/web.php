@@ -2,20 +2,19 @@
 
 // actualizacion 09/04/2025 //
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\AccesibilidadController;
+use App\Http\Controllers\BoletinController;
+use App\Http\Controllers\CentroAyudaController;
+use App\Http\Controllers\ExportarCsvController;
+use App\Http\Controllers\HistorialController;
+use App\Http\Controllers\Operador\OperadorProductoController;
+use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\StatisticController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\ViewUserController;
 use App\Http\Middleware\CheckUserEstado;
 use App\Http\Middleware\Roles_Admin_Opera;
-use App\Http\Controllers\BoletinController;
-use App\Http\Controllers\UsuarioController;
-use App\Http\Controllers\ProductoController;
-use App\Http\Controllers\ViewUserController;
-use App\Http\Controllers\StatisticController;
-use App\Http\Controllers\HistorialController;
-use App\Http\Controllers\ExportarCsvController;
-use App\Http\Controllers\CentroAyudaController;
-use App\Http\Controllers\AccesibilidadController;
-use App\Http\Controllers\Operador\OperadorProductoController;
+use Illuminate\Support\Facades\Route;
 
 // Rutas públicas
 Route::get('/', function () {
@@ -78,25 +77,22 @@ Route::middleware([
             Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
 
             // Boletines
-          // Primero las rutas específicas
-Route::resource('boletines', BoletinController::class);
-Route::post('boletines/importar-pdf', [BoletinController::class, 'importarPdf'])->name('boletines.importarPdf');
-Route::get('/boletines/cafe', [BoletinController::class, 'cafe'])->name('boletines.cafe');
-Route::get('/boletines/mora', [BoletinController::class, 'mora'])->name('boletines.mora');
+            Route::post('boletines/importar-pdf', [BoletinController::class, 'importarPdf'])->name('boletines.importarPdf');
+            Route::get('/boletines/cafe', [BoletinController::class, 'cafe'])->name('boletines.cafe');
+            Route::get('/boletines/mora', [BoletinController::class, 'mora'])->name('boletines.mora');
 
-// Luego las rutas estándar
-Route::get('/boletines', [BoletinController::class, 'index'])->name('boletines.index');
-Route::get('/boletines/create', [BoletinController::class, 'create'])->name('boletines.create');
-Route::post('/boletines', [BoletinController::class, 'store'])->name('boletines.store');
+            // Luego las rutas estándar
+            Route::get('/boletines', [BoletinController::class, 'index'])->name('boletines.index');
+            Route::get('/boletines/create', [BoletinController::class, 'create'])->name('boletines.create');
+            Route::post('/boletines', [BoletinController::class, 'store'])->name('boletines.store');
 
-// Finalmente, las rutas con parámetros dinámicos (al final SIEMPRE)
-Route::get('/boletines/{boletin}/edit', [BoletinController::class, 'edit'])->name('boletines.edit');
-Route::put('/boletines/{boletin}', [BoletinController::class, 'update'])->name('boletines.update');
-Route::delete('/boletines/{boletin}', [BoletinController::class, 'destroy'])->name('boletines.destroy');
-Route::get('/boletines/{boletin}', [BoletinController::class, 'show'])->name('boletines.show');
+            // Finalmente, las rutas con parámetros dinámicos (al final SIEMPRE)
+            Route::get('/boletines/{boletin}/edit', [BoletinController::class, 'edit'])->name('boletines.edit');
+            Route::put('/boletines/{boletin}', [BoletinController::class, 'update'])->name('boletines.update');
+            Route::delete('/boletines/{boletin}', [BoletinController::class, 'destroy'])->name('boletines.destroy');
+            Route::get('/boletines/{boletin}', [BoletinController::class, 'show'])->name('boletines.show');
 
-
-            //Estadistica
+            // Estadistica
             Route::get('admin/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index');
 
             // Vista de Usuarios
@@ -109,16 +105,16 @@ Route::get('/boletines/{boletin}', [BoletinController::class, 'show'])->name('bo
             Route::delete('view-user/{id}', [ViewUserController::class, 'destroy'])->name('view-user.destroy');
             Route::get('view-user/{id}/historial', [ViewUserController::class, 'historial'])->name('view-user.historial');
 
-            //Centro de Ayuda de la Aplicación___ routes/web.php
+            // Centro de Ayuda de la Aplicación___ routes/web.php
             Route::get('/centro-ayuda', [CentroAyudaController::class, 'index'])->name('centroAyuda.index');
             Route::get('/search-faq', [CentroAyudaController::class, 'searchFaq'])->name('search.faq');
             Route::get('/centro-ayuda/contacto', [CentroAyudaController::class, 'showContactForm'])->name('centroAyuda.contactForm');
             Route::post('/centro-ayuda/contact-submit', [CentroAyudaController::class, 'submitContact'])->name('contact.submit');
 
-            //Acesibilidad de la Aplicación
+            // Acesibilidad de la Aplicación
             Route::get('/accesibilidad', [AccesibilidadController::class, 'index'])->name('accesibilidad.index');
 
-            //Generador de archivo csv
+            // Generador de archivo csv
             Route::get('/generar-csv', [ExportarCsvController::class, 'generarCsv'])->middleware('auth');
 
             /*

@@ -1,22 +1,20 @@
 <?php
 
-//actualizacion 09/04/2025
+// actualizacion 09/04/2025
 
 namespace App\Http\Controllers;
 
 use App\Models\Boletin;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
-use Smalot\PdfParser\Parser;
-
 
 class BoletinController extends Controller
 {
-
     public function index()
     {
         $role = Role::select('name')->get();
         $boletines = Boletin::latest()->get();
+
         return view('boletines.index', compact('boletines'));
     }
 
@@ -28,7 +26,7 @@ class BoletinController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'archivo' => 'required|string',
+            'archivo' => 'nullable|string', //por el momento esta null, ya que en futuro se reutilizar
             'contenido' => 'required|string',
         ]);
 
@@ -76,18 +74,18 @@ class BoletinController extends Controller
         return view('boletines.mora');
     }
 
-public function importarPdf(Request $request)
-{
-    // Guardar el archivo en storage/app/public/boletines
-    $archivo = $request->file('archivo');
-    $rutaArchivo = $archivo->store('boletines', 'public');
+    public function importarPdf(Request $request)
+    {
+        // Guardar el archivo en storage/app/public/boletines
+        $archivo = $request->file('archivo');
+        $rutaArchivo = $archivo->store('boletines', 'public');
 
-    // Crear boletín con contenido, asunto y ruta del archivo
-    Boletin::create([
-        'archivo' => $rutaArchivo,
-        'contenido' => $request->contenido,
-    ]);
+        // Crear boletín con contenido, asunto y ruta del archivo
+        Boletin::create([
+            'archivo' => $rutaArchivo,
+            'contenido' => $request->contenido,
+        ]);
 
-    return redirect()->route('boletines.index')->with('success', 'Boletín importado correctamente');
-}
+        return redirect()->route('boletines.index')->with('success', 'Boletín importado correctamente');
+    }
 }
