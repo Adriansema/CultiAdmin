@@ -28,7 +28,7 @@ class BoletinController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'asunto' => 'required|string|max:255',
+            'archivo' => 'required|string',
             'contenido' => 'required|string',
         ]);
 
@@ -50,7 +50,7 @@ class BoletinController extends Controller
     public function update(Request $request, Boletin $boletin)
     {
         $validated = $request->validate([
-            'asunto' => 'required|string|max:255',
+            'archivo' => 'required|string',
             'contenido' => 'required|string',
         ]);
 
@@ -84,9 +84,8 @@ public function importarPdf(Request $request)
 
     // Crear boletín con contenido, asunto y ruta del archivo
     Boletin::create([
-        'asunto' => $request->asunto ?? 'Sin asunto',  // <-- aquí el valor por defecto
-        'contenido' => $request->contenido,
         'archivo' => $rutaArchivo,
+        'contenido' => $request->contenido,
     ]);
 
     return redirect()->route('boletines.index')->with('success', 'Boletín importado correctamente');
