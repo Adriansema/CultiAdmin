@@ -44,7 +44,7 @@
         </div>
 
         <!-- Alpine.js debe estar disponible (Jetstream ya lo incluye) -->
-        <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data" x-data="{ tab: 'general' }"
+        <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data" x-data="{ tab: 'historia' }"
             class="bg-red-200 p-8 rounded-2xl shadow-xl space-y-2">
             @csrf
 
@@ -75,54 +75,39 @@
             <div class="border-b mb-4">
                 <nav class="flex space-x-4">
                     <button type="button" class="px-4 py-2 font-semibold border-b-2"
-                        :class="tab === 'general' ? 'border-indigo-600 text-indigo-600' : 'border-transparent'"
-                        @click="tab = 'general'">General</button>
+                        :class="tab === 'historia' ? 'border-indigo-600 text-indigo-600' : 'border-transparent'"
+                        @click="tab = 'historia'">Historia</button>
 
                     <button type="button" class="px-4 py-2 font-semibold border-b-2"
-                        :class="tab === 'cultivo' ? 'border-indigo-600 text-indigo-600' : 'border-transparent'"
-                        @click="tab = 'cultivo'">Cultivo</button>
+                        :class="tab === 'productos' ? 'border-indigo-600 text-indigo-600' : 'border-transparent'"
+                        @click="tab = 'productos'">Productos</button>
 
                     <button type="button" class="px-4 py-2 font-semibold border-b-2"
-                        :class="tab === 'produccion' ? 'border-indigo-600 text-indigo-600' : 'border-transparent'"
-                        @click="tab = 'produccion'">Producción</button>
+                        :class="tab === 'variantes' ? 'border-indigo-600 text-indigo-600' : 'border-transparent'"
+                        @click="tab = 'variantes'">Variantes</button>
 
                     <button type="button" class="px-4 py-2 font-semibold border-b-2"
-                        :class="tab === 'salud' ? 'border-indigo-600 text-indigo-600' : 'border-transparent'"
-                        @click="tab = 'salud'">Salud & Uso</button>
+                        :class="tab === 'enfermedades' ? 'border-indigo-600 text-indigo-600' : 'border-transparent'"
+                        @click="tab = 'enfermedades'">Enfermedades</button>
 
                     <button type="button" class="px-4 py-2 font-semibold border-b-2"
-                        :class="tab === 'otros' ? 'border-indigo-600 text-indigo-600' : 'border-transparent'"
-                        @click="tab = 'otros'">Otros</button>
+                        :class="tab === 'agroinsumos' ? 'border-indigo-600 text-indigo-600' : 'border-transparent'"
+                        @click="tab = 'agroinsumos'">Agroinsumos</button>
                 </nav>
             </div>
 
-            <!-- Tab: General -->
-            <div x-show="tab === 'general'" class="space-y-4">
-                <label for="que_es" class="block text-sm font-medium text-gray-700">
-                    ¿Qué es? <span class="text-red-600">*</span>
-                </label>
-                <textarea name="detalles[que_es]" id="que_es" required class="w-full rounded">{{ old('detalles.que_es') }}</textarea>
-
+            <!-- Tab: historia -->
+            <div x-show="tab === 'historia'" class="space-y-4">
                 <label for="historia" class="block text-sm font-medium text-gray-700">
-                    Historia del cultivo <span class="text-red-600">*</span>
+                    Historia del productos <span class="text-red-600">*</span>
                 </label>
                 <textarea name="detalles[historia]" id="historia" required class="w-full rounded">{{ old('detalles.historia') }}</textarea>
-
-                <label for="nombre_cientifico" class="block text-sm font-medium text-gray-700">
-                    Nombre científico <span class="text-red-600">*</span>
-                </label>
-                <textarea name="detalles[nombre_cientifico]" id="nombre_cientifico" required class="w-full rounded">{{ old('detalles.nombre_cientifico') }}</textarea>
             </div>
 
-            <!-- Tab: Cultivo -->
-            <div x-show="tab === 'cultivo'" x-cloak class="space-y-4">
+            <!-- Tab: productos -->
+            <div x-show="tab === 'productos'" x-cloak class="space-y-4">
                 @foreach ([
-            'variedad' => 'Variedad',
-            'especies' => 'Especies',
-            'caracteristicas' => 'Características',
-            'clima' => 'Clima',
-            'suelo' => 'Suelo',
-            'riego' => 'Riego',
+            'productos y sus características' => 'Producto y sus Características',
         ] as $key => $label)
                     <div>
                         <label for="{{ $key }}" class="block text-sm font-medium text-gray-700">
@@ -133,13 +118,10 @@
                 @endforeach
             </div>
 
-            <!-- Tab: Producción -->
-            <div x-show="tab === 'produccion'" x-cloak class="space-y-4">
+            <!-- Tab: Variantes -->
+            <div x-show="tab === 'variantes'" x-cloak class="space-y-4">
                 @foreach ([
-            'cosecha' => 'Cosecha',
-            'postcosecha' => 'Postcosecha',
-            'tecnicas_cultivo' => 'Técnicas de cultivo',
-            'certificaciones' => 'Certificaciones',
+            'variantes' => 'Variantes',
         ] as $key => $label)
                     <div>
                         <label for="{{ $key }}" class="block text-sm font-medium text-gray-700">
@@ -150,12 +132,10 @@
                 @endforeach
             </div>
 
-            <!-- Tab: Salud & Uso -->
-            <div x-show="tab === 'salud'" x-cloak class="space-y-4">
+            <!-- Tab: Enfermedades -->
+            <div x-show="tab === 'enfermedades'" x-cloak class="space-y-4">
                 @foreach ([
-            'usos' => 'Usos y aplicaciones',
-            'valor_nutricional' => 'Valor nutricional',
-            'impacto_economico' => 'Impacto económico',
+            'enfermedades' => 'Enfermedades',
         ] as $key => $label)
                     <div>
                         <label for="{{ $key }}" class="block text-sm font-medium text-gray-700">
@@ -166,27 +146,13 @@
                 @endforeach
             </div>
 
-            <!-- Tab: Otros -->
-            <div x-show="tab === 'otros'" x-cloak class="space-y-4">
+            <!-- Tab: agroinsumos -->
+            <div x-show="tab === 'agroinsumos'" x-cloak class="space-y-4">
                 <div>
-                    <label for="ubicacion_geografica" class="block text-sm font-medium text-gray-700">
-                        Ubicación geográfica óptima <span class="text-red-600">*</span>
+                    <label for="insumos" class="block text-sm font-medium text-gray-700">
+                        Insumos <span class="text-red-600">*</span>
                     </label>
-                    <textarea name="detalles[ubicacion_geografica]" id="ubicacion_geografica" required class="w-full rounded">{{ old('detalles.ubicacion_geografica') }}</textarea>
-                </div>
-
-                <div>
-                    <label for="plagas" class="block text-sm font-medium text-gray-700">
-                        Plagas y enfermedades comunes <span class="text-red-600">*</span>
-                    </label>
-                    <textarea name="detalles[plagas]" id="plagas" required class="w-full rounded">{{ old('detalles.plagas') }}</textarea>
-                </div>
-
-                <div>
-                    <label for="observaciones" class="block text-sm font-medium text-gray-700">
-                        Observaciones (opcional)
-                    </label>
-                    <textarea name="observaciones" id="observaciones" class="w-full rounded">{{ old('observaciones') }}</textarea>
+                    <textarea name="detalles[insumos]" id="insumos" required class="w-full rounded">{{ old('detalles.insumos') }}</textarea>
                 </div>
             </div>
 
