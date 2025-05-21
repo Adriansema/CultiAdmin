@@ -83,6 +83,10 @@ html { font-size: 16px; }
         --color-ajustes: #D1D1D1;
         --color-sidebarhoverbtn: #547488;
         --color-Gestion: #E6EAED;
+        --color-formulario: #EAE4D5;
+        --color-pag: #00304D;
+        --color-hover: #39A900;
+        --color-tabla: #F6F6F6;
     }
 }
 
@@ -107,4 +111,34 @@ html { font-size: 16px; }
 
 .text-shadow-hover:hover {
     text-shadow: 2px 2px 6px rgba(0, 255, 0, 0.6); /* Verde brillante al hover */
+}
+
+/* Estilos para el select personalizado para esta ruta resources/views/vendor/paginate/tailwind.blade.php */
+.custom-select {
+    -webkit-appearance: none; /* Para Chrome, Safari, Edge */
+    -moz-appearance: none;    /* Para Firefox */
+    appearance: none;         /* Estándar */
+    background-image: none;   /* Asegura que no haya imagen de fondo por defecto */
+    padding-right: 2.2rem;    /* Deja espacio para tu icono */
+    cursor: pointer;
+}
+
+/* Hack para IE10/11 para ocultar la flecha */
+.custom-select::-ms-expand {
+    display: none;
+}
+
+.custom-select-wrapper {
+    position: relative; /* Necesario para posicionar la flecha */
+    display: inline-block; /* Para que el div no ocupe todo el ancho */
+}
+
+.custom-select-arrow {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem; /* Ajusta la posición de la flecha */
+    transform: translateY(-50%); /* Centra verticalmente */
+    pointer-events: none; /* Asegura que la flecha no intercepte clics */
+    width: 1.10rem; /* Ajusta el tamaño de la flecha (w-5 de Tailwind) */
+    height: 1.25rem; /* Ajusta el tamaño de la flecha (h-5 de Tailwind) */
 }

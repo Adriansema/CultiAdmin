@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request; // ¡Importa la clase Request!
+use App\Services\UserService; // Importa los filtros, paginacion, etc...
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -13,56 +14,11 @@ use Illuminate\Support\Facades\Response; //para exportar la tabla
 
 class UsuarioController extends Controller
 {
-
-    public function index(Request $request)
+    public function index(Request $request, UserService $userService)
     {
-        // Paso 1: Obtener los parámetros del formulario
-        $query = $request->input('q');              // Para buscar por nombre o email
-        $estado = $request->input('estado');        // Para filtrar por estado (activo/inactivo)
-        $rol = $request->input('rol');              // Para filtrar por rol (administrador/operador)
-        $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100])
-                ? $request->input('per_page')
-                : 5; // Número de registros por página
-
-        // Paso 2: Empezamos la consulta con relación de roles
-        $usuarios = User::with('roles');
-
-        // Paso 3: Filtro por nombre o correo
-        if ($query) {
-            $usuarios->where(function($q2) use ($query) {
-                $q2->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%'])
-                ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($query) . '%']);
-            });
-        }
-
-
-        // Paso 4: Filtro por estado (si se envió)
-        if ($estado === 'estado') {
-            $usuarios->where('estado', 'activo');
-        } elseif ($estado === 'inactivo') {
-            $usuarios->where('estado', 'inactivo');
-        }
-
-        // Paso 5: Filtro por rol (si se envió)
-        if ($rol) {
-            $usuarios->whereHas('roles', function($q3) use ($rol) {
-                $q3->where('name', $rol);
-            });
-        }
-
-        // Paso 6: Paginación con parámetros conservados
-        $usuarios = $usuarios->paginate($perPage)->withQueryString();
-
-        // Paso 7: Si se hizo búsqueda pero no hay resultados, mostrar mensaje
-        if ($usuarios->isEmpty() && ($query || $estado || $rol)) {
-            $mensaje = 'No se encontraron usuarios con los filtros seleccionados.';
-            return view('usuarios.index', compact('usuarios'))->with('error', $mensaje);
-        }
-
-        // Paso 8: Retornar vista con los usuarios filtrados
+        $usuarios = $userService->obtenerUsuariosFiltrados($request);
         return view('usuarios.index', compact('usuarios'));
     }
-
 
     public function create()
     {
@@ -122,14 +78,14 @@ class UsuarioController extends Controller
         $usuarios = User::with('roles');
 
         if ($query) {
-            $usuarios->where(function($q2) use ($query) {
+            $usuarios->where(function ($q2) use ($query) {
                 $q2->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%'])
-                ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($query) . '%']);
+                    ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($query) . '%']);
             });
         }
 
         if ($rol) {
-            $usuarios->whereHas('roles', function($q3) use ($rol) {
+            $usuarios->whereHas('roles', function ($q3) use ($rol) {
                 $q3->where('name', $rol);
             });
         }
