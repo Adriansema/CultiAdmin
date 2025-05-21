@@ -59,7 +59,6 @@ Route::middleware([
             Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
 
             // Boletines
-            Route::resource('boletines', BoletinController::class);
             Route::post('boletines/importar-pdf', [BoletinController::class, 'importarPdf'])->name('boletines.importarPdf');
             Route::get('/boletines/cafe', [BoletinController::class, 'cafe'])->name('boletines.cafe');
             Route::get('/boletines/mora', [BoletinController::class, 'mora'])->name('boletines.mora');
