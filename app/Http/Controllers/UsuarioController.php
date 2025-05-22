@@ -20,6 +20,13 @@ class UsuarioController extends Controller
         return view('usuarios.index', compact('usuarios'));
     }
 
+    public function getFilteredUsers(Request $request, UserService $userService)
+    {
+        $usuarios = $userService->obtenerUsuariosFiltrados($request);
+        // Devuelve una respuesta JSON, incluyendo la paginación
+        return response()->json($usuarios);
+    }
+
     public function create()
     {
         $roles = Role::all();

@@ -72,6 +72,7 @@ Route::middleware([
 
             // Usuarios / EN LA VISTA ESTA COMO Gestion de Usuarios
             Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
+            Route::get('/api/usuarios-filtrados', [UsuarioController::class, 'getFilteredUsers'])->name('usuarios.filtrados'); //renderiza los usuarios obtenidos por el backend-BD
             Route::get('/usuarios/create', [UsuarioController::class, 'create'])->name('usuarios.create');
             Route::post('/usuarios/importar-csv', [UsuarioController::class, 'importarCsv'])->name('usuarios.importarCsv');
             Route::get('/usuarios/exportar', [UsuarioController::class, 'exportarCSV'])->name('usuarios.exportar');

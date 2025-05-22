@@ -142,3 +142,11 @@ html { font-size: 16px; }
     width: 1.10rem; /* Ajusta el tamaño de la flecha (w-5 de Tailwind) */
     height: 1.25rem; /* Ajusta el tamaño de la flecha (h-5 de Tailwind) */
 }
+
+/* En tu archivo CSS principal, o en tu input.css si usas PostCSS/Tailwind */
+.highlight {
+    font-weight: bold;
+    background-color: rgb(221, 221, 221); /* Un amarillo suave para resaltar */
+    padding: 0 2px; /* Un poco de padding */
+    border-radius: 2px;
+}

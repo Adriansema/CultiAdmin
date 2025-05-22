@@ -38,17 +38,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'apellido',
-        'tipo_documento',
-        'documento',
-        'telefono',
-        'token',
-        'intentos_fallidos',
-        'bloqueado_hasta',
-        'codigo_verificacion',
-        'id_finca',
         'estado',
-        'clave_visible', // Solo para superadmin
     ];
 
     /**

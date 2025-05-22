@@ -5,4 +5,4 @@ window.ApexCharts = ApexCharts;
 
 // resources/js/app.js
 import './modal';
-import './search';
+import './inputSearch';
