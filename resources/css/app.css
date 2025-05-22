@@ -82,12 +82,30 @@ html { font-size: 16px; }
         --color-text: #F6F6F6;
         --color-ajustes: #D1D1D1;
         --color-sidebarhoverbtn: #547488;
+    }
+}
+
+/*resources/views/usuarios/index.blade.php u otras vistas de esa carpeta*/
+@layer base {
+  :root {
         --color-Gestion: #E6EAED;
         --color-formulario: #EAE4D5;
         --color-pag: #00304D;
         --color-hover: #39A900;
         --color-tabla: #F6F6F6;
-    }
+
+        --color-activo: #C2E4B0;
+        --color-textAct: #1F5D00;
+
+        --color-desactivar: #FFE4D5;
+        --color-textDesact: #B80000;
+
+        --color-inactivo: #E7E7E7;
+        --color-textInact: #454545;
+
+        --color-activar: #FEECB0;
+        --color-textActivar: #8B6B00;
+  }
 }
 
 /*color del Boton de Contactanos, resources/views/centroAyuda/index.blade.php*/
