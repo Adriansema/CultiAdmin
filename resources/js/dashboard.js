@@ -1,9 +1,13 @@
+
+//para poder utilizar la libreria de apechar
+import * as echarts from 'echarts';
+
 document.addEventListener("DOMContentLoaded", function () {
     let filtroActual = 'ultimos3dias';
     let porcentajes = [];
 
-     // 📌 Agrega aquí las funciones para calcular la semana pasada:
-     function getStartOfLastWeek() {
+    // 📌 Agrega aquí las funciones para calcular la semana pasada:
+    function getStartOfLastWeek() {
         const date = new Date();
         const dayOfWeek = date.getDay();
         const diff = dayOfWeek + 6; // (0 = domingo, queremos ir al lunes de la semana anterior)
@@ -96,29 +100,29 @@ document.addEventListener("DOMContentLoaded", function () {
     // Función para renderizar la gráfica con los datos
     function renderChart(data) {
         if (!Array.isArray(data.vistas)) {
-          console.error("Los datos de 'vistas' no son válidos:", data.vistas);
-          return;
+            console.error("Los datos de 'vistas' no son válidos:", data.vistas);
+            return;
         }
 
-         // Asignar data.vistas como base
-    let datosOrdenados = [...data.vistas];
+        // Asignar data.vistas como base
+        let datosOrdenados = [...data.vistas];
 
         // Filtrar y ordenar los datos según el filtro seleccionado
         switch (filtroActual) {
             case 'ultimos3dias':
                 datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
                 break;
-                case 'semana':
-                    const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
-                    datosOrdenados.sort((a, b) =>
-                        diasSemana.indexOf(
-                            a.grupo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
-                        ) -
-                        diasSemana.indexOf(
-                            b.grupo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
-                        )
-                    );
-                    break;
+            case 'semana':
+                const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+                datosOrdenados.sort((a, b) =>
+                    diasSemana.indexOf(
+                        a.grupo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+                    ) -
+                    diasSemana.indexOf(
+                        b.grupo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+                    )
+                );
+                break;
 
             case 'mes':
                 datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
@@ -132,40 +136,40 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         console.log("DEBUG data recibida:", data);
 
-// ✅ Validar si hay datos antes de mapear
-// Después (más permisivo)
-if (!Array.isArray(data.vistas) || data.vistas.length === 0) {
-    document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">Los datos no son válidos.</div>`;
-    return;
-}
+        // ✅ Validar si hay datos antes de mapear
+        // Después (más permisivo)
+        if (!Array.isArray(data.vistas) || data.vistas.length === 0) {
+            document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">Los datos no son válidos.</div>`;
+            return;
+        }
 
-// Validar que cada entrada tenga grupo y total numérico
-datosOrdenados = datosOrdenados.filter(stat => {
-    return stat.grupo !== undefined && !isNaN(parseInt(stat.total));
-});
+        // Validar que cada entrada tenga grupo y total numérico
+        datosOrdenados = datosOrdenados.filter(stat => {
+            return stat.grupo !== undefined && !isNaN(parseInt(stat.total));
+        });
 
-// Mostrar lo que se recibe en consola
-console.log("DEBUG data.vistas recibida:", JSON.stringify(data.vistas));
+        // Mostrar lo que se recibe en consola
+        console.log("DEBUG data.vistas recibida:", JSON.stringify(data.vistas));
 
-// Verificar si hay datos válidos
-if (datosOrdenados.length === 0) {
-    // Mostrar la gráfica con un solo punto "Sin datos"
-    datosOrdenados = [{
-        grupo: 'Sin datos',
-        total: 0
-    }];
-}
-
-
-// Procesar los datos limpios
-
-let seriesData = datosOrdenados.map(stat => ({
-    x: stat.grupo || "Sin etiqueta",
-    y: parseInt(stat.total)
-}));
+        // Verificar si hay datos válidos
+        if (datosOrdenados.length === 0) {
+            // Mostrar la gráfica con un solo punto "Sin datos"
+            datosOrdenados = [{
+                grupo: 'Sin datos',
+                total: 0
+            }];
+        }
 
 
-console.log("Datos para la gráfica:", seriesData);
+        // Procesar los datos limpios
+
+        let seriesData = datosOrdenados.map(stat => ({
+            x: stat.grupo || "Sin etiqueta",
+            y: parseInt(stat.total)
+        }));
+
+
+        console.log("Datos para la gráfica:", seriesData);
 
 
 
@@ -177,106 +181,96 @@ console.log("Datos para la gráfica:", seriesData);
             return anterior === 0 ? 0 : ((p.y - anterior) / anterior * 100).toFixed(1);
         });
 
-
-        // Verificar si existe una instancia anterior de ApexCharts y destruirla
-        if (window.chart && typeof window.chart.destroy === "function") {
-            window.chart.destroy();
-        }
-
-        const options = {
-            chart: {
-                type: 'area',
-                height: 350,
-                toolbar: {
-                  show: false
-                }
-              },
-
-              colors: ['#9'],
-
-
-            series: [{
-              name: 'Visitas',
-              data: seriesData
-            }],
-            stroke: {
-                curve: 'smooth',
-                width: 3,
-
-            },
-            fill: {
-                type: 'gradient',
-                    gradient: {
-                    shade: 'light',
-                    type: 'vertical',
-                    shadeIntensity: 0,
-                    gradientToColors: ['#bbf7d0'], // Verde claro abajo
-                    inverseColors: false,
-                    opacityFrom: 0.8, // Inicio del degradado (más fuerte)
-                    opacityTo: 0.3,     // Final del degradado (transparente)
-                    stops: [0, 90]
-                    }
-              },
-              markers: {
-                size: 6,
-                colors: ['#ffffff'],
-                strokeColors: '#22c55e',
-                strokeWidth: 3,
-                hover: {
-                  size: 8
-                }
-              },
-              dataLabels: {
-                enabled: true,
-                style: {
-                  colors: ['#ffffff'],
-                  fontWeight: 'bold'
-                },
-                background: {
-                  enabled: true,
-                  foreColor: '#ffffff',
-                  borderRadius: 4,
-                  padding: 6,
-                  backgroundColor: '#22c55e' // Fondo del número encima del punto
-                }
-              },
-
-            xaxis: {
-              type: 'category',
-              labels: {
-                style: {
-                    color:'#000'
-                }
-              }
-            },
-            tooltip: {
-              custom: function({ series, seriesIndex, dataPointIndex, w }) {
-                const valorActual = series[seriesIndex][dataPointIndex];
-                let porcentaje = 0;
-                if (dataPointIndex > 0) {
-                  const anterior = series[seriesIndex][dataPointIndex - 1];
-                  porcentaje = anterior === 0 ? 0 : ((valorActual - anterior) / anterior * 100).toFixed(1);
-                }
-                return `<div class="p-2">
-                  <strong>${w.globals.labels[dataPointIndex]}</strong><br>
-                  Visitas: <strong>${valorActual}</strong><br>
-                  Cambio: <strong>${porcentaje}%</strong>
-                </div>`;
-              }
-            }
-          };
-
-
-          if (!Array.isArray(seriesData) || seriesData.length === 0 || seriesData.some(v => isNaN(v.y))) {
+        // Validar datos antes de graficar
+        if (!Array.isArray(seriesData) || seriesData.length === 0 || seriesData.some(v => isNaN(v.y))) {
             document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos numéricos válidos para graficar.</div>`;
             return;
         }
 
+        // Inicializar el contenedor si aún no existe
+        if (!window.chartInstance) {
+            const chartDom = document.getElementById('chart');
+            window.chartInstance = echarts.init(chartDom);
+        } else {
+            window.chartInstance.dispose();
+            const chartDom = document.getElementById('chart');
+            window.chartInstance = echarts.init(chartDom);
+        }
+        const chart = echarts.init(document.getElementById('chart'));
+
+        // Aquí configuras tu gráfico
+        chart.setOption({
+            
+        });
+
+        // Hacer que se redimensione al cambiar el tamaño de la ventana
+        window.addEventListener('resize', () => {
+            chart.resize();
+        });
 
 
-        // Inicializar y renderizar el gráfico
-        window.chart = new ApexCharts(document.querySelector("#chart"), options);
-        window.chart.render();
+        // Convertir los datos a formato compatible con ECharts
+        const labels = seriesData.map(item => item.x);
+        const values = seriesData.map(item => item.y);
+
+        const options = {
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    const data = params[0];
+                    const valorActual = data.value;
+                    const index = data.dataIndex;
+                    let porcentaje = 0;
+                    if (index > 0) {
+                        const anterior = params[0].seriesData[index - 1]?.value || 0;
+                        porcentaje = anterior === 0 ? 0 : ((valorActual - anterior) / anterior * 100).toFixed(1);
+                    }
+                    return `
+                <div class="p-2">
+                    <strong>${data.name}</strong><br>
+                    Visitas: <strong>${valorActual}</strong><br>
+                    Cambio: <strong>${porcentaje}%</strong>
+                </div>`;
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: labels,
+                axisLabel: {
+                    color: '#000'
+                }
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: values,
+                type: 'line',
+                smooth: true,
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: '#22c55e' },
+                        { offset: 1, color: '#bbf7d0' }
+                    ])
+                },
+                itemStyle: {
+                    color: '#22c55e'
+                },
+                lineStyle: {
+                    width: 3
+                },
+                symbolSize: 8
+            }]
+        };
+
+
+        if (!Array.isArray(seriesData) || seriesData.length === 0 || seriesData.some(v => isNaN(v.y))) {
+            document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos numéricos válidos para graficar.</div>`;
+            return;
+        }
+
+        // Renderizar el gráfico
+        window.chartInstance.setOption(options);
 
         // Actualizar las métricas de usuarios, registros, etc.
         updateMetrics(data);

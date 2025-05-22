@@ -1,8 +1,6 @@
 import './bootstrap';
-/* import 'laravel-livewire'; */
-import ApexCharts from 'apexcharts';
-window.ApexCharts = ApexCharts;
-
-// resources/js/app.js
+// import 'laravel-livewire'; // solo si lo necesitas
+import './dashboard'; // ✅ Esto ya debe incluir tu gráfica de ECharts
+// Tu nuevo archivo con la gráfica ECharts
 import './modal';
 import './inputSearch';

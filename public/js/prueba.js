@@ -80,81 +80,85 @@ document.addEventListener("DOMContentLoaded", function () {
             window.chart.destroy();
         }
 
-        let options = {
+        const options = {
             chart: {
                 type: 'area',
-                height: 300,
-                toolbar: { show: false }
-            },
-            dataLabels: { enabled: false },
-            stroke: { curve: 'smooth', width: 3 },
-            fill: {
-              type: 'gradient',
-              gradient: {
-                shadeIntensity: 1,
-                inverseColors: false,
-                opacityFrom: 0.4,
-                opacityTo:   0.1,
-                stops: [0, 90, 100]
-              }
+                height: 350,
+                toolbar: {
+                    show: false
+                }
             },
 
-            series: [{ name: 'Visitas', data: visitas }],
-            xaxis: { categories: categorias },
+            colors: ['#9'],
 
 
-            colors: ['#4CAF50'],
+            series: [{
+                name: 'Visitas',
+                data: seriesData
+            }],
             stroke: {
                 curve: 'smooth',
-                width: 2
+                width: 3,
+
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: 'light',
+                    type: 'vertical',
+                    shadeIntensity: 0,
+                    gradientToColors: ['#bbf7d0'], // Verde claro abajo
+                    inverseColors: false,
+                    opacityFrom: 0.8, // Inicio del degradado (más fuerte)
+                    opacityTo: 0.3,     // Final del degradado (transparente)
+                    stops: [0, 90]
+                }
+            },
+            markers: {
+                size: 6,
+                colors: ['#ffffff'],
+                strokeColors: '#22c55e',
+                strokeWidth: 3,
+                hover: {
+                    size: 8
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                style: {
+                    colors: ['#ffffff'],
+                    fontWeight: 'bold'
+                },
+                background: {
+                    enabled: true,
+                    foreColor: '#ffffff',
+                    borderRadius: 4,
+                    padding: 6,
+                    backgroundColor: '#22c55e' // Fondo del número encima del punto
+                }
             },
 
-            fill: {             // ← Aquí añades el relleno bajo la curva
-                type: 'gradient',
-                opacity: 0.1,
-                gradient: {
-                  shadeIntensity: 1,
-                  opacityFrom: 0.6,  // más opaco junto a la línea
-                  opacityTo:   0.6,  // más transparente hacia abajo
-                  stops: [0, 100]
+            xaxis: {
+                type: 'category',
+                labels: {
+                    style: {
+                        color: '#000'
+                    }
                 }
-                // Si prefieres un relleno sólido:
-                // type: 'solid',
-                // opacity: 0.2
-              },
-              dataLabels: {
-                enabled: true,               // Muestra siempre los valores
-                style: {
-                  fontSize: '11px',
-                  colors: ['##4F4F4F']          // Color del texto
-                },
-                offsetY: -10,                // Para que se vea por encima del marcador
-                background: {
-                  enabled: false             // Sin fondo para que se vea limpio
-                }
-              },
-
-            markers: {
-                size: 4,
-
-                strokeColors: ['#4CAF50'],
-                strokeWidth: 2,
-                hover: { size: 8 }
             },
             tooltip: {
-                theme: 'dark',
-                custom: function({ series, seriesIndex, dataPointIndex, w }) {
-                    const valor = series[seriesIndex][dataPointIndex];
-                    const porcentaje = porcentajes[dataPointIndex];
-                    const color = porcentaje >= 0 ? '🟢' : '🔴';
-                    const signo = porcentaje >= 0 ? '+' : '';
-                    return `<div style="padding: 8px; text-align: center">
-                        <strong>${w.globals.labels[dataPointIndex]}</strong><br>
-                        ${valor} visitas<br>
-                        <span style="font-size: 12px; color: ${porcentaje >= 0 ? '#4CAF50' : '#F44336'}">
-                            ${color} ${signo}${porcentaje}%
-                        </span>
-                    </div>`;
+                custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+                    const valorActual = series[seriesIndex][dataPointIndex];
+                    let porcentaje = 0;
+                    if (dataPointIndex > 0) {
+                        const anterior = series[seriesIndex][dataPointIndex - 1];
+                        porcentaje = anterior === 0 ? 0 : ((valorActual - anterior) / anterior * 100).toFixed(1);
+                    }
+                    return `<div class="p-2">
+                  <strong>${w.globals.labels[dataPointIndex]}</strong><br>
+                  Visitas: <strong>${valorActual}</strong><br>
+                  Cambio: <strong>${porcentaje}%</strong>
+                </div>`;
                 }
             }
         };
