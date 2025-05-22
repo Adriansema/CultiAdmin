@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+{{-- TODO: Por el momento no está en uso, pero se puede reutilizar para hacer el modal para cuando se pase el cursor por encima de la columna rol --}}
+
 @section('content')
     <div class="max-w-4xl py-6 mx-auto">
         <div class="p-6 bg-white rounded shadow">

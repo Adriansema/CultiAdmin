@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
-@section('header')
-    <h2 class="text-xl font-semibold">Editar Usuario</h2>
-@endsection
+{{-- TODO: Por el momento no esta en uso, pero se puede reutilizar para juntarlo con la vista show.blade.php para realizar el modal al pasar por encima de la columna rol --}}
 
 @section('content')
     <div class="max-w-4xl py-6 mx-auto">

@@ -10,15 +10,6 @@
             {!! Breadcrumbs::render('centroAyuda.index') !!}
         </div>
 
-        {{-- @if (session('success'))
-    <div class="flex items-center p-4 mb-6 text-green-800 bg-green-100 border-l-4 border-green-500 rounded-lg shadow">
-        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2l4-4" />
-        </svg>
-        <span class="font-semibold">{{ session('success') }}</span>
-    </div>
-    @endif --}}
-
         <!-- Barra de búsqueda -->
         <div class="flex items-center w-full max-w-2xl px-4 py-2 mx-auto mb-8 bg-gray-100 rounded-full shadow-inner">
             <input id="search" type="text" placeholder="Busca aquí tus dudas..." oninput="filterQuestions()"
@@ -30,8 +21,6 @@
                     d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 1 0 5.64 5.64a7.5 7.5 0 0 0 10.61 10.61z" />
             </svg>
         </div>
-
-
 
         <!-- Pestañas -->
         <ul class="flex flex-wrap justify-center mb-8 text-sm font-medium text-gray-600 border-b border-gray-200"
@@ -60,9 +49,6 @@
             <div class="tab-pane fade" id="guide" role="tabpanel" aria-labelledby="guide-tab">
                 @include('centroAyuda.partials.guide')
             </div>
-            {{-- <div class="flex justify-center tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-            @include('centroAyuda.partials.contact')
-        </div> --}}
             <div class="flex justify-center tab-pane fade" id="links" role="tabpanel" aria-labelledby="links-tab">
                 @include('centroAyuda.partials.links')
             </div>

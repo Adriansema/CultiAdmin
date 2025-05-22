@@ -94,17 +94,6 @@ class ProductoController extends Controller
         return redirect()->route('productos.index')->with('success', 'Producto eliminado.');
     }
 
-    public function cafe()
-    {
-        // puedes pasar datos a la vista si necesitas
-        return view('productos.cafe');
-    }
-
-    public function mora()
-    {
-        return view('productos.mora');
-    }
-
     //importar archivo csv, para hacer automaticamente sin tener que escribir manualmente
     public function importarCSV(Request $request)
     {

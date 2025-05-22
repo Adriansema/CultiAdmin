@@ -6,7 +6,6 @@ use App\Http\Controllers\AccesibilidadController;
 use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\CentroAyudaController;
 use App\Http\Controllers\ExportarCsvController;
-use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\Operador\OperadorProductoController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\StatisticController;
@@ -104,9 +103,6 @@ Route::middleware([
 
             //Estadistica
             Route::get('admin/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index');
-
-            // Historial
-            Route::get('/historial', [HistorialController::class, 'index'])->name('historial.index');
 
             //Generador de archivo csv
             Route::get('/generar-csv', [ExportarCsvController::class, 'generarCsv'])->middleware('auth');

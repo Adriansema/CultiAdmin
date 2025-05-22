@@ -6,14 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Cultiva Sena') }}</title> <!-- SE CAMBIO EL NOMBRE DE LA PESTAÑA DE NAVEGACION POR "Cultiva Sena" -->
+    <title>{{ config('app.name', 'Cultiva Sena') }}</title>
+    <!-- SE CAMBIO EL NOMBRE DE LA PESTAÑA DE NAVEGACION POR "Cultiva Sena" -->
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset('images/Favicon.svg') }}"> <!-- SE AGREGA ESTA LINEA PARA QUE MUESTRE EL ICONO DE LA PESTAÑA DE NAVEGACIÓN -->
+    <link rel="icon" href="{{ asset('images/Favicon.svg') }}">
+    <!-- SE AGREGA ESTA LINEA PARA QUE MUESTRE EL ICONO DE LA PESTAÑA DE NAVEGACIÓN -->
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+    {{-- Define la variable global para las rutas de assets en JS --}}
+    {{-- <script>
+        window.assetUrl = "{{ asset('') }}";
+    </script> --}}
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -48,27 +55,27 @@
 
     <x-banner />
 
-        <!-- Sidebar dinámico según el rol -->
-        @role('administrador')
-            <x-sidebar-admin />
+    <!-- Sidebar dinámico según el rol -->
+    @role('administrador')
+        <x-sidebar-admin />
         @elserole('operador')
-            <x-sidebar-operador />
-        @endrole
+        <x-sidebar-operador />
+    @endrole
 
-        <!-- Contenido principal -->
-        <div class="flex flex-col flex-1 overflow-hidden bg-gray-2">
-            @if (isset($header))
+    <!-- Contenido principal -->
+    <div class="flex flex-col flex-1 overflow-hidden bg-gray-2">
+        @if (isset($header))
             <header class="px-4 py-6 bg-white shadow">
                 <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {{ $header }}
                 </div>
             </header>
-            @endif
+        @endif
 
-            <main class="flex-1 h-full p-6 overflow-y-auto" :class="sidebarOpen ? 'pl-64' : 'pl-16'">
-                @yield('content')
-            </main>
-        </div>
+        <main class="flex-1 h-full p-6 overflow-y-auto" :class="sidebarOpen ? 'pl-64' : 'pl-16'">
+            @yield('content')
+        </main>
+    </div>
 
     @stack('modals')
     @livewireScripts
