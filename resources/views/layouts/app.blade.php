@@ -17,32 +17,19 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    {{-- Define la variable global para las rutas de assets en JS --}}
-    {{-- <script>
-        window.assetUrl = "{{ asset('') }}";
-    </script> --}}
-
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Styles -->
     @livewireStyles
 
-    <script>
-        (function() {
-            if (localStorage.getItem('contrastHigh') === 'true') {
-                document.documentElement.classList.add('contrast-high');
-                document.body.classList.add('contrast-high');
-            }
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.documentElement.classList.add('dark-mode');
-                document.body.classList.add('dark-mode');
-            }
-            if (localStorage.getItem('fontSize')) {
-                document.documentElement.style.fontSize = localStorage.getItem('fontSize') + 'px';
-            }
-        })();
-    </script>
+    {{-- Define la variable global para las rutas de assets en JS --}}
+    {{-- <script>
+        window.assetUrl = "{{ asset('') }}";
+    </script> --}}
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
@@ -80,7 +67,16 @@
     {{-- @stack('modals')
     @livewireScripts
     @yield('scripts') --}}
-
+    <script>
+        // Inyecta las variables de sesión de Laravel en variables JavaScript globales
+        const sessionStatusProducto = @json(session('status_producto', null));
+        const sessionProductoIdForRedirect = @json(session('producto_id_for_redirect', null));
+        const sessionStatusBoletin = @json(session('status_boletin', null));
+        const sessionBoletinIdForRedirect = @json(session('boletin_id_for_redirect', null));
+        const sessionSuccess = @json(session('success', null));
+        const sessionError = @json(session('error', null));
+    </script>
+    <script src="{{ asset('js/sweetalert_messages.js') }}"></script>
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
 </body>
 

@@ -125,61 +125,69 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // --- Event listeners para el input de búsqueda (ya los tienes) ---
-    // 1. Cuando el input GANA FOCO o tiene texto
-    searchInput.addEventListener('focus', () => {
-        // Siempre mostrar la Equis al enfocar, incluso si está vacío
-        showClearIcon();
-    });
-
-    // 2. Cuando el input PIERDE FOCO
-    searchInput.addEventListener('blur', () => {
-        // Si el input está vacío al perder el foco, volvemos a la lupa
-        if (searchInput.value.length === 0) {
-            showSearchIcon();
-        }
-        // Si tiene texto, la Equis se queda (ya que el usuario podría querer borrarlo)
-    });
-
-    // 3. Cuando el usuario escribe/borra texto en el input
-    searchInput.addEventListener('input', () => {
-        if (searchInput.value.length > 0) {
-            // Si hay texto, aseguramos que la Equis esté visible (en caso de que se haya enfocado y luego borrado, y se vuelva a escribir)
+    if (searchInput) {
+        
+        // --- Event listeners para el input de búsqueda (ya los tienes) ---
+        // 1. Cuando el input GANA FOCO o tiene texto
+        searchInput.addEventListener('focus', () => {
+            // Siempre mostrar la Equis al enfocar, incluso si está vacío
             showClearIcon();
-        } else {
-            // Si no hay texto, y el input no está enfocado, volvemos a la lupa
-            // Si está enfocado, la 'focus' event listener ya se encargará
-            if (document.activeElement !== searchInput) { // Sólo si no está actualmente en foco
+        });
+    
+        // 2. Cuando el input PIERDE FOCO
+        searchInput.addEventListener('blur', () => {
+            // Si el input está vacío al perder el foco, volvemos a la lupa
+            if (searchInput.value.length === 0) {
                 showSearchIcon();
             }
+            // Si tiene texto, la Equis se queda (ya que el usuario podría querer borrarlo)
+        });
+    
+        // 3. Cuando el usuario escribe/borra texto en el input
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value.length > 0) {
+                // Si hay texto, aseguramos que la Equis esté visible (en caso de que se haya enfocado y luego borrado, y se vuelva a escribir)
+                showClearIcon();
+            } else {
+                // Si no hay texto, y el input no está enfocado, volvemos a la lupa
+                // Si está enfocado, la 'focus' event listener ya se encargará
+                if (document.activeElement !== searchInput) { // Sólo si no está actualmente en foco
+                    showSearchIcon();
+                }
+            }
+    
+            // Limpiar el timer anterior
+            clearTimeout(debounceTimer);
+            // Configurar un nuevo timer
+            debounceTimer = setTimeout(() => {
+                fetchUsers(); // Llama a la función para obtener usuarios después de la espera
+            }, DEBOUNCE_DELAY);
+        });
+    }
+
+
+    if (clearIconContainer) {
+        // 4. Lógica para borrar el texto al hacer clic en la "Equis"
+        clearIconContainer.addEventListener('click', () => {
+            searchInput.value = ''; // Borra el texto del input
+            searchInput.focus(); // Opcional: vuelve a poner el foco en el input
+            showSearchIcon(); // Vuelve a mostrar la lupa (porque el input ahora está vacío)
+            fetchUsers(); // Vuelve a cargar todos los usuarios (o los iniciales)
+            console.log('Campo de búsqueda limpiado.'); //TODO: se quita despues de hacer pruebas
+        });
+    }
+
+    if (searchInput) {
+        // Estado inicial: Asegúrate de que la lupa esté visible al cargar la página si el input está vacío
+        // O la Equis si ya tiene contenido (ej. autocompletado del navegador)
+        if (searchInput.value.length > 0) {
+            showClearIcon();
+            // Opcional: Si quieres que la búsqueda se realice con el valor inicial al cargar la página
+            // fetchUsers();
+        } else {
+            showSearchIcon();
         }
-
-        // Limpiar el timer anterior
-        clearTimeout(debounceTimer);
-        // Configurar un nuevo timer
-        debounceTimer = setTimeout(() => {
-            fetchUsers(); // Llama a la función para obtener usuarios después de la espera
-        }, DEBOUNCE_DELAY);
-    });
-
-
-    // 4. Lógica para borrar el texto al hacer clic en la "Equis"
-    clearIconContainer.addEventListener('click', () => {
-        searchInput.value = ''; // Borra el texto del input
-        searchInput.focus(); // Opcional: vuelve a poner el foco en el input
-        showSearchIcon(); // Vuelve a mostrar la lupa (porque el input ahora está vacío)
-        fetchUsers(); // Vuelve a cargar todos los usuarios (o los iniciales)
-        console.log('Campo de búsqueda limpiado.'); //TODO: se quita despues de hacer pruebas
-    });
-
-    // Estado inicial: Asegúrate de que la lupa esté visible al cargar la página si el input está vacío
-    // O la Equis si ya tiene contenido (ej. autocompletado del navegador)
-    if (searchInput.value.length > 0) {
-        showClearIcon();
-        // Opcional: Si quieres que la búsqueda se realice con el valor inicial al cargar la página
-        // fetchUsers();
-    } else {
-        showSearchIcon();
+        
     }
 
     // Para la primera carga de la página, si no estás haciendo una búsqueda inicial,
