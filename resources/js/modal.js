@@ -10,6 +10,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeSuccessBtn   = document.getElementById('closeSuccessBtn');
     const form              = document.getElementById('contactForm');
 
+    if (openModalBtn && closeModalBtn && modal) {
+    openModalBtn.addEventListener('click', showContact);
+    closeModalBtn.addEventListener('click', hideContact);
+    window.addEventListener('click', event => {
+        if (event.target === modal) hideContact();
+    });
+}
+
+
     // Funciones para mostrar/ocultar modal de contacto
     function showContact() {
         modal.classList.remove('hidden');
@@ -29,13 +38,6 @@ document.addEventListener('DOMContentLoaded', function () {
         successModal.classList.add('hidden');
         successModal.classList.remove('flex', 'items-center', 'justify-center');
     }
-
-    // Eventos modal de contacto
-    openModalBtn.addEventListener('click',  showContact);
-    closeModalBtn.addEventListener('click', hideContact);
-    window.addEventListener('click', event => {
-        if (event.target === modal) hideContact();
-    });
 
     // Evento de cierre manual del modal de éxito
     if (closeSuccessBtn) {

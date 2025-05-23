@@ -77,9 +77,9 @@
         </main>
     </div>
 
-    @stack('modals')
+    {{-- @stack('modals')
     @livewireScripts
-    @yield('scripts')
+    @yield('scripts') --}}
 
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
 </body>
