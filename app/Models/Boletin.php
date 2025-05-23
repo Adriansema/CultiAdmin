@@ -13,6 +13,12 @@ class Boletin extends Model
 
     protected $table = 'boletins';
 
-    protected $fillable = [ 'contenido', 'archivo', 'user_id', 'estado'];
+    protected $fillable = [
+        'archivo',
+        'contenido',
+        'user_id',       // ¡Asegúrate de que user_id esté aquí!
+        'estado',        // ¡Asegúrate de que estado esté aquí!
+        'observaciones', // ¡Asegúrate de que observaciones esté aquí!
+    ];
 }
 

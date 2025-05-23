@@ -11,7 +11,7 @@
         {!! Breadcrumbs::render('productos.show', $producto) !!}
     </div>
 
-    <div class="container max-w-4xl py-4 mx-auto bg-[var(--color-formulario)] shadow-xl px-8 space-x-4">
+    <div class="container max-w-4xl py-4 mx-auto bg-[var(--color-formulario)] shadow-xl px-8 space-x-4 rounded-lg">
         @php
             $campos = [
                 'historia' => 'Historia',
@@ -24,7 +24,31 @@
             $detalles = json_decode($producto->detalles_json, true) ?? [];
         @endphp
 
-        <!-- Imagen -->
+        {{-- Sección de Estado del Producto (Más Prominente) --}}
+        <div class="mb-6 p-4 rounded-lg
+            @if ($producto->estado === 'aprobado') bg-green-100 text-green-800 border border-green-300
+            @elseif ($producto->estado === 'rechazado') bg-red-100 text-red-800 border border-red-300
+            @elseif ($producto->estado === 'pendiente') bg-yellow-100 text-yellow-800 border border-yellow-300
+            @else bg-gray-100 text-gray-800 border border-gray-300 @endif">
+            <h3 class="text-base font-semibold">Estado Actual:
+                <span class="font-bold">{{ ucfirst($producto->estado) }}</span>
+            </h3>
+            @if ($producto->estado === 'rechazado' && $producto->observaciones)
+                <p class="text-sm mt-2">
+                    <strong>Observación del Operador:</strong> {{ $producto->observaciones }}
+                </p>
+                <div class="mt-4">
+                    <a href="{{ route('productos.edit', $producto->id) }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Ir a Editar Noticia →
+                    </a>
+                </div>
+            @elseif ($producto->estado === 'aprobado')
+                <p class="text-sm mt-2">¡Tu noticia ha sido aprobada y está lista para ser consumida!</p>
+            @elseif ($producto->estado === 'pendiente')
+                <p class="text-sm mt-2">Tu noticia está pendiente de revisión por parte del operador.</p>
+            @endif
+        </div>
+
         @if ($producto->imagen)
             <div class="mb-6">
                 <img src="{{ asset('storage/' . $producto->imagen) }}" alt="Imagen del producto"
@@ -32,55 +56,22 @@
             </div>
         @endif
 
-        <!-- Tipo -->
         <div class="mb-4">
             <h3 class="text-sm font-semibold text-gray-600">Tipo de producto</h3>
             <p class="text-lg text-gray-800">{{ ucfirst($producto->tipo) }}</p>
         </div>
 
-        <!-- Observaciones -->
-        @if ($producto->observaciones)
-            <div
-                class="mb-4 shadow-xl rounded-lg space-x-4 px-2 py-4
-        @if ($producto->estado == 'aprobado') bg-green-300
-        @elseif ($producto->estado == 'rechazado')
-            bg-red-300
-        @elseif ($producto->estado == 'pendiente') {{-- ¡Nueva condición para 'pendiente'! --}}
-            bg-yellow-200 {{-- Puedes ajustar el color según tu preferencia --}}
-        @else
-            bg-gray-200 {{-- Color por defecto si el estado no es reconocido --}} @endif">
-                <h3 class="text-sm font-semibold text-gray-600">Observaciones</h3>
-                <p class="text-gray-800">{{ $producto->observaciones }}</p>
+        {{-- El bloque de observaciones anterior se ha integrado en la sección de estado --}}
 
-                {{-- Aquí mostramos el estado de la observación --}}
-                @if ($producto->estado)
-                    <p class="text-xs text-gray-700 mt-2">Estado:
-                        <span
-                            class="font-bold
-                    @if ($producto->estado == 'aprobado') text-green-700
-                    @elseif ($producto->estado == 'rechazado')
-                        text-red-700
-                    @elseif ($producto->estado == 'pendiente') {{-- Color de texto para 'pendiente' --}}
-                        text-yellow-700 {{-- Puedes ajustar el color de texto también --}} @endif
-                ">
-                            {{ ucfirst($producto->estado) }}
-                        </span>
-                    </p>
-                @endif
-            </div>
-        @endif
-
-        <!-- Detalles -->
         @foreach ($campos as $key => $label)
             @if (!empty($detalles[$key]))
-                <div class="mb-4">
+                <div class="mb-4 p-3 bg-gray-50 rounded-md">
                     <h3 class="text-sm font-semibold text-gray-600">{{ $label }}</h3>
                     <p class="text-gray-800 whitespace-pre-line">{{ $detalles[$key] }}</p>
                 </div>
             @endif
         @endforeach
 
-        <!-- Botón volver -->
         <div class="mt-6">
             <a href="{{ route('productos.index') }}"
                 class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">

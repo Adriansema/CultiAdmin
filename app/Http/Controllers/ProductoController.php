@@ -7,6 +7,11 @@ namespace App\Http\Controllers;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail; // Importa Mail
+use App\Mail\NuevaRevisionPendienteMail; // Importa la nueva Mailable
+use App\Models\User; // Para buscar operadores
+use Spatie\Permission\Models\Role; // Si usas Spatie para roles
 
 class ProductoController extends Controller
 {
@@ -35,7 +40,8 @@ class ProductoController extends Controller
             $imagen = $request->file('imagen')->store('productos', 'public');
         }
 
-        Producto::create([
+        // *** CORRECCIÓN AQUÍ: Asigna el resultado de create() a $producto ***
+        $producto = Producto::create([
             'user_id' => Auth::id(),
             'detalles_json' => json_encode($request->detalles, JSON_UNESCAPED_UNICODE),
             'estado' => 'pendiente',
@@ -44,9 +50,14 @@ class ProductoController extends Controller
             'tipo' => $request->tipo,
         ]);
 
-        return redirect()->route('productos.index')->with('success', 'Producto creado con éxito.');
-    }
+        // *** Lógica para enviar email al operador cuando se crea un producto ***
+        $operadores = User::role('operador')->get(); // Obtiene todos los usuarios con el rol 'operador'
+        foreach ($operadores as $operador) {
+            Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($producto, 'Noticia'));
+        }
 
+        return redirect()->route('productos.index')->with('success', 'Producto creado con éxito y enviado a revisión del operador.');
+    }
 
     public function show(Producto $producto)
     {
@@ -64,26 +75,53 @@ class ProductoController extends Controller
             'detalles' => 'required|array',
             'tipo' => 'required|string',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'observaciones' => 'nullable|string',
+            'observaciones' => 'nullable|string', // El usuario puede modificar sus observaciones
         ]);
+
+        // Almacenar el estado original del producto ANTES de cualquier cambio
+        $originalEstado = $producto->estado;
 
         // Actualizar imagen si viene una nueva
         if ($request->hasFile('imagen')) {
-            // Opcional: eliminar imagen anterior si querés
-            // Storage::disk('public')->delete($producto->imagen);
-
+            // Eliminar imagen anterior si existe y es diferente a la nueva
+            if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
+                Storage::disk('public')->delete($producto->imagen);
+            }
             $imagen = $request->file('imagen')->store('productos', 'public');
             $producto->imagen = $imagen;
         }
 
-        // Actualizar los demás campos
+        // Actualizar los demás campos con los datos del request
         $producto->tipo = $request->tipo;
         $producto->detalles_json = json_encode($request->detalles, JSON_UNESCAPED_UNICODE);
-        $producto->observaciones = $request->observaciones;
+        $producto->observaciones = $request->observaciones; // El usuario puede editar sus propias observaciones aquí
+
+        // *** Lógica para cambiar el estado a 'pendiente' si el producto fue editado
+        // *** y su estado original era 'aprobado' o 'rechazado'.
+        // Esto asegura que cada edición por parte del creador requiera una nueva validación del operador.
+        $estadoCambiadoAPendiente = false;
+        if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
+             $producto->estado = 'pendiente';
+             // Opcional: limpiar la observación del operador al volver a pendiente.
+             // Esto evita mostrar una observación de "rechazado" de una revisión anterior
+             // cuando el producto vuelve a estar pendiente.
+             $producto->observaciones = null; // Limpiar observación del operador
+             $estadoCambiadoAPendiente = true;
+        }
+        // Si el estado original ya era 'pendiente', se mantiene 'pendiente'.
+        // No se permite al usuario cambiar el estado directamente desde esta vista.
 
         $producto->save();
 
-        return redirect()->route('productos.index')->with('success', 'Producto actualizado con éxito.');
+        // *** Lógica para enviar email al operador cuando un producto editado vuelve a pendiente ***
+        if ($estadoCambiadoAPendiente) {
+            $operadores = User::role('operador')->get(); // Obtiene todos los usuarios con el rol 'operador'
+            foreach ($operadores as $operador) {
+                Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($producto, 'Noticia'));
+            }
+        }
+
+        return redirect()->route('productos.index')->with('success', 'Producto actualizado y enviado a revisión del operador.');
     }
 
 
