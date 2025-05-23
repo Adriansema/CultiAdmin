@@ -12,7 +12,8 @@
     </div>
 
     <div class="container max-w-4xl py-6 mx-auto">
-        <form action="{{ route('productos.update', $producto) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('productos.update', $producto) }}" method="POST" enctype="multipart/form-data"
+        class="bg-[var(--color-formulario)] p-12 rounded-3xl shadow-2xl space-y-2">
             @csrf
             @method('PUT')
 
@@ -47,24 +48,11 @@
 
             <!-- Campos personalizados del array detalles -->
             @foreach ([
-            'que_es' => '¿Qué es?',
             'historia' => 'Historia del cultivo',
-            'variedad' => 'Variedad',
-            'especies' => 'Especies',
-            'caracteristicas' => 'Características',
-            'clima' => 'Condiciones del clima',
-            'suelo' => 'Tipo de suelo ideal',
-            'riego' => 'Requerimientos de riego',
-            'cosecha' => 'Época de cosecha',
-            'postcosecha' => 'Proceso postcosecha',
-            'plagas' => 'Plagas y enfermedades comunes',
-            'usos' => 'Usos y aplicaciones',
-            'valor_nutricional' => 'Valor nutricional',
-            'impacto_economico' => 'Impacto económico',
-            'tecnicas_cultivo' => 'Técnicas de cultivo',
-            'certificaciones' => 'Certificaciones disponibles',
-            'ubicacion_geografica' => 'Ubicación geográfica óptima',
-            'nombre_cientifico' => 'Nombre científico',
+            'productos y sus características' => 'Productos',
+            'variantes' => 'Variantes',
+            'enfermedades' => 'Enfermedades',
+            'insumos' => 'Insumos',
         ] as $key => $label)
                 <div class="mb-4">
                     <label for="detalles_{{ $key }}" class="block text-sm font-medium">{{ $label }}</label>
@@ -72,14 +60,6 @@
                         class="w-full border-gray-300 rounded shadow-sm">{{ old("detalles.$key", $detalles[$key] ?? '') }}</textarea>
                 </div>
             @endforeach
-
-            <div class="mb-4">
-                <label for="observaciones" class="block text-sm font-medium">Observaciones (opcional)</label>
-                <textarea name="observaciones" id="observaciones" rows="3" class="w-full border-gray-300 rounded shadow-sm">{{ old('observaciones') }}</textarea>
-                @error('observaciones')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
 
             <div class="flex justify-between items-center mb-6">
                 <a href="{{ route('productos.index') }}"

@@ -8,10 +8,10 @@
             <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
             <h1 class="text-3xl whitespace-nowrap font-bold">Detalles del Producto</h1>
         </div>
-        {!! Breadcrumbs::render('productos.show', $producto) !!} 
+        {!! Breadcrumbs::render('productos.show', $producto) !!}
     </div>
 
-    <div class="container max-w-4xl py-6 mx-auto">
+    <div class="container max-w-4xl py-4 mx-auto bg-[var(--color-formulario)] shadow-xl px-8 space-x-4">
         @php
             $campos = [
                 'historia' => 'Historia',
@@ -40,9 +40,33 @@
 
         <!-- Observaciones -->
         @if ($producto->observaciones)
-            <div class="mb-4">
+            <div
+                class="mb-4 shadow-xl rounded-lg space-x-4 px-2 py-4
+        @if ($producto->estado == 'aprobado') bg-green-300
+        @elseif ($producto->estado == 'rechazado')
+            bg-red-300
+        @elseif ($producto->estado == 'pendiente') {{-- ¡Nueva condición para 'pendiente'! --}}
+            bg-yellow-200 {{-- Puedes ajustar el color según tu preferencia --}}
+        @else
+            bg-gray-200 {{-- Color por defecto si el estado no es reconocido --}} @endif">
                 <h3 class="text-sm font-semibold text-gray-600">Observaciones</h3>
                 <p class="text-gray-800">{{ $producto->observaciones }}</p>
+
+                {{-- Aquí mostramos el estado de la observación --}}
+                @if ($producto->estado)
+                    <p class="text-xs text-gray-700 mt-2">Estado:
+                        <span
+                            class="font-bold
+                    @if ($producto->estado == 'aprobado') text-green-700
+                    @elseif ($producto->estado == 'rechazado')
+                        text-red-700
+                    @elseif ($producto->estado == 'pendiente') {{-- Color de texto para 'pendiente' --}}
+                        text-yellow-700 {{-- Puedes ajustar el color de texto también --}} @endif
+                ">
+                            {{ ucfirst($producto->estado) }}
+                        </span>
+                    </p>
+                @endif
             </div>
         @endif
 
