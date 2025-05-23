@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Aquí configuras tu gráfico
         chart.setOption({
-            
+
         });
 
         // Hacer que se redimensione al cambiar el tamaño de la ventana
@@ -233,11 +233,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>`;
                 }
             },
+            grid: {
+                left: '5%',
+                right: '5%',
+                top: '10%',
+                bottom: '20%',
+                containLabel: true
+            },
             xAxis: {
                 type: 'category',
                 data: labels,
                 axisLabel: {
-                    color: '#000'
+                    color: '#000',
+                    fontSize: 12,
+                    interval: 0,
+                    rotate: 0// útil si las etiquetas son largas
                 }
             },
             yAxis: {
@@ -250,19 +260,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 areaStyle: {
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                         { offset: 0, color: '#22c55e' },
-                        { offset: 1, color: '#bbf7d0' }
+                        { offset: 1, color: '#ffffff' }
                     ])
                 },
                 itemStyle: {
                     color: '#22c55e'
                 },
                 lineStyle: {
-                    width: 3
+                    width: 1.5
                 },
                 symbolSize: 8
             }]
         };
-
 
         if (!Array.isArray(seriesData) || seriesData.length === 0 || seriesData.some(v => isNaN(v.y))) {
             document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos numéricos válidos para graficar.</div>`;

@@ -89,7 +89,7 @@ html { font-size: 16px; }
 @layer base {
   :root {
         --color-Gestion: #E6EAED;
-        --color-formulario: #EAE4D5;
+        --color-formulario: #A5BFCC;
         --color-pag: #00304D;
         --color-hover: #39A900;
         --color-tabla: #F6F6F6;
