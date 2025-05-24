@@ -1,6 +1,7 @@
 
 //para poder utilizar la libreria de apechar
 import * as echarts from 'echarts';
+import { Container } from 'postcss';
 
 document.addEventListener("DOMContentLoaded", function () {
     let filtroActual = 'ultimos3dias';
@@ -234,12 +235,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             },
             grid: {
-                left: '5%',
-                right: '5%',
+                left: '0%',
+                right: '0%',
                 top: '10%',
-                bottom: '20%',
-                containLabel: true
+                bottom: '10',
+                ContainLabel: true
             },
+
             xAxis: {
                 type: 'category',
                 data: labels,
