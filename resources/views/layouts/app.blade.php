@@ -23,14 +23,7 @@
     <!-- Styles -->
     @livewireStyles
 
-    {{-- Define la variable global para las rutas de assets en JS --}}
-    {{-- <script>
-        window.assetUrl = "{{ asset('') }}";
-    </script> --}}
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="flex flex-col h-screen overflow-hidden font-sans antialiased">
@@ -59,14 +52,16 @@
             </header>
         @endif
 
+        {{-- SE ELIMINÓ ESTA LINEA YA QUE ERA LA DEL PROBLEMA
         <main class="flex-1 h-full p-6 overflow-y-auto" :class="sidebarOpen ? 'pl-64' : 'pl-16'">
             @yield('content')
-        </main>
+        </main> --}}
     </div>
 
-    {{-- @stack('modals')
+    @stack('modals')
+    @yield('scripts') 
     @livewireScripts
-    @yield('scripts') --}}
+    
     <script>
         // Inyecta las variables de sesión de Laravel en variables JavaScript globales
         const sessionStatusProducto = @json(session('status_producto', null));
@@ -76,7 +71,6 @@
         const sessionSuccess = @json(session('success', null));
         const sessionError = @json(session('error', null));
     </script>
-    {{-- <script src="{{ asset('js/sweetalert_messages.js') }}"></script> --}}
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
 </body>
 
