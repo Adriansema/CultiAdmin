@@ -21,11 +21,37 @@
 
     <hr class="my-4 border-gray-200">
 
-    <section class="flex-1 p-1 overflow-y-auto">
-        <div class="flex flex-col mb-6 md:flex-row md:items-center md:justify-between">
-            <div class="mb-6">
-                <h1 class="text-2xl font-semibold text-gray-800">Panel de Administración</h1>
-                <p class="mt-2 text-gray-600">Visualiza estadística de vistas al sitio, notificación y boletines.</p>
+        <section class="flex-1 p-1 overflow-y-auto">
+            <div class="flex flex-col mb-6 md:flex-row md:items-center md:justify-between">
+                <div class="mb-6">
+                    <h1 class="text-2xl font-semibold text-gray-800">Panel de Administración</h1>
+                    <p class="mt-2 text-gray-600">Visualiza estadística de vistas al sitio, notificación y boletines.</p>
+                </div>
+
+            <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
+                <button onclick="setFilter('ultimos3dias')"
+                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-black focus:border-5 focus:border-green-600">Ultimos
+                    3 dias</button>
+                <button onclick="setFilter('semana')"
+                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-green-200 focus:border-5 focus:border-green-600">Semana</button>
+                <button onclick="setFilter('mes')"
+                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-green-200 focus:border-5 focus:border-green-600">Mes</button>
+                <button onclick="setFilter('año')"
+                    class="px-6 py-3 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-green-200 focus:border-5 focus:border-green-600">Año</button>
+            </div>
+        </div>
+    </section>
+                <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
+                    <button onclick="setFilter('ultimos3dias')"
+                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700">Ultimos
+                        3 dias</button>
+                    <button onclick="setFilter('semana')"
+                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700 active">Semana</button>
+                    <button onclick="setFilter('mes')"
+                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700">Mes</button>
+                    <button onclick="setFilter('año')"
+                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700">Año</button>
+                </div>
             </div>
 
             <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
