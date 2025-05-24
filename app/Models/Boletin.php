@@ -20,5 +20,13 @@ class Boletin extends Model
         'estado',        // ¡Asegúrate de que estado esté aquí!
         'observaciones', // ¡Asegúrate de que observaciones esté aquí!
     ];
+
+    /**
+     * Get the user that owns the Boletin.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
 

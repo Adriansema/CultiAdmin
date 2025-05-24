@@ -4,20 +4,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User; // Para buscar operadores
 use App\Models\Boletin;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Mail; // Importa Mail
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Mail; // Importa Mail
 use App\Mail\NuevaRevisionPendienteMail; // Importa la nueva Mailable
-use App\Models\User; // Para buscar operadores
+
 
 class BoletinController extends Controller
 {
     public function index()
     {
-        $role = Role::select('name')->get();
         $boletines = Boletin::latest()->get();
 
         return view('boletines.index', compact('boletines'));
