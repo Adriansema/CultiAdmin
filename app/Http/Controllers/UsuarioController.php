@@ -43,13 +43,13 @@ class UsuarioController extends Controller
             'role'     => 'required|string|exists:roles,name',
         ]);
 
-        $user = User::create([
+        $usuario = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        $user->assignRole($request->role);
+        $usuario->syncRoles([$request->role]);  // Asegura que solo este rol sea asignado al nuevo usuario
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
     }
@@ -175,7 +175,7 @@ class UsuarioController extends Controller
         $request->validate([
             'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $usuario->id,
-            'role'  => 'required|string|exists:roles,name',
+            'role'  => 'required|string|exists:roles,name', // Asegúrate de que 'role' viene del formulario
         ]);
 
         $usuario->update([
@@ -183,7 +183,7 @@ class UsuarioController extends Controller
             'email' => $request->email,
         ]);
 
-        $usuario->syncRoles($request->role);
+        $usuario->syncRoles([$request->role]); // Asegura que el usuario tenga SOLO este rol
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado.');
     }

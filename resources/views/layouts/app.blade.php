@@ -76,7 +76,7 @@
         const sessionSuccess = @json(session('success', null));
         const sessionError = @json(session('error', null));
     </script>
-    <script src="{{ asset('js/sweetalert_messages.js') }}"></script>
+    {{-- <script src="{{ asset('js/sweetalert_messages.js') }}"></script> --}}
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
 </body>
 

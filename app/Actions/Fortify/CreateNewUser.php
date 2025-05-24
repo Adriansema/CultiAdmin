@@ -19,28 +19,16 @@ class CreateNewUser implements CreatesNewUsers
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'string', 'in:administrador,operador'],
-            /* 'role' => ['required', 'string', 'exists:roles,name'], */
-            /* 'password' => [
-                'required',
-                'string',
-                'min:8',              // Mínimo 8 caracteres
-                'regex:/[a-z]/',      // Al menos una minúscula
-                'regex:/[A-Z]/',      // Al menos una mayúscula
-                'regex:/[0-9]/',      // Al menos un número
-                'regex:/[@$!%*?&]/',  // Al menos un símbolo
-                'confirmed',          // Campo password_confirmation debe coincidir
-            ], */
-
         ])->validate();
 
-        $user = User::create([
+        $usuario = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
         ]);
 
-        $user->assignRole($input['role']);
+        $usuario->syncRoles([$input['role']]); // Sincroniza para que solo tenga este rol al registrarse
 
-        return $user;
+        return $usuario;
     }
 }

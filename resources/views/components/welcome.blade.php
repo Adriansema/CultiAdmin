@@ -1,4 +1,4 @@
-<div class="p-6 bg-white border-b border-gray-200 lg:p-8">
+{{-- <div class="p-6 bg-white border-b border-gray-200 lg:p-8">
     <x-application-logo class="block w-auto h-12" />
 
     <h1 class="mt-8 text-2xl font-medium text-gray-900">
@@ -11,9 +11,9 @@
         you should love expressing your creativity through programming, so we have spent time carefully crafting the Laravel
         ecosystem to be a breath of fresh air. We hope you love it.
     </p>
-</div>
+</div> --}}
 
-<div class="grid grid-cols-1 gap-6 p-6 bg-gray-200 bg-opacity-25 md:grid-cols-2 lg:gap-8 lg:p-8">
+{{-- <div class="grid grid-cols-1 gap-6 p-6 bg-gray-200 bg-opacity-25 md:grid-cols-2 lg:gap-8 lg:p-8"> --}}
     <!-- <div>
         <div class="flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="size-6 stroke-gray-400">
@@ -93,4 +93,4 @@
             Authentication and registration views are included with Laravel Jetstream, as well as support for user email verification and resetting forgotten passwords. So, you're free to get started with what matters most: building your application.
         </p>
     </div> -->
-</div>
+{{-- </div> --}}

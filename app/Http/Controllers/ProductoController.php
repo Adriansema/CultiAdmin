@@ -4,14 +4,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User; // Para buscar operadores
 use App\Models\Producto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail; // Importa Mail
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Mail; // Importa Mail
 use App\Mail\NuevaRevisionPendienteMail; // Importa la nueva Mailable
-use App\Models\User; // Para buscar operadores
-use Spatie\Permission\Models\Role; // Si usas Spatie para roles
 
 class ProductoController extends Controller
 {
