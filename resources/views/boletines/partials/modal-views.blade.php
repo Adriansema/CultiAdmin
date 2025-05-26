@@ -1,18 +1,18 @@
-{{--
-@extends('layouts.app')
+<!-- Modal (se mantiene oculto por defecto) -->
+<div id="modal-ver-{{ $boletin->id }}" class="hidden">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div class="w-full max-w-xl p-6 bg-[var(--color-gris1)] rounded-lg shadow-xl space-y-4 ">
+            <h1 class="mb-4 text-xl font-semibold">
+                Detalles del Boletín
+            </h1>
 
-@section('content')
-    <h2 class="text-2xl font-bold mb-4">Detalles del Boletín</h2>
-    <div class="max-w-3xl mx-auto mt-10">
-        <div class="p-6 bg-[var(--color-gris1)] rounded-xl shadow-lg">
-
-             Sección de Estado del Boletín (Más Prominente) 
+            {{-- Sección de Estado del Boletín (Más Prominente) --}}
             <div
                 class="mb-6 p-4 rounded-lg
-                @if ($boletin->estado === 'aprobado') bg-green-100 text-green-800 border border-green-300
-                @elseif ($boletin->estado === 'rechazado') bg-red-100 text-red-800 border border-red-300
-                @elseif ($boletin->estado === 'pendiente') bg-yellow-100 text-yellow-800 border border-yellow-300
-                @else bg-gray-100 text-gray-800 border border-gray-300 @endif">
+                            @if ($boletin->estado === 'aprobado') bg-green-100 text-green-800 border border-green-300
+                            @elseif ($boletin->estado === 'rechazado') bg-red-100 text-red-800 border border-red-300
+                            @elseif ($boletin->estado === 'pendiente') bg-yellow-100 text-yellow-800 border border-yellow-300
+                            @else bg-gray-100 text-gray-800 border border-gray-300 @endif">
                 <h3 class="text-base font-semibold">Estado Actual:
                     <span class="font-bold">{{ ucfirst($boletin->estado) }}</span>
                 </h3>
@@ -33,32 +33,34 @@
                 @endif
             </div>
 
+            {{-- Detalles del Boletin --}}
             @if ($boletin->archivo)
                 <div class="mt-4 flex justify-between gap-4"> {{-- Contenedor principal con flexbox y gap para la separación --}}
 
-                    {{-- Div del Contenido (Izquierda) --}
-                    <div class="flex-grow p-3 bg-gray-50 rounded-md"> {{-- flex-grow para ocupar espacio y estilos de tarjeta --}
+                    {{-- Div del Contenido (Izquierda) --}}
+                    <div class="flex-grow p-3 bg-gray-50 rounded-md "> {{-- flex-grow para ocupar espacio y estilos de tarjeta --}}
+                        <h3 class="text-md font-semibold text-black ">Contenido:</h3>
                         <p class="text-black whitespace-pre-line">
                             {{ $boletin->contenido }}
                         </p>
                     </div>
 
-                    {{-- Div del Icono (Derecha) --}
+                    {{-- Div del Icono (Derecha) --}}
                     <div class="p-3 bg-gray-50 rounded-md flex-shrink-2 flex flex-col items-center justify-center">
-                        {{-- Estilos de tarjeta y centrado --}
-                        <h3 class="text-xs font-semibold text-black ">Archivo Adjunto:</h3> {{-- Oculto visualmente, para accesibilidad --}
+                        {{-- Estilos de tarjeta y centrado --}}
+                        <h3 class="text-xs font-semibold text-black ">Archivo Adjunto:</h3>
+                        {{-- Oculto visualmente, para accesibilidad --}}
                         <a href="{{ asset('storage/' . $boletin->archivo) }}" target="_blank"
                             class="text-blue-600 hover:underline flex flex-col items-center
-                       transform transition-transform duration-300 ease-in-out
-                       hover:scale-105">
-                            <img src="{{ asset('images/PDF.svg') }}" alt="Icono PDF" class="w-14 h-14 mb-1 cursor-pointer">
-                            {{-- <span>Ver Archivo (PDF, etc.)</span> --}} {{-- Texto del enlace debajo del icono --}
+                                    transform transition-transform duration-300 ease-in-out
+                                    hover:scale-105">
+                            <img src="{{ asset('images/PDF.svg') }}" alt="Icono PDF"
+                                class="w-14 h-14 mb-1 cursor-pointer">
                         </a>
                     </div>
-
                 </div>
             @else
-                {{-- Si no hay archivo, solo mostrar el contenido ocupando todo el ancho --}
+                {{-- Si no hay archivo, solo mostrar el contenido ocupando todo el ancho --}}
                 <div class="mt-4 p-3 bg-gray-50 rounded-md">
                     <p class="text-gray-700 whitespace-pre-line">
                         {{ $boletin->contenido }}
@@ -66,13 +68,10 @@
                 </div>
             @endif
 
-            <div class="flex mt-6">
-                <a href="{{ route('boletines.index') }}"
-                    class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">Volver</a>
-            </div>
+            <button type="button" onclick="ocultarModal('ver', '{{ $boletin->id }}')"
+                class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+                Cancelar
+            </button>
         </div>
     </div>
-@endsection
---}}
-
-
+</div>

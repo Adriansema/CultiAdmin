@@ -35,47 +35,24 @@
                     </td>
 
                     <td class="flex flex-col px-4 py-2 space-y-1 align-top md:space-y-0 md:space-x-2 md:flex-row">
-                        <a href="{{ route('boletines.show', $boletin) }}"
-                            class="px-3 py-1 text-sm text-center text-white bg-indigo-600 rounded hover:bg-indigo-700">Ver</a>
+                        <button type="button" onclick="mostrarModal('ver', '{{ $boletin->id }}')" 
+                            class="px-3 py-1 text-sm text-center text-white bg-green-600 rounded hover:bg-green-700">
+                            Ver
+                        </button>
+                        @include('boletines.partials.modal-views')
 
-                        <a href="{{ route('boletines.edit', $boletin) }}"
-                            class="px-3 py-1 text-sm text-center text-white bg-yellow-500 rounded hover:bg-yellow-600">Editar</a>
+                        <button type="button" onclick="mostrarModal('editar', '{{ $boletin->id }}')" 
+                            class="px-3 py-1 text-sm text-center text-white bg-yellow-600 rounded hover:bg-yellow-700">
+                            Editar
+                        </button>
+                        @include('boletines.partials.modal-edit')
             
                         <!-- Botón que abre el modal -->
                         <button type="button" onclick="mostrarModal('boletin', '{{ $boletin->id }}')"
                             class="w-20 px-1 py-1 text-sm text-center text-white bg-red-600 rounded hover:bg-red-700">
                             Eliminar
                         </button>
-
-                        <!-- Modal (se mantiene oculto por defecto) -->
-                        <div id="modal-boletin-{{ $boletin->id }}" class="hidden">
-                            <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                                <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
-                                    <h3 class="mb-4 text-lg font-bold text-gray-800">
-                                        ¿Estás seguro de eliminar este boletin?
-                                    </h3>
-                                    <p class="mb-4 text-gray-600">
-                                        Esta acción no se puede deshacer. El boletin será eliminado permanentemente
-                                        del sistema.
-                                    </p>
-                                    <form action="{{ route('boletines.destroy', $boletin) }}" method="POST"
-                                        class="inline-block">
-                                        @csrf
-                                        @method('DELETE')
-                                        <div class="flex justify-end mt-4 space-x-2">
-                                            <button type="button"
-                                                onclick="ocultarModal('boletin', '{{ $boletin->id }}')"
-                                                class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
-                                                Cancelar
-                                            </button>
-                                            <x-button class="bg-red-600 hover:bg-red-700">
-                                                Eliminar
-                                            </x-button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+                        @include('boletines.partials.modal-delete')
                     </td>
                 </tr>
             @empty

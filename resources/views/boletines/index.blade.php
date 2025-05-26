@@ -28,7 +28,7 @@
                 {!! Breadcrumbs::render('boletines.index') !!}
             </div>
 
-            @include('boletines.partials.modal')
+            @include('boletines.partials.modal-create')
 
             @include('boletines.partials.tabla')
         </div>
