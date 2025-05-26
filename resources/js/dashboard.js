@@ -171,7 +171,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 bottom: '10',
                 containLabel: true
             },
-
             xAxis: {
                 type: 'category',
                 data: labels,
