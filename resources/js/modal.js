@@ -85,3 +85,19 @@ window.ocultarModal = function(tipo, id) {
         modal.classList.add('hidden');
     }
 }
+
+window.actualizarModal = function(tipo, id) {
+    const modal = document.getElementById(`modal-${tipo}-${id}`);
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+window.volverModal = function(tipo, id) {
+    const modal = document.getElementById(`modal-${tipo}-${id}`);
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+

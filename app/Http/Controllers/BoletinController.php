@@ -27,7 +27,52 @@ class BoletinController extends Controller
         return view('boletines.create');
     }
 
+    public function show(Boletin $boletin)
+    {
+        return view('boletines.show', compact('boletin'));
+    }
+
+    public function edit(Boletin $boletin)
+    {
+        return view('boletines.edit', compact('boletin'));
+    }
+
     public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'contenido' => 'required|string',
+            'archivo_upload' => 'nullable|file|mimes:pdf|max:5120', // Reglas de validación para el archivo
+            // - nullable: El archivo es opcional al crear.
+            // - file: Debe ser un archivo válido.
+            // - mimes: Tipos de archivo permitidos (ajusta según tus necesidades).
+            // - max: Tamaño máximo en kilobytes (5120 KB = 5 MB).
+        ]);
+
+        $filePath = null; // Inicializamos la ruta del archivo a null
+
+        // Lógica para manejar la subida del archivo si existe
+        if ($request->hasFile('archivo_upload')) {
+            // Guardar el archivo en la carpeta 'boletines' dentro de storage/app/public
+            $filePath = $request->file('archivo_upload')->store('boletines', 'public');
+        }
+
+        $boletin = Boletin::create([
+            'user_id' => Auth::id(),
+            'estado' => 'pendiente',
+            'contenido' => $validated['contenido'],
+            'archivo' => $filePath, // Asignamos la ruta del archivo (o null si no se subió)
+        ]);
+
+        // *** Lógica para enviar email al operador cuando se crea un boletín ***
+        $operadores = User::role('operador')->get(); // Obtiene todos los usuarios con el rol 'operador'
+        foreach ($operadores as $operador) {
+            Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
+        }
+
+        return redirect()->route('boletines.index')->with('success', 'Boletín creado con éxito y enviado a revisión del operador.');
+    }
+
+    /* public function store(Request $request)
     {
         $validated = $request->validate([
             'archivo' => 'nullable|string', //por el momento esta null, ya que en futuro se reutilizar
@@ -49,18 +94,72 @@ class BoletinController extends Controller
 
         return redirect()->route('boletines.index')->with('success', 'Boletín creado con éxito y enviado a revisión del operador.');
     }
-
-    public function show(Boletin $boletin)
-    {
-        return view('boletines.show', compact('boletin'));
-    }
-
-    public function edit(Boletin $boletin)
-    {
-        return view('boletines.edit', compact('boletin'));
-    }
+ */
 
     public function update(Request $request, Boletin $boletin)
+    {
+        $request->validate([
+            'contenido' => 'required|string',
+            // 'observaciones' => 'nullable|string', // El usuario puede modificar sus observaciones
+            'archivo_upload' => 'nullable|file|mimes:pdf|max:5120', // Reglas para el archivo:
+            // - nullable: puede no subir archivo (para mantener el actual)
+            // - file: debe ser un archivo
+            // - mimes: tipos de archivo permitidos (añade o quita según tus necesidades)
+            // - max: tamaño máximo en kilobytes (5120 KB = 5 MB)
+        ]);
+
+        // Almacenar el estado original del boletín ANTES de cualquier cambio
+        $originalEstado = $boletin->estado;
+
+        // *** Lógica para manejar la subida del archivo ***
+        if ($request->hasFile('archivo_upload')) {
+            // 1. Eliminar el archivo antiguo si existe
+            if ($boletin->archivo && Storage::disk('public')->exists($boletin->archivo)) {
+                Storage::disk('public')->delete($boletin->archivo);
+            }
+
+            // 2. Guardar el nuevo archivo
+            // El método store() guarda el archivo y devuelve la ruta relativa (ej: "boletines/nombre_archivo.pdf")
+            // 'boletines' será la subcarpeta dentro de storage/app/public
+            $path = $request->file('archivo_upload')->store('boletines', 'public');
+            $boletin->archivo = $path; // Guardar esta ruta en la base de datos
+        }
+        // Si no se sube un nuevo archivo, $boletin->archivo conserva su valor actual
+        // ($request->archivo ya no es relevante si usas 'archivo_upload')
+
+        // Actualizar los campos del boletín
+        $boletin->contenido = $request->contenido;
+        // La línea $boletin->archivo = $request->archivo; DEBE SER ELIMINADA o IGNORADA si usas 'archivo_upload'
+        // porque el campo 'archivo' en tu base de datos ahora se llenará desde la lógica de subida de archivos, no desde el input de texto.
+
+        // *** Lógica para cambiar el estado a 'pendiente' si el boletín fue editado
+        // *** y su estado original era 'aprobado' o 'rechazado'.
+        // Esto asegura que cada edición por parte del creador requiera una nueva validación del operador.
+        $estadoCambiadoAPendiente = false;
+        if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
+            $boletin->estado = 'pendiente';
+            // Opcional: limpiar la observación del operador al volver a pendiente.
+            // Asumiendo que 'observaciones' es la columna donde el operador pone la observación.
+            $boletin->observaciones = null; // Limpiar observación del operador
+            $estadoCambiadoAPendiente = true;
+        }
+        // No se permite al usuario cambiar el estado directamente desde esta vista.
+
+        $boletin->save();
+
+        // *** Lógica para enviar email al operador cuando un boletín editado vuelve a pendiente ***
+        if ($estadoCambiadoAPendiente) {
+            $operadores = User::role('operador')->get(); // Obtiene todos los usuarios con el rol 'operador'
+            foreach ($operadores as $operador) {
+                Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
+            }
+        }
+
+        // Mensaje de éxito más descriptivo para el usuario
+        return redirect()->route('boletines.index')->with('success', 'Boletín actualizado y enviado a revisión del operador.');
+    }
+
+    /* public function update(Request $request, Boletin $boletin)
     {
         $request->validate([
             'archivo' => 'nullable|string', // Puede ser nulo o string dependiendo del flujo
@@ -100,7 +199,7 @@ class BoletinController extends Controller
 
         // Mensaje de éxito más descriptivo para el usuario
         return redirect()->route('boletines.index')->with('success', 'Boletín actualizado y enviado a revisión del operador.');
-    }
+    } */
 
     public function destroy(Boletin $boletin)
     {
@@ -137,7 +236,7 @@ class BoletinController extends Controller
         foreach ($operadores as $operador) {
             Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
         }
-        
+
         return redirect()->route('boletines.index')->with('success', 'Boletín importado correctamente y pendiente de revisión.');
     }
 }

@@ -1,19 +1,6 @@
-{{-- resources/views/boletines/edit.blade.php 
-@extends('layouts.app')
-
-@section('content')
-    <div class=" space-x-2">
-        <div class="inline-block px-8 py-10">
-            <div class="flex items-center space-x-2">
-                <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-                <h1 class="text-3xl whitespace-nowrap font-bold">Editar Boletin</h1>
-            </div>
-            {!! Breadcrumbs::render('boletines.edit', $boletin) !!}
-        </div>
-    </div>
-
-    <div class="max-w-3xl mx-auto mt-10">
-        <form action="{{ route('boletines.update', $boletin) }}" method="POST" enctype="multipart/form-data"
+<div id="modal-editar-{{ $boletin->id }}" class="hidden">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <form id="form-boletin-{{ $boletin->id }}" action="{{ route('boletines.update', $boletin) }}" method="POST" enctype="multipart/form-data"
             class="bg-gray-200 px-4 py-6 space-y-4 rounded-xl">
             @csrf
             @method('PUT')
@@ -21,9 +8,9 @@
             <div class="mb-4">
                 <label for="archivo_upload" class="block font-semibold">Archivo Adjunto:</label>
 
-                {{-- Muestra el archivo actual como icono si existe --}
+                {{-- Muestra el archivo actual como icono si existe --}}
                 @if ($boletin->archivo)
-                    <div class="mt-2 flex items-center space-x-3 p-3 bg-gray-50 rounded-md">
+                    <div class="mt-2 flex items-center space-x-3 p-3 bg-gray-50 rounded-md **archivo-actual-info**">
                         @php
                             // Obtener la extensión para mostrar un icono relevante
                             $extension = pathinfo($boletin->archivo, PATHINFO_EXTENSION);
@@ -38,21 +25,21 @@
                             class="flex flex-col items-center text-blue-600 hover:underline
                             transform transition-transform duration-300 ease-in-out hover:scale-105">
                             <img src="{{ $iconSrc }}" alt="Icono de Archivo Actual" class="w-16 h-16 cursor-pointer">
-                            <span>Ver Archivo Actual ({{ strtoupper($extension) ?: 'Sin Ext.' }})</span>
+                            <span class="**archivo-extension-text**">Ver Archivo Actual ({{ strtoupper($extension) ?: 'Sin Ext.' }})</span>
                         </a>
-                        {{-- <span class="flex-grow text-sm text-gray-500 truncate">{{ basename($boletin->archivo) }}</span> --}
+                        {{-- <span class="flex-grow text-sm text-gray-500 truncate">{{ basename($boletin->archivo) }}</span> --}}
                     </div>
-                    <p class="mt-2 text-sm text-gray-600">Deja este campo vacío para mantener el archivo actual, o sube uno
+                    <p class="mt-2 text-sm text-gray-600 **info-archivo-subido**">Deja este campo vacío para mantener el archivo actual, o sube uno
                         nuevo para reemplazarlo.</p>
                 @else
-                    <p class="mt-2 text-sm text-gray-600">No hay archivo adjunto actualmente. Puedes subir uno a
+                    <p class="mt-2 text-sm text-gray-600 **no-archivo-mensaje**">No hay archivo adjunto actualmente. Puedes subir uno a
                         continuación.</p>
                 @endif
 
-                {{-- Input para subir un nuevo archivo --}
+                {{-- Input para subir un nuevo archivo --}}
                 <input type="file" name="archivo_upload" id="archivo_upload" class="w-full p-2 mt-2 border rounded-lg">
                 @error('archivo_upload')
-                    {{-- El nombre debe coincidir con el del campo en el controlador --}
+                    {{-- El nombre debe coincidir con el del campo en el controlador --}}
                     <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                 @enderror
             </div>
@@ -66,15 +53,14 @@
             </div>
 
             <div class="flex items-center justify-between mb-6">
-                <a href="{{ route('boletines.index') }}"
+                <a href="{{ route('boletines.index') }}" onclick="ocultarModal('editar', '{{ $boletin->id }}')"
                     class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">
-                    Volver al listado
+                    Cerrar
                 </a>
-                <button type="submit" class="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700">
+                <button onclick="actualizarModal('editar', '{{ $boletin->id }}')" type="button" class="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700">
                     Actualizar
                 </button>
             </div>
         </form>
     </div>
-@endsection
---}}
+</div>
