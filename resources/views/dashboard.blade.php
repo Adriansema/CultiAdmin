@@ -21,53 +21,51 @@
 
         <hr class="my-4 border-gray-200">
 
-        <section class="flex-1 p-1 overflow-y-auto">
-            <div class="flex flex-col mb-6 md:flex-row md:items-center md:justify-between">
-                <div class="mb-6">
-                    <h1 class="text-2xl font-semibold text-gray-800">Panel de Administración</h1>
-                    <p class="mt-2 text-gray-600">Visualiza estadística de vistas al sitio, notificación y boletines.</p>
-                </div>
-
-                <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
-                    <button onclick="setFilter('ultimos3dias')"
-                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700">Ultimos
-                        3 dias</button>
-                    <button onclick="setFilter('semana')"
-                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700 active">Semana</button>
-                    <button onclick="setFilter('mes')"
-                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700">Mes</button>
-                    <button onclick="setFilter('año')"
-                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:bg-green-700">Año</button>
-                </div>
+    <section class="flex-1 p-1 overflow-y-auto">
+        <div class="flex flex-col mb-6 md:flex-row md:items-center md:justify-between">
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-gray-800">Panel de Administración</h1>
+                <p class="mt-2 text-gray-600">Visualiza estadística de vistas al sitio, notificación y boletines.</p>
             </div>
-        </section>
 
-        <!-- ✅ Aquí agregas ECharts -->
-        <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+            <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
+                <button onclick="setFilter('ultimos3dias')"
+                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-black focus:border-5 focus:border-green-600">Ultimos
+                    3 dias</button>
+                <button onclick="setFilter('semana')"
+                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-green-200 focus:border-5 focus:border-green-600">Semana</button>
+                <button onclick="setFilter('mes')"
+                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-green-200 focus:border-5 focus:border-green-600">Mes</button>
+                <button onclick="setFilter('año')"
+                    class="px-6 py-3 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-green-200 focus:border-5 focus:border-green-600">Año</button>
+            </div>
+        </div>
+    </section>
 
-        {{-- Gráfica de usuarios conectados + Métricas --}}
-        <div class="flex-1 p-1 overflow-y-auto">
-            <section id="usuarios-conectados" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
+    <!-- ✅ Aquí agregas ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 
-                <!-- Agrupamos el icono y el texto en un div flex -->
-                <div class="flex items-center mb-3 space-x-2">
-                    <!-- Fondo circular para el icono -->
-                    <div class="bg-[var(--color-ICONOESTA)]  p-0 rounded-full relative -top-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 17l6-6 4 4 7-7" />
-                        </svg>
-                    </div>
+    {{-- Gráfica de usuarios conectados + Métricas --}}
+    <div class="flex-1 p-6 overflow-y-auto">
+        <section id="usuarios-conectados" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
+
+            <!-- Agrupamos el icono y el texto en un div flex -->
+            <div class="flex items-center mb-3 space-x-2">
+                <!-- Fondo circular para el icono -->
+                <div class="bg-[var(--color-ICONOESTA)]  p-0 rounded-full relative -top-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 17l6-6 4 4 7-7" />
+                      </svg>
+                </div>
 
                     <!-- Título -->
                     <h2 class="text-xl font-bold text-[var(--color-usucone)] -mt-3">Usuarios Conectados</h2>
                 </div>
 
-                <div class="p-5 bg-white shadow-sm rounded-2xl">
-                    {{-- Gráfica --}}
-                    <div class="w-full max-w-7xl mx-auto px-4">
-                        <div id="chart" class="my-6 w-full h-[400px] md:h-[500px] lg:h-[600px]"></div>
-                    </div>
+            <div class="p-6 bg-white shadow-sm rounded-3xl">
+                {{-- Gráfica --}}
+
+                <div id="chart" class="my-6 w-full h-[200px] md:h-[400px] lg:h-[450px]"></div>
 
                 </div>
                 {{-- Métricas generales --}}
