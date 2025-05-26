@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Models\Statistic;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 Carbon::setLocale(App::getLocale());
 
@@ -36,15 +35,15 @@ class StatisticController extends Controller
                     break;
 
                 case 'semana':
-                    $inicio = $ahora->copy()->startOfWeek(Carbon::MONDAY)->startOfDay();
-                    $fin = $ahora->copy()->endOfWeek(Carbon::SUNDAY)->endOfDay();
-                    $campoAgrupar = "DATE(created_at)";
+                    $hoy = Carbon::today();
+                    $inicio = $hoy->copy()->subDays(6)->startOfDay(); // Últimos 7 días
+                    $fin = $hoy->copy()->endOfDay();
                     break;
 
                 case 'mes':
                     $inicio = $ahora->copy()->startOfMonth();
                     $fin = $ahora->copy()->endOfMonth();
-                    $campoAgrupar = "FLOOR((EXTRACT(DAY FROM created_at) - 1) / 7) + 1";
+                    $campoAgrupar = 'FLOOR((EXTRACT(DAY FROM created_at) - 1) / 7) + 1';
                     break;
 
                 case 'año':
@@ -61,65 +60,59 @@ class StatisticController extends Controller
                     break;
             }
 
+            $vistasRaw = collect();
 
+            if ($filtro !== 'semana') {
+                $vistasRaw = DB::table('visits')
+                    ->select(DB::raw("$campoAgrupar AS grupo"), DB::raw('COUNT(*) AS total'))
+                    ->whereBetween('created_at', [$inicio, $fin])
+                    ->groupBy(DB::raw($campoAgrupar))
+                    ->orderBy(DB::raw('MIN(created_at)'))
+                    ->get();
+            }
 
-            $vistasRaw = DB::table('visits')
-                ->select(DB::raw("$campoAgrupar AS grupo"), DB::raw("COUNT(*) AS total"))
-                ->whereBetween('created_at', [$inicio, $fin])
-                ->groupBy(DB::raw($campoAgrupar))
-                ->orderBy(DB::raw("MIN(created_at)"))
-                ->get();
-
-
-            // Log de depuración
-            Log::info('VISITAS RAW:', $vistasRaw->toArray());
             if ($filtro === 'semana') {
                 $dias = collect();
                 $hoy = Carbon::today();
-                $inicio = $hoy->copy()->subDays(6)->startOfDay(); // 7 días hacia atrás incluyendo hoy
+                $inicio = $hoy->copy()->subDays(6)->startOfDay();
                 $fin = $hoy->copy()->endOfDay();
 
-                // Crear días vacíos (7 días atrás incluyendo hoy)
+                // Crear días vacíos (últimos 7 días)
                 for ($i = 6; $i >= 0; $i--) {
                     $fecha = $hoy->copy()->subDays($i);
                     $dias->put($fecha->format('Y-m-d'), [
-                        'grupo' => ucfirst($fecha->translatedFormat('l')),
+                        'grupo' => $fecha->translatedFormat('D d M'), // Ej: Lun 20 May
                         'total' => 0,
                     ]);
                 }
 
-                // Log para verificar días
-                Log::info("FILTRO PERSONALIZADO - Semana (últimos 7 días):");
-                Log::info("DÍAS DE REFERENCIA:", $dias->keys()->toArray());
-
                 // Traer datos reales de la base de datos
                 $vistasRaw = DB::table('visits')
-                    ->select(DB::raw("DATE(created_at) AS fecha"), DB::raw("COUNT(*) AS total"))
+                    ->select(DB::raw('DATE(created_at) AS fecha'), DB::raw('COUNT(*) AS total'))
                     ->whereBetween('created_at', [$inicio, $fin])
-                    ->groupBy(DB::raw("DATE(created_at)"))
+                    ->groupBy(DB::raw('DATE(created_at)'))
                     ->pluck('total', 'fecha');
 
-                // Rellenar los días con los valores reales si existen
+                // Reemplazar valores vacíos por los reales
                 $dias = $dias->mapWithKeys(function ($data, $fecha) use ($vistasRaw) {
                     if (isset($vistasRaw[$fecha])) {
                         $data['total'] = $vistasRaw[$fecha];
                     }
+
                     return [$fecha => $data];
                 });
 
                 $vistas = $dias->values()->map(function ($item) {
-                    return (object)[
+                    return (object) [
                         'grupo' => $item['grupo'],
                         'total' => $item['total'],
                     ];
                 });
-            }
-
-          else {
+            } else {
                 $vistas = $vistasRaw->map(function ($vista) use ($filtro) {
                     try {
                         if ($filtro === 'mes') {
-                            $vista->grupo = 'Semana ' . $vista->grupo;
+                            $vista->grupo = 'Semana '.$vista->grupo;
                         } elseif ($filtro === 'año') {
                             $vista->grupo = ucfirst(trim($vista->grupo));
                         } elseif ($filtro === 'ultimos3dias') {
@@ -128,6 +121,7 @@ class StatisticController extends Controller
                     } catch (\Exception $e) {
                         // Si falla, deja el grupo como está
                     }
+
                     return $vista;
                 });
             }
@@ -138,6 +132,10 @@ class StatisticController extends Controller
             $activos = DB::table('users')->whereBetween('last_login_at', [$inicio, $fin])->count();
             $conectados = DB::table('users')->where('is_online', true)->count();
 
+            if ($filtro === 'semana') {
+                Log::info('Vistas generadas para semana:', $vistas->toArray());
+            }
+
             return response()->json([
                 'vistas' => $vistas,
                 'usuarios' => $usuarios,
@@ -146,13 +144,15 @@ class StatisticController extends Controller
                 'conectados' => $conectados,
             ]);
         } catch (\Throwable $e) {
-            Log::error('Error al obtener estadísticas: ' . $e->getMessage());
+            Log::error('Error al obtener estadísticas: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error interno del servidor',
-                'detalle' => $e->getMessage()
+                'detalle' => $e->getMessage(),
             ], 500);
-
 
         }
     }
 }
+
+

@@ -95,39 +95,29 @@ document.addEventListener("DOMContentLoaded", function () {
             total: mapa[dia]
         }));
     }
-
-
-
-    // Función para renderizar la gráfica con los datos
     function renderChart(data) {
-        if (!Array.isArray(data.vistas)) {
-            console.error("Los datos de 'vistas' no son válidos:", data.vistas);
-            return;
-        }
-
-        // Asignar data.vistas como base
         let datosOrdenados = [...data.vistas];
 
-        // Filtrar y ordenar los datos según el filtro seleccionado
         switch (filtroActual) {
             case 'ultimos3dias':
-                datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
-                break;
-            case 'semana':
-                const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
-                datosOrdenados.sort((a, b) =>
-                    diasSemana.indexOf(
-                        a.grupo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
-                    ) -
-                    diasSemana.indexOf(
-                        b.grupo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
-                    )
-                );
-                break;
-
             case 'mes':
                 datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
                 break;
+                case 'semana':
+                    const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+
+                    // Filtrar los que tienen días válidos
+                    datosOrdenados = datosOrdenados.filter(dato =>
+                        diasSemana.includes(dato.grupo.toLowerCase())
+                    );
+
+                    // Ordenar solo los válidos
+                    datosOrdenados.sort((a, b) =>
+                        diasSemana.indexOf(a.grupo.toLowerCase()) - diasSemana.indexOf(b.grupo.toLowerCase())
+                    );
+                    break;
+                    
+
             case 'año':
                 const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
                 datosOrdenados.sort((a, b) =>
@@ -135,103 +125,43 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
                 break;
         }
-        console.log("DEBUG data recibida:", data);
 
-        // ✅ Validar si hay datos antes de mapear
-        // Después (más permisivo)
-        if (!Array.isArray(data.vistas) || data.vistas.length === 0) {
-            document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">Los datos no son válidos.</div>`;
+        if (!Array.isArray(datosOrdenados) || datosOrdenados.length === 0) {
+            document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos para mostrar.</div>`;
             return;
         }
 
-        // Validar que cada entrada tenga grupo y total numérico
-        datosOrdenados = datosOrdenados.filter(stat => {
-            return stat.grupo !== undefined && !isNaN(parseInt(stat.total));
-        });
+        // Preparar datos
+        const labels = datosOrdenados.map(item => item.grupo);
+        const values = datosOrdenados.map(item => parseInt(item.total));
 
-        // Mostrar lo que se recibe en consola
-        console.log("DEBUG data.vistas recibida:", JSON.stringify(data.vistas));
-
-        // Verificar si hay datos válidos
-        if (datosOrdenados.length === 0) {
-            // Mostrar la gráfica con un solo punto "Sin datos"
-            datosOrdenados = [{
-                grupo: 'Sin datos',
-                total: 0
-            }];
-        }
-
-
-        // Procesar los datos limpios
-
-        let seriesData = datosOrdenados.map(stat => ({
-            x: stat.grupo || "Sin etiqueta",
-            y: parseInt(stat.total)
-        }));
-
-
-        console.log("Datos para la gráfica:", seriesData);
-
-
-
-
-        // Calcular los porcentajes de cambio entre los valores
-        porcentajes = seriesData.map((p, i, arr) => {
-            if (i === 0) return 0;
-            const anterior = arr[i - 1].y;
-            return anterior === 0 ? 0 : ((p.y - anterior) / anterior * 100).toFixed(1);
-        });
-
-        // Validar datos antes de graficar
-        if (!Array.isArray(seriesData) || seriesData.length === 0 || seriesData.some(v => isNaN(v.y))) {
-            document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos numéricos válidos para graficar.</div>`;
-            return;
-        }
-
-        // Inicializar el contenedor si aún no existe
+        // Crear instancia o reutilizar
+        const chartDom = document.getElementById('chart');
         if (!window.chartInstance) {
-            const chartDom = document.getElementById('chart');
             window.chartInstance = echarts.init(chartDom);
         } else {
             window.chartInstance.dispose();
-            const chartDom = document.getElementById('chart');
             window.chartInstance = echarts.init(chartDom);
         }
-        const chart = echarts.init(document.getElementById('chart'));
-
-        // Aquí configuras tu gráfico
-        chart.setOption({
-
-        });
-
-        // Hacer que se redimensione al cambiar el tamaño de la ventana
-        window.addEventListener('resize', () => {
-            chart.resize();
-        });
-
-
-        // Convertir los datos a formato compatible con ECharts
-        const labels = seriesData.map(item => item.x);
-        const values = seriesData.map(item => item.y);
 
         const options = {
             tooltip: {
                 trigger: 'axis',
                 formatter: function (params) {
                     const data = params[0];
-                    const valorActual = data.value;
                     const index = data.dataIndex;
+                    const valorActual = data.value;
                     let porcentaje = 0;
                     if (index > 0) {
-                        const anterior = params[0].seriesData[index - 1]?.value || 0;
+                        const anterior = values[index - 1];
                         porcentaje = anterior === 0 ? 0 : ((valorActual - anterior) / anterior * 100).toFixed(1);
                     }
                     return `
-                <div class="p-2">
-                    <strong>${data.name}</strong><br>
-                    Visitas: <strong>${valorActual}</strong><br>
-                    Cambio: <strong>${porcentaje}%</strong>
-                </div>`;
+                        <div class="p-2">
+                            <strong>${data.name}</strong><br>
+                            Visitas: <strong>${valorActual}</strong><br>
+                            Cambio: <strong>${porcentaje}%</strong>
+                        </div>`;
                 }
             },
             grid: {
@@ -239,17 +169,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 right: '0%',
                 top: '10%',
                 bottom: '10',
-                ContainLabel: true
+                containLabel: true
             },
-
             xAxis: {
                 type: 'category',
                 data: labels,
                 axisLabel: {
                     color: '#000',
-                    fontSize: 12,
-                    interval: 0,
-                    rotate: 0// útil si las etiquetas son largas
+                    fontSize: 12
                 }
             },
             yAxis: {
@@ -275,17 +202,21 @@ document.addEventListener("DOMContentLoaded", function () {
             }]
         };
 
-        if (!Array.isArray(seriesData) || seriesData.length === 0 || seriesData.some(v => isNaN(v.y))) {
-            document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos numéricos válidos para graficar.</div>`;
-            return;
-        }
-
-        // Renderizar el gráfico
         window.chartInstance.setOption(options);
 
-        // Actualizar las métricas de usuarios, registros, etc.
+        // Hacer que se redimensione automáticamente
+        window.addEventListener('resize', () => {
+            window.chartInstance.resize();
+        });
+
+        // Actualizar métricas
         updateMetrics(data);
+        console.log("Datos recibidos:", data.vistas);
+
     }
+
+
+
 
     // Función para actualizar las métricas
     function updateMetrics(data) {
