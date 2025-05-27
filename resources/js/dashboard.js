@@ -44,22 +44,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // Cambiar el filtro y cargar datos
-    function setFilter(filtro) {
-        filtroActual = filtro;
+   function setFilter(filtro) {
+    filtroActual = filtro;
 
-        const buttons = document.querySelectorAll('#filter-buttons .filter-btn');
-        buttons.forEach(btn => btn.classList.remove('active'));
+    const buttons = document.querySelectorAll('#filter-buttons .filter-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
 
-        const activeBtn = Array.from(buttons).find(btn =>
-            btn.textContent.trim().toLowerCase() === filtro.toLowerCase()
-        );
+    // Busca el botón con data-filtro igual al filtro actual
+    const activeBtn = Array.from(buttons).find(btn => btn.getAttribute('data-filtro') === filtro);
 
-        if (activeBtn) {
-            activeBtn.classList.add('active');
-        }
-
-        loadData(filtro);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
     }
+
+    loadData(filtro);
+}
+
 
     function getLast7Days() {
         const days = [];
@@ -103,20 +103,45 @@ document.addEventListener("DOMContentLoaded", function () {
             case 'mes':
                 datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
                 break;
+
                 case 'semana':
-                    const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+                    const hoy = new Date();
+                    let diaSemana = hoy.getDay(); // 0 = domingo, ..., 3 = miércoles
+                    let diferencia = (diaSemana >= 3) ? diaSemana - 3 : 7 - (3 - diaSemana);
 
-                    // Filtrar los que tienen días válidos
-                    datosOrdenados = datosOrdenados.filter(dato =>
-                        diasSemana.includes(dato.grupo.toLowerCase())
-                    );
+                    let inicio = new Date(hoy);
+                    inicio.setDate(hoy.getDate() - diferencia);
 
-                    // Ordenar solo los válidos
-                    datosOrdenados.sort((a, b) =>
-                        diasSemana.indexOf(a.grupo.toLowerCase()) - diasSemana.indexOf(b.grupo.toLowerCase())
-                    );
+                    const formatearLabel = (fecha) => {
+                        const dias = ['dom.', 'lun.', 'mar.', 'mié.', 'jue.', 'vie.', 'sáb.'];
+                        const meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.'];
+
+                        const diaSemana = dias[fecha.getDay()];
+                        const dia = fecha.getDate();
+                        const mes = meses[fecha.getMonth()];
+
+                        return `${diaSemana} ${dia} ${mes}`;
+                    };
+
+                    const datosSemana = [];
+
+                    for (let i = 0; i < 7; i++) {
+                        const fecha = new Date(inicio);
+                        fecha.setDate(inicio.getDate() + i);
+
+                        const fechaClave = formatearLabel(fecha);
+                        const etiqueta = fechaClave;
+
+                        const dato = datosOrdenados.find(d => d.grupo === fechaClave);
+
+                        datosSemana.push({
+                            grupo: etiqueta,
+                            total: dato ? dato.total : 0
+                        });
+                    }
+
+                    datosOrdenados = datosSemana;
                     break;
-
 
             case 'año':
                 const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
@@ -125,6 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
                 break;
         }
+
 
         if (!Array.isArray(datosOrdenados) || datosOrdenados.length === 0) {
             document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos para mostrar.</div>`;
