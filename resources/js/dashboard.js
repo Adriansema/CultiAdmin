@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         diasSemana.indexOf(a.grupo.toLowerCase()) - diasSemana.indexOf(b.grupo.toLowerCase())
                     );
                     break;
-                    
+
 
             case 'año':
                 const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
@@ -171,6 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 bottom: '10',
                 containLabel: true
             },
+
             xAxis: {
                 type: 'category',
                 data: labels,
