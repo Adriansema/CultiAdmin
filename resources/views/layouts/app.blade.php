@@ -59,9 +59,9 @@
     </div>
 
     @stack('modals')
-    @yield('scripts') 
+    @yield('scripts')
     @livewireScripts
-    
+
     <script>
         // Inyecta las variables de sesión de Laravel en variables JavaScript globales
         const sessionStatusProducto = @json(session('status_producto', null));
