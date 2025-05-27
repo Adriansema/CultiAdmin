@@ -14,24 +14,11 @@
     <div class="container max-w-4xl py-6 mx-auto">
         @php
             $campos = [
-                'que_es' => '¿Qué es?',
-                'historia' => 'Historia del cultivo',
-                'variedad' => 'Variedad',
-                'especies' => 'Especies',
-                'caracteristicas' => 'Características',
-                'clima' => 'Condiciones del clima',
-                'suelo' => 'Tipo de suelo ideal',
-                'riego' => 'Requerimientos de riego',
-                'cosecha' => 'Época de cosecha',
-                'postcosecha' => 'Proceso postcosecha',
-                'plagas' => 'Plagas y enfermedades comunes',
-                'usos' => 'Usos y aplicaciones',
-                'valor_nutricional' => 'Valor nutricional',
-                'impacto_economico' => 'Impacto económico',
-                'tecnicas_cultivo' => 'Técnicas de cultivo',
-                'certificaciones' => 'Certificaciones disponibles',
-                'ubicacion_geografica' => 'Ubicación geográfica óptima',
-                'nombre_cientifico' => 'Nombre científico',
+               'historia' => 'Historia',
+                'productos y sus características' => 'Productos',
+                'variantes' => 'Variantes',
+                'enfermedades' => 'Enfermedades',
+                'insumos' => 'Insumos',
             ];
 
             $detalles = json_decode($producto->detalles_json, true) ?? [];

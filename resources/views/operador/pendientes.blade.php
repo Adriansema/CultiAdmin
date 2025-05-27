@@ -41,7 +41,7 @@
             @include('operador.partials.productos')
         </div>
 
-        <div x-show="tab === 'boletines'" {{-- x-cloak --}}>
+        <div x-show="tab === 'boletines'" x-cloak>
             @include('operador.partials.boletines')
         </div>
 
