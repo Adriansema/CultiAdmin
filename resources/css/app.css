@@ -169,3 +169,65 @@ html { font-size: 16px; }
     border-radius: 2px;
     color: black;
 }
+
+/* Define una clase personalizada para el contenedor de la imagen de fondo de inicio sesion */
+.fullscreen-image-overlay-purple {
+  position: fixed; /* Hace que el elemento sea fijo en la ventana de visualización */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Ocupa el 100% del ancho del viewport */
+  height: 100vh; /* Ocupa el 100% de la altura del viewport */
+  overflow: hidden; /* Oculta cualquier contenido que se desborde, previniendo el scroll */
+  z-index: -1; /* Coloca la imagen de fondo detrás de otros elementos de la página */
+  display: flex; /* Usa flexbox para centrar la imagen */
+  justify-content: center; /* Centra horizontalmente la imagen */
+  align-items: center; /* Centra verticalmente la imagen */
+}
+
+/* Estilos para la imagen dentro del contenedor */
+.fullscreen-image-overlay-purple img {
+  width: 100%; /* La imagen ocupa el 100% del ancho de su contenedor */
+  height: 100%; /* La imagen ocupa el 100% de la altura de su contenedor */
+  object-fit: cover; /* Ajusta la imagen para cubrir el área sin distorsión, recortando si es necesario */
+  object-position: center; /* Centra la imagen dentro de su contenedor */
+}
+
+/* Pseudo-elemento para la superposición morada */
+.fullscreen-image-overlay-purple::before {
+  content: ''; /* Contenido vacío para el pseudo-elemento */
+  position: absolute; /* Posicionamiento absoluto sobre la imagen */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Aquí está el nuevo estilo de gradiente:
+     - Empieza con morado opaco (rgba(128, 0, 128, 0.5)) en el centro (0%)
+     - Transiciona a negro opaco (rgba(0, 0, 0, 0.7)) a partir del 50% del radio
+     - Termina en negro opaco (rgba(0, 0, 0, 0.7)) al 100% del radio
+  */
+  background: radial-gradient(circle at center,
+                              rgb(51, 18, 55) 0%,   /* Morado opaco en el centro */
+                              rgba(0, 0, 0, 0.6) 50%,     /* Negro opaco a partir de la mitad del radio */
+                              rgba(0, 0, 0, 0.1) 100%    /* Negro opaco hasta los bordes */
+                             );
+  pointer-events: none; /* Permite que los eventos de clic pasen a la imagen subyacente */
+  z-index: 1; /* Asegura que la superposición esté sobre la imagen */
+}
+
+/* Estilos para tu formulario de inicio de sesión */
+ .login-form {
+   /* ... otros estilos que ya tengas para tu formulario ... */
+  background-color: white; /* Por ejemplo, si tu formulario tiene fondo blanco */
+  padding: 40px; /* Si tiene padding interno */
+  /* ... */
+
+  /* Para rounded-xl (borde redondeado más grande) */
+  border-radius: 32px; /* Un valor común para rounded-xl. Puedes ajustar a 16px si lo ves necesario */
+
+  /* Para max-w-lg (ancho máximo) */
+  max-width: 36rem; /* El valor equivalente a max-w-lg en Tailwind (512px) */
+  width: 100%; /* Asegura que ocupe todo el ancho disponible hasta el max-width */
+
+  /* Estilo para el shadow brillante blanco */
+  box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.75); /* Ajusta los valores según necesites */
+ }
