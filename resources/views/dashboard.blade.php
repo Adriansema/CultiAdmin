@@ -20,29 +20,41 @@
 
         <hr class="my-4 border-gray-200">
 
-        <section class="flex-1 p-1 overflow-y-auto">
-            <div class="flex flex-col mb-6 md:flex-row md:items-center md:justify-between">
-                <div class="mb-6">
-                    <h1 class="text-2xl font-semibold text-gray-800">Panel de Administración</h1>
-                    <p class="mt-2 text-gray-600">Visualiza estadística de vistas al sitio, notificación y boletines.</p>
-                </div>
-
-                <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
-                    <button onclick="setFilter('ultimos3dias')"
-                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-black focus:border-5 focus:border-green-600">Ultimos
-                        3 dias</button>
-                    <button onclick="setFilter('semana')"
-                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-green-200 focus:border-5 focus:border-green-600">Semana</button>
-                    <button onclick="setFilter('mes')"
-                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-green-200 focus:border-5 focus:border-green-600">Mes</button>
-                    <button onclick="setFilter('año')"
-                        class="px-6 py-3 text-green-600 transition-colors rounded-lg filter-btn hover:border hover:bg-green-200 focus:border-5 focus:border-green-600">Año</button>
-                </div>
+    <section class="flex-1 p-1 overflow-y-auto">
+        <div class="flex flex-col mb-6 md:flex-row md:items-center md:justify-between">
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-gray-800">Panel de Administración</h1>
+                <p class="mt-2 text-gray-600">Visualiza estadística de vistas al sitio, notificación y boletines.</p>
             </div>
-        </section>
 
-        <!-- ✅ Aquí agregas ECharts -->
-        <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+            <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
+                <button onclick="setFilter('ultimos3dias')" data-filtro="ultimos3dias"
+                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                    Últimos 3 días
+                </button>
+
+                <button onclick="setFilter('semana')" data-filtro="semana"
+                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                    Semana
+                </button>
+
+                <button onclick="setFilter('mes')" data-filtro="mes"
+                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                    Mes
+                </button>
+
+                <button onclick="setFilter('año')" data-filtro="año"
+                    class="px-6 py-3 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                    Año
+                </button>
+            </div>
+
+
+        </div>
+    </section>
+
+    <!-- ✅ Aquí agregas ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 
         {{-- Gráfica de usuarios conectados + Métricas --}}
         <div class="flex-1 p-6 overflow-y-auto">
@@ -184,16 +196,27 @@
         const STATISTICS_ROUTE = "{{ route('statistics.index') }}";
     </script>
 
-    <script src="{{ asset('js/dashboard.js') }}"></script>
-    <script src="{{ asset('js/filter.js') }}"></script> {{-- <== Aquí agregas tu archivo --}}
+<script src="{{ asset('js/dashboard.js') }}"></script>
+<script src="{{ asset('js/filter.js') }}"></script> {{-- <== Aquí agregas tu archivo --}} <style>
+    .filter-btn {
+    @apply px-4 py-2 rounded-lg text-white hover:bg-green-300 transition-colors;
+    }
 
-    <style>
-        .filter-btn {
-            @apply px-4 py-2 rounded-lg text-white hover:bg-green-300 transition-colors;
-        }
+    .filter-btn.active {
+    @apply bg-green-600 hover:bg-green-500;
 
-        .filter-btn.active {
-            @apply bg-green-600 hover:bg-green-500;
-        }
+    border: 2px solid #1fa700; /* Verde fuerte para el borde */
+    background-color: #e9fbe6; /* Verde suave para el fondo */
+    color: #1fa700; /* Mismo verde fuerte para el texto */
+    font-weight: bold;
+
+    }
+
+    .filter-btn:hover {
+    background-color: #c8facc; /* Verde claro más notorio (similar a degradado suave) */
+
+    color: #1fa700;
+    }
+
     </style>
-@endsection
+    @endsection

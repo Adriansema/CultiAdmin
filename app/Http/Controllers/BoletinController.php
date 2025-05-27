@@ -71,7 +71,7 @@ class BoletinController extends Controller
 
         return redirect()->route('boletines.index')->with('success', 'Boletín creado con éxito y enviado a revisión del operador.');
     }
-
+    
     public function update(Request $request, Boletin $boletin)
     {
         $request->validate([
