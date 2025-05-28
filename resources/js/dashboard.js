@@ -151,7 +151,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 break;
         }
 
-
         if (!Array.isArray(datosOrdenados) || datosOrdenados.length === 0) {
             document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos para mostrar.</div>`;
             return;

@@ -198,4 +198,21 @@ class UsuarioController extends Controller
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
     }
+
+    public function checkEmailExists(Request $request)
+    {
+        // 1. Validar la petición: Asegura que el 'email' esté presente y sea un formato válido.
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        // 2. Consultar la base de datos para ver si el correo existe.
+        $exists = User::where('email', $request->email)->exists();
+
+        // Puedes usar Log::info() para depurar si necesitas
+        // Log::info('Checking email: ' . $request->email . ' - Exists: ' . ($exists ? 'Yes' : 'No'));
+
+        // 3. Devolver una respuesta JSON.
+        return response()->json(['exists' => $exists]);
+    }
 }

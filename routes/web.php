@@ -16,14 +16,17 @@ use App\Http\Middleware\Roles_Admin_Opera;
 use Illuminate\Support\Facades\Route;
 
 // Rutas públicas
-Route::get('/', function () {
+/* Route::get('/', function () {
     return view('welcome');
-})->name('welcome');
+})->name('welcome'); */
 
 //Cumple la funcion de mostrarle al usuario que intenta ingresar a la pagina despues de haber sido desactivado por el administrador
 Route::get('/login', function () {
     return view('auth.login')->with('inactivo', session('inactivo'));
 })->name('login');
+
+// Ruta para verificar si el correo existe (pública, sin autenticación)
+Route::post('/check-email', [UsuarioController::class, 'checkEmailExists'])->name('check-email');
 
 // Autenticación y verificación
 Route::middleware([
