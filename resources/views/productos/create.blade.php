@@ -7,14 +7,14 @@
     <div class="inline-block px-8 py-10">
         <div class="flex items-center space-x-2">
             <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-            <h1 class="text-3xl whitespace-nowrap font-bold">Crear Usuario</h1>
+            <h1 class="text-3xl font-bold whitespace-nowrap">Crear Usuario</h1>
         </div>
         {!! Breadcrumbs::render('productos.create') !!}
     </div>
 
     <div class="container max-w-3xl py-2 mx-auto">
 
-        <div class="flex justify-between  space-x-8">
+        <div class="flex justify-between space-x-8">
             <!-- Botón Importar CSV -->
             <form action="{{ route('productos.importar.csv') }}" method="POST" enctype="multipart/form-data"
                 class="flex items-center justify-end mb-4 space-x-2 ">
@@ -22,7 +22,7 @@
                 <input type="file" name="archivo_csv" accept=".csv" required
                     class="text-sm text-white bg-slate-800 border border-cyan-600 rounded px-3 py-1.5 shadow-sm">
                 <button type="submit"
-                    class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-4 py-2 rounded-lg transition">
+                    class="px-4 py-2 font-semibold text-white transition rounded-lg bg-cyan-600 hover:bg-cyan-700">
                     Importar CSV
                 </button>
             </form>
@@ -30,14 +30,14 @@
             <!-- boton de generar CSV-->
             <form action="{{ route('productos.generarCSV') }}" method="GET" style="float: right;">
                 <select name="tipo"
-                    class=" bg-gray-600 bg-opacity-60 border border-cyan-500 text-cyan-100 text-sm rounded-xl shadow-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-300 px-4 py-3 pr-10 appearance-none hover:cursor-pointer"
+                    class="px-4 py-3 pr-10 text-sm transition-all duration-300 bg-gray-600 border shadow-xl appearance-none  bg-opacity-60 border-cyan-500 text-cyan-100 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent hover:cursor-pointer"
                     required>
                     <option value="" class="bg-slate-900 text-slate-400">Selecciona tipo</option>
                     <option value="café">Café</option>
                     <option value="mora">Mora</option>
                 </select>
                 <button type="submit"
-                    class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-4 py-2 rounded-lg transition">
+                    class="px-4 py-2 font-semibold text-white transition rounded-lg bg-cyan-600 hover:bg-cyan-700">
                     Generar CSV
                 </button>
             </form>
@@ -53,7 +53,7 @@
                 <x-label for="imagen" :value="'Imagen del producto (opcional)'" />
                 <x-input id="imagen" type="file" name="imagen" class="mt-0" />
                 @error('imagen')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
@@ -69,12 +69,12 @@
                     <option value="mora" {{ old('tipo') == 'mora' ? 'selected' : '' }}>Mora</option>
                 </select>
                 @error('tipo')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Tabs -->
-            <div class="border-b mb-2">
+            <div class="mb-2 border-b">
                 <nav class="flex space-x-4">
                     <button type="button" class="px-4 py-2 font-semibold border-b-2"
                         :class="tab === 'historia' ? 'border-indigo-600 text-indigo-600' : 'border-transparent'"
@@ -173,9 +173,9 @@
             <!-- Botones -->
             <div class="flex justify-between pt-6">
                 <a href="{{ route('productos.index') }}"
-                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-black text-white rounded hover:bg-gray-800 transition">
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition bg-black rounded hover:bg-gray-800">
                     <img src="{{ asset('images/vole.svg') }}" class="w-4 h-3" alt="Icono Nuevo Usuario">
-                    <span class="whitespace-nowrap font-bold">Volver</span>
+                    <span class="font-bold whitespace-nowrap">Volver</span>
                 </a>
                 <x-button>
                     Guardar producto

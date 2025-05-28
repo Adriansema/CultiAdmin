@@ -1,4 +1,4 @@
-@extends('layouts.app')
+{{-- @extends('layouts.app')
 
 @section('header')
     <h2 class="text-xl font-semibold">Crear Boletín</h2>
@@ -12,3 +12,4 @@
         </form>
     </div>
 @endsection
+ --}}

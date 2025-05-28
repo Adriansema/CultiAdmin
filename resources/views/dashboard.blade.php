@@ -53,7 +53,7 @@
         </div>
     </section>
 
-    <!-- ✅ Aquí agregas ECharts -->
+    <!-- Aquí agregas ECharts -->
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 
     {{-- Gráfica de usuarios conectados + Métricas --}}
@@ -193,7 +193,6 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     const STATISTICS_ROUTE = "{{ route('statistics.index') }}";
 </script>

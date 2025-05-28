@@ -59,6 +59,8 @@ Route::middleware([
 
             // Boletines
             Route::post('boletines/importar-pdf', [BoletinController::class, 'importarPdf'])->name('boletines.importarPdf');
+            Route::get('/boletines/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('boletines.exportarCSV');
+
             Route::get('/boletines/cafe', [BoletinController::class, 'cafe'])->name('boletines.cafe');
             Route::get('/boletines/mora', [BoletinController::class, 'mora'])->name('boletines.mora');
             Route::get('/boletines', [BoletinController::class, 'index'])->name('boletines.index');

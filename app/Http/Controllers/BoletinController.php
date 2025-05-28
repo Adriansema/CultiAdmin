@@ -4,23 +4,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User; // Para buscar operadores
+use App\Mail\NuevaRevisionPendienteMail; // Para buscar operadores
 use App\Models\Boletin;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail; // Importa Mail
+use App\Models\User;
+use App\Services\BoletinService;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Http\Request; // Importa Mail
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use App\Mail\NuevaRevisionPendienteMail; // Importa la nueva Mailable
-
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage; // Importa la nueva Mailable
 
 class BoletinController extends Controller
 {
-    public function index()
+    public function index(Request $request, BoletinService $boletinService)
     {
-        $boletines = Boletin::latest()->get();
-
+         // Llama al método del servicio para obtener los productos paginados
+        $boletines = $boletinService->obtenerBoletinFiltrados($request);
         return view('boletines.index', compact('boletines'));
     }
+
+    // Si también necesitas una respuesta JSON (ej. para una API o Vue/React):
+    public function getFilteredBoletin(Request $request, BoletinService $boletinService)
+    {
+        $productos = $boletinService->obtenerBoletinFiltrados($request);
+        return response()->json($productos);
+    } // Importar la fachada Response para streamuse App\Services\ProductService;
 
     public function create()
     {
@@ -239,4 +247,88 @@ class BoletinController extends Controller
 
         return redirect()->route('boletines.index')->with('success', 'Boletín importado correctamente y pendiente de revisión.');
     }
+
+    public function exportarCSV(Request $request)
+    {
+        $query = $request->input('q');
+        $estado = $request->input('estado');
+
+        $boletines = Boletin::with('user'); // Eager load del usuario asociado
+
+        if ($query) {
+            $boletines->where(function ($q2) use ($query) {
+                $q2->whereRaw('LOWER(contenido) LIKE ?', ['%'.strtolower($query).'%'])
+                    ->orWhereRaw('LOWER(observaciones) LIKE ?', ['%'.strtolower($query).'%']);
+            });
+        }
+
+        if ($estado) {
+            $boletines->where('estado', $estado);
+        }
+
+        /* $boletines = $boletines->get(); */
+
+        $nombreArchivo = 'boletines_'.now()->format('Y-m-d_H-i-s').'.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$nombreArchivo\"",
+        ];
+
+        $columnas = ['ID', 'Usuario', 'Estado', 'Contenido', 'Observaciones', 'Archivo', 'Creado'];
+
+        $callback = function () use ($boletines, $columnas) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columnas);
+
+            foreach ($boletines as $boletin) {
+                fputcsv($file, [
+                    $boletin->id,
+                    optional($boletin->user)->name ?? 'Sin usuario',
+                    $boletin->estado,
+                    $boletin->contenido,
+                    $boletin->observaciones,
+                    $boletin->archivo,
+                    $boletin->created_at->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
