@@ -45,7 +45,7 @@
 
         <!-- Alpine.js debe estar disponible (Jetstream ya lo incluye) -->
         <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data" x-data="{ tab: 'historia' }"
-            class="bg-[var(--color-formulario)] p-12 rounded-3xl shadow-2xl space-y-2">
+            class="bg-[var(--color-Gestion)] p-12 rounded-3xl shadow-md space-y-2">
             @csrf
 
             <!-- Imagen -->

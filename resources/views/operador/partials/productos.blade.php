@@ -1,8 +1,7 @@
-<h3 class="mb-3 text-lg font-bold">Productos Pendientes</h3>
 <div class="overflow-hidden bg-white rounded shadow">
     <table class="min-w-full text-sm text-left bg-red-200 hover:bg-red-300">
-        <thead>
-            <tr class="bg-red-100 cursor-default">
+        <thead class="bg-[var(--color-tabla)]">
+            <tr>
                 <th class="px-4 py-2">Tipo</th>
                 <th class="px-4 py-2">Fecha</th>
                 <th class="px-4 py-2">Estado</th>
@@ -11,8 +10,17 @@
         </thead>
         <tbody>
             @forelse($productos as $producto)
-                <tr class="border-t-2 bg-gray-200 hover:bg-gray-300 cursor-pointer">
-                    <td class="px-4 py-2 capitalize">{{ $producto->tipo }}</td>
+                <tr class="bg-white hover:bg-gray-300">
+                    <td class="px-6 py-4 flex items-center group relative">
+                        <span>{{ $producto->tipo }}</span>
+                        <a href="{{ route('productos.show', $producto) }}">
+                            <img src="{{ asset('images/ojo-open.svg') }}"
+                                class="w-6 h-4 absolute left-[calc(40%+4px)] top-1/2 -translate-y-1/2 
+                                        opacity-0 group-hover:opacity-30 
+                                        transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto"
+                                alt="editar">
+                        </a>
+                    </td>
                     <td class="max-w-xs px-4 py-2 text-gray-600 break-words whitespace-normal align-top">
                         {{ $producto->created_at->locale('es')->translatedFormat('d \d\e F \d\e\l Y h:i a') }}
                         <span class="block text-xs text-gray-500">
@@ -49,9 +57,5 @@
                 </tr>
             @endforelse
         </tbody>
-
     </table>
-    <div class="mt-4">
-        {{ $productos->links() }}
-    </div>
 </div>

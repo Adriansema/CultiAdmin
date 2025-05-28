@@ -10,11 +10,13 @@ class Producto extends Model
     use HasFactory;
 
     protected $fillable = [
-        'imagen',
-        'estado',
-        'observaciones',
         'user_id',
         'tipo',
+        'estado',
+        'validado_por_user_id', // <-- Nueva columna
+        'rechazado_por_user_id', // <-- Nueva columna
+        'observaciones',
+        'imagen',
         'detalles_json',
     ];
 
@@ -25,6 +27,18 @@ class Producto extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Relación para el usuario que validó
+    public function validador()
+    {
+        return $this->belongsTo(User::class, 'validado_por_user_id');
+    }
+
+    // Relación para el usuario que rechazó
+    public function rechazador()
+    {
+        return $this->belongsTo(User::class, 'rechazado_por_user_id');
     }
 }
 

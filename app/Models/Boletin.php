@@ -14,11 +14,28 @@ class Boletin extends Model
     protected $table = 'boletins';
 
     protected $fillable = [
-        'archivo',
+        'user_id',
+        'estado',
         'contenido',
-        'user_id',       // ¡Asegúrate de que user_id esté aquí!
-        'estado',        // ¡Asegúrate de que estado esté aquí!
-        'observaciones', // ¡Asegúrate de que observaciones esté aquí!
+        'archivo',  
+        'validado_por_user_id', // <-- Nueva columna
+        'rechazado_por_user_id', // <-- Nueva columna   
+        'observaciones', 
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+     public function validador()
+    {
+        return $this->belongsTo(User::class, 'validado_por_user_id');
+    }
+
+    public function rechazador()
+    {
+        return $this->belongsTo(User::class, 'rechazado_por_user_id');
+    }
 }
 

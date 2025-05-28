@@ -2,76 +2,40 @@
 
 namespace App\Http\Controllers\Operador;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Producto;
-use App\Models\Boletin;
 use App\Models\User; // Asegúrate de tener tu modelo de Usuario para enviar correos
-use Illuminate\Support\Facades\Mail;
-use App\Mail\ProductoEstadoMail; // Asegúrate de crear estas clases Mailable
+use App\Models\Boletin;
+use App\Models\Producto;
+use Illuminate\Http\Request;
 use App\Mail\BoletinEstadoMail;   // Asegúrate de crear estas clases Mailable
+use App\Mail\ProductoEstadoMail; // Asegúrate de crear estas clases Mailable
+use App\Services\OperadorService;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth; // Por si necesitas el usuario autenticado para permisos
 
 class OperadorProductoController extends Controller
 {
-    // Método para mostrar productos y boletines pendientes de revisión
-    public function pendientes()
+   // Método para mostrar productos y boletines pendientes de revisión
+    public function pendientes(Request $request, OperadorService $operadorService) // Corregido el paréntesis
     {
-        // Puedes agregar lógica de permisos aquí, por ejemplo:
-        // $this->authorize('viewAny', Producto::class); // Si usas Policies
+        $data = $operadorService->obtenerProductosYBoletinesFiltrados($request); // Renombrado el método
 
-        $productos = Producto::where('estado', 'pendiente')->latest()->paginate(10);
-        $boletines = Boletin::where('estado', 'pendiente')->latest()->paginate(10);
+        // Los resultados se obtienen del array retornado por el servicio
+        $productos = $data['productos'];
+        $boletines = $data['boletines'];
 
         return view('operador.pendientes', compact('productos', 'boletines'));
     }
 
-    // Método para validar/aprobar un Producto (Noticia)
-    public function validar(Request $request, $id) // Renombrado a validarProducto para claridad en el contexto
+    // Si también necesitas una respuesta JSON:
+    public function getFilteredProductsAndBoletins(Request $request, OperadorService $operadorService)
     {
-        $producto = Producto::findOrFail($id);
-
-        $producto->update([
-            'estado' => 'aprobado',
-            'observaciones' => null, // Limpiar observaciones anteriores al aprobar
+        $data = $operadorService->obtenerProductosYBoletinesFiltrados($request);
+        // Retornamos ambos en JSON, si es necesario, o solo uno, dependiendo de la necesidad del frontend
+        return response()->json([
+            'productos' => $data['productos'],
+            'boletines' => $data['boletines'],
         ]);
-
-        // Enviar notificación por correo
-        // Asumiendo que 'user_id' en Producto es el ID del creador de la noticia
-        $creador = User::find($producto->user_id);
-        if ($creador && $creador->email) {
-            Mail::to($creador->email)->send(new ProductoEstadoMail($producto));
-        }
-
-        // Retornar con mensaje para SweetAlert2 y sin redirección de ID, ya que no hay botón "Ir" aquí
-        return back()->with('status_producto', 'aprobado');
-    }
-
-    // Método para rechazar un Producto (Noticia)
-    public function rechazar(Request $request, $id) // Renombrado a rechazarProducto para claridad en el contexto
-    {
-        $request->validate([
-            'observaciones' => 'required|string|max:500', // Asegúrate de que las observaciones sean obligatorias y tengan un límite
-        ]);
-
-        $producto = Producto::findOrFail($id);
-
-        $producto->update([
-            'estado' => 'rechazado',
-            'observaciones' => $request->observaciones,
-        ]);
-
-        // Enviar notificación por correo
-        // Asumiendo que 'user_id' en Producto es el ID del creador de la noticia
-        $creador = User::find($producto->user_id);
-        if ($creador && $creador->email) {
-            Mail::to($creador->email)->send(new ProductoEstadoMail($producto));
-        }
-
-        // Retornar con mensaje para SweetAlert2, y el ID del producto para el botón "Ir"
-        return back()
-            ->with('status_producto', 'rechazado')
-            ->with('producto_id_for_redirect', $producto->id);
     }
 
     // Método para mostrar un Producto (Noticia) en detalle para el Operador
@@ -100,32 +64,98 @@ class OperadorProductoController extends Controller
         return view('operador.boletines.show', compact('boletin'));
     }
 
+    // Método para validar/aprobar un Producto
+    public function validar(Request $request, $id)
+    {
+        // 1. Verificación de permisos con Spatie Permission
+        if (!Auth::user()->hasRole('operador')) {
+            return back()->with('error', 'No tienes permiso para realizar esta acción.');
+            // O, más drástico: abort(403, 'Acción no autorizada.');
+        }
+
+        $producto = Producto::findOrFail($id);
+
+        $producto->update([
+            'estado' => 'aprobado',
+            'observaciones' => null,
+            'validado_por_user_id' => Auth::id(),
+            'rechazado_por_user_id' => null,
+        ]);
+
+        $creador = User::find($producto->user_id);
+        if ($creador && $creador->email) {
+            Mail::to($creador->email)->send(new ProductoEstadoMail($producto));
+        }
+
+        return back()->with('status_producto', 'aprobado');
+    }
+
+    // Método para rechazar un Producto
+    public function rechazar(Request $request, $id)
+    {
+        // 1. Verificación de permisos con Spatie Permission
+        if (!Auth::user()->hasRole('operador')) {
+            return back()->with('error', 'No tienes permiso para realizar esta acción.');
+        }
+
+        $request->validate([
+            'observaciones' => 'required|string|max:500',
+        ]);
+
+        $producto = Producto::findOrFail($id);
+
+        $producto->update([
+            'estado' => 'rechazado',
+            'observaciones' => $request->observaciones,
+            'rechazado_por_user_id' => Auth::id(),
+            'validado_por_user_id' => null,
+        ]);
+
+        $creador = User::find($producto->user_id);
+        if ($creador && $creador->email) {
+            Mail::to($creador->email)->send(new ProductoEstadoMail($producto));
+        }
+
+        return back()
+            ->with('status_producto', 'rechazado')
+            ->with('producto_id_for_redirect', $producto->id);
+    }
+
     // Método para validar/aprobar un Boletín
     public function validarBoletin(Request $request, $id)
     {
+        // 1. Verificación de permisos con Spatie Permission
+        if (!Auth::user()->hasRole('operador')) {
+            return back()->with('error', 'No tienes permiso para realizar esta acción.');
+        }
+
         $boletin = Boletin::findOrFail($id);
 
         $boletin->update([
             'estado' => 'aprobado',
-            'observaciones' => null, // Limpiar observaciones anteriores al aprobar
+            'observaciones' => null,
+            'validado_por_user_id' => Auth::id(),
+            'rechazado_por_user_id' => null,
         ]);
 
-        // Enviar notificación por correo
-        // Asumiendo que 'user_id' en Boletin es el ID del creador del boletín
         $creador = User::find($boletin->user_id);
         if ($creador && $creador->email) {
             Mail::to($creador->email)->send(new BoletinEstadoMail($boletin));
         }
 
-        // Retornar con mensaje para SweetAlert2
         return back()->with('status_boletin', 'aprobado');
     }
 
     // Método para rechazar un Boletín
     public function rechazarBoletin(Request $request, $id)
     {
+        // 1. Verificación de permisos con Spatie Permission
+        if (!Auth::user()->hasRole('operador')) {
+            return back()->with('error', 'No tienes permiso para realizar esta acción.');
+        }
+
         $request->validate([
-            'observaciones' => 'required|string|max:500', // Asegúrate de que las observaciones sean obligatorias y tengan un límite
+            'observaciones' => 'required|string|max:500',
         ]);
 
         $boletin = Boletin::findOrFail($id);
@@ -133,16 +163,15 @@ class OperadorProductoController extends Controller
         $boletin->update([
             'estado' => 'rechazado',
             'observaciones' => $request->observaciones,
+            'rechazado_por_user_id' => Auth::id(),
+            'validado_por_user_id' => null,
         ]);
 
-        // Enviar notificación por correo
-        // Asumiendo que 'user_id' en Boletin es el ID del creador del boletín
         $creador = User::find($boletin->user_id);
         if ($creador && $creador->email) {
             Mail::to($creador->email)->send(new BoletinEstadoMail($boletin));
         }
 
-        // Retornar con mensaje para SweetAlert2, y el ID del boletín para el botón "Ir"
         return back()
             ->with('status_boletin', 'rechazado')
             ->with('boletin_id_for_redirect', $boletin->id);

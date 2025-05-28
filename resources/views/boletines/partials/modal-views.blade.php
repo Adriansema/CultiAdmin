@@ -9,17 +9,26 @@
             {{-- Sección de Estado del Boletín (Más Prominente) --}}
             <div
                 class="mb-6 p-4 rounded-lg
-                            @if ($boletin->estado === 'aprobado') bg-green-100 text-green-800 border border-green-300
-                            @elseif ($boletin->estado === 'rechazado') bg-red-100 text-red-800 border border-red-300
-                            @elseif ($boletin->estado === 'pendiente') bg-yellow-100 text-yellow-800 border border-yellow-300
-                            @else bg-gray-100 text-gray-800 border border-gray-300 @endif">
+                    @if ($boletin->estado === 'aprobado') bg-green-100 text-green-800 border border-green-300
+                    @elseif ($boletin->estado === 'rechazado') bg-red-100 text-red-800 border border-red-300
+                    @elseif ($boletin->estado === 'pendiente') bg-yellow-100 text-yellow-800 border border-yellow-300
+                    @else bg-gray-100 text-gray-800 border border-gray-300 @endif">
                 <h3 class="text-base font-semibold">Estado Actual:
                     <span class="font-bold">{{ ucfirst($boletin->estado) }}</span>
                 </h3>
+
+                {{-- AÑADIR LA LÓGICA DE VALIDACIÓN/RECHAZO AQUÍ --}}
+
                 @if ($boletin->estado === 'rechazado' && $boletin->observaciones)
                     <p class="text-sm mt-2">
                         <strong>Observación del Operador:</strong> {{ $boletin->observaciones }}
                     </p>
+                    {{-- Aquí puedes añadir quién lo rechazó --}}
+                    @if ($boletin->rechazador)
+                        <p class="text-sm mt-1 text-red-700">
+                            Rechazado por: <span class="font-medium">{{ $boletin->rechazador->name }}</span>
+                        </p>
+                    @endif
                     <div class="mt-4">
                         <a href="{{ route('boletines.edit', $boletin->id) }}"
                             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -28,8 +37,16 @@
                     </div>
                 @elseif ($boletin->estado === 'aprobado')
                     <p class="text-sm mt-2">¡Tu boletín ha sido aprobado y está listo para ser consumido!</p>
+                    {{-- Aquí puedes añadir quién lo validó --}}
+                    @if ($boletin->validador)
+                        <p class="text-sm mt-1 text-green-700">
+                            Validado por: <span class="font-medium">{{ $boletin->validador->name }}</span>
+                        </p>
+                    @endif
                 @elseif ($boletin->estado === 'pendiente')
                     <p class="text-sm mt-2">Tu boletín está pendiente de revisión por parte del operador.</p>
+                    {{-- Opcional: Si quieres indicar que aún no hay validador/rechazador --}}
+                    {{-- <p class="text-sm mt-1 text-gray-600">Aún no ha sido revisado por un operador.</p> --}}
                 @endif
             </div>
 

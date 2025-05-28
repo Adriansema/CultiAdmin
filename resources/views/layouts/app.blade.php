@@ -72,6 +72,7 @@
         const sessionError = @json(session('error', null));
     </script>
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
+   {{--  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script --}}>
 </body>
 
 </html>

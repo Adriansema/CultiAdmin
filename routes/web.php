@@ -1,19 +1,19 @@
 <?php
 
-// actualizacion 09/04/2025 //
+// actualizacion 28/05/2025 //
 
-use App\Http\Controllers\AccesibilidadController;
-use App\Http\Controllers\BoletinController;
-use App\Http\Controllers\CentroAyudaController;
-use App\Http\Controllers\ExportarCsvController;
-use App\Http\Controllers\Operador\OperadorProductoController;
-use App\Http\Controllers\ProductoController;
-use App\Http\Controllers\StatisticController;
-use App\Http\Controllers\UsuarioController;
-use App\Http\Controllers\ViewUserController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckUserEstado;
 use App\Http\Middleware\Roles_Admin_Opera;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BoletinController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\ViewUserController;
+use App\Http\Controllers\StatisticController;
+use App\Http\Controllers\CentroAyudaController;
+use App\Http\Controllers\ExportarCsvController;
+use App\Http\Controllers\AccesibilidadController;
+use App\Http\Controllers\Operador\OperadorProductoController;
 
 // Rutas públicas
 /* Route::get('/', function () {
@@ -51,9 +51,8 @@ Route::middleware([
             Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
             Route::get('/productos/create', [ProductoController::class, 'create'])->name('productos.create');
             Route::post('/productos', [ProductoController::class, 'store'])->name('productos.store');
-            Route::get('/productos/cafe', [ProductoController::class, 'cafe'])->name('productos.cafe');
-            Route::get('/productos/mora', [ProductoController::class, 'mora'])->name('productos.mora');
             Route::post('/productos/importar-csv', [ProductoController::class, 'importarCSV'])->name('productos.importar.csv');
+            Route::get('/productos/exportar-csv', [ProductoController::class, 'exportarCSV'])->name('productos.exportarCSV');
             Route::get('/productos/generar-csv', [ProductoController::class, 'generarCSV'])->name('productos.generarCSV');
             Route::get('/productos/{producto}/edit', [ProductoController::class, 'edit'])->name('productos.edit');
             Route::get('/productos/{producto}', [ProductoController::class, 'show'])->name('productos.show');

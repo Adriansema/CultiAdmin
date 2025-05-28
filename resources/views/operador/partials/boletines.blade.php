@@ -1,8 +1,7 @@
-<h3 class="mb-3 text-lg font-bold">Boletines Pendientes</h3>
 <div class="overflow-hidden bg-white rounded shadow">
     <table class="min-w-full text-sm text-left bg-red-200 hover:bg-red-300">
-        <thead>
-            <tr class="bg-red-100">
+        <thead class="bg-[var(--color-tabla)]">
+            <tr>
                 <th class="px-4 py-2">Contenido</th>
                 <th class="px-4 py-2">Fecha</th>
                 <th class="px-4 py-2">Estado</th>
@@ -11,7 +10,7 @@
         </thead>
         <tbody>
             @forelse($boletines as $boletin)
-                <tr class="bg-gray-200 hover:bg-gray-300 border-t-2">
+                <tr class="bg-white hover:bg-gray-300">
                     <td class="px-4 py-2">{{ Str::limit(strip_tags($boletin->contenido), 50) }}</td>
                     <td class="max-w-xs px-4 py-2 text-gray-600 break-words whitespace-normal align-top">
                         {{ $boletin->created_at->locale('es')->translatedFormat('d \d\e F \d\e\l Y h:i a') }}
@@ -27,12 +26,12 @@
                         </span>
                     </td>
                     <td class="px-4 py-2 space-x-2">
-                        <button type="button" onclick="mostrarModal('view', '{{ $boletin->id }}')" 
+                        <button type="button" onclick="mostrarModal('view', '{{ $boletin->id }}')"
                             class="text-blue-600 hover:underline">
                             Ver
                         </button>
                         @include('operador.partials.modal-boletin-views')
-                            
+
 
                         <button type="button" onclick="mostrarModal('validar-boletin', '{{ $boletin->id }}')"
                             class="text-green-600 hover:underline">
@@ -55,7 +54,4 @@
             @endforelse
         </tbody>
     </table>
-    <div class="mt-4">
-        {{ $boletines->links() }}
-    </div>
 </div>
