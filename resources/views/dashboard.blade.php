@@ -148,8 +148,8 @@
                         </div>
                         <h2 class="text-lg font-semibold text-[var(--color-iconos)]">Mensajes</h2>
                     </div>
-                    <x-responsive-nav-link href="{{ route('accesibilidad.index') }}" :active="request()->routeIs('accesibilidad')"
-                        class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]">
+                    <x-responsive-nav-link href="{{ route('productos.index') }}" :active="request()->routeIs('accesibilidad')"
+                        class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-gray-300">
                         <div class="relative flex w-full justify-evenly">
                             <span class="text-ms">{{ __(' ver todo ↗') }}</span>
                         </div>
@@ -173,8 +173,8 @@
                         </div>
                         <h2 class="text-lg font-semibold text-[var(--color-iconos)]">Boletines</h2>
                     </div>
-                    <x-responsive-nav-link href="{{ route('accesibilidad.index') }}" :active="request()->routeIs('accesibilidad')"
-                        class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]">
+                    <x-responsive-nav-link href="{{ route('boletines.index') }}" :active="request()->routeIs('accesibilidad')"
+                        class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-gray-300">
                         <div class="relative flex w-full justify-evenly">
                             <span class="text-ms">{{ __(' ver todo ↗') }}</span>
                         </div>
