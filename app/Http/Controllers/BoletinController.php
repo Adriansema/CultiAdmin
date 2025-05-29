@@ -18,7 +18,7 @@ class BoletinController extends Controller
 {
     public function index(Request $request, BoletinService $boletinService)
     {
-         // Llama al método del servicio para obtener los productos paginados
+        // Llama al método del servicio para obtener los productos paginados
         $boletines = $boletinService->obtenerBoletinFiltrados($request);
         return view('boletines.index', compact('boletines'));
     }
@@ -79,7 +79,7 @@ class BoletinController extends Controller
 
         return redirect()->route('boletines.index')->with('success', 'Boletín creado con éxito y enviado a revisión del operador.');
     }
-    
+
     public function update(Request $request, Boletin $boletin)
     {
         $request->validate([
@@ -187,12 +187,12 @@ class BoletinController extends Controller
         $query = $request->input('q');
         $estado = $request->input('estado');
 
-        $boletines = Boletin::with('user'); // Eager load del usuario asociado
+        $boletines = Boletin::with('user');
 
         if ($query) {
             $boletines->where(function ($q2) use ($query) {
-                $q2->whereRaw('LOWER(contenido) LIKE ?', ['%'.strtolower($query).'%'])
-                    ->orWhereRaw('LOWER(observaciones) LIKE ?', ['%'.strtolower($query).'%']);
+                $q2->whereRaw('LOWER(contenido) LIKE ?', ['%' . strtolower($query) . '%'])
+                    ->orWhereRaw('LOWER(observaciones) LIKE ?', ['%' . strtolower($query) . '%']);
             });
         }
 
@@ -200,9 +200,10 @@ class BoletinController extends Controller
             $boletines->where('estado', $estado);
         }
 
-        /* $boletines = $boletines->get(); */
+        // Aquí es donde necesitas obtener los resultados antes de pasarlos al callback
+        $boletinesResultados = $boletines->get(); // <-- Añade esta línea para ejecutar la consulta
 
-        $nombreArchivo = 'boletines_'.now()->format('Y-m-d_H-i-s').'.csv';
+        $nombreArchivo = 'boletines_' . now()->format('Y-m-d_H-i-s') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
@@ -211,11 +212,11 @@ class BoletinController extends Controller
 
         $columnas = ['ID', 'Usuario', 'Estado', 'Contenido', 'Observaciones', 'Archivo', 'Creado'];
 
-        $callback = function () use ($boletines, $columnas) {
+        $callback = function () use ($boletinesResultados, $columnas) { // Usa $boletinesResultados aquí
             $file = fopen('php://output', 'w');
             fputcsv($file, $columnas);
 
-            foreach ($boletines as $boletin) {
+            foreach ($boletinesResultados as $boletin) { // Itera sobre los resultados
                 fputcsv($file, [
                     $boletin->id,
                     optional($boletin->user)->name ?? 'Sin usuario',
@@ -230,39 +231,6 @@ class BoletinController extends Controller
             fclose($file);
         };
 
-
+        return response()->stream($callback, 200, $headers); // <-- Añade esta línea
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
