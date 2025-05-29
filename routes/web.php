@@ -4,6 +4,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckUserEstado;
+use App\Http\Controllers\PqrsController;
 use App\Http\Middleware\Roles_Admin_Opera;
 use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
@@ -20,10 +21,8 @@ use App\Http\Controllers\Operador\OperadorProductoController;
     return view('welcome');
 })->name('welcome'); */
 
-//Cumple la funcion de mostrarle al usuario que intenta ingresar a la pagina despues de haber sido desactivado por el administrador
-Route::get('/login', function () {
-    return view('auth.login')->with('inactivo', session('inactivo'));
-})->name('login');
+Route::get('/pqrs/crear', [PqrsController::class, 'create'])->name('pqrs.create');
+Route::post('/pqrs/store', [PqrsController::class, 'store'])->name('pqrs.store'); // Necesitas una ruta POST para el envío del formulario
 
 // Ruta para verificar si el correo existe (pública, sin autenticación)
 Route::post('/check-email', [UsuarioController::class, 'checkEmailExists'])->name('check-email');

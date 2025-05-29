@@ -6,8 +6,7 @@
         {{-- Logo Cultiva centrado arriba --}}
         {{-- CAMBIOS AQUÍ: Eliminado translate-y-1/2, ajustado top-10, y el tamaño del logo --}}
         <div class="absolute transform -translate-x-1/2 top-60 left-1/2">
-            <img src="{{ asset('images/cultivasena.svg') }}" alt="Logo Cultiva"
-                class="w-auto h-20 sm:h-24 opacity-90">
+            <img src="{{ asset('images/cultivasena.svg') }}" alt="Logo Cultiva" class="w-auto h-20 sm:h-24 opacity-90">
             {{-- h-24 o h-32 (96px o 128px) para controlar la altura y que el ancho se ajuste proporcionalmente --}}
             {{-- w-auto para mantener la proporción, eliminado w-1/2 max-w-xl para evitar problemas de centrado en este contexto --}}
         </div>
@@ -114,38 +113,32 @@
         <img src="{{ asset('images/sena-logo.svg') }}" alt="Logo SENA" class="h-14 w-auto opacity-90">
     </div>
 
-    {{-- Modal usuario inactivo 
+    {{-- Modal usuario inactivo --}}
     @if (session('inactivo'))
-        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => { show = false;
-            window.location.href = '{{ route('login') }}'; }, 5000)"
+        <div id="inactivoModal" x-data="{ show: true }" {{-- x-show="show" x-init="setTimeout(() => { show = false; }, 5000)" --}}  {{-- Se quita la funcion de que se cierre el modal automaticamente por 5 sg --}} {{-- Solo cierra el modal, no redirige si ya estás en login --}}
             class="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
-            <div class="bg-white rounded-lg shadow-xl p-6 max-w-md text-center">
-                <h2 class="text-xl font-bold text-red-600 mb-4">Cuenta desactivada</h2>
+            <div class="bg-white rounded-3xl shadow-md p-6 max-w-md text-center">
+                {{-- Icono --}}
+                <img src="{{ asset('images/warning.svg') }}" alt="Icono de advertencia" class="mx-auto h-36 w-56 mb-4">
+                <h2 class="text-2xl font-bold text-red-600 mb-4">Cuenta Desactivada</h2>
                 <p class="text-gray-700 text-sm">
                     Si crees que esto es un error, contacta a
-                    <a href="mailto:soporteayuda2025@gmail.com" class="underline text-blue-600">
-                        soporteayuda2025@gmail.com
+                    {{-- CAMBIO AQUÍ: apunto a la ruta de PQR --}}
+                    <a href="{{ route('pqrs.create') }}" class="underline text-blue-600">
+                        nuestro soporte de PQR
                     </a>
+                    {{-- O si quieres mantener el email visible pero con un enlace: --}}
+                    {{-- <a href="{{ route('pqrs.create') }}" class="underline text-blue-600">
+                    soporteayuda2025@gmail.com
+                </a> --}}
+                    .
                 </p>
 
-                <button @click="show = false" class="mt-6 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                <button @click="show = false"
+                    class="mt-6 px-4 py-2 bg-[var(--color-iconos4)] text-white rounded hover:bg-green-600">
                     Cerrar
                 </button>
             </div>
         </div>
-        <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('inactivoModal').__x.$data.show = true;
-
-            setTimeout(() => {
-                const modalEl = document.getElementById('inactivoModal');
-                if (modalEl && modalEl.__x) {
-                    modalEl.__x.$data.show = false;
-                    // opcional: redirigir después de cerrar
-                    // window.location.href = "{{ route('login') }}";
-                }
-            }, 5000);
-        });
-    </script>
-    @endif --}}
+    @endif
 @endsection

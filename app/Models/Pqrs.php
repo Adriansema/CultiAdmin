@@ -1,11 +1,13 @@
 <?php
 
+// app/Models/Pqrs.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class IntentoAcceso extends Model
+class Pqrs extends Model
 {
     use HasFactory;
 
@@ -15,17 +17,18 @@ class IntentoAcceso extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
+        'user_id', // Permitimos user_id porque podría venir de un usuario logueado
         'email',
-        'ip_address',
-        'user_agent',
-        // 'created_at' y 'updated_at' son manejados automáticamente por timestamps()
+        'nombre',
+        'telefono',
+        'asunto',
+        'mensaje',
+        'tipo',
+        'estado',
     ];
 
     /**
-     * Get the user that owns the access attempt.
-     *
-     * Define la relación con el modelo User
+     * Get the user that owns the PQRS.
      */
     public function user()
     {
