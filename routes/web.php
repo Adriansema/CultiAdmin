@@ -15,6 +15,8 @@ use App\Http\Controllers\CentroAyudaController;
 use App\Http\Controllers\ExportarCsvController;
 use App\Http\Controllers\AccesibilidadController;
 use App\Http\Controllers\Operador\OperadorProductoController;
+use App\Http\Controllers\DashboardController;
+
 
 // Rutas públicas
 /* Route::get('/', function () {
@@ -59,6 +61,8 @@ Route::middleware([
             Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
 
             // Boletines
+            Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+            Route::get('/boletines/{id}/download', [BoletinController::class, 'download'])->name('boletines.download');
             Route::post('boletines/importar-pdf', [BoletinController::class, 'importarPdf'])->name('boletines.importarPdf');
             Route::get('/boletines/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('boletines.exportarCSV');
             Route::get('/boletines', [BoletinController::class, 'index'])->name('boletines.index');
