@@ -1,4 +1,11 @@
 @extends('layouts.guest')
+{{-- todo: El usuario ve el formulario de iniciar sesion, luego Envía el formulario a la ruta POST /login --}}
+{{-- ! GET|HEAD  login ..... login › Laravel\Fortify › AuthenticatedSessionController@create --}}
+{{-- ! POST      login .... login.store › Laravel\Fortify › AuthenticatedSessionController@store --}}
+{{-- ! POST      logout .... logout › Laravel\Fortify › AuthenticatedSessionController@destroy  --}}
+{{-- ? Login = Autenticación: Es el evento inicial donde se confirma tu identidad. --}}
+{{-- * Sesión = Estado después de la Autenticación: Es el mecanismo que mantiene tu estado de "autenticado" a lo largo 
+* de tu interacción con la aplicación, evitando que tengas que loguearte en cada clic o navegación de página. * --}}
 
 @section('content')
     {{-- Fondo de logos superpuestos --}}
@@ -67,7 +74,7 @@
                 @enderror
             </div>
 
-            {{-- Contraseña --}}
+            {{-- Contraseña --}
             <div class="mb-6" x-data="{ showPassword: false }">
                 <label for="password" class="block mb-1 text-sm font-bold text-gray-700">Contraseña</label>
                 <div class="relative">
@@ -83,9 +90,41 @@
                         <img :src="showPassword ? '{{ asset('images/ojo-open.svg') }}' : '{{ asset('images/ojo-close.svg') }}'"
                             alt="Mostrar/Ocultar contraseña" class="w-5 h-5 opacity-50">
                     </span>
-                    {{-- Mensaje de error para el campo de contraseña --}}
+                    {{-- Mensaje de error para el campo de contraseña 
                     @error('password')
                         <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div> --}}
+
+            {{-- Contraseña --}}
+            <div class="mb-6" x-data="{ showPassword: false }">
+                <label for="password" class="block mb-1 text-sm font-bold text-gray-700">Contraseña</label>
+
+                {{-- Este es el div que envolverá todo el campo de contraseña, iconos y error --}}
+                <div class="relative">
+                    {{-- Icono de Candado --}}
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <img src="{{ asset('images/candado.svg') }}" alt="candado" class="w-4 h-4">
+                    </span>
+
+                    {{-- Campo de Contraseña --}}
+                    <input id="password" :type="showPassword ? 'text' : 'password'" name="password"
+                        placeholder="ingrese su contraseña" required
+                        class="w-full px-3 py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+
+                    {{-- Icono de Ojo (Mostrar/Ocultar Contraseña) --}}
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 cursor-pointer"
+                        @click="showPassword = !showPassword">
+                        <img :src="showPassword ? '{{ asset('images/ojo-open.svg') }}' : '{{ asset('images/ojo-close.svg') }}'"
+                            alt="Mostrar/Ocultar contraseña" class="w-5 h-5 opacity-50">
+                    </span>
+
+                    {{-- Mensaje de error para el campo de contraseña --}}
+                    {{-- ¡AHORA DENTRO DEL MISMO CONTENEDOR RELATIVO! --}}
+                    @error('password')
+                        <span class="text-red-500 text-xs block mt-1">{{ $message }}</span>
+                        {{-- Añadí 'block' para asegurar que el span ocupe su propia línea y el 'mt-1' funcione bien --}}
                     @enderror
                 </div>
             </div>
@@ -115,7 +154,7 @@
 
     {{-- Modal usuario inactivo --}}
     @if (session('inactivo'))
-        <div id="inactivoModal" x-data="{ show: true }" {{-- x-show="show" x-init="setTimeout(() => { show = false; }, 5000)" --}}  {{-- Se quita la funcion de que se cierre el modal automaticamente por 5 sg --}} {{-- Solo cierra el modal, no redirige si ya estás en login --}}
+        <div id="inactivoModal" x-data="{ show: true }" {{-- x-show="show" x-init="setTimeout(() => { show = false; }, 5000)" --}} {{-- Se quita la funcion de que se cierre el modal automaticamente por 5 sg --}} {{-- Solo cierra el modal, no redirige si ya estás en login --}}
             class="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
             <div class="bg-white rounded-3xl shadow-md p-6 max-w-md text-center">
                 {{-- Icono --}}

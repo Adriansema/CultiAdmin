@@ -5,141 +5,132 @@ use Laravel\Fortify\Features;
 return [
 
     /*
-    |--------------------------------------------------------------------------
-    | Fortify Guard
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify which authentication guard Fortify will use while
-    | authenticating users. This value should correspond with one of your
-    | guards that is already present in your "auth" configuration file.
-    |
-    */
+|--------------------------------------------------------------------------
+| Fortify Guard
+|--------------------------------------------------------------------------
+|
+| Aquí puede especificar qué protección de autenticación utilizará Fortify al autenticar usuarios. Este valor debe corresponder a 
+| una de sus protecciones que ya esté presente en su archivo de configuración "auth".
+|
+*/
 
     'guard' => 'web',
 
     /*
-    |--------------------------------------------------------------------------
-    | Fortify Password Broker
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify which password broker Fortify can use when a user
-    | is resetting their password. This configured value should match one
-    | of your password brokers setup in your "auth" configuration file.
-    |
-    */
+|--------------------------------------------------------------------------
+| Agente de contraseñas de Fortify
+|--------------------------------------------------------------------------
+|
+| Aquí puede especificar qué agente de contraseñas puede usar Fortify cuando un usuario restablece su contraseña. 
+| Este valor configurado debe coincidir con uno de los agentes de contraseñas configurados en su archivo de configuración de autenticación.
+|
+*/
 
     'passwords' => 'users',
 
-    /*
-    |--------------------------------------------------------------------------
-    | Username / Email
-    |--------------------------------------------------------------------------
-    |
-    | This value defines which model attribute should be considered as your
-    | application's "username" field. Typically, this might be the email
-    | address of the users but you are free to change this value here.
-    |
-    | Out of the box, Fortify expects forgot password and reset password
-    | requests to have a field named 'email'. If the application uses
-    | another name for the field you may define it below as needed.
-    |
-    */
+   /*
+|--------------------------------------------------------------------------
+| Nombre de usuario / Correo electrónico
+|--------------------------------------------------------------------------
+|
+| Este valor define qué atributo del modelo debe considerarse como el campo "nombre de usuario" de su aplicación. Normalmente, 
+| este podría ser la dirección de correo electrónico de los usuarios, pero puede cambiar este valor aquí.
+|
+| De fábrica, Fortify espera que las solicitudes de olvido de contraseña y restablecimiento de contraseña tengan un campo llamado 
+| "correo electrónico". Si la aplicación usa otro nombre para el campo, puede definirlo a continuación según sea necesario.
+|
+*/
 
     'username' => 'email',
 
     'email' => 'email',
 
     /*
-    |--------------------------------------------------------------------------
-    | Lowercase Usernames
-    |--------------------------------------------------------------------------
-    |
-    | This value defines whether usernames should be lowercased before saving
-    | them in the database, as some database system string fields are case
-    | sensitive. You may disable this for your application if necessary.
-    |
-    */
+|--------------------------------------------------------------------------
+| Nombres de usuario en minúsculas
+|--------------------------------------------------------------------------
+|
+| Este valor define si los nombres de usuario deben escribirse en minúsculas antes de guardarlos en la base de datos, 
+| ya que algunos campos de cadena del sistema de la base de datos distinguen entre mayúsculas y minúsculas. Puede desactivar 
+| esta opción para su aplicación si es necesario.
+|
+*/
 
     'lowercase_usernames' => true,
 
     /*
-    |--------------------------------------------------------------------------
-    | Home Path
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure the path where users will get redirected during
-    | authentication or password reset when the operations are successful
-    | and the user is authenticated. You are free to change this value.
-    |
-    */
+|--------------------------------------------------------------------------
+| Ruta de inicio
+|--------------------------------------------------------------------------
+|
+| Aquí puede configurar la ruta a la que serán redirigidos los usuarios durante la autenticación o el restablecimiento 
+| de contraseña cuando las operaciones se realicen correctamente y el usuario esté autenticado. Puede cambiar este valor.
+|
+*/
 
     'home' => '/dashboard',
 
     /*
-    |--------------------------------------------------------------------------
-    | Fortify Routes Prefix / Subdomain
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify which prefix Fortify will assign to all the routes
-    | that it registers with the application. If necessary, you may change
-    | subdomain under which all of the Fortify routes will be available.
-    |
-    */
+|--------------------------------------------------------------------------
+| Prefijo/Subdominio de Rutas Fortify
+|--------------------------------------------------------------------------
+|
+| Aquí puede especificar el prefijo que Fortify asignará a todas las rutas que registre en la aplicación. 
+| Si es necesario, puede cambiar el subdominio bajo el cual estarán disponibles todas las rutas de Fortify.
+|
+*/
 
     'prefix' => '',
 
     'domain' => null,
 
     /*
-    |--------------------------------------------------------------------------
-    | Fortify Routes Middleware
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify which middleware Fortify will assign to the routes
-    | that it registers with the application. If necessary, you may change
-    | these middleware but typically this provided default is preferred.
-    |
-    */
+|--------------------------------------------------------------------------
+| Middleware de Rutas de Fortify
+|------------------------------------------------------------------------------------------
+|
+| Aquí puede especificar qué middleware asignará Fortify a las rutas que registre con la aplicación. Si es necesario, 
+| puede cambiar este middleware, pero normalmente se prefiere el valor predeterminado.
+|
+*/
 
     'middleware' => ['web'],
 
     /*
-    |--------------------------------------------------------------------------
-    | Rate Limiting
-    |--------------------------------------------------------------------------
-    |
-    | By default, Fortify will throttle logins to five requests per minute for
-    | every email and IP address combination. However, if you would like to
-    | specify a custom rate limiter to call then you may specify it here.
-    |
-    */
+|--------------------------------------------------------------------------
+| Limitación de velocidad
+|--------------------------------------------------------------------------
+|
+| De forma predeterminada, Fortify limitará los inicios de sesión a cinco solicitudes por minuto para cada combinación 
+| de correo electrónico y dirección IP. Sin embargo, si desea especificar un limitador de velocidad personalizado, puede especificarlo aquí.
+|
+*/
 
     'limiters' => [
         'login' => 'login',
         'two-factor' => 'two-factor',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Register View Routes
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify if the routes returning views should be disabled as
-    | you may not need them when building your own application. This may be
-    | especially true if you're writing a custom single-page application.
-    |
-    */
+   /*
+|--------------------------------------------------------------------------
+| Registrar rutas de vista
+|------------------------------------------------------------------------------------------
+|
+| Aquí puede especificar si las rutas que devuelven vistas deben estar deshabilitadas, ya que
+| podría no necesitarlas al crear su propia aplicación. Esto puede ser
+| especialmente cierto si está escribiendo una aplicación personalizada de una sola página.
+|
+*/
 
     'views' => true,
 
     /*
     |--------------------------------------------------------------------------
-    | Features
+    | Características
     |--------------------------------------------------------------------------
     |
-    | Some of the Fortify features are optional. You may disable the features
-    | by removing them from this array. You're free to only remove some of
-    | these features or you can even remove all of these if you need to.
+    | Algunas de las características de Fortify son opcionales. Puedes deshabilitarlas
+    | eliminándolas de esta matriz. Puedes eliminar solo algunas de estas características o incluso todas si lo necesitas.
     |
     */
 

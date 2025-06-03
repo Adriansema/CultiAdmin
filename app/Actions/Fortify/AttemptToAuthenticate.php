@@ -7,11 +7,29 @@ use App\Models\IntentoAcceso; // Si usas IntentoAcceso
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
+use App\Actions\Fortify\PasswordValidationRules; // Importa el trait que contiene tus reglas de validación de contraseña
+use Illuminate\Validation\ValidationException; // Importa la clase para lanzar excepciones de validación
+use Illuminate\Support\Facades\Validator;    // Importa el facade de Validator
 
 class AttemptToAuthenticate
 {
+    // Usa el trait para tener acceso a passwordRules()
+    use PasswordValidationRules;
+
     public function handle(Request $request, callable $next)
     {
+        // --- 1. Lógica de validación de robustez de contraseña (AGREGADO AQUÍ) ---
+        $validator = Validator::make($request->all(), [
+            'password' => $this->passwordRules(), // Aplica tus reglas de robustez
+        ]);
+
+        if ($validator->fails()) {
+            throw ValidationException::withMessages([
+                'password' => $validator->errors()->first('password'),
+            ]);
+        }
+        // --- FIN de la lógica de validación de robustez de contraseña ---
+
         $user = User::where(Fortify::username(), $request->{Fortify::username()})->first();
 
         // Registro de intento de acceso (ajustado para ser más robusto si el usuario no existe)

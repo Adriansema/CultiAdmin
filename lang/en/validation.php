@@ -181,7 +181,10 @@ return [
             //'mimes' => 'This file type is not supported, only PDF files are allowed.',
 
             // Opción B: Mensaje dinámico que muestra los tipos de archivo permitidos
-             'mimes' => 'This file type is not supported. Only :values file types are allowed.',
+            'mimes' => 'This file type is not supported. Only :values file types are allowed.',
+        ],
+        'password' => [
+            'regex' => 'The password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
         ],
     ],
 
