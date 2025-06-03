@@ -21,7 +21,7 @@
 
     {{-- Formulario de inicio de sesión --}}
     <div class="relative z-20 flex flex-col items-center justify-center min-h-screen p-4">
-        <form method="POST" action="{{ route('login') }}" class="login-form w-full max-w-md mt-16 sm:mt-24">
+        <form method="POST" action="{{ route('login') }}" class="w-full max-w-md mt-16 login-form sm:mt-24">
             @csrf
             <div class="mb-6" x-data="{ email: '', emailExists: null, debounceTimeout: null }">
                 <label for="email" class="block mb-1 text-sm font-bold text-gray-700">Correo electrónico</label>
@@ -70,7 +70,7 @@
                 </div>
                 {{-- Mensaje de error para el campo de correo --}}
                 @error('email')
-                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                    <span class="mt-1 text-xs text-red-500">{{ $message }}</span>
                 @enderror
             </div>
 
@@ -90,41 +90,9 @@
                         <img :src="showPassword ? '{{ asset('images/ojo-open.svg') }}' : '{{ asset('images/ojo-close.svg') }}'"
                             alt="Mostrar/Ocultar contraseña" class="w-5 h-5 opacity-50">
                     </span>
-                    {{-- Mensaje de error para el campo de contraseña 
-                    @error('password')
-                        <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                    @enderror
-                </div>
-            </div> --}}
-
-            {{-- Contraseña --}}
-            <div class="mb-6" x-data="{ showPassword: false }">
-                <label for="password" class="block mb-1 text-sm font-bold text-gray-700">Contraseña</label>
-
-                {{-- Este es el div que envolverá todo el campo de contraseña, iconos y error --}}
-                <div class="relative">
-                    {{-- Icono de Candado --}}
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                        <img src="{{ asset('images/candado.svg') }}" alt="candado" class="w-4 h-4">
-                    </span>
-
-                    {{-- Campo de Contraseña --}}
-                    <input id="password" :type="showPassword ? 'text' : 'password'" name="password"
-                        placeholder="ingrese su contraseña" required
-                        class="w-full px-3 py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
-
-                    {{-- Icono de Ojo (Mostrar/Ocultar Contraseña) --}}
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 cursor-pointer"
-                        @click="showPassword = !showPassword">
-                        <img :src="showPassword ? '{{ asset('images/ojo-open.svg') }}' : '{{ asset('images/ojo-close.svg') }}'"
-                            alt="Mostrar/Ocultar contraseña" class="w-5 h-5 opacity-50">
-                    </span>
-
                     {{-- Mensaje de error para el campo de contraseña --}}
-                    {{-- ¡AHORA DENTRO DEL MISMO CONTENEDOR RELATIVO! --}}
                     @error('password')
-                        <span class="text-red-500 text-xs block mt-1">{{ $message }}</span>
-                        {{-- Añadí 'block' para asegurar que el span ocupe su propia línea y el 'mt-1' funcione bien --}}
+                        <span class="mt-1 text-xs text-red-500">{{ $message }}</span>
                     @enderror
                 </div>
             </div>
@@ -135,7 +103,7 @@
                     <input type="checkbox" name="remember" class="mr-2">
                     Recuérdame en este dispositivo
                 </label>
-                <a href="{{ route('password.request') }}" class="text-sm text-purple-600 font-bold hover:underline">
+                <a href="{{ route('password.request') }}" class="text-sm font-bold text-purple-600 hover:underline">
                     ¿Olvidaste tu contraseña?
                 </a>
             </div>
@@ -149,25 +117,25 @@
     </div>
 
     <div class="absolute transform -translate-x-1/2 bottom-44 left-1/2">
-        <img src="{{ asset('images/sena-logo.svg') }}" alt="Logo SENA" class="h-14 w-auto opacity-90">
+        <img src="{{ asset('images/sena-logo.svg') }}" alt="Logo SENA" class="w-auto h-14 opacity-90">
     </div>
 
     {{-- Modal usuario inactivo --}}
     @if (session('inactivo'))
-        <div id="inactivoModal" x-data="{ show: true }" {{-- x-show="show" x-init="setTimeout(() => { show = false; }, 5000)" --}} {{-- Se quita la funcion de que se cierre el modal automaticamente por 5 sg --}} {{-- Solo cierra el modal, no redirige si ya estás en login --}}
-            class="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
-            <div class="bg-white rounded-3xl shadow-md p-6 max-w-md text-center">
+        <div id="inactivoModal" x-data="{ show: true }" {{-- x-show="show" x-init="setTimeout(() => { show = false; }, 5000)" --}}  {{-- Se quita la funcion de que se cierre el modal automaticamente por 5 sg --}} {{-- Solo cierra el modal, no redirige si ya estás en login --}}
+            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+            <div class="max-w-md p-6 text-center bg-white shadow-md rounded-3xl">
                 {{-- Icono --}}
-                <img src="{{ asset('images/warning.svg') }}" alt="Icono de advertencia" class="mx-auto h-36 w-56 mb-4">
-                <h2 class="text-2xl font-bold text-red-600 mb-4">Cuenta Desactivada</h2>
-                <p class="text-gray-700 text-sm">
+                <img src="{{ asset('images/warning.svg') }}" alt="Icono de advertencia" class="w-56 mx-auto mb-4 h-36">
+                <h2 class="mb-4 text-2xl font-bold text-red-600">Cuenta Desactivada</h2>
+                <p class="text-sm text-gray-700">
                     Si crees que esto es un error, contacta a
                     {{-- CAMBIO AQUÍ: apunto a la ruta de PQR --}}
-                    <a href="{{ route('pqrs.create') }}" class="underline text-blue-600">
+                    <a href="{{ route('pqrs.create') }}" class="text-blue-600 underline">
                         nuestro soporte de PQR
                     </a>
                     {{-- O si quieres mantener el email visible pero con un enlace: --}}
-                    {{-- <a href="{{ route('pqrs.create') }}" class="underline text-blue-600">
+                    {{-- <a href="{{ route('pqrs.create') }}" class="text-blue-600 underline">
                     soporteayuda2025@gmail.com
                 </a> --}}
                     .

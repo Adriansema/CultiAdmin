@@ -302,6 +302,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    
+
     // Cargar los datos inicialmente
     loadData();
 

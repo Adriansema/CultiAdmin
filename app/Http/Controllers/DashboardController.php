@@ -5,13 +5,32 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\Boletin;
 
+use Illuminate\Support\Facades\Storage; // Importa Storage
 class DashboardController extends Controller
 {
     public function index()
     {
-        return view('dashboard');
+        $boletines = Boletin::orderBy('created_at', 'desc')->take(5)->get();
+        
+         return view('dashboard', compact('boletines'));
     }
+
+     public function download($id)
+    {
+        $boletin = Boletin::findOrFail($id);
+
+        // Suponiendo que tienes un campo 'archivo' con la ruta del archivo
+        $filePath = $boletin->archivo; 
+
+        if (Storage::exists($filePath)) {
+            return Storage::download($filePath);
+        } else {
+            abort(404, 'Archivo no encontrado');
+        }
+    }
+
 
     public function getData($range)
     {
@@ -56,4 +75,5 @@ class DashboardController extends Controller
             'connected' => $connectedUsers,
         ]);
     }
-}
+ 
+    }

@@ -19,7 +19,7 @@
     @livewireStyles
 
     <div class="fullscreen-image-overlay-purple">
-        <img src="{{ asset('images/MORA 1 1.png') }}" alt="Descripción de la imagen" class="w-full h-auto">
+        <img src="{{ asset('images/CultivaAdmin.png') }}" alt="Descripción de la imagen" class="w-full h-auto">
     </div>
 </head>
 

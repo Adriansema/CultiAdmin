@@ -20,41 +20,41 @@
 
         <hr class="my-4 border-gray-200">
 
-    <section class="flex-1 p-1 overflow-y-auto">
-        <div class="flex flex-col mb-6 md:flex-row md:items-center md:justify-between">
-            <div class="mb-6">
-                <h1 class="text-2xl font-semibold text-gray-800">Panel de Administración</h1>
-                <p class="mt-2 text-gray-600">Visualiza estadística de vistas al sitio, notificación y boletines.</p>
+        <section class="flex-1 p-1 overflow-y-auto">
+            <div class="flex flex-col mb-6 md:flex-row md:items-center md:justify-between">
+                <div class="mb-6">
+                    <h1 class="text-2xl font-semibold text-gray-800">Panel de Administración</h1>
+                    <p class="mt-2 text-gray-600">Visualiza estadística de vistas al sitio, notificación y boletines.</p>
+                </div>
+
+                <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
+                    <button onclick="setFilter('ultimos3dias')" data-filtro="ultimos3dias"
+                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                        Últimos 3 días
+                    </button>
+
+                    <button onclick="setFilter('semana')" data-filtro="semana"
+                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                        Semana
+                    </button>
+
+                    <button onclick="setFilter('mes')" data-filtro="mes"
+                        class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                        Mes
+                    </button>
+
+                    <button onclick="setFilter('año')" data-filtro="año"
+                        class="px-6 py-3 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                        Año
+                    </button>
+                </div>
+
+
             </div>
+        </section>
 
-            <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
-                <button onclick="setFilter('ultimos3dias')" data-filtro="ultimos3dias"
-                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
-                    Últimos 3 días
-                </button>
-
-                <button onclick="setFilter('semana')" data-filtro="semana"
-                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
-                    Semana
-                </button>
-
-                <button onclick="setFilter('mes')" data-filtro="mes"
-                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
-                    Mes
-                </button>
-
-                <button onclick="setFilter('año')" data-filtro="año"
-                    class="px-6 py-3 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
-                    Año
-                </button>
-            </div>
-
-
-        </div>
-    </section>
-
-    <!-- Aquí agregas ECharts -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+        <!-- Aquí agregas ECharts -->
+        <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 
         {{-- Gráfica de usuarios conectados + Métricas --}}
         <div class="flex-1 p-6 overflow-y-auto">
@@ -138,7 +138,8 @@
         <section id="novedades-boletines" class="relative grid gap-6 mt-8 md:grid-cols-2">
 
             <!-- Primer panel: Mensajes -->
-            <section id="mensajes" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
+            <section id="mensajes" class="bg-[var(--color-gris1)] shadow rounded-lg p-6 -mt-4">
+
                 <!-- Encabezado con ícono y título -->
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-2">
@@ -148,8 +149,8 @@
                         </div>
                         <h2 class="text-lg font-semibold text-[var(--color-iconos)]">Mensajes</h2>
                     </div>
-                    <x-responsive-nav-link href="{{ route('accesibilidad.index') }}" :active="request()->routeIs('accesibilidad')"
-                        class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]">
+                    <x-responsive-nav-link href="{{ route('productos.index') }}" :active="request()->routeIs('accesibilidad')"
+                        class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-gray-300">
                         <div class="relative flex w-full justify-evenly">
                             <span class="text-ms">{{ __(' ver todo ↗') }}</span>
                         </div>
@@ -163,7 +164,8 @@
             </section>
 
             <!-- Segundo panel: Boletines -->
-            <section id="boletines" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
+            <section id="boletines" class="bg-[var(--color-gris1)] shadow rounded-lg p-6 -mt-4">
+
                 <!-- Encabezado con ícono y título -->
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-2">
@@ -173,50 +175,128 @@
                         </div>
                         <h2 class="text-lg font-semibold text-[var(--color-iconos)]">Boletines</h2>
                     </div>
-                    <x-responsive-nav-link href="{{ route('accesibilidad.index') }}" :active="request()->routeIs('accesibilidad')"
-                        class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]">
+                    <x-responsive-nav-link href="{{ route('boletines.index') }}" :active="request()->routeIs('accesibilidad')"
+                        class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-gray-300">
                         <div class="relative flex w-full justify-evenly">
                             <span class="text-ms">{{ __(' ver todo ↗') }}</span>
                         </div>
                     </x-responsive-nav-link>
                 </div>
 
-                <!-- Lista de boletines o mensaje -->
-                <div id="boletines-novedades" class="p-4 bg-white rounded-lg shadow">
-                    <p class="text-gray-500">No hay novedades por ahora.</p>
+                <style>
+                    .boletin-content {
+                        max-height: 0;
+                        overflow: hidden;
+                        transition: max-height 0.3s ease-in-out;
+                    }
+                </style>
+
+
+                <div id="boletines-novedades" class="p-4 bg-white rounded-lg shadow max-w-full">
+                    @if ($boletines->isEmpty())
+                        <p class="text-gray-500">No hay novedades por ahora.</p>
+                    @else
+                        <ul>
+                            @foreach ($boletines as $boletin)
+                                <li class="mb-4 border-b border-gray-200 pb-2">
+                                    <div class="flex justify-between items-center cursor-pointer boletin-header"
+                                        data-id="{{ $boletin->id }}">
+                                        <div>
+                                            <strong>{{ $boletin->titulo }}</strong>
+                                            <small
+                                                class="text-gray-400 ml-2">{{ $boletin->created_at->format('d M Y') }}</small>
+                                            <span class="ml-2 text-sm italic text-gray-600">
+                                                Boletín Semana {{ $boletin->created_at->weekOfYear }}
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <!-- Icono para expandir/colapsar -->
+                                            <svg class="w-5 h-5 text-gray-600 transform transition-transform duration-300"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+
+                                            <!-- Icono para descargar -->
+                                            <a href="{{ route('boletines.download', $boletin->id) }}"
+                                                title="Descargar boletín" class="text-blue-600 hover:text-blue-800"
+                                                target="_blank" rel="noopener noreferrer"
+                                                onclick="event.stopPropagation()">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    viewBox="0 0 24 24">
+                                                    <path d="M12 4v16m0 0l-4-4m4 4l4-4"></path>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="boletin-content mt-2 text-gray-700 max-h-0 overflow-hidden transition-[max-height] duration-300 ease-in-out">
+                                        <p>{{ $boletin->contenido }}</p>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
                 </div>
-            </section>
-        </section>
+
+                @push('scripts')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', () => {
+                            document.querySelectorAll('.boletin-header').forEach(header => {
+                                header.addEventListener('click', e => {
+                                    if (e.target.closest('a')) return;
+
+                                    const li = header.parentElement;
+                                    const content = li.querySelector('.boletin-content');
+                                    const icon = header.querySelector('svg');
+
+                                    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                                        content.style.maxHeight = '0px';
+                                        icon.style.transform = 'rotate(0deg)';
+                                    } else {
+                                        content.style.maxHeight = content.scrollHeight + 'px';
+                                        icon.style.transform = 'rotate(180deg)';
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+                @endpush
+
     </div>
 @endsection
 
 @section('scripts')
-<script>
-    const STATISTICS_ROUTE = "{{ route('statistics.index') }}";
-</script>
+    <script>
+        const STATISTICS_ROUTE = "{{ route('statistics.index') }}";
+    </script>
 
-<script src="{{ asset('js/dashboard.js') }}"></script>
-<script src="{{ asset('js/filter.js') }}"></script> {{-- <== Aquí agregas tu archivo --}} <style>
-    .filter-btn {
-    @apply px-4 py-2 rounded-lg text-white hover:bg-green-300 transition-colors;
-    }
+    <script src="{{ asset('js/dashboard.js') }}"></script>
+    <script src="{{ asset('js/filter.js') }}"></script> {{-- <== Aquí agregas tu archivo --}} <style>
+        .filter-btn {
+            @apply px-4 py-2 rounded-lg text-white hover:bg-green-300 transition-colors;
+        }
 
-    .filter-btn.active {
-    @apply bg-green-600 hover:bg-green-500;
+        .filter-btn.active {
+            @apply bg-green-600 hover:bg-green-500;
 
-    border: 2px solid #1fa700; /* Verde fuerte para el borde */
-    background-color: #e9fbe6; /* Verde suave para el fondo */
-    color: #1fa700; /* Mismo verde fuerte para el texto */
-    font-weight: bold;
+            border: 2px solid #1fa700;
+            /* Verde fuerte para el borde */
+            background-color: #e9fbe6;
+            /* Verde suave para el fondo */
+            color: #1fa700;
+            /* Mismo verde fuerte para el texto */
+            font-weight: bold;
 
-    }
+        }
 
-    .filter-btn:hover {
-    background-color: #c8facc; /* Verde claro más notorio (similar a degradado suave) */
+        .filter-btn:hover {
+            background-color: #c8facc;
+            /* Verde claro más notorio (similar a degradado suave) */
 
-    color: #1fa700;
-    }
-
+            color: #1fa700;
+        }
     </style>
-    @endsection
-
+@endsection
