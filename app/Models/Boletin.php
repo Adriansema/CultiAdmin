@@ -16,11 +16,12 @@ class Boletin extends Model
     protected $fillable = [
         'user_id',
         'estado',
+        'nombre',
         'contenido',
-        'archivo',  
+        'archivo',
         'validado_por_user_id', // <-- Nueva columna
-        'rechazado_por_user_id', // <-- Nueva columna   
-        'observaciones', 
+        'rechazado_por_user_id', // <-- Nueva columna
+        'observaciones',
     ];
 
     public function user()

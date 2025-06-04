@@ -16,12 +16,19 @@ namespace App\Models{
  * 
  *
  * @property int $id
+ * @property int|null $user_id
+ * @property string $estado
  * @property string $contenido
+ * @property string|null $archivo
+ * @property string|null $observaciones
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string $estado
- * @property int|null $user_id
- * @property string|null $archivo
+ * @property int|null $validado_por_user_id
+ * @property int|null $rechazado_por_user_id
+ * @property string|null $nombre
+ * @property-read \App\Models\User|null $rechazador
+ * @property-read \App\Models\User|null $user
+ * @property-read \App\Models\User|null $validador
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin query()
@@ -30,8 +37,12 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin whereEstado($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin whereNombre($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin whereObservaciones($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin whereRechazadoPorUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Boletin whereValidadoPorUserId($value)
  */
 	class Boletin extends \Eloquent {}
 }
@@ -40,9 +51,24 @@ namespace App\Models{
 /**
  * 
  *
+ * @property int $id
+ * @property int|null $user_id
+ * @property string|null $email
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|IntentoAcceso newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|IntentoAcceso newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|IntentoAcceso query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IntentoAcceso whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IntentoAcceso whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IntentoAcceso whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IntentoAcceso whereIpAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IntentoAcceso whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IntentoAcceso whereUserAgent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IntentoAcceso whereUserId($value)
  */
 	class IntentoAcceso extends \Eloquent {}
 }
@@ -52,15 +78,54 @@ namespace App\Models{
  * 
  *
  * @property int $id
- * @property string|null $imagen
+ * @property int|null $user_id
+ * @property string $email
+ * @property string|null $nombre
+ * @property string|null $telefono
+ * @property string $asunto
+ * @property string $mensaje
+ * @property string $tipo
  * @property string $estado
- * @property string|null $observaciones
- * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property array<array-key, mixed>|null $detalles_json
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs whereAsunto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs whereEstado($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs whereMensaje($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs whereNombre($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs whereTelefono($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs whereTipo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pqrs whereUserId($value)
+ */
+	class Pqrs extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property int $user_id
  * @property string $tipo
+ * @property string $estado
+ * @property string|null $observaciones
+ * @property string $imagen
+ * @property array<array-key, mixed>|null $detalles_json
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $validado_por_user_id
+ * @property int|null $rechazado_por_user_id
+ * @property bool $validado
+ * @property-read \App\Models\User|null $rechazador
  * @property-read \App\Models\User $user
+ * @property-read \App\Models\User|null $validador
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto query()
@@ -70,9 +135,12 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto whereImagen($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto whereObservaciones($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto whereRechazadoPorUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto whereTipo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto whereValidado($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Producto whereValidadoPorUserId($value)
  */
 	class Producto extends \Eloquent {}
 }
@@ -106,16 +174,6 @@ namespace App\Models{
  * @property string|null $two_factor_recovery_codes
  * @property string|null $two_factor_confirmed_at
  * @property string|null $last_login_at
- * @property string|null $apellido
- * @property string|null $tipo_documento
- * @property string|null $documento
- * @property string|null $telefono
- * @property string|null $token
- * @property int $intentos_fallidos
- * @property string|null $bloqueado_hasta
- * @property string|null $codigo_verificacion
- * @property int|null $id_finca
- * @property string|null $clave_visible
  * @property bool $is_online
  * @property string $estado
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
@@ -133,28 +191,18 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User permission($permissions, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User role($roles, $guard = null, $without = false)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereApellido($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereBloqueadoHasta($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereClaveVisible($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereCodigoVerificacion($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereCurrentTeamId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereDocumento($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEstado($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereIdFinca($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereIntentosFallidos($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereIsOnline($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereLastLoginAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereProfilePhotoPath($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTelefono($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTipoDocumento($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTwoFactorConfirmedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTwoFactorRecoveryCodes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTwoFactorSecret($value)
@@ -170,10 +218,10 @@ namespace App\Models{
  * 
  *
  * @property int $id
+ * @property int|null $user_id
  * @property string|null $page
  * @property string|null $ip
  * @property string $created_at
- * @property int|null $user_id
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Visit newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Visit newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Visit query()

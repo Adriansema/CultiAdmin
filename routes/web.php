@@ -36,9 +36,8 @@ Route::middleware([
     'verified',
 ])->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+      // CAMBIO IMPORTANTE AQUÍ: La ruta /dashboard ahora usa StatisticController::showDashboardPage
+    Route::get('/dashboard', [StatisticController::class, 'showDashboardPage'])->name('dashboard');
 
     /*
     |--------------------------------------------------------------------------
@@ -61,7 +60,7 @@ Route::middleware([
             Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
 
             // Boletines
-            Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+           // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
             Route::get('/boletines/{id}/download', [BoletinController::class, 'download'])->name('boletines.download');
             Route::post('boletines/importar-pdf', [BoletinController::class, 'importarPdf'])->name('boletines.importarPdf');
             Route::get('/boletines/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('boletines.exportarCSV');

@@ -1,11 +1,49 @@
 
-//para poder utilizar la libreria de apechar
 import * as echarts from 'echarts';
-import { Container } from 'postcss';
+//import { Container } from 'postcss';
 
 document.addEventListener("DOMContentLoaded", function () {
     let filtroActual = 'ultimos3dias';
+    // nueva variable que esto va con el año y el subfiltro cuando el año este activo
+    let selectedYearForChart = new Date().getFullYear().toString(); //año por defecto: el actual
+    let selectedChartSubFilter = 'month'; // Sub-filtro por defecto para la gráfica anual
+
     let porcentajes = [];
+
+    // --- Inicialización de Flatpickr para el selector de año ---
+const yearPicker = flatpickr("#yearPicker", {
+    dateFormat: "Y", // Solo formato de año
+
+    // Simplificamos defaultDate y defaultViewDate para asegurar el año
+    defaultDate: new Date().getFullYear().toString(), // Asegúrate de que sea solo el año actual como string, ej: "2025"
+    defaultViewDate: new Date().getFullYear() + "-01-01", // Esto debería forzar la vista al 1 de enero del año actual
+
+    // Opcional: Si aún se va muy atrás, puedes añadir un minDate suave para guiarlo:
+    // minDate: "2000-01-01", // Por ejemplo, no permitir que se vaya antes del año 2000
+
+    maxDate: new Date().getFullYear() + 1, // Permite seleccionar hasta el año actual + 1
+
+    onChange: function (selectedDates, dateStr, instance) {
+        if (dateStr) {
+            selectedYearForChart = dateStr; // Actualiza el año seleccionado
+            if (filtroActual === 'año') {
+                loadData(filtroActual, selectedYearForChart, selectedChartSubFilter);
+            }
+            }
+        }
+    });
+
+    // --- Listener para el selector de sub-filtro (Mes, Semana, Día, Hora) ---
+    const chartSubFilterSelect = document.getElementById('chartSubFilterSelect');
+    const yearChartFiltersContainer = document.getElementById('year-chart-filters');
+
+    chartSubFilterSelect.addEventListener('change', function () {
+        selectedChartSubFilter = this.value; // Actualiza el sub-filtro seleccionado
+        if (filtroActual === 'año') {
+            // Si el filtro principal es 'año', recarga los datos con el nuevo sub-filtro
+            loadData(filtroActual, selectedYearForChart, selectedChartSubFilter);
+        }
+    });
 
     // 📌 Agrega aquí las funciones para calcular la semana pasada:
     function getStartOfLastWeek() {
@@ -43,23 +81,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Cambiar el filtro y cargar datos
-   function setFilter(filtro) {
-    filtroActual = filtro;
-
-    const buttons = document.querySelectorAll('#filter-buttons .filter-btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
-
-    // Busca el botón con data-filtro igual al filtro actual
-    const activeBtn = Array.from(buttons).find(btn => btn.getAttribute('data-filtro') === filtro);
-
-    if (activeBtn) {
-        activeBtn.classList.add('active');
-    }
-
-    loadData(filtro);
-}
-
 
     function getLast7Days() {
         const days = [];
@@ -95,6 +116,31 @@ document.addEventListener("DOMContentLoaded", function () {
             total: mapa[dia]
         }));
     }
+
+    // --- Modificar la función setFilter para controlar la visibilidad y cargar datos ---
+    window.setFilter = function (filtro) {
+        filtroActual = filtro;
+
+        const buttons = document.querySelectorAll('#main-filter-buttons .filter-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        const activeBtn = Array.from(buttons).find(btn => btn.getAttribute('data-filtro') === filtro);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+
+        // Mostrar u ocultar los selectores de año y sub-filtro
+        if (filtroActual === 'año') {
+            yearChartFiltersContainer.style.display = 'flex'; // Mostrar como flex para mantener el diseño
+            // Cuando seleccionamos 'año', cargamos los datos con el año y el sub-filtro actuales
+            loadData(filtroActual, selectedYearForChart, selectedChartSubFilter);
+        } else {
+            yearChartFiltersContainer.style.display = 'none'; // Ocultar
+            // Para otros filtros, solo se carga con el filtro principal
+            loadData(filtroActual);
+        }
+    };
+
     function renderChart(data) {
         let datosOrdenados = [...data.vistas];
 
@@ -104,44 +150,44 @@ document.addEventListener("DOMContentLoaded", function () {
                 datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
                 break;
 
-                case 'semana':
-                    const hoy = new Date();
-                    let diaSemana = hoy.getDay(); // 0 = domingo, ..., 3 = miércoles
-                    let diferencia = (diaSemana >= 3) ? diaSemana - 3 : 7 - (3 - diaSemana);
+            case 'semana':
+                const hoy = new Date();
+                let diaSemana = hoy.getDay(); // 0 = domingo, ..., 3 = miércoles
+                let diferencia = (diaSemana >= 3) ? diaSemana - 3 : 7 - (3 - diaSemana);
 
-                    let inicio = new Date(hoy);
-                    inicio.setDate(hoy.getDate() - diferencia);
+                let inicio = new Date(hoy);
+                inicio.setDate(hoy.getDate() - diferencia);
 
-                    const formatearLabel = (fecha) => {
-                        const dias = ['dom.', 'lun.', 'mar.', 'mié.', 'jue.', 'vie.', 'sáb.'];
-                        const meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.'];
+                const formatearLabel = (fecha) => {
+                    const dias = ['dom.', 'lun.', 'mar.', 'mié.', 'jue.', 'vie.', 'sáb.'];
+                    const meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.'];
 
-                        const diaSemana = dias[fecha.getDay()];
-                        const dia = fecha.getDate();
-                        const mes = meses[fecha.getMonth()];
+                    const diaSemana = dias[fecha.getDay()];
+                    const dia = fecha.getDate();
+                    const mes = meses[fecha.getMonth()];
 
-                        return `${diaSemana} ${dia} ${mes}`;
-                    };
+                    return `${diaSemana} ${dia} ${mes}`;
+                };
 
-                    const datosSemana = [];
+                const datosSemana = [];
 
-                    for (let i = 0; i < 7; i++) {
-                        const fecha = new Date(inicio);
-                        fecha.setDate(inicio.getDate() + i);
+                for (let i = 0; i < 7; i++) {
+                    const fecha = new Date(inicio);
+                    fecha.setDate(inicio.getDate() + i);
 
-                        const fechaClave = formatearLabel(fecha);
-                        const etiqueta = fechaClave;
+                    const fechaClave = formatearLabel(fecha);
+                    const etiqueta = fechaClave;
 
-                        const dato = datosOrdenados.find(d => d.grupo === fechaClave);
+                    const dato = datosOrdenados.find(d => d.grupo === fechaClave);
 
-                        datosSemana.push({
-                            grupo: etiqueta,
-                            total: dato ? dato.total : 0
-                        });
-                    }
+                    datosSemana.push({
+                        grupo: etiqueta,
+                        total: dato ? dato.total : 0
+                    });
+                }
 
-                    datosOrdenados = datosSemana;
-                    break;
+                datosOrdenados = datosSemana;
+                break;
 
             case 'año':
                 const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
@@ -153,6 +199,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!Array.isArray(datosOrdenados) || datosOrdenados.length === 0) {
             document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos para mostrar.</div>`;
+            // Asegúrate de resetear las métricas también si no hay datos de visitas
+            updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 });
             return;
         }
 
@@ -265,29 +313,48 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Cargar datos de la API o desde localStorage si no hay conexión
-    function loadData(filtro = null) {
-        let url = '/api/estadisticas'; // Cambia esta URL a la de tu API
+    function loadData(filtro = null, year = null, chartSubFilter = null) {
+        let url = '/api/estadisticas';
+        let params = new URLSearchParams();
+
         if (filtro) {
-            url += `?filtro=${filtro}`;
+            params.append('filtro', filtro);
         }
+        if (year) { // Siempre enviar el año si está disponible, incluso si filtro no es 'año'
+            params.append('year', year);
+        }
+        if (chartSubFilter && filtro === 'año') { // Solo enviar el sub-filtro si el filtro principal es 'año'
+            params.append('chartFilter', chartSubFilter);
+        }
+
+        url += `?${params.toString()}`;
 
         const chartElement = document.querySelector("#chart");
         chartElement.innerHTML = `<div class="text-center text-gray-500 p-4 animate-pulse">Cargando estadísticas...</div>`;
 
-        const storageKey = `offline_stats_${filtro || 'default'}`;
+        const storageKey = `offline_stats_${filtro || 'default'}_${year || ''}_${chartSubFilter || ''}`;
 
         if (navigator.onLine) {
             fetch(url)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(`HTTP error! Status: ${response.status}, Detail: ${errorData.detalle || response.statusText}`);
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     localStorage.setItem(storageKey, JSON.stringify(data));
                     renderChart(data);
                 })
                 .catch(error => {
                     console.error("Error al obtener las estadísticas:", error);
+                    mostrarMensajeError(`No se pudieron cargar los datos: ${error.message}. Mostrando datos offline si están disponibles.`);
                     loadOfflineData(storageKey);
                 });
         } else {
+            mostrarMensajeError("No hay conexión a Internet. Mostrando datos offline si están disponibles.");
             loadOfflineData(storageKey);
         }
     }
@@ -298,11 +365,16 @@ document.addEventListener("DOMContentLoaded", function () {
         if (savedData) {
             renderChart(JSON.parse(savedData));
             const chartElement = document.querySelector("#chart");
-            chartElement.innerHTML = "<div class='text-center text-yellow-500 p-4'>Mostrando datos de prueba.</div>";
+            // Aquí puedes ajustar el mensaje para datos offline
+            chartElement.innerHTML += "<div class='text-center text-yellow-500 p-4'>Mostrando datos almacenados (offline).</div>";
+        } else {
+            const chartElement = document.querySelector("#chart");
+            chartElement.innerHTML = "<div class='text-center text-red-500 p-4'>No hay conexión a Internet y no se encontraron datos almacenados.</div>";
+            updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 }); // Resetea métricas si no hay datos
         }
     }
 
-    
+
 
     // Cargar los datos inicialmente
     loadData();
