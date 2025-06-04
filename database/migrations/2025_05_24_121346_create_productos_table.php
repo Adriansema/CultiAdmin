@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('estado', 255)->default('pendiente'); // Estado (varchar(255), Por defecto 'pendiente')
             $table->text('observaciones')->nullable(); // Observaciones (text, puede ser nulo)
             // ¡COLUMNA 'descripcion' ELIMINADA!
-            $table->string('imagen', 255); // Imagen (varchar(255), no nulo)
+            $table->string('imagen', 255)->nullable(); // Imagen (varchar(255), no nulo)
             $table->json('detalles_json')->nullable(); // detalles_json (json, puede ser nulo)
 
             $table->timestamps(); // created_at y updated_at (timestamp(0))

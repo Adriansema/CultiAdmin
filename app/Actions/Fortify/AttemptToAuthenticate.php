@@ -3,13 +3,13 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User; // Asegúrate de importar tu modelo User
-use App\Models\IntentoAcceso; // Si usas IntentoAcceso
-use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
+use App\Models\IntentoAcceso; // Si usas IntentoAcceso
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Support\Facades\Validator;    // Importa el facade de Validator
 use App\Actions\Fortify\PasswordValidationRules; // Importa el trait que contiene tus reglas de validación de contraseña
 use Illuminate\Validation\ValidationException; // Importa la clase para lanzar excepciones de validación
-use Illuminate\Support\Facades\Validator;    // Importa el facade de Validator
 
 class AttemptToAuthenticate
 {
@@ -18,9 +18,9 @@ class AttemptToAuthenticate
 
     public function handle(Request $request, callable $next)
     {
-        // --- 1. Lógica de validación de robustez de contraseña (AGREGADO AQUÍ) ---
+        // --- Lógica de validación de robustez de contraseña ---
         $validator = Validator::make($request->all(), [
-            'password' => $this->passwordRules(), // Aplica tus reglas de robustez
+            'password' => $this->passwordRules(true), // <-- Pasa 'true' aquí
         ]);
 
         if ($validator->fails()) {
@@ -34,15 +34,15 @@ class AttemptToAuthenticate
 
         // Registro de intento de acceso (ajustado para ser más robusto si el usuario no existe)
         if ($user) {
-             IntentoAcceso::create([
+            IntentoAcceso::create([
                 'user_id' => $user->id,
                 'email' => $request->{Fortify::username()},
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->header('User-Agent'),
             ]);
         } else {
-             // Registrar intento incluso si el email no corresponde a un usuario existente
-             IntentoAcceso::create([
+            // Registrar intento incluso si el email no corresponde a un usuario existente
+            IntentoAcceso::create([
                 'user_id' => null,
                 'email' => $request->{Fortify::username()},
                 'ip_address' => $request->ip(),

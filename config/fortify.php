@@ -147,4 +147,10 @@ return [
         ]),
     ],
 
+    'responses' => [
+        // ... otras respuestas de Fortify
+        'failedlogin' => \App\Http\Responses\Fortify\FailedLoginResponse::class,
+        // ...
+    ],
+
 ];

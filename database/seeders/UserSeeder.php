@@ -18,7 +18,8 @@ class UserSeeder extends Seeder
             ['email' => 'admin@cultiadmin.com'],
             [
                 'name' => 'Administrador',
-                'password' => Hash::make('agrosena123'), // cámbialo por seguridad
+                // Usa una contraseña que CLARAMENTE cumpla la regex:
+                'password' => Hash::make('CultiAdmin_2025!'),
             ]
         );
 
@@ -26,9 +27,11 @@ class UserSeeder extends Seeder
             ['email' => 'opera@cultiopera.com'],
             [
                 'name' => 'Operador',
-                'password' => Hash::make('agrosena321'), // cámbialo por seguridad
+                // Otra contraseña que CLARAMENTE cumpla la regex:
+                'password' => Hash::make('CultiOpera_2025!'),
             ]
-            );
+        );
+        
         // Crear roles si no existen
         $adminRole = Role::firstOrCreate(['name' => 'administrador']);
         $operadorRole = Role::firstOrCreate(['name' => 'operador']);

@@ -1,4 +1,4 @@
- //!{{-- SE IMPORTA ALGUNA FUNCION, PERO SE VE EN EL EJEMPLO 2 --}}
+//!{{-- SE IMPORTA ALGUNA FUNCION, PERO SE VE EN EL EJEMPLO 2 --}}
 
 document.addEventListener('DOMContentLoaded', () => { 
     const searchInput = document.getElementById('searchInput');

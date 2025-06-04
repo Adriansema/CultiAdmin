@@ -180,7 +180,7 @@ return [
             'mimes' => 'Este tipo de archivo no se admite, solo el archivo tipo PDF.', // O si quieres que sea dinámico: 'Este tipo de archivo no se admite. Solo se permiten archivos tipo :values.'
         ],
         'password' => [
-            'regex' => 'La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial.',
+            'regex' => 'Contraseña: ¡Usa letras, números y símbolos!',
         ],
     ],
 

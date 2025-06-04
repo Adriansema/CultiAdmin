@@ -57,7 +57,7 @@
 </div>
 @endif
 
-<div class="mb-4">
+{{-- <div class="mb-4">
     <x-label for="role" value="Rol" />
     <select name="role" id="role" class="block w-full mt-1 border-gray-300 rounded shadow-sm">
         <option value="">-- Seleccionar rol --</option>
@@ -71,4 +71,4 @@
     @error('role')
     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
     @enderror
-</div>
+</div> --}}

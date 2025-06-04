@@ -3,4 +3,4 @@ import './bootstrap';
 import './dashboard'; // ✅ Esto ya debe incluir tu gráfica de ECharts
 // Tu nuevo archivo con la gráfica ECharts
 import './modal';
-import './Inputsearch'; // Primero, el que maneja la carga y el DOM
+import './UserSearch'; // Primero, el que maneja la carga y el DOM
