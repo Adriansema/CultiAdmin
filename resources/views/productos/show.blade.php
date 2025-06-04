@@ -5,24 +5,14 @@
 @section('content')
     <div class="inline-block px-8 py-10">
         <div class="flex items-center space-x-2">
-            <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
+            <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Volver">
             <h1 class="text-3xl whitespace-nowrap font-bold">Detalles del Producto</h1>
         </div>
+        {{-- Asegúrate de que Breadcrumbs::render esté correctamente configurado en tu proyecto --}}
         {!! Breadcrumbs::render('productos.show', $producto) !!}
     </div>
 
     <div class="container max-w-4xl py-4 mx-auto bg-[var(--color-formulario)] shadow-xl px-8 space-x-4 rounded-lg">
-        @php
-            $campos = [
-                'historia' => 'Historia',
-                'productos y sus características' => 'Productos',
-                'variantes' => 'Variantes',
-                'enfermedades' => 'Enfermedades',
-                'insumos' => 'Insumos',
-            ];
-
-            $detalles = json_decode($producto->detalles_json, true) ?? [];
-        @endphp
 
         {{-- Sección de Estado del Producto (Más Prominente) --}}
         <div
@@ -35,13 +25,10 @@
                 <span class="font-bold">{{ ucfirst($producto->estado) }}</span>
             </h3>
 
-            {{-- AÑADIR LA LÓGICA DE VALIDACIÓN/RECHAZO AQUÍ --}}
-
-            @if ($producto->estado === 'rechazado' && $producto->observaciones)
+            @if ($producto->estado === 'rechazado')
                 <p class="text-sm mt-2">
-                    <strong>Observación del Operador:</strong> {{ $producto->observaciones }}
+                    <strong>Observación del Operador:</strong> {{ $producto->observaciones ?? 'N/A' }}
                 </p>
-                {{-- Aquí puedes añadir quién lo rechazó --}}
                 @if ($producto->rechazador)
                     <p class="text-sm mt-1 text-red-700">
                         Rechazado por: <span class="font-medium">{{ $producto->rechazador->name }}</span>
@@ -50,21 +37,18 @@
                 <div class="mt-4">
                     <a href="{{ route('productos.edit', $producto->id) }}"
                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Ir a Editar Noticia →
+                        Ir a Editar Producto →
                     </a>
                 </div>
             @elseif ($producto->estado === 'aprobado')
-                <p class="text-sm mt-2">¡Tu noticia ha sido aprobada y está lista para ser consumida!</p>
-                {{-- Aquí puedes añadir quién lo validó --}}
+                <p class="text-sm mt-2">¡Tu producto ha sido aprobado y está listo para ser consumido!</p>
                 @if ($producto->validador)
                     <p class="text-sm mt-1 text-green-700">
                         Validado por: <span class="font-medium">{{ $producto->validador->name }}</span>
                     </p>
                 @endif
             @elseif ($producto->estado === 'pendiente')
-                <p class="text-sm mt-2">Tu noticia está pendiente de revisión por parte del operador.</p>
-                {{-- Opcional: Si quieres indicar que aún no hay validador/rechazador --}}
-                {{-- <p class="text-sm mt-1 text-gray-600">Aún no ha sido revisado por un operador.</p> --}}
+                <p class="text-sm mt-2">Tu producto está pendiente de revisión por parte del operador.</p>
             @endif
         </div>
 
@@ -80,16 +64,65 @@
             <p class="text-lg text-gray-800">{{ ucfirst($producto->tipo) }}</p>
         </div>
 
-        {{-- El bloque de observaciones anterior se ha integrado en la sección de estado --}}
+        {{-- Mostrar detalles específicos según el tipo de producto --}}
+        @if ($producto->tipo === 'café' && $producto->cafe)
+            <h2 class="text-xl font-bold mt-6 mb-4">Detalles de Café</h2>
 
-        @foreach ($campos as $key => $label)
-            @if (!empty($detalles[$key]))
+            @if ($producto->cafe->cafInfor)
                 <div class="mb-4 p-3 bg-gray-50 rounded-md">
-                    <h3 class="text-sm font-semibold text-gray-600">{{ $label }}</h3>
-                    <p class="text-gray-800 whitespace-pre-line">{{ $detalles[$key] }}</p>
+                    <h3 class="text-sm font-semibold text-gray-600">Información General del Café</h3>
+                    <p class="text-gray-800 whitespace-pre-line">{{ $producto->cafe->cafInfor->informacion ?? 'N/A' }}</p>
                 </div>
             @endif
-        @endforeach
+
+            @if ($producto->cafe->cafInsumos)
+                <div class="mb-4 p-3 bg-gray-50 rounded-md">
+                    <h3 class="text-sm font-semibold text-gray-600">Detalles de Insumos del Café</h3>
+                    <p class="text-gray-800 whitespace-pre-line">{{ $producto->cafe->cafInsumos->informacion ?? 'N/A' }}</p>
+                </div>
+            @endif
+
+            @if ($producto->cafe->cafPatoge)
+                <div class="mb-4 p-3 bg-gray-50 rounded-md">
+                    <h3 class="text-sm font-semibold text-gray-600">Nombre del Patógeno de la Mora</h3>
+                    <p class="text-gray-800">{{ $producto->cafe->cafPatoge->patogeno ?? 'N/A' }}</p>
+                </div>
+                <div class="mb-4 p-3 bg-gray-50 rounded-md">
+                    <h3 class="text-sm font-semibold text-gray-600">Información de Patógenos del Café</h3>
+                    <p class="text-gray-800 whitespace-pre-line">{{ $producto->cafe->cafPatoge->informacion ?? 'N/A' }}</p>
+                </div>
+            @endif
+
+        @elseif ($producto->tipo === 'mora' && $producto->mora)
+            <h2 class="text-xl font-bold mt-6 mb-4">Detalles de Mora</h2>
+
+            @if ($producto->mora->moraInf)
+                <div class="mb-4 p-3 bg-gray-50 rounded-md">
+                    <h3 class="text-sm font-semibold text-gray-600">Información General de la Mora</h3>
+                    <p class="text-gray-800 whitespace-pre-line">{{ $producto->mora->moraInf->informacion ?? 'N/A' }}</p>
+                </div>
+            @endif
+
+            @if ($producto->mora->moraInsu)
+                <div class="mb-4 p-3 bg-gray-50 rounded-md">
+                    <h3 class="text-sm font-semibold text-gray-600">Detalles de Insumos de la Mora</h3>
+                    <p class="text-gray-800 whitespace-pre-line">{{ $producto->mora->moraInsu->informacion ?? 'N/A' }}</p>
+                </div>
+            @endif
+
+            @if ($producto->mora->moraPatoge)
+                <div class="mb-4 p-3 bg-gray-50 rounded-md">
+                    <h3 class="text-sm font-semibold text-gray-600">Nombre del Patógeno de la Mora</h3>
+                    <p class="text-gray-800">{{ $producto->mora->moraPatoge->patogeno ?? 'N/A' }}</p>
+                </div>
+                <div class="mb-4 p-3 bg-gray-50 rounded-md">
+                    <h3 class="text-sm font-semibold text-gray-600">Información del Patógeno de la Mora</h3>
+                    <p class="text-gray-800 whitespace-pre-line">{{ $producto->mora->moraPatoge->informacion ?? 'N/A' }}</p>
+                </div>
+            @endif
+        @else
+            <p class="text-gray-600 mt-4">No hay detalles específicos disponibles para este tipo de producto.</p>
+        @endif
 
         <div class="mt-6">
             <a href="{{ route('productos.index') }}"
@@ -99,3 +132,4 @@
         </div>
     </div>
 @endsection
+

@@ -7,9 +7,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request; // ¡Importa la clase Request!
 use App\Services\UserService; // Importa los filtros, paginacion, etc...
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Role; //Importar el modelo role
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Permission; //Importar el modelo permissions
 use Illuminate\Support\Facades\Response; //para exportar la tabla
 
 class UsuarioController extends Controller
@@ -29,8 +30,8 @@ class UsuarioController extends Controller
 
     public function create()
     {
-        $roles = Role::all();
-        $usuario = new user(); // Inicializa la variable $usuario como nueva instancia de User
+        $roles = Role::all(); // Puedes mantener esto si quieres que el administrador elija un rol inicial
+        $usuario = new User();
         return view('usuarios.create', compact('roles', 'usuario'));
     }
 
@@ -40,7 +41,7 @@ class UsuarioController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role'     => 'required|string|exists:roles,name',
+            'role'     => 'nullable|string|exists:roles,name', // Mantienes la asignación de un rol inicial
         ]);
 
         $usuario = User::create([
@@ -49,10 +50,12 @@ class UsuarioController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $usuario->syncRoles([$request->role]);  // Asegura que solo este rol sea asignado al nuevo usuario
+        $usuario->syncRoles([$request->role]);
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
+        // *** CAMBIO CLAVE AQUÍ: REDIRIGIMOS A LA VISTA DE EDICIÓN DEL USUARIO ***
+        return redirect()->route('usuarios.edit', $usuario->id)->with('success', 'Usuario creado exitosamente. Ahora puedes asignar roles y permisos adicionales.');
     }
+
 
     public function show(User $usuario)
     {
@@ -72,8 +75,16 @@ class UsuarioController extends Controller
 
     public function edit(User $usuario)
     {
-        $roles = Role::all();
-        return view('usuarios.edit', compact('usuario', 'roles'));
+        $roles = Role::all(); // Obtiene todos los roles disponibles
+        $permissions = Permission::all(); // ¡Obtiene todos los permisos disponibles!
+
+        // Obtiene los nombres de los roles que el usuario TIENE actualmente
+        $userRoles = $usuario->roles->pluck('name')->toArray();
+        // Obtiene los nombres de los permisos directos que el usuario TIENE actualmente
+        $userDirectPermissions = $usuario->getDirectPermissions()->pluck('name')->toArray();
+
+        // Pasa todas estas variables a la vista
+        return view('usuarios.edit', compact('usuario', 'roles', 'permissions', 'userRoles', 'userDirectPermissions'));
     }
 
     public function exportarCSV(Request $request)
@@ -173,19 +184,34 @@ class UsuarioController extends Controller
     public function update(Request $request, User $usuario)
     {
         $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $usuario->id,
-            'role'  => 'required|string|exists:roles,name', // Asegúrate de que 'role' viene del formulario
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|email|unique:users,email,' . $usuario->id,
+            'password'  => 'nullable|string|min:8|confirmed', // 'nullable' si no es obligatorio cambiarla
+            'roles'     => 'nullable|array', // Ahora 'roles' será un array
+            'roles.*'   => 'exists:roles,name', // Valida que cada elemento del array sea un nombre de rol existente
+            'permissions' => 'nullable|array', // Para permisos directos, también un array
+            'permissions.*' => 'exists:permissions,name', // Valida que cada permiso exista
         ]);
 
-        $usuario->update([
-            'name'  => $request->name,
-            'email' => $request->email,
-        ]);
+        $usuario->name = $request->name;
+        $usuario->email = $request->email;
 
-        $usuario->syncRoles([$request->role]); // Asegura que el usuario tenga SOLO este rol
+        if ($request->filled('password')) { // Solo actualiza la contraseña si se proporcionó
+            $usuario->password = Hash::make($request->password);
+        }
+        $usuario->save();
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado.');
+        // *** Sincronizar Roles: Usa syncRoles para asignar los roles seleccionados ***
+        // Si no se seleccionó ningún rol, $request->input('roles', []) devuelve un array vacío
+        // esto asegura que todos los roles existentes del usuario sean revocados.
+        $usuario->syncRoles($request->input('roles', []));
+
+        // *** Sincronizar Permisos Directos: Usa syncPermissions para asignar los permisos directos seleccionados ***
+        // Similar a syncRoles, pero para permisos directos.
+        // Revisa la sección de 'Consideraciones sobre Permisos Directos' abajo.
+        $usuario->syncPermissions($request->input('permissions', []));
+
+        return redirect()->route('usuarios.edit', $usuario->id)->with('success', 'Usuario y sus roles/permisos actualizados correctamente.');
     }
 
     public function destroy(User $usuario)

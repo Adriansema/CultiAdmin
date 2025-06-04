@@ -233,7 +233,7 @@ html { font-size: 16px; }
   margin: 20px;
 
   /* Para rounded-xl (borde redondeado más grande) */
-  border-radius: 32px; /* Un valor común para rounded-xl. Puedes ajustar a 16px si lo ves necesario */
+  border-radius: 24px; /* Un valor común para rounded-xl. Puedes ajustar a 16px si lo ves necesario */
 
   /* Para max-w-lg (ancho máximo) */
   max-width: 36rem; /* El valor equivalente a max-w-lg en Tailwind (512px) */
@@ -241,4 +241,16 @@ html { font-size: 16px; }
 
   /* Estilo para el shadow brillante blanco */
   /* box-shadow: 0 0 10px 1px rgba(255, 255, 255, 0.50); */ /* Ajusta los valores según necesites */
+ }
+
+ .recuperar-form {
+  
+  background-color: white;
+  padding: 30px; 
+  margin: 30px;
+
+  border-radius: 32px;
+
+  /* max-width: 48rem; */
+  width: 100%;
  }

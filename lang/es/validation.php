@@ -179,6 +179,9 @@ return [
         'archivo_upload' => [
             'mimes' => 'Este tipo de archivo no se admite, solo el archivo tipo PDF.', // O si quieres que sea dinámico: 'Este tipo de archivo no se admite. Solo se permiten archivos tipo :values.'
         ],
+        'password' => [
+            'regex' => 'Contraseña: ¡Usa letras, números y símbolos!',
+        ],
     ],
 
     /*

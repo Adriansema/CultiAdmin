@@ -1,18 +1,28 @@
 <?php
 
 namespace App\Actions\Fortify;
-
-use Illuminate\Validation\Rules\Password;
-
 trait PasswordValidationRules
 {
     /**
-     * Get the validation rules used to validate passwords.
+     * Get the validation rules for passwords.
      *
-     * @return array<int, \Illuminate\Contracts\Validation\Rule|array<mixed>|string>
+     * @param bool $forLogin Indica si las reglas son para el formulario de login.
+     * @return array
      */
-    protected function passwordRules(): array
+    protected function passwordRules(bool $forLogin = false) // Añadimos el parámetro $forLogin
     {
-        return ['required', 'string', Password::default(), 'confirmed'];
+        $rules = [
+            'required',
+            'string',
+            'min:8', // Longitud mínima
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\\w])).+$/', // Tu regex
+        ];
+
+        // Si NO es para el login, o si no se especificó $forLogin (comportamiento por defecto para registro/cambio)
+        if (!$forLogin) {
+            $rules[] = 'confirmed'; // Solo añadimos 'confirmed' si no es para el login
+        }
+
+        return $rules;
     }
 }

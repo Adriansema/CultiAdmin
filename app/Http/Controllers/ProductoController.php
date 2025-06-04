@@ -5,7 +5,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\User; // Para buscar operadores
+use App\Models\Cafe;
+use App\Models\Mora;
 use App\Models\Producto;
+use App\Models\CafInfor;
+use App\Models\CafInsumos;
+use App\Models\CafPatoge;
+use App\Models\MoraInf;
+use App\Models\MoraInsu;
+use App\Models\MoraPatoge;
 use Illuminate\Http\Request;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\Mail; // Importa Mail
@@ -37,62 +45,164 @@ class ProductoController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'detalles' => 'required|array',
-            'tipo' => 'required|string',
+        // Validación de los campos
+        $rules = [
+            'tipo' => 'required|string|in:café,mora',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'observaciones' => 'nullable|string',
-        ]);
+        ];
 
+        // Añadir reglas de validación condicionalmente según el tipo seleccionado
+        if ($request->input('tipo') === 'café') {
+            $rules['caf_infor.informacion'] = 'required|string';
+            $rules['caf_insumos.informacion'] = 'required|string';
+            $rules['caf_patoge.informacion'] = 'required|string';
+            $rules['caf_patoge.patogeno'] = 'required|string|max:255';
+        } elseif ($request->input('tipo') === 'mora') {
+            $rules['mora_inf.informacion'] = 'required|string';
+            $rules['mora_insu.informacion'] = 'required|string';
+            $rules['mora_patoge.informacion'] = 'required|string';
+            $rules['mora_patoge.patogeno'] = 'required|string|max:255';
+        }
+
+        $request->validate($rules); // Aplica las reglas de validación
+
+        // Lógica para guardar la imagen
         $imagen = null;
         if ($request->hasFile('imagen')) {
             $imagen = $request->file('imagen')->store('productos', 'public');
         }
 
-        // *** CORRECCIÓN AQUÍ: Asigna el resultado de create() a $producto ***
+        // 1. Crear el registro principal en la tabla 'productos'
         $producto = Producto::create([
-            'user_id' => Auth::id(),
-            'detalles_json' => json_encode($request->detalles, JSON_UNESCAPED_UNICODE),
-            'estado' => 'pendiente',
+            'user_id' => Auth::id(), // Asume que el usuario está autenticado
+            'estado' => 'pendiente', // O el estado inicial que desees
             'observaciones' => $request->observaciones,
             'imagen' => $imagen,
             'tipo' => $request->tipo,
         ]);
 
-        // *** Lógica para enviar email al operador cuando se crea un producto ***
-        $operadores = User::role('operador')->get(); // Obtiene todos los usuarios con el rol 'operador'
+        $tipoProducto = $request->input('tipo');
+
+        if ($tipoProducto === 'café') {
+            // Crear los registros de detalle de Café
+            $cafInforData = $request->input('caf_infor', []);
+            $cafInfor = CafInfor::create([
+                'numero_pagina' => 1, // Valor predeterminado
+                'informacion' => $cafInforData['informacion'] ?? '',
+            ]);
+
+            $cafInsumosData = $request->input('caf_insumos', []);
+            $cafInsumos = CafInsumos::create([
+                'numero_pagina' => 1,
+                'informacion' => $cafInsumosData['informacion'] ?? '',
+            ]);
+
+            $cafPatogeData = $request->input('caf_patoge', []);
+            $cafPatoge = CafPatoge::create([
+                'numero_pagina' => 1,
+                'patogeno' => $cafPatogeData['patogeno'] ?? 'General',
+                'informacion' => $cafPatogeData['informacion'] ?? '',
+            ]);
+
+            // Crear el registro en la tabla 'cafe' y vincularlo con el producto principal
+            // y con los registros de detalle de café
+            Cafe::create([
+                'producto_id' => $producto->id,
+                'id_caf' => $cafInfor->id_caf,
+                'id_insumos' => $cafInsumos->id_insumos,
+                'id_patoge' => $cafPatoge->id_patoge,
+            ]);
+
+        } elseif ($tipoProducto === 'mora') {
+            // Crear los registros de detalle de Mora
+            $moraInfData = $request->input('mora_inf', []);
+            $moraInf = MoraInf::create([
+                'numero_pagina' => 1,
+                'informacion' => $moraInfData['informacion'] ?? '',
+            ]);
+
+            $moraInsuData = $request->input('mora_insu', []);
+            $moraInsu = MoraInsu::create([
+                'numero_pagina' => 1,
+                'informacion' => $moraInsuData['informacion'] ?? '',
+            ]);
+
+            $moraPatogeData = $request->input('mora_patoge', []);
+            $moraPatoge = MoraPatoge::create([
+                'numero_pagina' => 1,
+                'patogeno' => $moraPatogeData['patogeno'] ?? 'General',
+                'informacion' => $moraPatogeData['informacion'] ?? '',
+            ]);
+
+            // Crear el registro en la tabla 'mora' y vincularlo con el producto principal
+            // y con los registros de detalle de mora
+            Mora::create([
+                'producto_id' => $producto->id,
+                'id_info' => $moraInf->id_info,
+                'id_insu' => $moraInsu->id_insu,
+                'id_pat' => $moraPatoge->id_pat,
+            ]);
+        }
+
+        // Lógica para enviar email al operador
+        $operadores = User::role('operador')->get();
         foreach ($operadores as $operador) {
             Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($producto, 'Noticia'));
         }
 
-        return redirect()->route('productos.index')->with('success', 'Producto creado con éxito y enviado a revisión del operador.');
-    }
-
-    public function show(Producto $producto)
-    {
-        return view('productos.show', compact('producto'));
+        return redirect()->route('productos.index')->with('success', 'Información guardada con éxito.');
     }
 
     public function edit(Producto $producto)
     {
+        // Cargar las relaciones necesarias para la vista de edición
+        $producto->load([
+            'cafe.cafInfor',
+            'cafe.cafInsumos',
+            'cafe.cafPatoge',
+            'mora.moraInf',
+            'mora.moraInsu',
+            'mora.moraPatoge',
+        ]);
+
         return view('productos.edit', compact('producto'));
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, Producto $producto)
     {
-        $request->validate([
-            'detalles' => 'required|array',
-            'tipo' => 'required|string',
+        $rules = [
+            'tipo' => 'required|string|in:café,mora', // El tipo no debería cambiar en la edición, pero se valida
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'observaciones' => 'nullable|string', // El usuario puede modificar sus observaciones
-        ]);
+            'observaciones' => 'nullable|string',
+        ];
+
+        // Añadir reglas de validación condicionalmente según el tipo del producto
+        // Usamos $producto->tipo porque el campo 'tipo' en la vista estará deshabilitado
+        if ($producto->tipo === 'café') {
+            $rules['caf_infor.informacion'] = 'required|string';
+            $rules['caf_insumos.informacion'] = 'required|string';
+            $rules['caf_patoge.informacion'] = 'required|string';
+            $rules['caf_patoge.patogeno'] = 'required|string|max:255';
+        } elseif ($producto->tipo === 'mora') {
+            $rules['mora_inf.informacion'] = 'required|string';
+            $rules['mora_insu.informacion'] = 'required|string';
+            $rules['mora_patoge.informacion'] = 'required|string';
+            $rules['mora_patoge.patogeno'] = 'required|string|max:255';
+        }
+
+        $request->validate($rules);
 
         // Almacenar el estado original del producto ANTES de cualquier cambio
         $originalEstado = $producto->estado;
 
+        // 1. Actualizar campos principales del Producto
         // Actualizar imagen si viene una nueva
         if ($request->hasFile('imagen')) {
-            // Eliminar imagen anterior si existe y es diferente a la nueva
+            // Eliminar imagen anterior si existe
             if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
                 Storage::disk('public')->delete($producto->imagen);
             }
@@ -100,31 +210,101 @@ class ProductoController extends Controller
             $producto->imagen = $imagen;
         }
 
-        // Actualizar los demás campos con los datos del request
-        $producto->tipo = $request->tipo;
-        $producto->detalles_json = json_encode($request->detalles, JSON_UNESCAPED_UNICODE);
-        $producto->observaciones = $request->observaciones; // El usuario puede editar sus propias observaciones aquí
+        // Actualizar los demás campos del producto principal
+        // El tipo no se actualiza directamente aquí si lo deshabilitaste en la vista
+        // $producto->tipo = $request->tipo; // Descomentar si permites cambiar el tipo
+        $producto->observaciones = $request->observaciones;
 
-        // *** Lógica para cambiar el estado a 'pendiente' si el producto fue editado
-        // *** y su estado original era 'aprobado' o 'rechazado'.
-        // Esto asegura que cada edición por parte del creador requiera una nueva validación del operador.
+        // Lógica para cambiar el estado a 'pendiente' si el producto fue editado
         $estadoCambiadoAPendiente = false;
         if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
              $producto->estado = 'pendiente';
              // Opcional: limpiar la observación del operador al volver a pendiente.
-             // Esto evita mostrar una observación de "rechazado" de una revisión anterior
-             // cuando el producto vuelve a estar pendiente.
              $producto->observaciones = null; // Limpiar observación del operador
              $estadoCambiadoAPendiente = true;
         }
-        // Si el estado original ya era 'pendiente', se mantiene 'pendiente'.
-        // No se permite al usuario cambiar el estado directamente desde esta vista.
 
-        $producto->save();
+        $producto->save(); // Guarda los cambios en el producto principal
 
-        // *** Lógica para enviar email al operador cuando un producto editado vuelve a pendiente ***
+        // 2. Actualizar registros en las tablas de detalle según el tipo
+        if ($producto->tipo === 'café') {
+            // Asegúrate de que las relaciones existan antes de intentar acceder a ellas
+            // Si un producto de tipo café no tiene un registro en 'cafe' o sus detalles, esto fallaría.
+            // Esto debería estar cubierto por la lógica de 'store' al crear el producto.
+            $cafe = $producto->cafe; // Obtiene el modelo Cafe relacionado
+
+            if ($cafe) { // Verifica que el registro Cafe exista
+                $cafInforData = $request->input('caf_infor', []);
+                if ($cafe->cafInfor) {
+                    $cafe->cafInfor->update(['informacion' => $cafInforData['informacion'] ?? '']);
+                } else {
+                    // Si no existe, créalo (esto no debería pasar si el store funciona bien)
+                    $cafInfor = CafInfor::create(['numero_pagina' => 1, 'informacion' => $cafInforData['informacion'] ?? '']);
+                    $cafe->update(['id_caf' => $cafInfor->id_caf]);
+                }
+
+                $cafInsumosData = $request->input('caf_insumos', []);
+                if ($cafe->cafInsumos) {
+                    $cafe->cafInsumos->update(['informacion' => $cafInsumosData['informacion'] ?? '']);
+                } else {
+                    $cafInsumos = CafInsumos::create(['numero_pagina' => 1, 'informacion' => $cafInsumosData['informacion'] ?? '']);
+                    $cafe->update(['id_insumos' => $cafInsumos->id_insumos]);
+                }
+
+                $cafPatogeData = $request->input('caf_patoge', []);
+                if ($cafe->cafPatoge) {
+                    $cafe->cafPatoge->update([
+                        'patogeno' => $cafPatogeData['patogeno'] ?? 'General',
+                        'informacion' => $cafPatogeData['informacion'] ?? '']);
+                } else {
+                    $cafPatoge = CafPatoge::create([
+                        'numero_pagina' => 1, 
+                        'patogeno' => $cafPatogeData['patogeno'] ?? 'General',
+                        'informacion' => $cafPatogeData['informacion'] ?? '']);
+                    $cafe->update(['id_patoge' => $cafPatoge->id_patoge]);
+                }
+            }
+
+        } elseif ($producto->tipo === 'mora') {
+            $mora = $producto->mora; // Obtiene el modelo Mora relacionado
+
+            if ($mora) { // Verifica que el registro Mora exista
+                $moraInfData = $request->input('mora_inf', []);
+                if ($mora->moraInf) {
+                    $mora->moraInf->update(['informacion' => $moraInfData['informacion'] ?? '']);
+                } else {
+                    $moraInf = MoraInf::create(['numero_pagina' => 1, 'informacion' => $moraInfData['informacion'] ?? '']);
+                    $mora->update(['id_info' => $moraInf->id_info]);
+                }
+
+                $moraInsuData = $request->input('mora_insu', []);
+                if ($mora->moraInsu) {
+                    $mora->moraInsu->update(['informacion' => $moraInsuData['informacion'] ?? '']);
+                } else {
+                    $moraInsu = MoraInsu::create(['numero_pagina' => 1, 'informacion' => $moraInsuData['informacion'] ?? '']);
+                    $mora->update(['id_insu' => $moraInsu->id_insu]);
+                }
+
+                $moraPatogeData = $request->input('mora_patoge', []);
+                if ($mora->moraPatoge) {
+                    $mora->moraPatoge->update([
+                        'patogeno' => $moraPatogeData['patogeno'] ?? 'General',
+                        'informacion' => $moraPatogeData['informacion'] ?? '',
+                    ]);
+                } else {
+                    $moraPatoge = MoraPatoge::create([
+                        'numero_pagina' => 1,
+                        'patogeno' => $moraPatogeData['patogeno'] ?? 'General',
+                        'informacion' => $moraPatogeData['informacion'] ?? '',
+                    ]);
+                    $mora->update(['id_pat' => $moraPatoge->id_pat]);
+                }
+            }
+        }
+
+        // Lógica para enviar email al operador
         if ($estadoCambiadoAPendiente) {
-            $operadores = User::role('operador')->get(); // Obtiene todos los usuarios con el rol 'operador'
+            $operadores = User::role('operador')->get();
             foreach ($operadores as $operador) {
                 Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($producto, 'Noticia'));
             }
@@ -133,6 +313,27 @@ class ProductoController extends Controller
         return redirect()->route('productos.index')->with('success', 'Producto actualizado y enviado a revisión del operador.');
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function show(Producto $producto)
+    {
+        // Cargar las relaciones necesarias para mostrar los detalles
+        $producto->load([
+            'user', // Para mostrar quién lo creó
+            'cafe.cafInfor',
+            'cafe.cafInsumos',
+            'cafe.cafPatoge',
+            'mora.moraInf',
+            'mora.moraInsu',
+            'mora.moraPatoge',
+            'validador', 
+            'rechazador',
+        ]);
+        /* dd($producto); */
+
+        return view('productos.show', compact('producto'));
+    }
 
     public function destroy(Producto $producto)
     {
