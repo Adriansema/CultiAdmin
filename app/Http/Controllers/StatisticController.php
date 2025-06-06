@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-// use GuzzleHttp\Promise\Create; // Esta línea no es necesaria y la voy a quitar para limpiar.
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+// Asegura que la localización de Carbon sea global para el contexto del controlador
 Carbon::setLocale(App::getLocale());
 
 class StatisticController extends Controller
@@ -17,110 +17,64 @@ class StatisticController extends Controller
      * Muestra la página del dashboard con los filtros y la gráfica.
      * Este método se encarga de cargar la vista inicial y los años disponibles.
      */
-
     public function showDashboardPage(Request $request)
     {
-        // 1. Determinar los años disponibles para el selector
         $currentYear = Carbon::now()->year;
         $availableYears = [];
 
-        // Obtener el año más antiguo de registros en la tabla 'boletins'
-        // Esto asume que tienes datos en 'boletins'. Si no, puedes dejarlo comentado
-        // y usar un año de inicio fijo como 2020.
-        $firstBoletinYear = DB::table('boletins')->min(DB::raw('EXTRACT(YEAR FROM created_at)'));
+        // Obtener el año más antiguo de registros en la tabla 'visits' (o la que uses para visitas)
+        // Asegúrate que esta tabla exista y tenga la columna 'created_at'.
+        $firstRecordYear = DB::table('visits')->min(DB::raw('EXTRACT(YEAR FROM created_at)'));
 
-        // Si no hay boletines en la base de datos, o quieres empezar siempre desde un año fijo (ej. 2020)
-        // Usa el mayor entre un año fijo y el año del primer boletín (si existe)
-        $startYear = max(2020, $firstBoletinYear ?? $currentYear); // Empieza en 2020 o el primer año de boletín
+        // El año de inicio para el selector: mínimo 2020 o el año del primer registro si es anterior
+        $startYear = max(2020, $firstRecordYear ?? $currentYear);
 
         // Generar años desde el "startYear" hasta el año actual + 1
-        // Esto asegura que 2025 y 2026 (si estamos en 2025) aparezcan.
         for ($year = $startYear; $year <= ($currentYear + 1); $year++) {
             $availableYears[] = (string)$year;
         }
 
-        // Si quieres incluir el año actual aunque no haya datos antiguos, y quizás el próximo
-        // Puedes asegurar que $availableYears no esté vacío si startYear es futuro (lo cual es raro)
+        // Asegurarse de que el año actual y el siguiente estén siempre disponibles
         if (!in_array((string)$currentYear, $availableYears)) {
             $availableYears[] = (string)$currentYear;
         }
         if (!in_array((string)($currentYear + 1), $availableYears)) {
             $availableYears[] = (string)($currentYear + 1);
         }
-        // Ordenar para que estén en orden ascendente
-        sort($availableYears);
-
+        sort($availableYears); // Ordenar para que estén en orden ascendente
 
         $selectedYear = $request->input('year', $currentYear); // Por defecto, el año actual
-        $selectedFilter = $request->input('filter', 'year'); // Por defecto, el filtro por año
+        $selectedFilter = $request->input('filter', 'ultimos3dias'); // Por defecto, el filtro a 'ultimos3dias'
 
-        // Define $boletines aunque sea un array vacío si no los usas para no dar error en la vista
-        $boletines = collect(); // Esto creará una colección vacía para pasar a la vista
-
+        // Pasa $boletines aunque sea una colección vacía si no la usas en la vista para evitar errores
+        $boletines = collect();
 
         return view('dashboard', compact('availableYears', 'selectedYear', 'selectedFilter', 'boletines'));
     }
 
-      public function getChartData(Request $request)
-    {
-        $year = (int)$request->input('year', Carbon::now()->year); // Año seleccionado del frontend
-        $filter = $request->input('filter', 'year');
-
-        $labels = [];
-        $data = [];
-
-        // Para el filtro 'year' (que agrupa por meses)
-        if ($filter === 'year') {
-            $currentYear = Carbon::now()->year;
-            $currentMonth = Carbon::now()->month;
-
-            // Si el año seleccionado es el año actual o un año futuro,
-            // solo muestra los meses que ya han transcurrido (hasta el mes actual).
-            // Si es un año pasado, muestra los 12 meses.
-            $monthsToShow = ($year <= $currentYear) ? ($year === $currentYear ? $currentMonth : 12) : 0;
-            // ^^^ Lógica mejorada: Si es el año actual, hasta el mes actual; si es pasado, 12 meses; si es futuro, 0 inicialmente.
-
-            // Consulta de datos
-            $results = DB::table('boletins')
-                ->select(DB::raw('EXTRACT(MONTH FROM created_at) as month'), DB::raw('COUNT(*) as count'))
-                ->whereYear('created_at', $year)
-                ->groupBy('month')
-                ->orderBy('month')
-                ->get();
-
-            // Rellenar con 0s y generar etiquetas hasta el mes adecuado
-            for ($i = 1; $i <= $monthsToShow; $i++) {
-                $monthName = Carbon::create(null, $i, 1)->monthName;
-                $labels[] = ucfirst($monthName);
-                $found = $results->firstWhere('month', $i);
-                $data[] = $found ? $found->count : 0;
-            }
-
-        } // ... (resto de filtros como 'month', 'week', 'day' si los implementas) ...
-
-        return response()->json(['labels' => $labels, 'data' => $data]);
-    }
-
-    // ... (Tu método getChartData va aquí) ...
- public function getStatistics(Request $request)
+    /**
+     * Este método obtiene los datos para la gráfica y las métricas,
+     * basado en los filtros enviados desde el frontend.
+     */
+    public function getStatistics(Request $request)
     {
         try {
-            // Configuración regional para fechas (asegúrate de que el sistema tenga los locales instalados)
+            // Asegura la localización para Carbon y funciones de fecha en PHP
             setlocale(LC_TIME, 'es_ES.UTF-8');
             Carbon::setLocale('es');
 
-            $filtro = $request->query('filtro', 'ultimos3dias'); // Filtro principal: ultimos3dias, semana, mes, año
+            $filtro = $request->query('filtro', 'ultimos3dias'); // Filtro principal
             $selectedYear = (int)$request->query('year', Carbon::now()->year); // Año seleccionado del Flatpickr
-            $chartSubFilter = $request->query('chartFilter', 'month'); // Sub-filtro para el 'año': month, week, day, hour
+            // Sub-filtro para el 'año': month, week, day, hour (por defecto 'month' si no se especifica)
+            $chartSubFilter = $request->query('chartFilter', 'month');
 
-            $vistas = collect(); // Para almacenar los datos de la gráfica (grupo y total)
+            $vistas = collect(); // Colección para los datos de la gráfica (grupo y total)
             $inicio = null;
             $fin = null;
-            $campoAgrupar = null;
 
-            // La fecha base para el rango ahora siempre usa el año seleccionado, pero el mes/día/hora actuales
-            // si no se especifica lo contrario (para filtros como 'ultimos3dias', 'semana', 'mes').
-            $baseDateForFiltering = Carbon::create(
+            // Fecha actual en el contexto del año seleccionado para filtros como 'ultimos3dias', 'semana', 'mes'
+            // Esto permite que si seleccionas 2024, "últimos 3 días" se refiera a los últimos 3 días de 2024.
+            $currentDateForSelectedYear = Carbon::create(
                 $selectedYear,
                 Carbon::now()->month,
                 Carbon::now()->day,
@@ -129,82 +83,93 @@ class StatisticController extends Controller
                 Carbon::now()->second
             );
 
-            // Consulta base para las visitas (se inicializa aquí para aplicar filtros)
-            $baseQuery = DB::table('visits'); // Asegúrate que 'visits' es la tabla correcta
+            // Consulta base para las visitas (¡Asegúrate que 'visits' sea tu tabla real!)
+            $baseQuery = DB::table('visits');
 
             switch ($filtro) {
                 case 'ultimos3dias':
-                    $inicio = $baseDateForFiltering->copy()->subDays(2)->startOfDay();
-                    $fin = $baseDateForFiltering->copy()->endOfDay();
-                    // PostgreSQL: TO_CHAR(created_at, 'YYYY-MM-DD')
-                    // MySQL: DATE_FORMAT(created_at, '%Y-%m-%d')
-                    $campoAgrupar = (env('DB_CONNECTION') === 'pgsql') ? "TO_CHAR(created_at, 'YYYY-MM-DD')" : "DATE_FORMAT(created_at, '%Y-%m-%d')";
+                    // Rango: los últimos 3 días (incluyendo hoy) en el contexto del año seleccionado
+                    $fin = $currentDateForSelectedYear->copy()->endOfDay();
+                    $inicio = $fin->copy()->subDays(2)->startOfDay(); // 3 días: hoy, ayer, anteayer
 
-                    // Llenar datos con 0s para los 3 días
+                    $dbDateFormatter = (env('DB_CONNECTION') === 'pgsql') ? "TO_CHAR(created_at, 'YYYY-MM-DD')" : "DATE_FORMAT(created_at, '%Y-%m-%d')";
+
                     $tempVistas = [];
                     for ($i = 2; $i >= 0; $i--) {
-                        $date = $baseDateForFiltering->copy()->subDays($i);
-                        $formattedDate = $date->toDateString(); // YYYY-MM-DD
-                        $tempVistas[$formattedDate] = (object)['grupo' => $date->translatedFormat('l'), 'total' => 0]; // Formato de día de la semana
+                        $date = $fin->copy()->subDays($i);
+                        $formattedDateKey = $date->toDateString(); // Clave 'YYYY-MM-DD' para el array asociativo
+                        $tempVistas[$formattedDateKey] = (object)['grupo' => $date->translatedFormat('l'), 'total' => 0]; // Ej: "viernes"
                     }
 
                     $results = $baseQuery->whereBetween('created_at', [$inicio, $fin])
-                                         ->select(DB::raw("$campoAgrupar AS grupo"), DB::raw('COUNT(*) AS total'))
-                                         ->groupBy(DB::raw($campoAgrupar))
+                                         ->select(DB::raw("$dbDateFormatter AS date_key"), DB::raw('COUNT(*) AS total'))
+                                         ->groupBy(DB::raw($dbDateFormatter))
                                          ->get();
 
                     foreach ($results as $item) {
-                        $tempVistas[$item->grupo]->total = $item->total;
+                        if (isset($tempVistas[$item->date_key])) {
+                            $tempVistas[$item->date_key]->total = $item->total;
+                        }
                     }
-                    $vistas = collect(array_values($tempVistas));
+                    $vistas = collect(array_values($tempVistas)); // Convertir a array indexado numéricamente
                     break;
 
                 case 'semana':
-                    // Obtener los últimos 7 días terminando en la baseDateForFiltering
-                    $inicio = $baseDateForFiltering->copy()->subDays(6)->startOfDay();
-                    $fin = $baseDateForFiltering->copy()->endOfDay();
+                    // Rango: 7 días terminando en la baseDateForFiltering
+                    $fin = $currentDateForSelectedYear->copy()->endOfDay();
+                    $inicio = $fin->copy()->subDays(6)->startOfDay(); // 7 días: hoy y 6 anteriores
+
+                    $dbDateFormatter = (env('DB_CONNECTION') === 'pgsql') ? "TO_CHAR(created_at, 'YYYY-MM-DD')" : "DATE_FORMAT(created_at, '%Y-%m-%d')";
 
                     $tempVistas = [];
                     for ($i = 6; $i >= 0; $i--) {
-                        $date = $baseDateForFiltering->copy()->subDays($i);
-                        $formattedDate = $date->toDateString(); // YYYY-MM-DD
-                        $tempVistas[$formattedDate] = (object)['grupo' => $date->translatedFormat('D d M'), 'total' => 0]; // Ej: Lun 03 Jun
+                        $date = $fin->copy()->subDays($i);
+                        $formattedDateKey = $date->toDateString(); // Clave 'YYYY-MM-DD'
+                        $tempVistas[$formattedDateKey] = (object)['grupo' => $date->translatedFormat('D d M'), 'total' => 0]; // Ej: "Vie 06 Jun"
                     }
 
                     $results = $baseQuery->whereBetween('created_at', [$inicio, $fin])
-                                         ->select(DB::raw((env('DB_CONNECTION') === 'pgsql' ? 'DATE(created_at)' : 'DATE(created_at)') . ' AS grupo'), DB::raw('COUNT(*) AS total')) // Agrupar por fecha completa
-                                         ->groupBy(DB::raw((env('DB_CONNECTION') === 'pgsql' ? 'DATE(created_at)' : 'DATE(created_at)')))
+                                         ->select(DB::raw("$dbDateFormatter AS date_key"), DB::raw('COUNT(*) AS total'))
+                                         ->groupBy(DB::raw($dbDateFormatter))
                                          ->get();
 
                     foreach ($results as $item) {
-                        if (isset($tempVistas[$item->grupo])) {
-                             $tempVistas[$item->grupo]->total = $item->total;
+                        if (isset($tempVistas[$item->date_key])) {
+                             $tempVistas[$item->date_key]->total = $item->total;
                         }
                     }
                     $vistas = collect(array_values($tempVistas));
                     break;
 
                 case 'mes':
-                    $inicio = $baseDateForFiltering->copy()->startOfMonth();
-                    $fin = $baseDateForFiltering->copy()->endOfMonth();
-                    // Agrupa por semana del mes. Adaptar para MySQL/PostgreSQL si es necesario.
-                    $campoAgrupar = (env('DB_CONNECTION') === 'pgsql') ? 'FLOOR((EXTRACT(DAY FROM created_at) - 1) / 7) + 1' : 'WEEKOFYEAR(created_at) - WEEKOFYEAR(DATE_FORMAT(created_at, \'%Y-%m-01\')) + 1';
+                    // Rango: El mes completo de la baseDateForFiltering
+                    $inicio = $currentDateForSelectedYear->copy()->startOfMonth();
+                    $fin = $currentDateForSelectedYear->copy()->endOfMonth();
+
+                    // Agrupar por semana del mes.
+                    // ATENCIÓN: WEEKOFYEAR en MySQL puede ser inconsistente sin un modo específico.
+                    // Para MySQL, se recomienda 'WEEK(created_at, 3)' para ISO-8601 (lunes como primer día de la semana).
+                    // Pero para agrupar semanas del mes, la lógica que tenías era compleja.
+                    // Es más simple agrupar por día y luego el frontend puede interpretarlo si lo necesitas semanal.
+                    $dbWeekFormatter = (env('DB_CONNECTION') === 'pgsql') ? 'FLOOR((EXTRACT(DAY FROM created_at) - 1) / 7) + 1' : 'CEIL(DAY(created_at) / 7)';
 
                     $results = $baseQuery->whereBetween('created_at', [$inicio, $fin])
-                                         ->select(DB::raw("$campoAgrupar AS grupo"), DB::raw('COUNT(*) AS total'))
-                                         ->groupBy(DB::raw($campoAgrupar))
+                                         ->select(DB::raw("$dbWeekFormatter AS grupo"), DB::raw('COUNT(*) AS total'))
+                                         ->groupBy(DB::raw($dbWeekFormatter))
                                          ->orderBy('grupo') // Asegura el orden por semana del mes
                                          ->get();
 
                     // Rellenar las semanas faltantes
-                    $weeksInMonth = (int)ceil($baseDateForFiltering->daysInMonth / 7);
+                    $weeksInMonth = (int)ceil($currentDateForSelectedYear->daysInMonth / 7);
                     $tempVistas = [];
                     for ($i = 1; $i <= $weeksInMonth; $i++) {
                         $tempVistas[$i] = (object)['grupo' => 'Semana ' . $i, 'total' => 0];
                     }
 
                     foreach ($results as $item) {
-                        $tempVistas[$item->grupo]->total = $item->total;
+                        if (isset($tempVistas[$item->grupo])) { // $item->grupo será el número de semana
+                            $tempVistas[$item->grupo]->total = $item->total;
+                        }
                     }
                     $vistas = collect(array_values($tempVistas));
                     break;
@@ -216,118 +181,122 @@ class StatisticController extends Controller
 
                     $currentYear = Carbon::now()->year;
                     $currentMonth = Carbon::now()->month;
-                    $currentWeek = Carbon::now()->weekOfYear;
+                    $currentWeekOfYear = Carbon::now()->weekOfYear;
                     $currentDayOfYear = Carbon::now()->dayOfYear;
                     $currentHour = Carbon::now()->hour;
 
                     switch ($chartSubFilter) {
                         case 'month':
-                            // Mostrar meses hasta el actual si es el año actual, o los 12 meses si es pasado/futuro
-                            $monthsToIterate = ($selectedYear === $currentYear) ? $currentMonth : 12;
-                            if ($selectedYear > $currentYear) { // Si es un año futuro, no muestra meses pasados del futuro
-                                $monthsToIterate = 0; // O si quieres, puedes mostrar 0, o dejarlo vacío
-                            }
-
-
-                            $campoAgrupar = (env('DB_CONNECTION') === 'pgsql') ? "EXTRACT(MONTH FROM created_at)" : "MONTH(created_at)";
+                            $dbMonthFormatter = (env('DB_CONNECTION') === 'pgsql') ? "EXTRACT(MONTH FROM created_at)" : "MONTH(created_at)";
 
                             $results = $baseQuery->whereYear('created_at', $selectedYear)
-                                                 ->select(DB::raw("$campoAgrupar AS grupo"), DB::raw('COUNT(*) AS total'))
-                                                 ->groupBy(DB::raw($campoAgrupar))
-                                                 ->orderBy('grupo')
+                                                 ->select(DB::raw("$dbMonthFormatter AS month_num"), DB::raw('COUNT(*) AS total'))
+                                                 ->groupBy(DB::raw($dbMonthFormatter))
+                                                 ->orderBy('month_num')
                                                  ->get();
 
                             $tempVistas = [];
+                            $monthsToIterate = 12; // Por defecto 12 meses
+                            if ($selectedYear === $currentYear) {
+                                $monthsToIterate = $currentMonth; // Hasta el mes actual
+                            } elseif ($selectedYear > $currentYear) {
+                                $monthsToIterate = 0; // Si es un año futuro, no hay datos aún
+                            }
+
                             for ($i = 1; $i <= $monthsToIterate; $i++) {
-                                $monthName = Carbon::create(null, $i, 1)->monthName;
+                                $monthName = Carbon::create(null, $i, 1)->translatedFormat('F'); // Nombre completo del mes
                                 $tempVistas[$i] = (object)['grupo' => ucfirst($monthName), 'total' => 0];
                             }
 
                             foreach ($results as $item) {
-                                if (isset($tempVistas[$item->grupo])) {
-                                    $tempVistas[$item->grupo]->total = $item->total;
+                                if (isset($tempVistas[$item->month_num])) {
+                                    $tempVistas[$item->month_num]->total = $item->total;
                                 }
                             }
                             $vistas = collect(array_values($tempVistas));
                             break;
 
                         case 'week':
-                            // Agrupar por semanas dentro del año
-                            $weeksInYear = (new Carbon("{$selectedYear}-12-31"))->weekOfYear; // Total de semanas en el año
-                            $weeksToIterate = ($selectedYear === $currentYear) ? $currentWeek : $weeksInYear;
-                            if ($selectedYear > $currentYear) {
-                                $weeksToIterate = 0;
-                            }
-
-                            $campoAgrupar = (env('DB_CONNECTION') === 'pgsql') ? "EXTRACT(WEEK FROM created_at)" : "WEEK(created_at, 3)"; // 3 para semana ISO (lunes-domingo)
+                            $dbWeekFormatter = (env('DB_CONNECTION') === 'pgsql') ? "EXTRACT(WEEK FROM created_at)" : "WEEK(created_at, 3)"; // WEEK(date, 3) for ISO-8601 weeks
 
                             $results = $baseQuery->whereYear('created_at', $selectedYear)
-                                                 ->select(DB::raw("$campoAgrupar AS grupo"), DB::raw('COUNT(*) AS total'))
-                                                 ->groupBy(DB::raw($campoAgrupar))
-                                                 ->orderBy('grupo')
+                                                 ->select(DB::raw("$dbWeekFormatter AS week_num"), DB::raw('COUNT(*) AS total'))
+                                                 ->groupBy(DB::raw($dbWeekFormatter))
+                                                 ->orderBy('week_num')
                                                  ->get();
 
                             $tempVistas = [];
+                            $weeksInSelectedYear = (new Carbon("{$selectedYear}-12-31"))->weekOfYear; // Total de semanas en el año seleccionado
+                            $weeksToIterate = $weeksInSelectedYear; // Por defecto todas las semanas
+                            if ($selectedYear === $currentYear) {
+                                $weeksToIterate = $currentWeekOfYear; // Hasta la semana actual
+                            } elseif ($selectedYear > $currentYear) {
+                                $weeksToIterate = 0; // Si es un año futuro, no hay datos aún
+                            }
+
                             for ($i = 1; $i <= $weeksToIterate; $i++) {
                                 $tempVistas[$i] = (object)['grupo' => 'Semana ' . $i, 'total' => 0];
                             }
 
                             foreach ($results as $item) {
-                                if (isset($tempVistas[$item->grupo])) {
-                                    $tempVistas[$item->grupo]->total = $item->total;
+                                if (isset($tempVistas[$item->week_num])) {
+                                    $tempVistas[$item->week_num]->total = $item->total;
                                 }
                             }
                             $vistas = collect(array_values($tempVistas));
                             break;
 
                         case 'day':
-                            // Agrupar por días del año
-                            $daysInYear = Carbon::create($selectedYear, 1, 1)->daysInYear;
-                            $daysToIterate = ($selectedYear === $currentYear) ? $currentDayOfYear : $daysInYear;
-                            if ($selectedYear > $currentYear) {
-                                $daysToIterate = 0;
-                            }
-
-                            $campoAgrupar = (env('DB_CONNECTION') === 'pgsql') ? "TO_CHAR(created_at, 'YYYY-MM-DD')" : "DATE_FORMAT(created_at, '%Y-%m-%d')";
+                            $dbDayFormatter = (env('DB_CONNECTION') === 'pgsql') ? "TO_CHAR(created_at, 'YYYY-MM-DD')" : "DATE_FORMAT(created_at, '%Y-%m-%d')";
 
                             $results = $baseQuery->whereYear('created_at', $selectedYear)
-                                                 ->select(DB::raw("$campoAgrupar AS grupo"), DB::raw('COUNT(*) AS total'))
-                                                 ->groupBy(DB::raw($campoAgrupar))
-                                                 ->orderBy('grupo')
+                                                 ->select(DB::raw("$dbDayFormatter AS date_key"), DB::raw('COUNT(*) AS total'))
+                                                 ->groupBy(DB::raw($dbDayFormatter))
+                                                 ->orderBy('date_key')
                                                  ->get();
 
                             $tempVistas = [];
+                            $daysInSelectedYear = Carbon::create($selectedYear, 1, 1)->daysInYear;
+                            $daysToIterate = $daysInSelectedYear; // Por defecto todos los días
+                            if ($selectedYear === $currentYear) {
+                                $daysToIterate = $currentDayOfYear; // Hasta el día actual del año
+                            } elseif ($selectedYear > $currentYear) {
+                                $daysToIterate = 0; // Si es un año futuro, no hay datos aún
+                            }
+
                             for ($i = 0; $i < $daysToIterate; $i++) {
                                 $date = Carbon::create($selectedYear, 1, 1)->addDays($i);
-                                $formattedDate = $date->toDateString();
-                                $tempVistas[$formattedDate] = (object)['grupo' => $date->translatedFormat('d M'), 'total' => 0];
+                                $formattedDateKey = $date->toDateString();
+                                $tempVistas[$formattedDateKey] = (object)['grupo' => $date->translatedFormat('d M'), 'total' => 0]; // Ej: "01 Ene", "06 Jun"
                             }
 
                             foreach ($results as $item) {
-                                if (isset($tempVistas[$item->grupo])) { // Match by 'YYYY-MM-DD'
-                                    $tempVistas[$item->grupo]->total = $item->total;
+                                if (isset($tempVistas[$item->date_key])) {
+                                    $tempVistas[$item->date_key]->total = $item->total;
                                 }
                             }
-                             $vistas = collect(array_values($tempVistas));
+                            $vistas = collect(array_values($tempVistas));
                             break;
 
                         case 'hour':
-                            // Agrupar por horas del día (para el día actual del año seleccionado)
-                            // Se asume que quieres las horas del día actual, pero dentro del año seleccionado
+                            // Para 'hour', se asume que se quiere ver las horas del *día actual* del *año seleccionado*
                             $targetDateForHours = Carbon::create($selectedYear, Carbon::now()->month, Carbon::now()->day);
-                            if ($selectedYear > $currentYear || ($selectedYear === $currentYear && $targetDateForHours->gt(Carbon::now())) ) {
-                                $hoursToIterate = 0; // Si es futuro, no hay horas
-                            } else {
-                                $hoursToIterate = ($targetDateForHours->isToday()) ? $currentHour + 1 : 24;
+
+                            // Si el año seleccionado es futuro, o si es el año actual pero el día objetivo es futuro, no hay horas.
+                            $hoursToIterate = 24; // Por defecto todas las horas
+                            if ($selectedYear > $currentYear || ($selectedYear === $currentYear && $targetDateForHours->gt(Carbon::now()))) {
+                                $hoursToIterate = 0;
+                            } elseif ($targetDateForHours->isToday()) {
+                                $hoursToIterate = $currentHour + 1; // Hasta la hora actual de hoy
                             }
 
-                            $campoAgrupar = (env('DB_CONNECTION') === 'pgsql') ? "EXTRACT(HOUR FROM created_at)" : "HOUR(created_at)";
+                            $dbHourFormatter = (env('DB_CONNECTION') === 'pgsql') ? "EXTRACT(HOUR FROM created_at)" : "HOUR(created_at)";
 
                             $results = $baseQuery->whereYear('created_at', $selectedYear)
                                                  ->whereDate('created_at', $targetDateForHours->toDateString())
-                                                 ->select(DB::raw("$campoAgrupar AS grupo"), DB::raw('COUNT(*) AS total'))
-                                                 ->groupBy(DB::raw($campoAgrupar))
-                                                 ->orderBy('grupo')
+                                                 ->select(DB::raw("$dbHourFormatter AS hour_num"), DB::raw('COUNT(*) AS total'))
+                                                 ->groupBy(DB::raw($dbHourFormatter))
+                                                 ->orderBy('hour_num')
                                                  ->get();
 
                             $tempVistas = [];
@@ -336,8 +305,8 @@ class StatisticController extends Controller
                             }
 
                             foreach ($results as $item) {
-                                if (isset($tempVistas[$item->grupo])) {
-                                    $tempVistas[$item->grupo]->total = $item->total;
+                                if (isset($tempVistas[$item->hour_num])) {
+                                    $tempVistas[$item->hour_num]->total = $item->total;
                                 }
                             }
                             $vistas = collect(array_values($tempVistas));
@@ -345,45 +314,48 @@ class StatisticController extends Controller
                     }
                     break;
 
-                default: // Si el filtro no es 'año', 'ultimos3dias', 'semana', 'mes', por defecto a 'ultimos3dias' o puedes definir otro
-                    // Esto es un fallback. Tu JS envía 'ultimos3dias' por defecto.
-                    // Podrías redirigir a un caso de filtro conocido si lo deseas.
-                    $inicio = $baseDateForFiltering->copy()->subDays(2)->startOfDay();
-                    $fin = $baseDateForFiltering->copy()->endOfDay();
-                    $campoAgrupar = (env('DB_CONNECTION') === 'pgsql') ? "TO_CHAR(created_at, 'YYYY-MM-DD')" : "DATE_FORMAT(created_at, '%Y-%m-%d')";
+                default: // Fallback si no se reconoce el filtro
+                    // Se usa la misma lógica que 'ultimos3dias' como un default seguro
+                    $fin = $currentDateForSelectedYear->copy()->endOfDay();
+                    $inicio = $fin->copy()->subDays(2)->startOfDay();
+                    $dbDateFormatter = (env('DB_CONNECTION') === 'pgsql') ? "TO_CHAR(created_at, 'YYYY-MM-DD')" : "DATE_FORMAT(created_at, '%Y-%m-%d')";
 
                     $tempVistas = [];
                     for ($i = 2; $i >= 0; $i--) {
-                        $date = $baseDateForFiltering->copy()->subDays($i);
-                        $formattedDate = $date->toDateString(); // YYYY-MM-DD
-                        $tempVistas[$formattedDate] = (object)['grupo' => $date->translatedFormat('l'), 'total' => 0]; // Formato de día de la semana
+                        $date = $fin->copy()->subDays($i);
+                        $formattedDateKey = $date->toDateString();
+                        $tempVistas[$formattedDateKey] = (object)['grupo' => $date->translatedFormat('l'), 'total' => 0];
                     }
 
                     $results = $baseQuery->whereBetween('created_at', [$inicio, $fin])
-                                         ->select(DB::raw("$campoAgrupar AS grupo"), DB::raw('COUNT(*) AS total'))
-                                         ->groupBy(DB::raw($campoAgrupar))
+                                         ->select(DB::raw("$dbDateFormatter AS date_key"), DB::raw('COUNT(*) AS total'))
+                                         ->groupBy(DB::raw("$dbDateFormatter"))
                                          ->get();
 
                     foreach ($results as $item) {
-                        $tempVistas[$item->grupo]->total = $item->total;
+                        if (isset($tempVistas[$item->date_key])) {
+                            $tempVistas[$item->date_key]->total = $item->total;
+                        }
                     }
                     $vistas = collect(array_values($tempVistas));
                     break;
             }
 
-            // Métricas generales: DEBEN consultar en función de $inicio y $fin
-            // Asegúrate de que tus tablas y columnas sean correctas (ej. 'users', 'last_login_at', 'is_online')
-            $usuarios = DB::table('users')->count(); // Total de usuarios, independiente del filtro de fecha
+            // Métricas generales: Estas son las métricas que aparecen en las tarjetas
+            // Asegúrate de que las tablas y columnas sean correctas (ej. 'users', 'last_login_at', 'is_online')
+            // Se mantienen filtradas por el rango $inicio y $fin, si quieres que sean globales, quita los whereBetween
+            $usuarios = DB::table('users')->count(); // Total de usuarios en la BD
             $registrados = DB::table('users')->whereBetween('created_at', [$inicio, $fin])->count();
             $activos = DB::table('users')->whereBetween('last_login_at', [$inicio, $fin])->count();
-            // Para 'conectados', asumimos que es en tiempo real y no depende del filtro de fecha
-            $conectados = DB::table('users')->where('is_online', true)->count();
+            // Asumiendo que 'conectados' se refiere a usuarios actualmente online
+            $conectados = DB::table('users')->where('is_online', true)->count(); // Requiere una columna 'is_online'
 
-            // Log de depuración para ver qué datos se envían al frontend
             Log::info('Datos de estadísticas enviados:', [
                 'filtro' => $filtro,
                 'selectedYear' => $selectedYear,
                 'chartSubFilter' => $chartSubFilter,
+                'inicio' => $inicio ? $inicio->toDateTimeString() : 'N/A',
+                'fin' => $fin ? $fin->toDateTimeString() : 'N/A',
                 'vistas_count' => $vistas->count(),
                 'usuarios' => $usuarios,
                 'registrados' => $registrados,
@@ -393,7 +365,7 @@ class StatisticController extends Controller
             ]);
 
             return response()->json([
-                'vistas' => $vistas->values()->toArray(), // Asegúrate de que sea un array indexado numéricamente
+                'vistas' => $vistas->values()->toArray(), // Asegúrate de que sea un array de objetos
                 'usuarios' => $usuarios,
                 'registrados' => $registrados,
                 'activos' => $activos,
@@ -408,11 +380,8 @@ class StatisticController extends Controller
             return response()->json([
                 'error' => 'Error interno del servidor al obtener estadísticas',
                 'detalle' => $e->getMessage(),
-                'trace' => env('APP_DEBUG') ? $e->getTraceAsString() : null, // Mostrar trace solo en modo debug
+                'trace' => env('APP_DEBUG') ? $e->getTraceAsString() : null,
             ], 500);
         }
     }
 }
-
-
-

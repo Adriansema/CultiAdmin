@@ -9,9 +9,9 @@
                 <p class="mt-2 text-gray-600">Visualiza estadística de vistas al sitio, notificación y boletines.</p>
             </div>
 
-            <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
+            <div class="flex flex-wrap items-center mt-4 space-x-2 md:mt-0" id="filter-buttons-container">
                 <button onclick="setFilter('ultimos3dias')" data-filtro="ultimos3dias"
-                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600 active-filter-button">
                     Últimos 3 días
                 </button>
 
@@ -25,43 +25,30 @@
                     Mes
                 </button>
 
-                <button onclick="setFilter('año')" data-filtro="año"
-                    class="px-6 py-3 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
-                    Año
-                      <div id="year-chart-filters" class="items-center ml-4 space-x-4" style="display:none;">
-                <label for="yearPicker" class="block text-sm font-medium text-gray-700">Año:</label>
-                <input type="text" id="yearPicker"
-                    class="block py-2 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md w-28 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Selecciona Año">
-
-                <label for="chartSubFilterSelect" class="block text-sm font-medium text-gray-700">Ver por:</label>
-                <select id="chartSubFilterSelect" name="chartSubFilter"
-                    class="block w-32 py-2 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option value="month">Mes</option>
-                    <option value="week">Semana</option>
-                    <option value="day">Día</option>
-                    <option value="hour">Hora</option>
-                </select>
+                {{-- Botón "Año" con el selector de año de Flatpickr integrado --}}
+                <div class="relative inline-block"> {{-- Contenedor para el botón y el input oculto --}}
+                    <button onclick="setFilter('año')" data-filtro="año"
+                        class="flex items-center px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                        Año
+                        {{-- Icono de calendario junto a "Año" --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    {{-- Input de Flatpickr para el año, oculto visualmente pero activo --}}
+                    <input type="text" id="yearPicker"
+                        class="absolute inset-0 opacity-0 cursor-pointer" {{-- Lo hacemos invisible y lo superponemos al botón --}}
+                        placeholder="Selecciona Año">
+                </div>
             </div>
-                </button>
-            </div>
-          
-
-
         </div>
     </section>
-
-
-    <!-- Aquí agregas ECharts -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 
     {{-- Gráfica de usuarios conectados + Métricas --}}
     <div class="flex-1 p-6 overflow-y-auto">
         <section id="usuarios-conectados" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
 
-            <!-- Agrupamos el icono y el texto en un div flex -->
             <div class="flex items-center mb-3 space-x-2">
-                <!-- Fondo circular para el icono -->
                 <div class="bg-[var(--color-ICONOESTA)]  p-0 rounded-full relative -top-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -69,64 +56,56 @@
                     </svg>
                 </div>
 
-                <!-- Título -->
                 <h2 class="text-xl font-bold text-[var(--color-usucone)] -mt-3">Usuarios Conectados</h2>
             </div>
 
             <div class="p-6 bg-white shadow-sm rounded-3xl">
                 {{-- Gráfica --}}
-
-                <div id="chart" class="my-6 w-full h-[200px] md:h-[400px] lg:h-[450px]"></div>
-
+                <div id="mainChart" class="my-6 w-full h-[200px] md:h-[400px] lg:h-[450px]"></div>
             </div>
             {{-- Métricas generales --}}
             <div class="grid grid-cols-1 gap-6 mt-8 sm:grid-cols-2 lg:grid-cols-4">
                 <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
-                    <!-- Ícono en la esquina superior derecha -->
                     <div class="absolute top-3 right-3 bg-[var(--color-iconos)] p-2 rounded-full">
                         <img src="{{ asset('images/Icon.svg') }}" alt="usuario">
                     </div>
 
                     <h3 class="text-2xl text-[var(--color-iconos)]">Usuarios</h3>
-                    <p id="users-count" class="text-3xl font-bold text-gray-800">0</p>
-                    <p id="registered-percent" class="text-sm text-gray-800">0% de los usuarios</p>
+                    <p id="totalUsuarios" class="text-3xl font-bold text-gray-800">0</p>
+                    <p id="totalUsuarios-percent" class="text-sm text-gray-800">0% de los usuarios</p>
                 </div>
 
                 {{-- Registrados --}}
                 <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
-                    <!-- Ícono en la esquina superior derecha -->
                     <div class="absolute top-3 right-3 bg-[var(--color-iconos3)] p-2 rounded-full">
                         <img src="{{ asset('images/regis.svg') }}" alt="registro">
                     </div>
 
-                    <!-- Contenido interno, sin fondo ni sombra duplicados -->
                     <div>
                         <h3 class="text-2xl text-[var(--color-iconos)]">{{ __('message.Register') }}</h3>
-                        <p id="registered-count" class="text-3xl font-bold text-gray-800">0</p>
-                        <p id="registered-percent" class="text-sm text-gray-800">0% de los usuarios</p>
+                        <p id="usuariosRegistrados" class="text-3xl font-bold text-gray-800">0</p>
+                        <p id="usuariosRegistrados-percent" class="text-sm text-gray-800">0% de los usuarios</p>
                     </div>
                 </div>
 
                 <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
-                    <!-- Ícono -->
                     <div class="absolute top-3 right-3 bg-[var(--color-iconos2)] p-2 rounded-full">
                         <img src="{{ asset('images/activos.svg') }}" alt="activos">
                     </div>
 
                     <h3 class="text-2xl text-[var(--color-iconos)]">Activos</h3>
-                    <p id="active-count" class="text-3xl font-bold text-gray-800">0</p>
-                    <p id="active-percent" class="text-sm text-gray-800">0% de los usuarios</p>
+                    <p id="usuariosActivos" class="text-3xl font-bold text-gray-800">0</p>
+                    <p id="usuariosActivos-percent" class="text-sm text-gray-800">0% de los usuarios</p>
                 </div>
 
                 <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
-                    <!-- Ícono -->
                     <div class="absolute top-3 right-3 bg-[var(--color-iconos4)] p-2 rounded-full">
                         <img src="{{ asset('images/conectados.svg') }}" alt="conectados">
                     </div>
 
                     <h3 class="text-2xl text-[var(--color-iconos)]">Conectados</h3>
-                    <p id="connected-count" class="text-3xl font-bold text-gray-800">0</p>
-                    <p id="connected-percent" class="text-sm text-gray-800">0% de los usuarios</p>
+                    <p id="usuariosConectados" class="text-3xl font-bold text-gray-800">0</p>
+                    <p id="usuariosConectados-percent" class="text-sm text-gray-800">0% de los usuarios</p>
                 </div>
             </div>
         </section>
@@ -136,10 +115,8 @@
     {{-- Novedades y Boletines --}}
     <section id="novedades-boletines" class="relative grid gap-6 mt-8 md:grid-cols-2">
 
-        <!-- Primer panel: Mensajes -->
         <section id="mensajes" class="bg-[var(--color-gris1)] shadow rounded-lg p-6 -mt-4">
 
-            <!-- Encabezado con ícono y título -->
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center space-x-2">
                     <div
@@ -157,16 +134,13 @@
                 </x-responsive-nav-link>
             </div>
 
-            <!-- Lista de boletines o mensaje -->
             <div id="mensajes-novedades" class="p-4 bg-white rounded-lg shadow">
                 <p class="text-gray-500">No hay novedades por ahora.</p>
             </div>
         </section>
 
-        <!-- Segundo panel: Boletines -->
         <section id="boletines" class="bg-[var(--color-gris1)] shadow rounded-lg p-6 -mt-4">
 
-            <!-- Encabezado con ícono y título -->
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center space-x-2">
                     <div
@@ -193,6 +167,7 @@
             </style>
 
 
+            {{-- Comentado: Contenido de boletines --}}
             {{-- <div id="boletines-novedades" class="max-w-full p-4 bg-white rounded-lg shadow">
                 @if ($boletines->isEmpty())
                 <p class="text-gray-500">No hay novedades por ahora.</p>
@@ -210,7 +185,6 @@
                                 </span>
                             </div>
                             <div class="flex items-center space-x-3">
-                                <!-- Icono para expandir/colapsar -->
                                 <svg class="w-5 h-5 text-gray-600 transition-transform duration-300 transform"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -218,7 +192,6 @@
                                         d="M19 9l-7 7-7-7"></path>
                                 </svg>
 
-                                <!-- Icono para descargar -->
                                 <a href="{{ route('boletines.download', $boletin->id) }}" title="Descargar boletín"
                                     class="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener noreferrer"
                                     onclick="event.stopPropagation()">
@@ -239,37 +212,56 @@
                 @endif
             </div> --}}
 
+            {{-- Este @push('scripts') se mantiene solo para la lógica de boletines, que no usa Flatpickr/ECharts --}}
             @push('scripts')
             <script>
                 document.addEventListener('DOMContentLoaded', () => {
-                            document.querySelectorAll('.boletin-header').forEach(header => {
-                                header.addEventListener('click', e => {
-                                    if (e.target.closest('a')) return;
+                    document.querySelectorAll('.boletin-header').forEach(header => {
+                        header.addEventListener('click', e => {
+                            if (e.target.closest('a')) return;
 
-                                    const li = header.parentElement;
-                                    const content = li.querySelector('.boletin-content');
-                                    const icon = header.querySelector('svg');
+                            const li = header.parentElement;
+                            const content = li.querySelector('.boletin-content');
+                            const icon = header.querySelector('svg');
 
-                                    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
-                                        content.style.maxHeight = '0px';
-                                        icon.style.transform = 'rotate(0deg)';
-                                    } else {
-                                        content.style.maxHeight = content.scrollHeight + 'px';
-                                        icon.style.transform = 'rotate(180deg)';
-                                    }
-                                });
-                            });
+                            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                                content.style.maxHeight = '0px';
+                                icon.style.transform = 'rotate(0deg)';
+                            } else {
+                                content.style.maxHeight = content.scrollHeight + 'px';
+                                icon.style.transform = 'rotate(180deg)';
+                            }
                         });
+                    });
+                });
             </script>
             @endpush
 
 </div>
 @endsection
 
+{{-- AHORA, TODOS los scripts principales (Flatpickr, ECharts, dashboard.js) VAN AQUÍ --}}
 @section('scripts')
+{{-- Flatpickr CSS --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{{-- Flatpickr MonthSelect Plugin CSS --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+
+{{-- Flatpickr JS --}}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+{{-- Flatpickr Localization (Spanish) --}}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+{{-- Flatpickr MonthSelect Plugin JS --}}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/monthSelect.js"></script>
+
+{{-- ECharts JS --}}
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+{{-- Custom Dashboard JS --}}
+<script src="{{ asset('js/dashboard.js') }}"></script>
+
 <script>
+    // Variable global para la ruta de la API
     const STATISTICS_ROUTE = "{{ route('statistics.index') }}";
 </script>
-
-
 @endsection

@@ -9,41 +9,48 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedChartSubFilter = 'month'; // Sub-filtro por defecto para la gráfica anual
 
     let porcentajes = [];
-
-    // --- Inicialización de Flatpickr para el selector de año ---
-const yearPicker = flatpickr("#yearPicker", {
-    dateFormat: "Y", // Solo formato de año
-
-    // Simplificamos defaultDate y defaultViewDate para asegurar el año
-    defaultDate: new Date().getFullYear().toString(), // Asegúrate de que sea solo el año actual como string, ej: "2025"
-    defaultViewDate: new Date().getFullYear() + "-01-01", // Esto debería forzar la vista al 1 de enero del año actual
-
-    // Opcional: Si aún se va muy atrás, puedes añadir un minDate suave para guiarlo:
-    // minDate: "2000-01-01", // Por ejemplo, no permitir que se vaya antes del año 2000
-
-    maxDate: new Date().getFullYear() + 1, // Permite seleccionar hasta el año actual + 1
-
-    onChange: function (selectedDates, dateStr, instance) {
-        if (dateStr) {
-            selectedYearForChart = dateStr; // Actualiza el año seleccionado
-            if (filtroActual === 'año') {
-                loadData(filtroActual, selectedYearForChart, selectedChartSubFilter);
+       // --- CONSOLIDACIÓN: Inicialización de Flatpickr DENTRO del DOMContentLoaded ---
+    const yearPickerInstance = flatpickr("#yearPicker", {
+        locale: 'es', // Cargar localización en español
+        dateFormat: "Y", // Solo formato de año
+        altInput: true, // Esto es útil para ocultar el input real y mostrar el formato
+        altFormat: "Y",  // Formato que se muestra al usuario (solo el año)
+        enableTime: false,
+        noCalendar: true, // Oculta el calendario normal de días
+        plugins: [
+            // Asegúrate de que monthSelectPlugin esté disponible globalmente (ej. por CDN en tu Blade)
+            // Si no lo importas en este JS, se referirá a la versión global.
+            new monthSelectPlugin({
+                shorthand: true, // Muestra "Ene" en lugar de "Enero"
+                dateFormat: "Y",
+                altFormat: "Y",
+                theme: "light",
+            })
+        ],
+        minDate: "2025", // <--- CAMBIO AQUÍ: Empieza desde el año 2025.
+        defaultDate: new Date().getFullYear().toString(), // Por defecto el año actual
+        maxDate: new Date().getFullYear() + 1, // Permite seleccionar hasta el año actual + 1
+        onReady: function(selectedDates, dateStr, instance) {
+            if (!dateStr) {
+                instance.setDate(new Date().getFullYear().toString(), true);
+                selectedYearForChart = new Date().getFullYear().toString();
             }
+            const initialFilterButton = document.querySelector('[data-filtro="ultimos3dias"]');
+            if (initialFilterButton) {
+                initialFilterButton.classList.add('active-filter-button');
+            }
+            loadData(filtroActual, selectedYearForChart);
+        },
+        onChange: function (selectedDates, dateStr, instance) {
+            if (dateStr) {
+                selectedYearForChart = dateStr;
+                if (filtroActual === 'año') {
+                    loadData(filtroActual, selectedYearForChart);
+                }
             }
         }
     });
 
-    // --- Listener para el selector de sub-filtro (Mes, Semana, Día, Hora) ---
-    const chartSubFilterSelect = document.getElementById('chartSubFilterSelect');
-    const yearChartFiltersContainer = document.getElementById('year-chart-filters');
-
-    chartSubFilterSelect.addEventListener('change', function () {
-        selectedChartSubFilter = this.value; // Actualiza el sub-filtro seleccionado
-        if (filtroActual === 'año') {
-            // Si el filtro principal es 'año', recarga los datos con el nuevo sub-filtro
-            loadData(filtroActual, selectedYearForChart, selectedChartSubFilter);
-        }
-    });
 
     // 📌 Agrega aquí las funciones para calcular la semana pasada:
     function getStartOfLastWeek() {
