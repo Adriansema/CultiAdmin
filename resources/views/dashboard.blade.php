@@ -29,7 +29,7 @@
 
             <div class="mt-4 space-x-2 md:mt-0" id="filter-buttons">
                 <button onclick="setFilter('ultimos3dias')" data-filtro="ultimos3dias"
-                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-400">
                     Últimos 3 días
                 </button>
 
