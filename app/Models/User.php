@@ -1,77 +1,52 @@
 <?php
 
-//actualizacion 09/04/2025
-
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Concerns\HasRelationships; // <- Añadido para usar HasRelationships
+use Illuminate\Foundation\Auth\User as Authenticatable; // Permite que este modelo maneje la autenticación (login/logout).
+use Illuminate\Database\Eloquent\Concerns\HasRelationships;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable // Este modelo es ahora un "usuario autenticable" para Laravel.
 {
-    use HasApiTokens;
-    use HasRoles;
-    use HasRelationships; // <- Añadido para usar HasRelationships
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasApiTokens;              // Para tokens de API (Sanctum).
+    use HasRoles;                  // Para roles y permisos (Spatie).
+    use HasRelationships;
     use HasFactory;
-    use HasProfilePhoto;
-    use Notifiable;
-    use TwoFactorAuthenticatable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    use HasProfilePhoto;           // Para fotos de perfil (Jetstream).
+    use Notifiable;                // Para notificaciones (ej. emails).
+    use TwoFactorAuthenticatable;  // Para autenticación de dos factores (Fortify).
 
     protected $table = 'users';
 
     protected $fillable = [
         'name',
         'email',
-        'password',
+        'password', // Se permite asignar el valor, pero siempre será un hash (no texto plano).
         'estado',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
-        'password',
+        'password',       // Oculta el hash de la contraseña en respuestas JSON/arrays por seguridad.
         'remember_token',
         'two_factor_recovery_codes',
         'two_factor_secret',
     ];
 
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
     protected $appends = [
         'profile_photo_url',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'password' => 'hashed', // Laravel 10+: Asegura que la contraseña siempre se guarde hasheada y se verifique automáticamente.
         'estado' => 'string',
     ];
 
-    protected $guard_name = 'web'; // <-- Esto es opcional pero útil
+    protected $guard_name = 'web'; // <-- IMPORTANTE para Spatie Permissions: Define qué 'guard' usa este modelo para roles/permisos.
+                                  // Conecta roles/permisos asignados a este usuario con el guard 'web'.
 }

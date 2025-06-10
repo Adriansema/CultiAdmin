@@ -40,5 +40,16 @@ class Producto extends Model
     {
         return $this->belongsTo(User::class, 'rechazado_por_user_id');
     }
+
+    // Relaciones con las tablas de detalle de café y mora (si las necesitas desde Producto)
+    public function cafe()
+    {
+        return $this->hasOne(Cafe::class, 'producto_id', 'id');
+    }
+
+    public function mora()
+    {
+        return $this->hasOne(Mora::class, 'producto_id', 'id');
+    }
 }
 

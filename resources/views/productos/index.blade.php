@@ -75,32 +75,3 @@
         @endif
     </div>
 @endsection
-
-
-{{-- @if (session('success')) mensaje de exito
-            <div class="p-3 mb-4 text-green-700 bg-green-100 rounded shadow">
-                {{ session('success') }}
-            </div>
-        @endif --}}
-
-{{-- Scripts para modales 
-    <script>
-        function mostrarModal(tipo, id) {
-            const modal = document.getElementById(`modal-${tipo}-${id}`);
-            modal.classList.remove('hidden');
-        }
-
-        function ocultarModal(tipo, id) {
-            const modal = document.getElementById(`modal-${tipo}-${id}`);
-            modal.classList.add('hidden');
-        }
-    </script> --}}
-
-{{-- <div class="container max-w-6xl py-6 mx-auto">
-    caja de la tabla
-</div> --}}
-
-{{-- BOTON DE NUEVO PRODUCTO
-<a href="{{ route('productos.create') }}" class="px-4 py-2 text-white bg-green-600 rounded-3xl hover:bg-green-700">
-            + Nuevo Producto
-        </a> --}}

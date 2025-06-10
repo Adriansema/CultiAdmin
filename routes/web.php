@@ -4,6 +4,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckUserEstado;
+use App\Http\Controllers\PqrsController;
 use App\Http\Middleware\Roles_Admin_Opera;
 use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
@@ -14,16 +15,16 @@ use App\Http\Controllers\CentroAyudaController;
 use App\Http\Controllers\ExportarCsvController;
 use App\Http\Controllers\AccesibilidadController;
 use App\Http\Controllers\Operador\OperadorProductoController;
+use App\Http\Controllers\DashboardController;
+
 
 // Rutas públicas
 /* Route::get('/', function () {
     return view('welcome');
 })->name('welcome'); */
 
-//Cumple la funcion de mostrarle al usuario que intenta ingresar a la pagina despues de haber sido desactivado por el administrador
-Route::get('/login', function () {
-    return view('auth.login')->with('inactivo', session('inactivo'));
-})->name('login');
+Route::get('/pqrs/crear', [PqrsController::class, 'create'])->name('pqrs.create');
+Route::post('/pqrs/store', [PqrsController::class, 'store'])->name('pqrs.store'); // Necesitas una ruta POST para el envío del formulario
 
 // Ruta para verificar si el correo existe (pública, sin autenticación)
 Route::post('/check-email', [UsuarioController::class, 'checkEmailExists'])->name('check-email');
@@ -60,6 +61,8 @@ Route::middleware([
             Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
 
             // Boletines
+            Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+            Route::get('/boletines/{id}/download', [BoletinController::class, 'download'])->name('boletines.download');
             Route::post('boletines/importar-pdf', [BoletinController::class, 'importarPdf'])->name('boletines.importarPdf');
             Route::get('/boletines/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('boletines.exportarCSV');
             Route::get('/boletines', [BoletinController::class, 'index'])->name('boletines.index');

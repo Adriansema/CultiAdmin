@@ -13,8 +13,13 @@ return [
     |
     */
 
-    'failed' => 'Estas credenciales no coinciden con nuestros registros.',
+    'failed' => 'el correo o la contraseña no coincide.',
     'password' => 'La contraseña proporcionada es incorrecta.',
     'throttle' => 'Demasiados intentos de inicio de sesión. Por favor, inténtalo de nuevo en :seconds segundos.',
 
 ];
+
+/**
+ * GET|HEAD  forgot-password .. password.request › Laravel\Fortify › PasswordResetLinkController@create
+ * POST      forgot-password .. password.email › Laravel\Fortify › PasswordResetLinkController@store
+ */

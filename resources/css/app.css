@@ -208,9 +208,9 @@ html { font-size: 16px; }
      - Termina en negro opaco (rgba(0, 0, 0, 0.7)) al 100% del radio
   */
   background: radial-gradient(circle at center,
-                              rgb(51, 18, 55) 0%,   /* Morado opaco en el centro */
-                              rgba(0, 0, 0, 0.6) 50%,     /* Negro opaco a partir de la mitad del radio */
-                              rgba(0, 0, 0, 0.1) 100%    /* Negro opaco hasta los bordes */
+                              /* rgb(0, 0, 0, 0.6) 0%,  */  /* Morado opaco en el centro */
+                              /* rgba(0, 0, 0, 0.6) 50%, */     /* Negro opaco a partir de la mitad del radio */
+                              /* rgba(0, 0, 0, 0.1) 100%  */   /* Negro opaco hasta los bordes */
                              );
   pointer-events: none; /* Permite que los eventos de clic pasen a la imagen subyacente */
   z-index: 1; /* Asegura que la superposición esté sobre la imagen */
@@ -220,16 +220,28 @@ html { font-size: 16px; }
  .login-form {
    /* ... otros estilos que ya tengas para tu formulario ... */
   background-color: white; /* Por ejemplo, si tu formulario tiene fondo blanco */
-  padding: 40px; /* Si tiene padding interno */
-  /* ... */
+  padding: 30px; /* Si tiene padding interno */
+  margin: 20px;
 
   /* Para rounded-xl (borde redondeado más grande) */
-  border-radius: 32px; /* Un valor común para rounded-xl. Puedes ajustar a 16px si lo ves necesario */
+  border-radius: 24px; /* Un valor común para rounded-xl. Puedes ajustar a 16px si lo ves necesario */
 
   /* Para max-w-lg (ancho máximo) */
   max-width: 36rem; /* El valor equivalente a max-w-lg en Tailwind (512px) */
   width: 100%; /* Asegura que ocupe todo el ancho disponible hasta el max-width */
 
   /* Estilo para el shadow brillante blanco */
-  box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.75); /* Ajusta los valores según necesites */
+  /* box-shadow: 0 0 10px 1px rgba(255, 255, 255, 0.50); */ /* Ajusta los valores según necesites */
+ }
+
+ .recuperar-form {
+  
+  background-color: white;
+  padding: 30px; 
+  margin: 30px;
+
+  border-radius: 32px;
+
+  /* max-width: 48rem; */
+  width: 100%;
  }
