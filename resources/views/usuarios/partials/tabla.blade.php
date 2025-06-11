@@ -26,64 +26,79 @@
                      <tr class="bg-white hover:bg-gray-300">
                          <td class="px-6 py-4 flex items-center group relative">
                              <span>{{ $usuario->roles->pluck('name')->join(', ') }}</span>
-                             <a href="{{ route('usuarios.edit', $usuario->id) }}">
-                                 <img src="{{ asset('images/lapiz.svg') }}"
-                                     class="w-4 h-4 absolute left-[calc(60%+4px)] top-1/2 -translate-y-1/2 
+                             {{-- Botón de edición: Visible solo si el usuario puede 'actualizar' este usuario específico --}}
+                             @can('update', $usuario)
+                                 <a href="{{ route('usuarios.edit', $usuario->id) }}">
+                                     <img src="{{ asset('images/lapiz.svg') }}"
+                                         class="w-4 h-4 absolute left-[calc(60%+4px)] top-1/2 -translate-y-1/2 
                                         opacity-0 group-hover:opacity-100 
                                         transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto"
-                                     alt="editar">
-                             </a>
+                                         alt="editar">
+                                 </a>
+                             @endcan
                          </td>
                          <td class="px-6 py-4">{{ $usuario->name }}
                          </td>
                          <td class="px-6 py-4">{{ $usuario->email }}
                          </td>
                          <td class=" py-4">
-                             {{-- !Cuando se hace clic en el botón, se envía una solicitud PATCH a la aplicación para actualizar el estado del usuario en la base de datos, garantizando la seguridad con el token CSRF de Laravel. --}}
-                             <form action="{{ route('usuarios.toggle', $usuario) }}" method="POST"
-                                 class="inline-block">
-                                 @csrf
-                                 @method('PATCH')
+                             {{-- Dentro del bucle foreach para cada $usuario 
+                             <p>Usuario Actual ID: {{ $usuario->id }}</p>
+                             <p>Usuario Logueado ID: {{ Auth::id() }}</p>
+                             <p>¿IDs Iguales?: {{ Auth::id() === $usuario->id ? 'Sí' : 'No' }}</p>
+                             @php
+                                 // Llama directamente a la Policy para ver el resultado
+                                 $policyAllowsToggle = Auth::user()->can('toggle', $usuario);
+                             @endphp
+                             <p>Policy permite toggle: {{ $policyAllowsToggle ? 'Sí' : 'No' }}</p>--}}
+                             {{-- Formulario para cambiar estado: Visible solo si el usuario puede 'toggleStatus' este usuario específico --}}
+                             @can('toggle', $usuario)
+                                 {{-- !Cuando se hace clic en el botón, se envía una solicitud PATCH a la aplicación para actualizar el estado del usuario en la base de datos, garantizando la seguridad con el token CSRF de Laravel. --}}
+                                 <form action="{{ route('usuarios.toggle', $usuario) }}" method="POST"
+                                     class="inline-block">
+                                     @csrf
+                                     @method('PATCH')
 
-                                 {{-- ! botón dinámico que permite cambiar el estado de un usuario (de "activo" a "inactivo" y viceversa) --}}
-                                 <button type="submit"
-                                     class="group relative px-4 py-2 text-sm rounded-lg text-[var(--color-textAct)] transition-colors duration-300
+                                     {{-- ! botón dinámico que permite cambiar el estado de un usuario (de "activo" a "inactivo" y viceversa) --}}
+                                     <button type="submit"
+                                         class="group relative px-4 py-2 text-sm rounded-lg text-[var(--color-textAct)] transition-colors duration-300
                                             {{ $usuario->estado === 'activo' ? 'bg-[var(--color-activo)] hover:bg-[var(--color-desactivar)]' : 'bg-[var(--color-inactivo)] hover:bg-[var(--color-activar)]' }}
                                             inline-flex items-center justify-center">
-                                     {{-- !El botón se adapta visualmente: --}}
-                                     {{-- Usamos inline-flex para el botón --}}
+                                         {{-- !El botón se adapta visualmente: --}}
+                                         {{-- Usamos inline-flex para el botón --}}
 
-                                     {{-- !Muestra el estado actual del usuario (Activo/Inactivo) con su propio color y un icono específico para ese estado. --}}
-                                     {{-- ? Contenido para el estado normal (Activo/Inactivo) --}}
-                                     <span
-                                         class="flex items-center space-x-2 transition-opacity duration-300
+                                         {{-- !Muestra el estado actual del usuario (Activo/Inactivo) con su propio color y un icono específico para ese estado. --}}
+                                         {{-- ? Contenido para el estado normal (Activo/Inactivo) --}}
+                                         <span
+                                             class="flex items-center space-x-2 transition-opacity duration-300
                                                         {{ $usuario->estado === 'activo' ? '' : 'text-[var(--color-textInact)]' }}
                                                         group-hover:opacity-0 pointer-events-none">
-                                         {{-- Añadir pointer-events-none aquí también --}}
-                                         <span>{{ ucfirst($usuario->estado) }}</span>
+                                             {{-- Añadir pointer-events-none aquí también --}}
+                                             <span>{{ ucfirst($usuario->estado) }}</span>
 
-                                         {{-- ? Icono para el estado "activo" o "inactivo" activo-flecha.svg: Representa visualmente el estado "activo".
+                                             {{-- ? Icono para el estado "activo" o "inactivo" activo-flecha.svg: Representa visualmente el estado "activo".
                                          ? inact-flecha.svg: Representa visualmente el estado "inactivo". --}}
-                                         <img src="{{ asset('images/' . ($usuario->estado === 'activo' ? 'activo-flecha.svg' : 'inact-flecha.svg')) }}"
-                                             alt="Icono {{ $usuario->estado }}" class="w-4 h-4">
-                                     </span>
+                                             <img src="{{ asset('images/' . ($usuario->estado === 'activo' ? 'activo-flecha.svg' : 'inact-flecha.svg')) }}"
+                                                 alt="Icono {{ $usuario->estado }}" class="w-4 h-4">
+                                         </span>
 
-                                     {{-- !Al pasar el ratón por encima, el botón cambia para indicar la acción que se realizará (Desactivar/Activar), mostrando el color correspondiente y un icono distinto para la acción. --}}
-                                     {{-- ? Contenido para el estado al hacer hover (Desactivar/Activar) --}}
-                                     <span
-                                         class="absolute inset-0 flex items-center justify-center space-x-2
+                                         {{-- !Al pasar el ratón por encima, el botón cambia para indicar la acción que se realizará (Desactivar/Activar), mostrando el color correspondiente y un icono distinto para la acción. --}}
+                                         {{-- ? Contenido para el estado al hacer hover (Desactivar/Activar) --}}
+                                         <span
+                                             class="absolute inset-0 flex items-center justify-center space-x-2
                                                         opacity-0 group-hover:opacity-100 transition-opacity duration-300
                                                         {{ $usuario->estado === 'activo' ? 'text-[var(--color-textDesact)]' : 'text-[var(--color-textActivar)]' }}
                                                         pointer-events-none">
-                                         <span>{{ $usuario->estado === 'activo' ? 'Desactivar' : 'Activar' }}</span>
+                                             <span>{{ $usuario->estado === 'activo' ? 'Desactivar' : 'Activar' }}</span>
 
-                                         {{-- ? Icono para la acción al hacer hover ("Desactivar" o "Activar") desactivar-desact.svg: Representa visualmente la acción de "desactivar" (cuando el usuario está activo y haces hover).
+                                             {{-- ? Icono para la acción al hacer hover ("Desactivar" o "Activar") desactivar-desact.svg: Representa visualmente la acción de "desactivar" (cuando el usuario está activo y haces hover).
                                           ? activar-flecha.svg: Representa visualmente la acción de "activar" (cuando el usuario está inactivo y haces hover). --}}
-                                         <img src="{{ asset('images/' . ($usuario->estado === 'activo' ? 'desact-flecha.svg' : 'activar-flecha.svg')) }}"
-                                             alt="Icono Hover" class="w-4 h-4">
-                                     </span>
-                                 </button>
-                             </form>
+                                             <img src="{{ asset('images/' . ($usuario->estado === 'activo' ? 'desact-flecha.svg' : 'activar-flecha.svg')) }}"
+                                                 alt="Icono Hover" class="w-4 h-4">
+                                         </span>
+                                     </button>
+                                 </form>
+                             @endcan
                          </td>
                      </tr>
                  @endforeach

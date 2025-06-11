@@ -86,7 +86,7 @@
             @endif
 
             <button type="button" onclick="ocultarModal('ver', '{{ $boletin->id }}')"
-                class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+                class="px-4 py-2 text-white bg-[var(--color-iconos)] rounded hover:bg-[var(--color-iconos6)]">
                 Cancelar
             </button>
         </div>

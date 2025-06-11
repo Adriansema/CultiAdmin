@@ -219,7 +219,7 @@
                                             </svg>
 
                                             <!-- Icono para descargar -->
-                                            <a href="{{ route('boletines.download', $boletin->id) }}"
+                                            {{-- <a href="{{ route('boletines.download', $boletin->id) }}"
                                                 title="Descargar boletín" class="text-blue-600 hover:text-blue-800"
                                                 target="_blank" rel="noopener noreferrer"
                                                 onclick="event.stopPropagation()">
@@ -228,7 +228,7 @@
                                                     viewBox="0 0 24 24">
                                                     <path d="M12 4v16m0 0l-4-4m4 4l4-4"></path>
                                                 </svg>
-                                            </a>
+                                            </a> --}}
                                         </div>
                                     </div>
                                     <div

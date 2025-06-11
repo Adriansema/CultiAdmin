@@ -30,7 +30,7 @@
             a través del Centro de Ayuda, no dudes en contactarnos. Nuestro equipo de soporte está aquí para ayudarte.
         </p>
 
-        <form id="contactForm" action="{{ route('contact.submit') }}" method="POST" class="w-full h-full space-y-3">
+        <form id="contactForm" action="{{ route('centroAyuda.contact.submit') }}" method="POST" class="w-full h-full space-y-3">
             <!-- CSRF Token -->
             @csrf
 

@@ -1,7 +1,3 @@
-// resources/js/modal.js
-//hola
-// resources/js/modal.js
-
 document.addEventListener('DOMContentLoaded', function () {
     const openModalBtn      = document.getElementById('openModalBtn');
     const closeModalBtn     = document.getElementById('closeModalBtn');
@@ -72,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 //resources/views/operador/partials/productos y boletines.blade.php : estos son los script/funciones para utilizar los modales
-window.mostrarModal = function(tipo, id) {
+window.mostrarModal = function(tipo, id) { 
     const modal = document.getElementById(`modal-${tipo}-${id}`);
     if (modal) {
         modal.classList.remove('hidden');
@@ -83,13 +79,6 @@ window.ocultarModal = function(tipo, id) {
     const modal = document.getElementById(`modal-${tipo}-${id}`);
     if (modal) {
         modal.classList.add('hidden');
-    }
-}
-
-window.actualizarModal = function(tipo, id) {
-    const modal = document.getElementById(`modal-${tipo}-${id}`);
-    if (modal) {
-        modal.classList.remove('hidden');
     }
 }
 

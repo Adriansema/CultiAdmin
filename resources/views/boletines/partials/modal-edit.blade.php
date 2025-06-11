@@ -57,7 +57,7 @@
                     class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">
                     Cerrar
                 </a>
-                <button onclick="actualizarModal('editar', '{{ $boletin->id }}')" type="button" class="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700">
+                <button type="submit" class="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700">
                     Actualizar
                 </button>
             </div>

@@ -34,12 +34,15 @@
                         Rechazado por: <span class="font-medium">{{ $producto->rechazador->name }}</span>
                     </p>
                 @endif
-                <div class="mt-4">
-                    <a href="{{ route('productos.edit', $producto->id) }}"
-                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Ir a Editar Producto →
-                    </a>
-                </div>
+                {{-- Botón para editar producto: Visible solo si el producto está rechazado Y el usuario puede 'editar productos' --}}
+                @can('update', $producto)
+                    <div class="mt-4">
+                        <a href="{{ route('productos.edit', $producto->id) }}"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Ir a Editar Producto →
+                        </a>
+                    </div>
+                @endcan
             @elseif ($producto->estado === 'aprobado')
                 <p class="text-sm mt-2">¡Tu producto ha sido aprobado y está listo para ser consumido!</p>
                 @if ($producto->validador)
@@ -64,6 +67,11 @@
             <p class="text-lg text-gray-800">{{ ucfirst($producto->tipo) }}</p>
         </div>
 
+        <div class="mb-4 p-3 bg-gray-50 rounded-md">
+            <h3 class="text-sm font-semibold text-gray-600">Observaciones</h3>
+            <p class="text-gray-800 whitespace-pre-line break-words">{{ $producto->observaciones ?? 'N/A' }}</p>
+        </div>
+
         {{-- Mostrar detalles específicos según el tipo de producto --}}
         @if ($producto->tipo === 'café' && $producto->cafe)
             <h2 class="text-xl font-bold mt-6 mb-4">Detalles de Café</h2>
@@ -78,7 +86,8 @@
             @if ($producto->cafe->cafInsumos)
                 <div class="mb-4 p-3 bg-gray-50 rounded-md">
                     <h3 class="text-sm font-semibold text-gray-600">Detalles de Insumos del Café</h3>
-                    <p class="text-gray-800 whitespace-pre-line">{{ $producto->cafe->cafInsumos->informacion ?? 'N/A' }}</p>
+                    <p class="text-gray-800 whitespace-pre-line">{{ $producto->cafe->cafInsumos->informacion ?? 'N/A' }}
+                    </p>
                 </div>
             @endif
 
@@ -92,7 +101,6 @@
                     <p class="text-gray-800 whitespace-pre-line">{{ $producto->cafe->cafPatoge->informacion ?? 'N/A' }}</p>
                 </div>
             @endif
-
         @elseif ($producto->tipo === 'mora' && $producto->mora)
             <h2 class="text-xl font-bold mt-6 mb-4">Detalles de Mora</h2>
 
@@ -117,7 +125,8 @@
                 </div>
                 <div class="mb-4 p-3 bg-gray-50 rounded-md">
                     <h3 class="text-sm font-semibold text-gray-600">Información del Patógeno de la Mora</h3>
-                    <p class="text-gray-800 whitespace-pre-line">{{ $producto->mora->moraPatoge->informacion ?? 'N/A' }}</p>
+                    <p class="text-gray-800 whitespace-pre-line">{{ $producto->mora->moraPatoge->informacion ?? 'N/A' }}
+                    </p>
                 </div>
             @endif
         @else
@@ -132,4 +141,3 @@
         </div>
     </div>
 @endsection
-

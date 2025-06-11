@@ -39,7 +39,7 @@ class UserService
             });
         }
 
-        return $usuarios->paginate($perPage);
+        return $usuarios->paginate($perPage)->withQueryString();
     }
 }
 
