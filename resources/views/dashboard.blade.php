@@ -40,6 +40,12 @@
                         class="absolute inset-0 opacity-0 cursor-pointer" {{-- Lo hacemos invisible y lo superponemos al botón --}}
                         placeholder="Selecciona Año">
                 </div>
+                 <div id= "yearChartFiltersContainer" class="flex flex-wrap items-center mt-4 space-x-2 md:mt-0" style="display: none;">
+                <label for="chartSubFilter" class="sr-only">Filtrar por:</label>
+                <select id="chartSubFilter" class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300">
+                    <option value="month">Por Mes</option>
+                    <option value="quarter">Por Trimestre</option>
+                </select>
             </div>
         </div>
     </section>
@@ -61,7 +67,7 @@
 
             <div class="p-6 bg-white shadow-sm rounded-3xl">
                 {{-- Gráfica --}}
-                <div id="mainChart" class="my-6 w-full h-[200px] md:h-[400px] lg:h-[450px]"></div>
+                <div id="chart" class="my-6 w-full h-[200px] md:h-[400px] lg:h-[450px]"></div>
             </div>
             {{-- Métricas generales --}}
             <div class="grid grid-cols-1 gap-6 mt-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -71,8 +77,8 @@
                     </div>
 
                     <h3 class="text-2xl text-[var(--color-iconos)]">Usuarios</h3>
-                    <p id="totalUsuarios" class="text-3xl font-bold text-gray-800">0</p>
-                    <p id="totalUsuarios-percent" class="text-sm text-gray-800">0% de los usuarios</p>
+                    <p id="users-count" class="text-3xl font-bold text-gray-800">0</p>
+                    <p id="users-percent" class="text-sm text-gray-800">0% de los usuarios</p>
                 </div>
 
                 {{-- Registrados --}}
@@ -83,8 +89,8 @@
 
                     <div>
                         <h3 class="text-2xl text-[var(--color-iconos)]">{{ __('message.Register') }}</h3>
-                        <p id="usuariosRegistrados" class="text-3xl font-bold text-gray-800">0</p>
-                        <p id="usuariosRegistrados-percent" class="text-sm text-gray-800">0% de los usuarios</p>
+                        <p id="registered-count" class="text-3xl font-bold text-gray-800">0</p>
+                        <p id="registered-percent" class="text-sm text-gray-800">0% de los usuarios</p>
                     </div>
                 </div>
 
@@ -94,8 +100,8 @@
                     </div>
 
                     <h3 class="text-2xl text-[var(--color-iconos)]">Activos</h3>
-                    <p id="usuariosActivos" class="text-3xl font-bold text-gray-800">0</p>
-                    <p id="usuariosActivos-percent" class="text-sm text-gray-800">0% de los usuarios</p>
+                    <p id="active-count" class="text-3xl font-bold text-gray-800">0</p>
+                    <p id="active-percent" class="text-sm text-gray-800">0% de los usuarios</p>
                 </div>
 
                 <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
@@ -104,8 +110,8 @@
                     </div>
 
                     <h3 class="text-2xl text-[var(--color-iconos)]">Conectados</h3>
-                    <p id="usuariosConectados" class="text-3xl font-bold text-gray-800">0</p>
-                    <p id="usuariosConectados-percent" class="text-sm text-gray-800">0% de los usuarios</p>
+                    <p id="connected-count" class="text-3xl font-bold text-gray-800">0</p>
+                    <p id="connected-percent" class="text-sm text-gray-800">0% de los usuarios</p>
                 </div>
             </div>
         </section>
@@ -240,28 +246,4 @@
 </div>
 @endsection
 
-{{-- AHORA, TODOS los scripts principales (Flatpickr, ECharts, dashboard.js) VAN AQUÍ --}}
-@section('scripts')
-{{-- Flatpickr CSS --}}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-{{-- Flatpickr MonthSelect Plugin CSS --}}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 
-{{-- Flatpickr JS --}}
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-{{-- Flatpickr Localization (Spanish) --}}
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-{{-- Flatpickr MonthSelect Plugin JS --}}
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/monthSelect.js"></script>
-
-{{-- ECharts JS --}}
-<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-
-{{-- Custom Dashboard JS --}}
-<script src="{{ asset('js/dashboard.js') }}"></script>
-
-<script>
-    // Variable global para la ruta de la API
-    const STATISTICS_ROUTE = "{{ route('statistics.index') }}";
-</script>
-@endsection

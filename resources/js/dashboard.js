@@ -1,55 +1,106 @@
 
 import * as echarts from 'echarts';
-//import { Container } from 'postcss';
+import flatpickr from 'flatpickr';
+import "flatpickr/dist/flatpickr.min.css";
+import { Spanish } from 'flatpickr/dist/l10n/es.js';
 
-document.addEventListener("DOMContentLoaded", function () {
+import  MonthSelectPlugin  from 'flatpickr/dist/plugins/monthSelect/index.js';
+
+
+// Declarar myChart y chartDom fuera del ámbito del listener
+let myChart = null;
+let chartDom = null; // Inicialmente null
+
+// CAMBIO CLAVE AQUÍ: Usamos window.onload en lugar de document.addEventListener("DOMContentLoaded")
+// Esto asegura que el DOM y todo el CSS se han cargado y renderizado antes de intentar inicializar ECharts.
+window.onload = function(){
+
+    // 1. --- DECLARACIÓN DE VARIABLES GLOBALES Y OBTENCIÓN DE ELEMENTOS DEL DOM ---
     let filtroActual = 'ultimos3dias';
-    // nueva variable que esto va con el año y el subfiltro cuando el año este activo
-    let selectedYearForChart = new Date().getFullYear().toString(); //año por defecto: el actual
-    let selectedChartSubFilter = 'month'; // Sub-filtro por defecto para la gráfica anual
-
+    let selectedYearForChart = new Date().getFullYear().toString();
+    let selectedChartSubFilter = 'month';
     let porcentajes = [];
-       // --- CONSOLIDACIÓN: Inicialización de Flatpickr DENTRO del DOMContentLoaded ---
-    const yearPickerInstance = flatpickr("#yearPicker", {
-        locale: 'es', // Cargar localización en español
-        dateFormat: "Y", // Solo formato de año
-        altInput: true, // Esto es útil para ocultar el input real y mostrar el formato
-        altFormat: "Y",  // Formato que se muestra al usuario (solo el año)
-        enableTime: false,
-        noCalendar: true, // Oculta el calendario normal de días
-        plugins: [
-            // Asegúrate de que monthSelectPlugin esté disponible globalmente (ej. por CDN en tu Blade)
-            // Si no lo importas en este JS, se referirá a la versión global.
-            new monthSelectPlugin({
-                shorthand: true, // Muestra "Ene" en lugar de "Enero"
-                dateFormat: "Y",
-                altFormat: "Y",
-                theme: "light",
-            })
-        ],
-        minDate: "2025", // <--- CAMBIO AQUÍ: Empieza desde el año 2025.
-        defaultDate: new Date().getFullYear().toString(), // Por defecto el año actual
-        maxDate: new Date().getFullYear() + 1, // Permite seleccionar hasta el año actual + 1
-        onReady: function(selectedDates, dateStr, instance) {
-            if (!dateStr) {
-                instance.setDate(new Date().getFullYear().toString(), true);
-                selectedYearForChart = new Date().getFullYear().toString();
-            }
-            const initialFilterButton = document.querySelector('[data-filtro="ultimos3dias"]');
-            if (initialFilterButton) {
-                initialFilterButton.classList.add('active-filter-button');
-            }
-            loadData(filtroActual, selectedYearForChart);
-        },
-        onChange: function (selectedDates, dateStr, instance) {
-            if (dateStr) {
-                selectedYearForChart = dateStr;
-                if (filtroActual === 'año') {
-                    loadData(filtroActual, selectedYearForChart);
-                }
-            }
+
+    // OBTENEMOS TODOS LOS ELEMENTOS DEL DOM AQUÍ. ¡VERIFICA ESTOS IDs EN TU HTML!
+    chartDom = document.getElementById('chart'); //
+    const usersCountElement = document.getElementById('users-count'); //
+    const registeredCountElement = document.getElementById('registered-count');
+    const activeCountElement = document.getElementById('active-count');
+    const connectedCountElement = document.getElementById('connected-count');
+    const usersPercentElement = document.getElementById('users-percent');
+    const registeredPercentElement = document.getElementById('registered-percent');
+    const activePercentElement = document.getElementById('active-percent');
+    const connectedPercentElement = document.getElementById('connected-percent');
+
+    const yearChartFiltersContainer = document.querySelector('#yearChartFiltersContainer');
+    const chartSubFilterSelect = document.getElementById('chartSubFilter');
+    const mensajeErrorElement = document.getElementById('mensaje-error'); // Asegúrate de que este ID exista en tu HTML
+
+    // 2. --- INICIALIZACIÓN DE ECHARTS (¡UNA SOLA VEZ Y MÁS ROBUSTA!) ---
+    if (chartDom) {
+        // Primero, intentar obtener una instancia existente y desecharla para evitar duplicados.
+        // Esto resuelve el error "There is a chart instance already initialized".
+        if (echarts.getInstanceByDom(chartDom)) {
+            myChart = echarts.getInstanceByDom(chartDom);
+            myChart.dispose(); // Desechar la instancia anterior
         }
-    });
+
+        // Ahora, inicializar una nueva instancia.
+        myChart = echarts.init(chartDom);
+
+        // Opciones iniciales para ECharts (vacías o predeterminadas)
+        let option = {
+            tooltip: { trigger: 'axis' },
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: { type: 'category', boundaryGap: false, data: [] },
+            yAxis: { type: 'value' },
+            series: [{ name: 'Vistas', type: 'line', data: [] }]
+        };
+        myChart.setOption(option);
+
+        // Añadir el listener de redimensionamiento UNA SOLA VEZ.
+        // Esto resuelve el error "Cannot read properties of undefined (reading 'addEventListener')"
+        window.addEventListener('resize', () => {
+            if (myChart) {
+                myChart.resize();
+            }
+        });
+    } else {
+        console.error("Elemento del DOM con ID 'chart' no encontrado. La gráfica no se inicializará.");
+        if (mensajeErrorElement) { // Si el elemento para mensajes de error existe
+            mensajeErrorElement.textContent = "Error grave: El contenedor de la gráfica no se encontró en la página.";
+            mensajeErrorElement.style.display = 'block';
+        }
+    }
+
+
+    // 3. --- DEFINICIÓN DE LA FUNCIÓN loadData ---
+    // Esta función ahora está completa y utiliza las variables globales myChart y chartDom.
+    async function loadData(filtro, year = null, subfiltro = null) {
+        let url = '/api/estadisticas';
+        let params = new URLSearchParams();
+
+        if (filtro) {
+            params.append('filtro', filtro);
+        }
+        if (year) {
+            params.append('year', year);
+        }
+        if (subfiltro && filtro === 'año') { // Usar 'subfiltro' en lugar de 'chartSubFilter' para el parámetro
+            params.append('chartFilter', subfiltro);
+        }
+
+        url += `?${params.toString()}`;
+
+        // Mostrar loading solo si chartDom existe
+        if (chartDom) {
+            chartDom.innerHTML = `<div class="text-center text-gray-500 p-4 animate-pulse">Cargando estadísticas...</div>`;
+            if (myChart) {
+                myChart.showLoading();
+            }
+        } else {
+            console.warn("No se puede mostrar mensaje de carga: Elemento 'chart' no encontrado.");
+        }
 
 
     // 📌 Agrega aquí las funciones para calcular la semana pasada:
@@ -295,9 +346,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-
-
-
     // Función para actualizar las métricas
     function updateMetrics(data) {
         const usersCountEl = document.getElementById("users-count");
@@ -380,6 +428,7 @@ document.addEventListener("DOMContentLoaded", function () {
             updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 }); // Resetea métricas si no hay datos
         }
     }
+}
 
 
 
@@ -388,5 +437,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Exponer la función de cambiar el filtro globalmente
     window.setFilter = setFilter;
-});
+
+};
 
