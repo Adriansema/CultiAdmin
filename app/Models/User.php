@@ -47,6 +47,11 @@ class User extends Authenticatable // Este modelo es ahora un "usuario autentica
         'estado' => 'string',
     ];
 
-    protected $guard_name = 'web'; // <-- IMPORTANTE para Spatie Permissions: Define qué 'guard' usa este modelo para roles/permisos.
-                                  // Conecta roles/permisos asignados a este usuario con el guard 'web'.
+    protected $guard_name = 'web'; // <-- IMPORTANTE para Spatie Permissions: Define qué 'guard' usa este modelo para roles/permisos. // Conecta roles/permisos asignados a este usuario con el guard 'web'.
+
+    // Opcional: Método de ayuda para verificar rol (si aún lo necesitas)
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('administrador');
+    }
 }

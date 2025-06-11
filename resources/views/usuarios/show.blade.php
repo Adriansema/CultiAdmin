@@ -25,7 +25,8 @@
                     <label class="block text-sm text-gray-500">Roles asignados</label>
                     <div class="flex flex-wrap gap-2 mt-1">
                         @forelse ($usuario->roles as $role)
-                            <span class="px-3 py-1 text-sm text-blue-800 bg-blue-100 rounded-full">{{ $role->name }}</span>
+                            <span
+                                class="px-3 py-1 text-sm text-blue-800 bg-blue-100 rounded-full">{{ $role->name }}</span>
                         @empty
                             <span class="text-sm text-gray-400">Sin roles</span>
                         @endforelse
@@ -44,11 +45,10 @@
             <!-- Botón de volver -->
             <div class="mt-6">
                 <a href="{{ route('usuarios.index') }}"
-                   class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">
+                    class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">
                     ← Volver a la lista
                 </a>
             </div>
         </div>
     </div>
 @endsection
-

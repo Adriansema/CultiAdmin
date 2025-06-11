@@ -6,6 +6,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,10 +19,8 @@ class Roles_Admin_Opera
      */
     public function handle(Request $request, Closure $next): Response
     {
-
-
         // Verifica si el usuario tiene alguno de los roles necesarios
-        if (!auth()->user()?->hasAnyRole(['administrador', 'operador'])) {
+        if (!Auth::User()?->hasAnyRole(['administrador', 'operador'])) {
             abort(403, 'Acceso no autorizado');
         }
 

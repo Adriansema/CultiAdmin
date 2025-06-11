@@ -1,10 +1,10 @@
 <?php
 
-//actualizacion 09/04/2025
+//actualizacion 09/04/2025 (y ahora con ProductPolicy 06/06/2025)
 
 namespace App\Http\Controllers;
 
-use App\Models\User; // Para buscar operadores
+use App\Models\User;
 use App\Models\Cafe;
 use App\Models\Mora;
 use App\Models\Producto;
@@ -16,17 +16,24 @@ use App\Models\MoraInsu;
 use App\Models\MoraPatoge;
 use Illuminate\Http\Request;
 use App\Services\ProductService;
-use Illuminate\Support\Facades\Mail; // Importa Mail
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Response; // Importar la fachada Response para stream
-use App\Mail\NuevaRevisionPendienteMail; // Importa la nueva Mailable
+use Illuminate\Support\Facades\Response;
+use App\Mail\NuevaRevisionPendienteMail;
 
 class ProductoController extends Controller
 {
+    // Opcional: Se puede inyectar la Policy si se va a usar mucho,
+    // pero $this->authorize() ya se encarga de resolverla.
+
     public function index(Request $request, ProductService $productService)
     {
-         // Llama al método del servicio para obtener los productos paginados
+        /* dd($request->all()); */
+        // Autorización: El usuario debe tener permiso para ver cualquier producto (para la lista).
+        // Si el 'before' de la Policy permite al administrador pasar, esta línea será ignorada para él.
+        $this->authorize('viewAny', Producto::class);
+
         $productos = $productService->obtenerProductosFiltrados($request);
         return view('productos.index', compact('productos'));
     }
@@ -34,17 +41,30 @@ class ProductoController extends Controller
     // Si también necesitas una respuesta JSON (ej. para una API o Vue/React):
     public function getFilteredProducts(Request $request, ProductService $productService)
     {
+        // Autorización: Mismo permiso que viewAny, ya que es para ver la lista filtrada.
+        $this->authorize('viewAny', Producto::class);
+
         $productos = $productService->obtenerProductosFiltrados($request);
         return response()->json($productos);
     }
 
     public function create()
     {
+        // Autorización: El usuario debe tener permiso para crear productos.
+        $this->authorize('create', Producto::class);
+
+        // Asegúrate de que las vistas tienen las variables necesarias.
+        // Las variables $tiposCafe, $cafeInformaciones, etc. no estaban aquí,
+        // si tu vista 'productos.create' las necesita, deberás traerlas aquí.
+        // Por ahora, solo se devuelve la vista.
         return view('productos.create');
     }
 
     public function store(Request $request)
     {
+        // Autorización: El usuario debe tener permiso para crear productos.
+        $this->authorize('create', Producto::class);
+
         // Validación de los campos
         $rules = [
             'tipo' => 'required|string|in:café,mora',
@@ -156,6 +176,9 @@ class ProductoController extends Controller
 
     public function edit(Producto $producto)
     {
+        // Autorización: El usuario debe tener permiso para actualizar este producto específico.
+        $this->authorize('update', $producto);
+
         // Cargar las relaciones necesarias para la vista de edición
         $producto->load([
             'cafe.cafInfor',
@@ -174,6 +197,9 @@ class ProductoController extends Controller
      */
     public function update(Request $request, Producto $producto)
     {
+        // Autorización: El usuario debe tener permiso para actualizar este producto específico.
+        $this->authorize('update', $producto);
+
         $rules = [
             'tipo' => 'required|string|in:café,mora', // El tipo no debería cambiar en la edición, pero se valida
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -228,17 +254,13 @@ class ProductoController extends Controller
 
         // 2. Actualizar registros en las tablas de detalle según el tipo
         if ($producto->tipo === 'café') {
-            // Asegúrate de que las relaciones existan antes de intentar acceder a ellas
-            // Si un producto de tipo café no tiene un registro en 'cafe' o sus detalles, esto fallaría.
-            // Esto debería estar cubierto por la lógica de 'store' al crear el producto.
             $cafe = $producto->cafe; // Obtiene el modelo Cafe relacionado
 
-            if ($cafe) { // Verifica que el registro Cafe exista
+            if ($cafe) {
                 $cafInforData = $request->input('caf_infor', []);
                 if ($cafe->cafInfor) {
                     $cafe->cafInfor->update(['informacion' => $cafInforData['informacion'] ?? '']);
                 } else {
-                    // Si no existe, créalo (esto no debería pasar si el store funciona bien)
                     $cafInfor = CafInfor::create(['numero_pagina' => 1, 'informacion' => $cafInforData['informacion'] ?? '']);
                     $cafe->update(['id_caf' => $cafInfor->id_caf]);
                 }
@@ -258,7 +280,7 @@ class ProductoController extends Controller
                         'informacion' => $cafPatogeData['informacion'] ?? '']);
                 } else {
                     $cafPatoge = CafPatoge::create([
-                        'numero_pagina' => 1, 
+                        'numero_pagina' => 1,
                         'patogeno' => $cafPatogeData['patogeno'] ?? 'General',
                         'informacion' => $cafPatogeData['informacion'] ?? '']);
                     $cafe->update(['id_patoge' => $cafPatoge->id_patoge]);
@@ -268,7 +290,7 @@ class ProductoController extends Controller
         } elseif ($producto->tipo === 'mora') {
             $mora = $producto->mora; // Obtiene el modelo Mora relacionado
 
-            if ($mora) { // Verifica que el registro Mora exista
+            if ($mora) {
                 $moraInfData = $request->input('mora_inf', []);
                 if ($mora->moraInf) {
                     $mora->moraInf->update(['informacion' => $moraInfData['informacion'] ?? '']);
@@ -318,6 +340,9 @@ class ProductoController extends Controller
      */
     public function show(Producto $producto)
     {
+        // Autorización: El usuario debe tener permiso para ver este producto específico.
+        $this->authorize('view', $producto);
+
         // Cargar las relaciones necesarias para mostrar los detalles
         $producto->load([
             'user', // Para mostrar quién lo creó
@@ -327,7 +352,7 @@ class ProductoController extends Controller
             'mora.moraInf',
             'mora.moraInsu',
             'mora.moraPatoge',
-            'validador', 
+            'validador',
             'rechazador',
         ]);
         /* dd($producto); */
@@ -337,14 +362,20 @@ class ProductoController extends Controller
 
     public function destroy(Producto $producto)
     {
+        // Autorización: El usuario debe tener permiso para eliminar este producto específico.
+        $this->authorize('delete', $producto);
+
+        // Tu lógica de borrado (mantén la misma)
         $producto->delete();
 
         return redirect()->route('productos.index')->with('success', 'Producto eliminado.');
     }
 
-    //importar archivo csv, para hacer automaticamente sin tener que escribir manualmente
     public function importarCSV(Request $request)
     {
+        // Autorización: El usuario debe tener permiso para importar/crear productos.
+        $this->authorize('import', Producto::class);
+
         $request->validate([
             'archivo_csv' => 'required|file|mimes:csv,txt',
         ]);
@@ -353,52 +384,156 @@ class ProductoController extends Controller
         $ruta = $archivo->getRealPath();
 
         $file = fopen($ruta, 'r');
-        $encabezados = fgetcsv($file);
+        $encabezados = fgetcsv($file); // Lee la primera fila como encabezados
 
-        // Campos técnicos (claves) y sus etiquetas legibles, desde configuración
-        $claveLegible = config('claves_legibles');
+        $productosCreados = 0;
+        $erroresPorFila = [];
 
-        while (($fila = fgetcsv($file)) !== false) {
-            $datos = array_combine($encabezados, $fila);
+        // Definir los campos que esperamos en el CSV y cómo mapearlos
+        // Puedes refinar esto según los encabezados exactos de tu CSV
+        $requiredCsvHeaders = [
+            'tipo',
+            'observaciones',
+            'caf_infor_informacion', // Usar nombres planos para CSV
+            'caf_insumos_informacion',
+            'caf_patoge_informacion',
+            'caf_patoge_patogeno',
+            'mora_inf_informacion',
+            'mora_insu_informacion',
+            'mora_patoge_informacion',
+            'mora_patoge_patogeno',
+        ];
 
-            // Construir el JSON con los campos que importan
-            $detalles = [];
-            foreach (array_keys($claveLegible) as $campo) {
-                $detalles[$campo] = $datos[$campo] ?? '';
+        // Validar que los encabezados esperados estén en el CSV
+        foreach ($requiredCsvHeaders as $header) {
+            if (!in_array($header, $encabezados)) {
+                fclose($file);
+                return redirect()->back()->withErrors(['csv_error' => "El archivo CSV debe contener el encabezado requerido: '{$header}'."]);
             }
+        }
 
-            // Crear el producto con detalles JSON y otros campos
-            Producto::create([
-                'user_id' => Auth::id(),
-                'detalles_json' => json_encode($detalles, JSON_UNESCAPED_UNICODE),
-                'estado' => 'pendiente',
-                'tipo' => $datos['tipo'] ?? 'sin_tipo',
-                'observaciones' => $datos['observaciones'] ?? null,
-                'imagen' => null, // no se importa desde CSV
-            ]);
+
+        // Itera sobre cada fila del CSV
+        $filaNumero = 1; // Para seguimiento de errores
+        while (($fila = fgetcsv($file)) !== false) {
+            $filaNumero++;
+
+            // Combinar encabezados con datos de la fila para un array asociativo
+            $datosFila = array_combine($encabezados, $fila);
+
+            try {
+                // Validación básica por fila (puedes expandir esto)
+                $tipo = $datosFila['tipo'] ?? null;
+                if (!in_array($tipo, ['café', 'mora'])) {
+                    throw new \Exception("Tipo de producto inválido en la fila {$filaNumero}: '{$tipo}'. Debe ser 'café' o 'mora'.");
+                }
+
+                // 1. Crear el registro principal en la tabla 'productos'
+                $producto = Producto::create([
+                    'user_id' => Auth::id(),
+                    'estado' => 'pendiente',
+                    'observaciones' => $datosFila['observaciones'] ?? null,
+                    'imagen' => null, // No se importa desde CSV
+                    'tipo' => $tipo,
+                ]);
+
+                // 2. Crear las relaciones anidadas según el tipo
+                if ($tipo === 'café') {
+                    // Crear los registros de detalle de Café
+                    $cafInfor = CafInfor::create([
+                        'numero_pagina' => 1,
+                        'informacion' => $datosFila['caf_infor_informacion'] ?? '',
+                    ]);
+
+                    $cafInsumos = CafInsumos::create([
+                        'numero_pagina' => 1,
+                        'informacion' => $datosFila['caf_insumos_informacion'] ?? '',
+                    ]);
+
+                    $cafPatoge = CafPatoge::create([
+                        'numero_pagina' => 1,
+                        'patogeno' => $datosFila['caf_patoge_patogeno'] ?? 'General',
+                        'informacion' => $datosFila['caf_patoge_informacion'] ?? '',
+                    ]);
+
+                    // Crear el registro en la tabla 'cafe' y vincularlo
+                    Cafe::create([
+                        'producto_id' => $producto->id,
+                        'id_caf' => $cafInfor->id_caf,
+                        'id_insumos' => $cafInsumos->id_insumos,
+                        'id_patoge' => $cafPatoge->id_patoge,
+                    ]);
+
+                } elseif ($tipo === 'mora') {
+                    // Crear los registros de detalle de Mora
+                    $moraInf = MoraInf::create([
+                        'numero_pagina' => 1,
+                        'informacion' => $datosFila['mora_inf_informacion'] ?? '',
+                    ]);
+
+                    $moraInsu = MoraInsu::create([
+                        'numero_pagina' => 1,
+                        'informacion' => $datosFila['mora_insu_informacion'] ?? '',
+                    ]);
+
+                    $moraPatoge = MoraPatoge::create([
+                        'numero_pagina' => 1,
+                        'patogeno' => $datosFila['mora_patoge_patogeno'] ?? 'General',
+                        'informacion' => $datosFila['mora_patoge_informacion'] ?? '',
+                    ]);
+
+                    // Crear el registro en la tabla 'mora' y vincularlo
+                    Mora::create([
+                        'producto_id' => $producto->id,
+                        'id_info' => $moraInf->id_info,
+                        'id_insu' => $moraInsu->id_insu,
+                        'id_pat' => $moraPatoge->id_pat,
+                    ]);
+                }
+
+                $productosCreados++;
+
+                // Lógica para enviar email al operador (solo si se creó el producto con éxito)
+                $operadores = User::role('operador')->get();
+                foreach ($operadores as $operador) {
+                    Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($producto, 'Noticia'));
+                }
+
+            } catch (\Exception $e) {
+                // Capturar errores por fila y almacenarlos
+                $erroresPorFila[] = "Fila {$filaNumero}: " . $e->getMessage();
+                // Opcional: Registrar el error en los logs de Laravel
+                \Log::error("Error al importar fila CSV: " . $e->getMessage(), ['fila' => $filaNumero, 'datos' => $datosFila]);
+            }
         }
 
         fclose($file);
 
-        return redirect()->back()->with('success', 'Archivo CSV importado con éxito.');
+        // Mensaje de éxito o de errores
+        if (!empty($erroresPorFila)) {
+            $mensaje = "Se importaron {$productosCreados} productos. Hubo errores en algunas filas:<br>" . implode('<br>', $erroresPorFila);
+            return redirect()->back()->with('warning', $mensaje);
+        } else {
+            return redirect()->back()->with('success', "Archivo CSV importado con éxito. Se crearon {$productosCreados} productos.");
+        }
     }
 
     public function exportarCSV(Request $request)
     {
+        // Autorización: El usuario debe tener permiso para exportar productos.
+        $this->authorize('export', Producto::class);
+
         // 1. Obtener los parámetros de filtro de la solicitud
-        // 'q' para una consulta general (ej. buscar por nombre o ID de producto)
         $query = $request->input('q');
-        // 'estado' para filtrar por el estado del producto (ej. 'pendiente', 'aprobado')
         $estado = $request->input('estado');
-        // 'user_id' para filtrar por el usuario que creó el producto
         $userIdFilter = $request->input('user_id');
 
         // 2. Iniciar la consulta Eloquent para el modelo Producto
-        $productos = Producto::query();
+        $productosQuery = Producto::query();
 
         // 3. Aplicar los filtros dinámicamente a la consulta
         if ($query) {
-            $productos->where(function ($q2) use ($query) {
+            $productosQuery->where(function ($q2) use ($query) {
                 // Se cambió 'nombre' por 'tipo' ya que 'nombre' no existe en tu esquema.
                 // Si 'tipo' no es el campo deseado para la búsqueda general,
                 // deberías considerar añadir una columna de 'nombre' o 'titulo' a tu tabla.
@@ -409,158 +544,106 @@ class ProductoController extends Controller
         }
 
         if ($estado) {
-            $productos->where('estado', $estado);
+            $productosQuery->where('estado', $estado);
         }
 
         if ($userIdFilter) {
-            $productos->where('user_id', $userIdFilter);
+            $productosQuery->where('user_id', $userIdFilter);
         }
 
-        // 4. Obtener los productos que cumplen con los filtros
-        // No se usa paginate() aquí porque queremos todos los resultados para la exportación.
-        $productos = $productos->get();
+        // 4. Cargar las relaciones anidadas DESPUÉS de aplicar los filtros, y luego obtener los productos
+        $productos = $productosQuery->with([
+            'user', // Para obtener el creador
+            'cafe.cafInfor',
+            'cafe.cafInsumos',
+            'cafe.cafPatoge',
+            'mora.moraInf',
+            'mora.moraInsu',
+            'mora.moraPatoge',
+        ])->get();
 
         // 5. Generar un nombre de archivo único para el CSV
-        $nombreArchivo = 'productos_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        $nombreArchivo = 'productos_exportados_' . now()->format('Y-m-d_H-i-s') . '.csv';
 
         // 6. Definir los encabezados HTTP necesarios para la descarga del archivo CSV
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"$nombreArchivo\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
         ];
 
         // 7. Definir los nombres de las columnas que aparecerán en la primera fila del CSV
+        // ¡Aquí se define la estructura de las columnas de salida!
         $columnas = [
             'ID Producto',
             'ID Usuario Creador',
-            'Detalles (JSON)', // Se exportará el string JSON completo
+            'Email Usuario Creador', // Nuevo campo
+            'Tipo Producto',
             'Estado',
             'Observaciones',
-            'Ruta Imagen', // Se exportará la ruta o URL de la imagen
-            'Tipo de Producto',
-            'Fecha de Creación'
+            'Ruta Imagen',
+            'Fecha de Creacion',
+            // Campos específicos para Café
+            'Cafe - Info General', // Ajuste de nombre para claridad
+            'Cafe - Info Insumos',
+            'Cafe - Info Patogenos',
+            'Cafe - Nombre Patogeno',
+            // Campos específicos para Mora
+            'Mora - Info General', // Ajuste de nombre para claridad
+            'Mora - Info Insumos',
+            'Mora - Info Patogenos',
+            'Mora - Nombre Patogeno',
         ];
 
         // 8. Definir la función de callback que generará el contenido del CSV
-        // Esta función se ejecutará cuando Laravel transmita la respuesta.
         $callback = function () use ($productos, $columnas) {
-            $file = fopen('php://output', 'w'); // Abrir el flujo de salida para escribir el CSV
-            fputcsv($file, $columnas); // Escribir la fila de encabezados
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columnas);
 
-            // Iterar sobre cada producto y escribir sus datos en el CSV
             foreach ($productos as $producto) {
-                // Para 'detalles_json', se exporta el string JSON tal cual.
-                // Si quisieras parsear el JSON y exportar campos específicos,
-                // la lógica de parsing iría aquí antes de fputcsv.
-                $detallesParaCSV = $producto->detalles_json;
-
-                fputcsv($file, [
+                // Base de la fila para el CSV
+                $row = [
                     $producto->id,
                     $producto->user_id,
-                    $detallesParaCSV,
+                    $producto->user->email ?? 'N/A', // Email del creador
+                    $producto->tipo,
                     $producto->estado,
                     $producto->observaciones,
                     $producto->imagen,
-                    $producto->tipo,
-                    // Formatear la fecha de creación; usar un string vacío si es nula
                     $producto->created_at ? $producto->created_at->format('Y-m-d H:i:s') : '',
-                ]);
+                ];
+
+                // Añadir campos específicos de Café
+                if ($producto->tipo === 'café' && $producto->cafe) {
+                    $row[] = $producto->cafe->cafInfor->informacion ?? '';
+                    $row[] = $producto->cafe->cafInsumos->informacion ?? '';
+                    $row[] = $producto->cafe->cafPatoge->informacion ?? '';
+                    $row[] = $producto->cafe->cafPatoge->patogeno ?? '';
+                } else {
+                    // Si no es café, añadir celdas vacías para las columnas de café para mantener la consistencia
+                    $row = array_merge($row, array_fill(0, 4, '')); // 4 campos vacíos para Café
+                }
+
+                // Añadir campos específicos de Mora
+                if ($producto->tipo === 'mora' && $producto->mora) {
+                    $row[] = $producto->mora->moraInf->informacion ?? '';
+                    $row[] = $producto->mora->moraInsu->informacion ?? '';
+                    $row[] = $producto->mora->moraPatoge->informacion ?? '';
+                    $row[] = $producto->mora->moraPatoge->patogeno ?? '';
+                } else {
+                    // Si no es mora, añadir celdas vacías para las columnas de mora
+                    $row = array_merge($row, array_fill(0, 4, '')); // 4 campos vacíos para Mora
+                }
+
+                fputcsv($file, $row);
             }
 
-            fclose($file); // Cerrar el archivo
+            fclose($file);
         };
 
-        // 9. Retornar la respuesta de streaming. Esto permite que el archivo CSV se genere
-        // y se descargue sin cargar todos los datos en la memoria del servidor a la vez.
+        // 9. Retornar la respuesta de streaming
         return Response::stream($callback, 200, $headers);
-    }
-
-    public function generarCSV(Request $request)
-    {
-        $tipo = $request->input('tipo');
-
-        // Obtenemos las claves ordenadas desde config
-        $claveLegible = config('claves_legibles');
-        $cabeceras = array_keys($claveLegible);
-
-        // Datos de ejemplo por tipo
-        $datosCafe = [
-            'historia' => [
-                "El café es una bebida milenaria, apreciada por su aroma envolvente y sabor inconfundible, resultado de un meticuloso proceso desde la semilla hasta la taza. Es símbolo de encuentro, tradición y cultura en innumerables regiones del mundo.",
-                "Su historia se remonta al siglo IX en Etiopía, donde leyendas cuentan que un pastor notó el efecto energizante en sus cabras. A lo largo de los siglos, el cultivo se expandió por el mundo, dando forma a economías y paisajes enteros, especialmente en América Latina.",
-            ],
-            'productos_y_sus_características' => [
-                "Las variedades más cultivadas son Arábica y Robusta, cada una con perfiles únicos. Arábica se distingue por su acidez brillante y aromas florales, mientras que Robusta ofrece un sabor más fuerte y mayor contenido de cafeína.",
-                "Granos pequeños, forma ovalada y superficie lisa. Su color varía desde verde hasta marrón oscuro según el grado de tostado, cada etapa influye en el resultado final en la taza.",
-                "Más allá de la bebida, el café se utiliza en cosméticos, aromaterapia y como componente en productos alimenticios innovadores.",
-            ],
-            'variantes' => [
-                "Coffea arabica y Coffea canephora son las especies predominantes, con adaptaciones específicas a diferentes altitudes y climas que influyen directamente en el perfil sensorial del café.",
-                "Coffea arabica",
-            ],
-            'enfermedades' => [
-                "La roya y la broca del café son las principales amenazas, gestionadas mediante prácticas agrícolas sostenibles y manejo integrado de plagas.",
-            ],
-            'insumos' => [
-                "Incluyen sombra controlada, podas regulares, fertilización orgánica y uso de variedades resistentes para mantener la productividad y calidad.",
-                "Certificaciones como Fair Trade, Rainforest Alliance y orgánicas garantizan prácticas éticas y sostenibles en la producción.",
-            ],
-        ];
-
-        $datosMora = [
-            'historia' => [
-                "La mora es un fruto silvestre con un intenso color y sabor dulce, apreciado por su versatilidad en gastronomía y beneficios para la salud, cultivada principalmente en zonas tropicales y subtropicales.",
-                "Originaria de las regiones andinas, la mora ha sido parte fundamental de las culturas indígenas por siglos, utilizada en alimentación, medicina tradicional y rituales ancestrales.",
-            ],
-            'productos_y_sus_características' => [
-                "Frutos jugosos, de forma redondeada y color oscuro intenso, con una pulpa rica en antioxidantes y vitaminas, perfectos para consumo fresco o procesado.",
-                "Consumida fresca, en jugos, mermeladas y productos derivados como vinos y suplementos nutricionales.",
-            ],
-            'variantes' => [
-                "Rubus glaucus y Rubus fruticosus son las especies más comunes, con características botánicas que determinan su sabor, tamaño y textura.",
-                "Rubus glaucus",
-            ],
-            'enfermedades' => [
-                "Pulgones y mildiu son las plagas más comunes, controladas mediante métodos biológicos y fitosanitarios adecuados.",
-            ],
-            'insumos' => [
-                "Incluyen el uso de guías y espalderas, poda controlada y fertilización balanceada para maximizar rendimiento.",
-                "Global GAP y certificaciones orgánicas respaldan la calidad y sostenibilidad del producto.",
-            ],
-        ];
-
-        if ($tipo === 'café') {
-            $datos = $datosCafe;
-        } elseif ($tipo === 'mora') {
-            $datos = $datosMora;
-        } else {
-            abort(404, 'Tipo no válido.');
-        }
-
-        return new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($cabeceras, $datos) {
-            $handle = fopen('php://output', 'w');
-            // Escribir encabezados
-            fputcsv($handle, $cabeceras);
-
-            // Calcular la cantidad máxima de filas para no perder líneas
-            $maxFilas = 0;
-            foreach ($datos as $campo => $filas) {
-                $maxFilas = max($maxFilas, count($filas));
-            }
-
-            // Iterar fila a fila para armar cada línea del CSV
-            for ($i = 0; $i < $maxFilas; $i++) {
-                $filaCSV = [];
-                foreach ($cabeceras as $campo) {
-                    $filaCSV[] = $datos[$campo][$i] ?? '';
-                }
-                fputcsv($handle, $filaCSV);
-            }
-
-            fclose($handle);
-        }, 200, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="plantilla_producto_' . $tipo . '.csv"',
-        ]);
     }
 }

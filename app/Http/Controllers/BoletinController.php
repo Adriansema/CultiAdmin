@@ -1,24 +1,26 @@
 <?php
 
-// actualizacion 09/04/2025
+// actualizacion 09/04/2025 (y ahora con BoletinPolicy 06/06/2025)
 
 namespace App\Http\Controllers;
 
-use App\Mail\NuevaRevisionPendienteMail; // Para buscar operadores
-use App\Models\Boletin;
 use App\Models\User;
+use App\Models\Boletin;
+use Illuminate\Support\Str; // Para usar Str::limit en la vista parcial
+use Illuminate\Http\Request;
 use App\Services\BoletinService;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Http\Request; // Importa Mail
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage; // Importa la nueva Mailable
-
+use Illuminate\Support\Facades\Storage;
+use App\Mail\NuevaRevisionPendienteMail;
 class BoletinController extends Controller
 {
     public function index(Request $request, BoletinService $boletinService)
     {
-        // Llama al método del servicio para obtener los productos paginados
+        // Autorización: El usuario debe tener permiso para ver cualquier boletín (para la lista).
+        $this->authorize('viewAny', Boletin::class);
+
         $boletines = $boletinService->obtenerBoletinFiltrados($request);
         return view('boletines.index', compact('boletines'));
     }
@@ -26,41 +28,50 @@ class BoletinController extends Controller
     // Si también necesitas una respuesta JSON (ej. para una API o Vue/React):
     public function getFilteredBoletin(Request $request, BoletinService $boletinService)
     {
-        $productos = $boletinService->obtenerBoletinFiltrados($request);
-        return response()->json($productos);
-    } // Importar la fachada Response para streamuse App\Services\ProductService;
+        // Autorización: Mismo permiso que viewAny.
+        $this->authorize('viewAny', Boletin::class);
+
+        $boletines = $boletinService->obtenerBoletinFiltrados($request);
+        return response()->json($boletines);
+    }
 
     public function create()
     {
+        // Autorización: El usuario debe tener permiso para crear boletines.
+        $this->authorize('create', Boletin::class);
+
         return view('boletines.create');
     }
 
     public function show(Boletin $boletin)
     {
+        // Autorización: El usuario debe tener permiso para ver este boletín específico.
+        $this->authorize('view', $boletin);
+
         return view('boletines.show', compact('boletin'));
     }
 
     public function edit(Boletin $boletin)
     {
+        // Autorización: El usuario debe tener permiso para actualizar este boletín específico.
+        $this->authorize('update', $boletin);
+
         return view('boletines.edit', compact('boletin'));
     }
 
     public function store(Request $request)
     {
+        // Autorización: El usuario debe tener permiso para crear boletines.
+        $this->authorize('create', Boletin::class);
+
         $validated = $request->validate([
             'contenido' => 'required|string',
-            'archivo_upload' => 'nullable|file|mimes:pdf|max:5120', // Reglas de validación para el archivo
-            // - nullable: El archivo es opcional al crear.
-            // - file: Debe ser un archivo válido.
-            // - mimes: Tipos de archivo permitidos (ajusta según tus necesidades).
-            // - max: Tamaño máximo en kilobytes (5120 KB = 5 MB).
+            'archivo_upload' => 'nullable|file|mimes:pdf|max:5120',
         ]);
 
-        $filePath = null; // Inicializamos la ruta del archivo a null
+        $filePath = null;
 
-        // Lógica para manejar la subida del archivo si existe
         if ($request->hasFile('archivo_upload')) {
-            // Guardar el archivo en la carpeta 'boletines' dentro de storage/app/public
             $filePath = $request->file('archivo_upload')->store('boletines', 'public');
         }
 
@@ -68,11 +79,10 @@ class BoletinController extends Controller
             'user_id' => Auth::id(),
             'estado' => 'pendiente',
             'contenido' => $validated['contenido'],
-            'archivo' => $filePath, // Asignamos la ruta del archivo (o null si no se subió)
+            'archivo' => $filePath,
         ]);
 
-        // *** Lógica para enviar email al operador cuando se crea un boletín ***
-        $operadores = User::role('operador')->get(); // Obtiene todos los usuarios con el rol 'operador'
+        $operadores = User::role('operador')->get();
         foreach ($operadores as $operador) {
             Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
         }
@@ -82,70 +92,73 @@ class BoletinController extends Controller
 
     public function update(Request $request, Boletin $boletin)
     {
-        $request->validate([
-            'contenido' => 'required|string',
-            // 'observaciones' => 'nullable|string', // El usuario puede modificar sus observaciones
-            'archivo_upload' => 'nullable|file|mimes:pdf|max:5120', // Reglas para el archivo:
-            // - nullable: puede no subir archivo (para mantener el actual)
-            // - file: debe ser un archivo
-            // - mimes: tipos de archivo permitidos (añade o quita según tus necesidades)
-            // - max: tamaño máximo en kilobytes (5120 KB = 5 MB)
+        // Autorización: El usuario debe tener permiso para actualizar este boletín específico.
+        $this->authorize('update', $boletin);
+
+        $rules = ([
+            'contenido' => 'required|string|max:100',
+            'archivo_upload' => 'nullable|file|mimes:pdf|max:5000',
         ]);
 
-        // Almacenar el estado original del boletín ANTES de cualquier cambio
+        $messages = [
+            'contenido.required' => 'El contenido del boletin es obligatorio.',
+            'contenido.string' => 'El contenido debe der texto.',
+            'contenido.max' => 'El contenido no debe exceder lo 100 caracteres.',
+            'archivo_upload.file' => 'El archivo debe ser un archivo válido.',
+            'archivo_upload.mimes' => 'El archivo debe ser de tipo PDF.',
+            'archivo_upload.max' => 'El archivo no debe pesar más de 5MB.',
+        ];
+
+        $validatedData = $request->validate($rules, $messages);
+
         $originalEstado = $boletin->estado;
 
-        // *** Lógica para manejar la subida del archivo ***
         if ($request->hasFile('archivo_upload')) {
-            // 1. Eliminar el archivo antiguo si existe
             if ($boletin->archivo && Storage::disk('public')->exists($boletin->archivo)) {
                 Storage::disk('public')->delete($boletin->archivo);
             }
-
-            // 2. Guardar el nuevo archivo
-            // El método store() guarda el archivo y devuelve la ruta relativa (ej: "boletines/nombre_archivo.pdf")
-            // 'boletines' será la subcarpeta dentro de storage/app/public
             $path = $request->file('archivo_upload')->store('boletines', 'public');
-            $boletin->archivo = $path; // Guardar esta ruta en la base de datos
+            $boletin->archivo = $path;
         }
-        // Si no se sube un nuevo archivo, $boletin->archivo conserva su valor actual
-        // ($request->archivo ya no es relevante si usas 'archivo_upload')
 
-        // Actualizar los campos del boletín
-        $boletin->contenido = $request->contenido;
-        // La línea $boletin->archivo = $request->archivo; DEBE SER ELIMINADA o IGNORADA si usas 'archivo_upload'
-        // porque el campo 'archivo' en tu base de datos ahora se llenará desde la lógica de subida de archivos, no desde el input de texto.
+        $boletin->contenido = $validatedData['contenido'];
 
-        // *** Lógica para cambiar el estado a 'pendiente' si el boletín fue editado
-        // *** y su estado original era 'aprobado' o 'rechazado'.
-        // Esto asegura que cada edición por parte del creador requiera una nueva validación del operador.
         $estadoCambiadoAPendiente = false;
         if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
             $boletin->estado = 'pendiente';
-            // Opcional: limpiar la observación del operador al volver a pendiente.
-            // Asumiendo que 'observaciones' es la columna donde el operador pone la observación.
-            $boletin->observaciones = null; // Limpiar observación del operador
+            $boletin->observaciones = null;
             $estadoCambiadoAPendiente = true;
         }
-        // No se permite al usuario cambiar el estado directamente desde esta vista.
 
         $boletin->save();
 
-        // *** Lógica para enviar email al operador cuando un boletín editado vuelve a pendiente ***
         if ($estadoCambiadoAPendiente) {
-            $operadores = User::role('operador')->get(); // Obtiene todos los usuarios con el rol 'operador'
+            $operadores = User::role('operador')->get();
             foreach ($operadores as $operador) {
                 Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
             }
         }
 
-        // Mensaje de éxito más descriptivo para el usuario
+        $boletin = $boletin->fresh();
+
+        $renderedRow = view('boletines.partials.boletin_row', ['boletin' => $boletin])->render();
+
+        if($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Boletin actualizado con éxito',
+                'boletin' => $boletin,
+                'html_row' => $renderedRow,
+            ]);
+        }
+
         return redirect()->route('boletines.index')->with('success', 'Boletín actualizado y enviado a revisión del operador.');
     }
 
     public function destroy(Boletin $boletin)
     {
-        // Opcional: Eliminar archivo asociado si existe
+        // Autorización: El usuario debe tener permiso para eliminar este boletín específico.
+        $this->authorize('delete', $boletin);
+
         if ($boletin->archivo && Storage::disk('public')->exists($boletin->archivo)) {
             Storage::disk('public')->delete($boletin->archivo);
         }
@@ -157,23 +170,23 @@ class BoletinController extends Controller
 
     public function importarPdf(Request $request)
     {
+        // Autorización: El usuario debe tener permiso para importar boletines.
+        $this->authorize('import', Boletin::class);
+
         $request->validate([
-            'archivo' => 'required|file|mimes:pdf|max:10240', // Validar que sea un PDF y tamaño
-            'contenido' => 'nullable|string', // Contenido podría ser una descripción del PDF
+            'archivo' => 'required|file|mimes:pdf|max:10240',
+            'contenido' => 'nullable|string',
         ]);
 
-        // Guardar el archivo en storage/app/public/boletines
         $rutaArchivo = $request->file('archivo')->store('boletines', 'public');
 
-        // Crear boletín con contenido y ruta del archivo
-        $boletin = Boletin::create([ // Captura la instancia del boletín creado
+        $boletin = Boletin::create([
             'user_id' => Auth::id(),
             'archivo' => $rutaArchivo,
             'contenido' => $request->contenido,
             'estado' => 'pendiente',
         ]);
 
-        // *** Lógica para enviar email al operador cuando se importa un PDF (que también es pendiente) ***
         $operadores = User::role('operador')->get();
         foreach ($operadores as $operador) {
             Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
@@ -184,6 +197,9 @@ class BoletinController extends Controller
 
     public function exportarCSV(Request $request)
     {
+        // Autorización: El usuario debe tener permiso para exportar boletines.
+        $this->authorize('export', Boletin::class);
+
         $query = $request->input('q');
         $estado = $request->input('estado');
 
@@ -200,8 +216,7 @@ class BoletinController extends Controller
             $boletines->where('estado', $estado);
         }
 
-        // Aquí es donde necesitas obtener los resultados antes de pasarlos al callback
-        $boletinesResultados = $boletines->get(); // <-- Añade esta línea para ejecutar la consulta
+        $boletinesResultados = $boletines->get();
 
         $nombreArchivo = 'boletines_' . now()->format('Y-m-d_H-i-s') . '.csv';
 
@@ -212,11 +227,11 @@ class BoletinController extends Controller
 
         $columnas = ['ID', 'Usuario', 'Estado', 'Contenido', 'Observaciones', 'Archivo', 'Creado'];
 
-        $callback = function () use ($boletinesResultados, $columnas) { // Usa $boletinesResultados aquí
+        $callback = function () use ($boletinesResultados, $columnas) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columnas);
 
-            foreach ($boletinesResultados as $boletin) { // Itera sobre los resultados
+            foreach ($boletinesResultados as $boletin) {
                 fputcsv($file, [
                     $boletin->id,
                     optional($boletin->user)->name ?? 'Sin usuario',
@@ -231,6 +246,6 @@ class BoletinController extends Controller
             fclose($file);
         };
 
-        return response()->stream($callback, 200, $headers); // <-- Añade esta línea
+        return response()->stream($callback, 200, $headers);
     }
 }

@@ -14,13 +14,15 @@
                 <tr class="bg-white hover:bg-gray-300">
                     <td class="px-6 py-4 flex items-center group relative">
                         <span>{{ $producto->tipo }}</span>
-                        <a href="{{ route('productos.show', $producto) }}">
-                            <img src="{{ asset('images/ojo-open.svg') }}"
-                                class="w-6 h-4 absolute left-[calc(40%+4px)] top-1/2 -translate-y-1/2 
+                        @can('view', $producto)
+                            <a href="{{ route('productos.show', $producto) }}">
+                                <img src="{{ asset('images/ojo-open.svg') }}"
+                                    class="w-6 h-4 absolute left-[calc(40%+4px)] top-1/2 -translate-y-1/2 
                                         opacity-0 group-hover:opacity-30 
                                         transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto"
-                                alt="editar">
-                        </a>
+                                    alt="editar">
+                            </a>
+                        @endcan
                     </td>
 
                     <td class="max-w-xs px-4 py-2 text-gray-600 break-words whitespace-normal align-top">
@@ -40,15 +42,19 @@
 
                     <td class="px-4 py-2 space-x-2">
                         {{-- <a href="{{ route('productos.show', $producto) }}" class="text-blue-600 hover:underline">Ver</a> --}}
-                        <a href="{{ route('productos.edit', $producto) }}"
-                            class="text-yellow-600 hover:underline">Editar</a>
+                        @can('update', $producto)
+                            <a href="{{ route('productos.edit', $producto) }}"
+                                class="text-yellow-600 hover:underline">Editar</a>
+                        @endcan
 
-                        <!-- Botón que abre el modal -->
-                        <button type="button" onclick="mostrarModal('producto', '{{ $producto->id }}')"
-                            class="text-red-600 hover:underline">
-                            Eliminar
-                        </button>
-                        @include('productos.partials.modal-delete')
+                        @can('delete', $producto)
+                            <!-- Botón que abre el modal -->
+                            <button type="button" onclick="mostrarModal('producto', '{{ $producto->id }}')"
+                                class="text-red-600 hover:underline">
+                                Eliminar
+                            </button>
+                            @include('productos.partials.modal-delete')
+                        @endcan
                     </td>
                 </tr>
             @empty
