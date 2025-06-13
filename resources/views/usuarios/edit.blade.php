@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800">
+    <div class="container px-4 py-8 mx-auto">
+        <h1 class="mb-6 text-3xl font-bold text-gray-800">
             Editar Usuario: <span class="text-blue-600">{{ $usuario->name }}</span>
         </h1>
         {{-- Integración de Breadcrumbs si usas el paquete diglactic/laravel-breadcrumbs --}}
@@ -12,28 +12,28 @@
 
         {{-- Mensajes de sesión --}}
         @if (session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <div class="relative px-4 py-3 mb-4 text-green-700 bg-green-100 border border-green-400 rounded" role="alert">
                 <strong class="font-bold">¡Éxito!</strong>
                 <span class="block sm:inline">{{ session('success') }}</span>
             </div>
         @endif
 
         @if (session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <div class="relative px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded" role="alert">
                 <strong class="font-bold">¡Error!</strong>
                 <span class="block sm:inline">{{ session('error') }}</span>
             </div>
         @endif
 
         @if (session('info'))
-            <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <div class="relative px-4 py-3 mb-4 text-blue-700 bg-blue-100 border border-blue-400 rounded" role="alert">
                 <strong class="font-bold">¡Información!</strong>
                 <span class="block sm:inline">{{ session('info') }}</span>
             </div>
         @endif
 
         @if ($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            <div class="relative px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded">
                 <strong class="font-bold">¡Error de Validación!</strong>
                 <span class="block sm:inline">Por favor, corrige los siguientes problemas:</span>
                 <ul class="mt-3 list-disc list-inside">
@@ -48,7 +48,7 @@
         {{-- El @can('update', $usuario) en el controlador ya debería manejar el acceso a esta página --}}
         {{-- Este @can aquí es más para mostrar/ocultar el formulario si la política lo permite --}}
         @can('update', $usuario)
-            <div class="bg-white shadow-lg rounded-lg p-8 max-w-4xl mx-auto">
+            <div class="max-w-4xl p-8 mx-auto bg-white rounded-lg shadow-lg">
                 <form action="{{ route('usuarios.update', $usuario->id) }}" method="POST">
                     @csrf
                     @method('PUT')
@@ -56,7 +56,7 @@
                     {{-- **INICIO: Mensaje de Advertencia para administrador** --}}
                     {{-- Comprueba si el usuario logueado es el que se está editando Y si es administrador --}}
                     @if (Auth::id() === $usuario->id && Auth::user()->hasRole('administrador'))
-                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-md"
+                        <div class="p-4 mb-6 text-yellow-700 bg-yellow-100 border-l-4 border-yellow-500 rounded-md"
                             role="alert">
                             <p class="font-bold">¡Advertencia: Estás editando tu propio perfil de administrador!</p>
                             <p class="text-sm">Ten extrema precaución al modificar tus propios roles o permisos. Si te quitas el
@@ -68,37 +68,37 @@
                     {{-- **FIN: Mensaje de Advertencia** --}}
 
                     {{-- Sección de Datos Básicos del Usuario --}}
-                    <h2 class="text-2xl font-semibold mb-4 text-gray-700">Datos del Usuario</h2>
+                    <h2 class="mb-4 text-2xl font-semibold text-gray-700">Datos del Usuario</h2>
                     <div class="mb-6">
                         <label for="name" class="block text-sm font-medium text-gray-700">Nombre:</label>
                         <input type="text" name="name" id="name" value="{{ old('name', $usuario->name) }}"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         @error('name')
-                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                            <span class="text-sm text-red-500">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="mb-6">
                         <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
                         <input type="email" name="email" id="email" value="{{ old('email', $usuario->email) }}"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         @error('email')
-                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                            <span class="text-sm text-red-500">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="mb-6">
                         <label for="password" class="block text-sm font-medium text-gray-700">Contraseña (dejar en blanco para
                             no cambiar):</label>
                         <input type="password" name="password" id="password"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         @error('password')
-                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                            <span class="text-sm text-red-500">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="mb-6">
                         <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirmar
                             Contraseña:</label>
                         <input type="password" name="password_confirmation" id="password_confirmation"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                     </div>
 
                     {{-- Sección de Roles y Permisos (condicional a 'gestionar_roles_y_permisos') --}}
@@ -107,15 +107,15 @@
                         {{-- 'editar roles y permisos de usuario' es el permiso que necesitas en tu UserPolicy --}}
                         <hr class="my-8 border-gray-300">
 
-                        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Roles del Usuario</h2>
-                        <p class="text-gray-600 text-sm mb-4">Selecciona los roles que este usuario debe tener. Los roles confieren
+                        <h2 class="mb-4 text-2xl font-semibold text-gray-700">Roles del Usuario</h2>
+                        <p class="mb-4 text-sm text-gray-600">Selecciona los roles que este usuario debe tener. Los roles confieren
                             conjuntos de permisos.</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 mb-8">
+                        <div class="grid grid-cols-1 mb-8 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6">
                             @forelse ($roles as $role)
                                 <div class="flex items-center">
                                     <input type="checkbox" name="roles[]" value="{{ $role->name }}"
                                         id="role_{{ $role->id }}"
-                                        class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                        class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                         @checked(in_array($role->name, $userRoles))>
                                     <label for="role_{{ $role->id }}" class="ml-3 text-sm font-medium text-gray-700">
                                         {{ $role->name }}
@@ -129,13 +129,13 @@
 
                         <hr class="my-8 border-gray-300">
 
-                        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Permisos Directos del Usuario</h2>
-                        <p class="text-gray-600 text-sm mb-4">
+                        <h2 class="mb-4 text-2xl font-semibold text-gray-700">Permisos Directos del Usuario</h2>
+                        <p class="mb-4 text-sm text-gray-600">
                             Marca un permiso para asignarlo directamente a este usuario. Desmárcalo para revocarlo.
                             Si un permiso se obtiene a través de un rol, aparecerá con "(Vía Rol)" y no podrá ser modificado
                             directamente desde aquí.
                         </p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 mb-8">
+                        <div class="grid grid-cols-1 mb-8 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6">
                             @forelse ($permissions as $permission)
                                 {{-- Definimos las variables para cada permiso dentro del bucle --}}
                                 @php
@@ -155,7 +155,7 @@
                                     <label for="permission_{{ $permission->id }}" class="ml-3 text-sm font-medium text-gray-700">
                                         {{ $permission->name }}
                                         @if ($isViaRole && !$isDirect)
-                                            <span class="ml-2 text-xs text-blue-600 font-medium">(Vía Rol)</span>
+                                            <span class="ml-2 text-xs font-medium text-blue-600">(Vía Rol)</span>
                                         @endif
                                     </label>
                                 </div>
@@ -166,21 +166,21 @@
                         </div>
                     @else
                         {{-- Mensaje si el usuario logueado no tiene permiso para gestionar roles/permisos --}}
-                        <div class="bg-red-400 border-l-4 border-gray-300 text-gray-700 p-4 mb-6 rounded-lg" role="alert">
+                        <div class="p-4 mb-6 text-gray-700 bg-red-400 border-l-4 border-gray-300 rounded-lg" role="alert">
                             <p class="font-bold">Acceso Restringido</p>
                             <p class="text-sm">No tienes los permisos necesarios para modificar los roles y permisos de este
                                 usuario.</p>
                         </div>
                     @endcan
 
-                    <div class="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mt-6">
+                    <div class="flex flex-col gap-4 mt-6 sm:flex-row sm:justify-between sm:items-center">
                         <a href="{{ route('usuarios.index') }}"
                             class="px-4 py-2 text-center text-white bg-gray-600 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                             Volver a la lista de usuarios
                         </a>
 
                         <button type="submit"
-                            class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                            class="inline-flex items-center px-6 py-3 text-sm font-medium text-white transition duration-150 ease-in-out bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             Guardar Cambios
                         </button>
                     </div>
@@ -188,10 +188,10 @@
             </div>
         @else
             {{-- Mensaje si el usuario logueado no tiene permiso para editar al usuario (incluso los datos básicos) --}}
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg" role="alert">
+            <div class="p-4 mb-6 text-red-700 bg-red-100 border-l-4 border-red-500 rounded-lg" role="alert">
                 <p class="font-bold">Acceso Denegado</p>
                 <p class="text-sm">No tienes permiso para editar este perfil de usuario.</p>
-                <a href="{{ route('usuarios.index') }}" class="mt-4 inline-block text-blue-600 hover:text-blue-800">Volver a
+                <a href="{{ route('usuarios.index') }}" class="inline-block mt-4 text-blue-600 hover:text-blue-800">Volver a
                     la lista de usuarios</a>
             </div>
         @endcan

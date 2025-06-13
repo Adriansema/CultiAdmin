@@ -200,19 +200,36 @@ window.onload = function(){
     };
 
     function renderChart(data) {
+        const chartDom = document.getElementById('chart');
+
+        if (!chartDom) {
+            console.error("Error: Contenedor de la gráfica con id 'chart' no encontrado en el DOM.");
+            return;
+        }
+
+        // Importante: Asegurarse de que el contenedor tiene dimensiones
+        // Esto es lo que causa "Can't get DOM width or height" si no tiene tamaño.
+        if (chartDom.offsetWidth === 0 || chartDom.offsetHeight === 0) {
+        console.warn("Advertencia: El contenedor de la gráfica tiene ancho o alto cero. Reintentando renderizar en 200ms...");
+        chartDom.innerHTML = `<div class="text-center text-gray-500 p-4">Cargando gráfica...</div>`;
+        setTimeout(() => renderChart(data), 200);
+        return;
+    }
+
+        // Lógica de ordenamiento y preparación de datos
         let datosOrdenados = [...data.vistas];
 
         switch (filtroActual) {
             case 'ultimos3dias':
             case 'mes':
+
                 datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
                 break;
 
             case 'semana':
                 const hoy = new Date();
-                let diaSemana = hoy.getDay(); // 0 = domingo, ..., 3 = miércoles
-                let diferencia = (diaSemana >= 3) ? diaSemana - 3 : 7 - (3 - diaSemana);
-
+                let diaSemana = hoy.getDay();
+                let diferencia = (diaSemana >= 3) ? diaSemana - 3 : 7 - (3 - diaSemana); // Lógica de hace 3 días
                 let inicio = new Date(hoy);
                 inicio.setDate(hoy.getDate() - diferencia);
 
@@ -228,69 +245,83 @@ window.onload = function(){
                 };
 
                 const datosSemana = [];
-
                 for (let i = 0; i < 7; i++) {
                     const fecha = new Date(inicio);
                     fecha.setDate(inicio.getDate() + i);
-
                     const fechaClave = formatearLabel(fecha);
                     const etiqueta = fechaClave;
-
-                    const dato = datosOrdenados.find(d => d.grupo === fechaClave);
-
+                    const dato = data.vistas.find(d => d.grupo === fechaClave); // Usar data.vistas aquí
                     datosSemana.push({
                         grupo: etiqueta,
                         total: dato ? dato.total : 0
                     });
                 }
-
                 datosOrdenados = datosSemana;
                 break;
 
             case 'año':
-                const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                // Para el filtro 'año', los grupos serán los nombres de los meses (ej. "Enero")
+                // Asegúrate que tu API te envía los meses correctamente formateados.
+                const mesesOrden = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
                 datosOrdenados.sort((a, b) =>
-                    meses.indexOf(a.grupo.toLowerCase()) - meses.indexOf(b.grupo.toLowerCase())
+                    mesesOrden.indexOf(a.grupo.toLowerCase()) - mesesOrden.indexOf(b.grupo.toLowerCase())
                 );
+                break;
+
+            case 'rangoPersonalizado':
+                // Si el rango personalizado devuelve fechas (YYYY-MM-DD), ordenarlas por fecha
+                datosOrdenados.sort((a, b) => new Date(a.grupo) - new Date(b.grupo));
+                break;
+
+            case 'todo': // Asumiendo que 'todo' agrupa por año
+                datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
                 break;
         }
 
+        // si el array de datos esta vacio o no es un array ntonces si mostrar el mensaje pero sielementos  incluso si todos lo totales son cero lo renderizamos
         if (!Array.isArray(datosOrdenados) || datosOrdenados.length === 0) {
-            document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos para mostrar.</div>`;
-            // Asegúrate de resetear las métricas también si no hay datos de visitas
-            updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 });
-            return;
+        document.querySelector("#chart").innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos válidos para mostrar para este período.</div>`;
+        updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 });
+        if (myChart) {
+            myChart.dispose(); // Si había una gráfica, la eliminamos.
+            myChart = null;
         }
+        return; // Salimos de la función.
+    }
 
-        // Preparar datos
+        // Preparar datos para ECharts
         const labels = datosOrdenados.map(item => item.grupo);
         const values = datosOrdenados.map(item => parseInt(item.total));
 
-        // Crear instancia o reutilizar
-        const chartDom = document.getElementById('chart');
-        if (!window.chartInstance) {
-            window.chartInstance = echarts.init(chartDom);
-        } else {
-            window.chartInstance.dispose();
-            window.chartInstance = echarts.init(chartDom);
+        // Inicializar ECharts si no existe, o simplemente actualizar las opciones
+        // La instancia 'myChart' se declara globalmente al principio del script.
+        if (myChart === null) {
+            myChart = echarts.init(chartDom);
+             // Registrar el listener de resize solo una vez, cuando el chart se inicializa por primera vez.
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
         }
+        // Si ya existe, solo actualizamos las opciones. No dispose() y init() de nuevo.
 
         const options = {
             tooltip: {
                 trigger: 'axis',
                 formatter: function (params) {
-                    const data = params[0];
-                    const index = data.dataIndex;
-                    const valorActual = data.value;
+                    // console.log("Tooltip params:", params); // Depuración del tooltip
+                    const dataPoint = params[0];
+                    const index = dataPoint.dataIndex;
+                    const valorActual = dataPoint.value;
                     let porcentaje = 0;
                     if (index > 0) {
                         const anterior = values[index - 1];
                         porcentaje = anterior === 0 ? 0 : ((valorActual - anterior) / anterior * 100).toFixed(1);
                     }
+                    const seriesName = dataPoint.seriesName || (filtroActual === 'año' ? 'Registros' : 'Visitas'); // Nombre dinámico
                     return `
                         <div class="p-2">
-                            <strong>${data.name}</strong><br>
-                            Visitas: <strong>${valorActual}</strong><br>
+                            <strong>${dataPoint.name}</strong><br>
+                            ${seriesName}: <strong>${valorActual}</strong><br>
                             Cambio: <strong>${porcentaje}%</strong>
                         </div>`;
                 }
@@ -307,13 +338,22 @@ window.onload = function(){
                 data: labels,
                 axisLabel: {
                     color: '#000',
-                    fontSize: 12
+                    fontSize: 12,
+                    interval: 0, // Mostrar todas las etiquetas
+                    rotate: 30 // Rotar para evitar superposición en etiquetas largas
                 }
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                minInterval: 1, // Asegura que el eje Y muestra números enteros
+                axisLabel: {
+                    formatter: function (value) {
+                        return value % 1 === 0 ? value : ''; // Muestra solo enteros
+                    }
+                }
             },
             series: [{
+                name: (filtroActual === 'año' ? 'Registros' : 'Visitas'), // Nombre dinámico de la serie
                 data: values,
                 type: 'line',
                 smooth: true,
@@ -330,21 +370,22 @@ window.onload = function(){
                     width: 1.5
                 },
                 symbolSize: 8
-            }]
+            }],
+            // Añade un título dinámico si lo deseas
+            title: {
+                text: (filtroActual === 'año' ? 'Nuevos Registros por Mes' : 'Visitas') // O más específico según el filtro
+            }
         };
 
-        window.chartInstance.setOption(options);
+        myChart.setOption(options);
 
-        // Hacer que se redimensione automáticamente
-        window.addEventListener('resize', () => {
-            window.chartInstance.resize();
-        });
+        // Ya no necesitamos window.addEventListener('resize') aquí, se registra una sola vez arriba.
 
         // Actualizar métricas
-        updateMetrics(data);
-        console.log("Datos recibidos:", data.vistas);
-
+        updateMetrics(data); // Asegúrate de que esta función existe y es global o está accesible
+        console.log("Datos de gráfica recibidos y procesados para ECharts:", data.vistas);
     }
+
 
     // Función para actualizar las métricas
     function updateMetrics(data) {
