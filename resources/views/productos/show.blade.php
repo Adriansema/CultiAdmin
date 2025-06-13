@@ -1,4 +1,4 @@
-@extends('layouts.app')
+{{-- @extends('layouts.app')
 
 @section('title', 'Detalle del Producto')
 
@@ -8,13 +8,13 @@
             <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Volver">
             <h1 class="text-3xl whitespace-nowrap font-bold">Detalles del Producto</h1>
         </div>
-        {{-- Asegúrate de que Breadcrumbs::render esté correctamente configurado en tu proyecto --}}
+         Asegúrate de que Breadcrumbs::render esté correctamente configurado en tu proyecto --}
         {!! Breadcrumbs::render('productos.show', $producto) !!}
     </div>
 
     <div class="container max-w-4xl py-4 mx-auto bg-[var(--color-formulario)] shadow-xl px-8 space-x-4 rounded-lg">
 
-        {{-- Sección de Estado del Producto (Más Prominente) --}}
+        {{-- Sección de Estado del Producto (Más Prominente) --}
         <div
             class="mb-6 p-4 rounded-lg
                 @if ($producto->estado === 'aprobado') bg-green-100 text-green-800 border border-green-300
@@ -34,7 +34,7 @@
                         Rechazado por: <span class="font-medium">{{ $producto->rechazador->name }}</span>
                     </p>
                 @endif
-                {{-- Botón para editar producto: Visible solo si el producto está rechazado Y el usuario puede 'editar productos' --}}
+                {{-- Botón para editar producto: Visible solo si el producto está rechazado Y el usuario puede 'editar productos' --}
                 @can('update', $producto)
                     <div class="mt-4">
                         <a href="{{ route('productos.edit', $producto->id) }}"
@@ -72,7 +72,7 @@
             <p class="text-gray-800 whitespace-pre-line break-words">{{ $producto->observaciones ?? 'N/A' }}</p>
         </div>
 
-        {{-- Mostrar detalles específicos según el tipo de producto --}}
+        {{-- Mostrar detalles específicos según el tipo de producto --}
         @if ($producto->tipo === 'café' && $producto->cafe)
             <h2 class="text-xl font-bold mt-6 mb-4">Detalles de Café</h2>
 
@@ -138,6 +138,63 @@
                 class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">
                 Volver al listado
             </a>
+        </div>
+    </div>
+@endsection --}}
+
+
+@extends('layouts.app') {{-- Asume que tienes un layout base --}}
+
+@section('content')
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Detalles del Producto</h1>
+
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <p class="mb-2"><strong class="font-semibold">ID:</strong> {{ $producto->id }}</p>
+            <p class="mb-2"><strong class="font-semibold">Tipo:</strong> {{ $producto->tipo }}</p>
+            <p class="mb-2"><strong class="font-semibold">Estado:</strong> {{ $producto->estado }}</p>
+            <p class="mb-2"><strong class="font-semibold">Observaciones Generales:</strong>
+                {{ $producto->observaciones ?? 'N/A' }}</p>
+
+            @if ($producto->imagen)
+                <div class="mb-4">
+                    <strong class="font-semibold">Imagen del Producto:</strong>
+                    <img src="{{ asset('storage/' . $producto->imagen) }}" alt="Imagen del producto"
+                        class="mt-2 w-64 h-auto object-cover rounded-lg">
+                </div>
+            @endif
+
+            @if ($producto->user)
+                <p class="mb-2"><strong class="font-semibold">Creado por:</strong> {{ $producto->user->nombre }}
+                    {{ $producto->user->apellido }} ({{ $producto->user->correo }})</p>
+            @endif
+
+            @if ($producto->tipo === 'café' && $producto->cafe)
+                <h2 class="text-xl font-semibold mt-4 mb-2">Detalles de Café</h2>
+                <p class="mb-2"><strong class="font-semibold">Número de Página:</strong>
+                    {{ $producto->cafe->numero_pagina }}</p>
+                <p class="mb-2"><strong class="font-semibold">Clase:</strong> {{ $producto->cafe->clase ?? 'N/A' }}</p>
+                <p class="mb-2"><strong class="font-semibold">Información de Café:</strong>
+                    {{ $producto->cafe->informacion }}</p>
+            @elseif ($producto->tipo === 'mora' && $producto->mora)
+                <h2 class="text-xl font-semibold mt-4 mb-2">Detalles de Mora</h2>
+                <p class="mb-2"><strong class="font-semibold">Número de Página:</strong>
+                    {{ $producto->mora->numero_pagina }}</p>
+                <p class="mb-2"><strong class="font-semibold">Clase:</strong> {{ $producto->mora->clase ?? 'N/A' }}</p>
+                <p class="mb-2"><strong class="font-semibold">Información de Mora:</strong>
+                    {{ $producto->mora->informacion }}</p>
+            @endif
+
+            <div class="mt-6 flex space-x-4">
+                <a href="{{ route('productos.edit', $producto) }}"
+                    class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Editar Producto
+                </a>
+                <a href="{{ route('productos.index') }}"
+                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Volver a la Lista
+                </a>
+            </div>
         </div>
     </div>
 @endsection
