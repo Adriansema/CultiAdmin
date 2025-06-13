@@ -21,8 +21,12 @@
         @method('PUT') {{-- Método PUT para actualizaciones en Laravel --}}
 
         <div class="mb-4">
-            <label for="tipo" class="block text-gray-700 text-sm font-bold mb-2">Tipo (Café o Mora):</label>
-            <input type="text" name="tipo" id="tipo" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="{{ old('tipo', $noticia->tipo) }}" placeholder="Ej. café o mora">
+            <label for="tipo" class="block text-gray-700 text-sm font-bold mb-2">Tipo de Producto:</label>
+            <select name="tipo" id="tipo" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <option value="">Seleccione un tipo</option>
+                <option value="café" {{ old('tipo') == 'café' ? 'selected' : '' }}>Café</option>
+                <option value="mora" {{ old('tipo') == 'mora' ? 'selected' : '' }}>Mora</option>
+            </select>
             @error('tipo')
                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
             @enderror

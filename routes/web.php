@@ -73,10 +73,10 @@ Route::middleware([
                Route::post('/', [BoletinController::class, 'store'])->name('store');
                Route::post('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf');
                Route::get('/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('exportarCSV');
-               Route::get('/{boletin}/edit', [BoletinController::class, 'edit'])->name('edit');
+               /* Route::get('/{boletin}/edit', [BoletinController::class, 'edit'])->name('edit'); */
                Route::put('/{boletin}', [BoletinController::class, 'update'])->name('update');
                Route::delete('/{boletin}', [BoletinController::class, 'destroy'])->name('destroy');
-               Route::get('/{boletin}', [BoletinController::class, 'show'])->name('show');
+               /* Route::get('/{boletin}', [BoletinController::class, 'show'])->name('show'); */
           });
 
           Route::prefix('usuario')->name('usuarios.')->group(function () {
@@ -124,7 +124,7 @@ Route::middleware([
 Route::fallback(function () {
      // Si un usuario no autenticado llega aquí, podría redirigir a 'welcome'
      if (!Auth::check()) {
-          return redirect()->route('welcome');
+          return redirect()->route('login');
      }
      // Si un usuario autenticado llega aquí, podría redirigir al dashboard con un error
      return redirect()->route('dashboard')->with('error', 'Ruta no encontrada.');

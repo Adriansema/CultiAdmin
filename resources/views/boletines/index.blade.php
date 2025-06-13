@@ -6,11 +6,6 @@
 
 @section('content')
     <div class="max-w-6xl py-6 mx-auto">
-        @if (session('success'))
-            <div class="p-4 mb-4 text-green-800 bg-green-100 border border-green-300 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
         <div>
             <h1 class="flex items-center space-x-2 text-3xl font-bold text-gray-800">
                 <img src="{{ asset('images/reverse.svg') }}" alt="icono" class="w-5 h-5">
