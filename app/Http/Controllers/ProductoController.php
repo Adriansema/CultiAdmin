@@ -23,10 +23,6 @@ class ProductoController extends Controller
 
     public function index(Request $request, ProductService $productService)
     {
-        /* dd($request->all()); */
-        // Autorización: El usuario debe tener permiso para ver cualquier producto (para la lista).
-        // Si el 'before' de la Policy permite al administrador pasar, esta línea será ignorada para él.
-        $this->authorize('viewAny', Producto::class);
 
         $productos = $productService->obtenerProductosFiltrados($request);
         return view('productos.index', compact('productos'));
@@ -35,8 +31,6 @@ class ProductoController extends Controller
     // Si también necesitas una respuesta JSON (ej. para una API o Vue/React):
     public function getFilteredProducts(Request $request, ProductService $productService)
     {
-        // Autorización: Mismo permiso que viewAny, ya que es para ver la lista filtrada.
-        $this->authorize('viewAny', Producto::class);
 
         $productos = $productService->obtenerProductosFiltrados($request);
         return response()->json($productos);
@@ -44,8 +38,7 @@ class ProductoController extends Controller
 
     public function create()
     {
-        // Autorización: El usuario debe tener permiso para crear productos.
-        $this->authorize('create', Producto::class);
+
 
         // Asegúrate de que las vistas tienen las variables necesarias.
         // Las variables $tiposCafe, $cafeInformaciones, etc. no estaban aquí,
@@ -60,8 +53,6 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
-        // Autorización: El usuario debe tener permiso para crear productos.
-        $this->authorize('create', Producto::class);
 
         // 1. Definir las reglas de validación base para el producto.
         $rules = [
@@ -143,8 +134,6 @@ class ProductoController extends Controller
      */
     public function edit(Producto $producto)
     {
-        // Autorización: El usuario debe tener permiso para actualizar este producto específico.
-        $this->authorize('update', $producto);
 
         // Cargar las relaciones necesarias para la vista de edición.
         // Solo necesitamos cargar 'cafe' o 'mora' directamente, no sus sub-relaciones.
@@ -161,8 +150,7 @@ class ProductoController extends Controller
      */
     public function update(Request $request, Producto $producto)
     {
-        // Autorización: El usuario debe tener permiso para actualizar este producto específico.
-        $this->authorize('update', $producto);
+
 
         // 1. Definir las reglas de validación base para la actualización del producto.
         $rules = [
@@ -254,8 +242,6 @@ class ProductoController extends Controller
      */
     public function show(Producto $producto)
     {
-        // Autorización: El usuario debe tener permiso para ver este producto específico.
-        $this->authorize('view', $producto);
 
         // Cargar las relaciones necesarias para mostrar los detalles.
         // Solo cargamos las relaciones directas que existen.
@@ -273,8 +259,6 @@ class ProductoController extends Controller
 
     public function destroy(Producto $producto)
     {
-        // Autorización: El usuario debe tener permiso para eliminar este producto específico.
-        $this->authorize('delete', $producto);
 
         // Tu lógica de borrado (mantén la misma)
         $producto->delete();
@@ -284,8 +268,6 @@ class ProductoController extends Controller
 
     public function importarCSV(Request $request)
     {
-        // Autorización: El usuario debe tener permiso para importar/crear productos.
-        $this->authorize('import', Producto::class);
 
         $request->validate([
             'archivo_csv' => 'required|file|mimes:csv,txt',
@@ -348,60 +330,6 @@ class ProductoController extends Controller
                     'tipo' => $tipo,
                 ]);
 
-                /* // 2. Crear las relaciones anidadas según el tipo
-                if ($tipo === 'café') {
-                    // Crear los registros de detalle de Café
-                    $cafInfor = CafInfor::create([
-                        'numero_pagina' => 1,
-                        'informacion' => $datosFila['caf_infor_informacion'] ?? '',
-                    ]);
-
-                    $cafInsumos = CafInsumos::create([
-                        'numero_pagina' => 1,
-                        'informacion' => $datosFila['caf_insumos_informacion'] ?? '',
-                    ]);
-
-                    $cafPatoge = CafPatoge::create([
-                        'numero_pagina' => 1,
-                        'patogeno' => $datosFila['caf_patoge_patogeno'] ?? 'General',
-                        'informacion' => $datosFila['caf_patoge_informacion'] ?? '',
-                    ]);
-
-                    // Crear el registro en la tabla 'cafe' y vincularlo
-                    Cafe::create([
-                        'producto_id' => $producto->id,
-                        'id_caf' => $cafInfor->id_caf,
-                        'id_insumos' => $cafInsumos->id_insumos,
-                        'id_patoge' => $cafPatoge->id_patoge,
-                    ]);
-
-                } elseif ($tipo === 'mora') {
-                    // Crear los registros de detalle de Mora
-                    $moraInf = MoraInf::create([
-                        'numero_pagina' => 1,
-                        'informacion' => $datosFila['mora_inf_informacion'] ?? '',
-                    ]);
-
-                    $moraInsu = MoraInsu::create([
-                        'numero_pagina' => 1,
-                        'informacion' => $datosFila['mora_insu_informacion'] ?? '',
-                    ]);
-
-                    $moraPatoge = MoraPatoge::create([
-                        'numero_pagina' => 1,
-                        'patogeno' => $datosFila['mora_patoge_patogeno'] ?? 'General',
-                        'informacion' => $datosFila['mora_patoge_informacion'] ?? '',
-                    ]);
-
-                    // Crear el registro en la tabla 'mora' y vincularlo
-                    Mora::create([
-                        'producto_id' => $producto->id,
-                        'id_info' => $moraInf->id_info,
-                        'id_insu' => $moraInsu->id_insu,
-                        'id_pat' => $moraPatoge->id_pat,
-                    ]);
-                }
- */
                 $productosCreados++;
 
                 // Lógica para enviar email al operador (solo si se creó el producto con éxito)
@@ -431,8 +359,6 @@ class ProductoController extends Controller
 
     public function exportarCSV(Request $request)
     {
-        // Autorización: El usuario debe tener permiso para exportar productos.
-        $this->authorize('export', Producto::class);
 
         // 1. Obtener los parámetros de filtro de la solicitud
         $query = $request->input('q');

@@ -19,25 +19,20 @@
     </td>
 
     <td class="flex flex-col px-4 py-2 space-y-1 align-top md:space-y-0 md:space-x-2 md:flex-row boletin-acciones-cell">
-        @can('view', $boletin)
-            <button type="button" onclick="mostrarModal('ver', '{{ $boletin->id }}')"
-                class="px-3 py-1 text-sm text-center text-white bg-green-600 rounded hover:bg-green-700">
-                Ver
-            </button>
-        @endcan
 
-        @can('update', $boletin)
-            <button type="button" onclick="mostrarModal('editar', '{{ $boletin->id }}')"
-                class="px-3 py-1 text-sm text-center text-white bg-yellow-600 rounded hover:bg-yellow-700">
-                Editar
-            </button>
-        @endcan
+        <button type="button" onclick="mostrarModal('ver', '{{ $boletin->id }}')"
+            class="px-3 py-1 text-sm text-center text-white bg-green-600 rounded hover:bg-green-700">
+            Ver
+        </button>
 
-        @can('delete', $boletin)
-            <button type="button" onclick="mostrarModal('boletin', '{{ $boletin->id }}')"
-                class="w-20 px-1 py-1 text-sm text-center text-white bg-red-600 rounded hover:bg-red-700">
-                Eliminar
-            </button>
-        @endcan
+        <button type="button" onclick="mostrarModal('editar', '{{ $boletin->id }}')"
+            class="px-3 py-1 text-sm text-center text-white bg-yellow-600 rounded hover:bg-yellow-700">
+            Editar
+        </button>
+
+        <button type="button" onclick="mostrarModal('boletin', '{{ $boletin->id }}')"
+            class="w-20 px-1 py-1 text-sm text-center text-white bg-red-600 rounded hover:bg-red-700">
+            Eliminar
+        </button>
     </td>
 </tr>

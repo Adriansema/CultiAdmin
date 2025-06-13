@@ -1,11 +1,9 @@
 <?php
 
-// actualizacion 06/06/2025 - Integración de permisos con Spatie y Laravel Policies
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckUserEstado;
 use App\Http\Controllers\PqrsController;
-use App\Http\Middleware\Roles_Admin_Opera; // Este middleware lo mantendremos para un control de acceso inicial
+use App\Http\Middleware\Roles_Admin_Opera;
 use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProductoController;
@@ -16,15 +14,9 @@ use App\Http\Controllers\CentroAyudaController;
 use App\Http\Controllers\ExportarCsvController;
 use App\Http\Controllers\AccesibilidadController;
 use App\Http\Controllers\Operador\OperadorProductoController;
-use App\Models\Producto; // Importar el modelo Producto para el middleware 'can'
-use App\Models\Boletin;  // Importar el modelo Boletin para el middleware 'can'
-use App\Models\User;     // Importar el modelo User para el middleware 'can'
-
-// Rutas públicas (no necesitan autenticación ni permisos)
-// Estas rutas NO deben estar dentro del middleware 'auth'
-Route::get('/', function () {
+/* Route::get('/', function () {
      return view('welcome');
-})->name('welcome');
+})->name('welcome'); */
 
 // Rutas para PQRS (Diseñadas para ser públicas, aceptan envíos de invitados)
 Route::prefix('pqrs')->name('pqrs.')->group(function () {
@@ -60,121 +52,47 @@ Route::middleware([
      CheckUserEstado::class // Verifica el estado activo/inactivo del usuario
 ])->group(function () {
 
-     // Dashboard (visible para cualquier usuario autenticado y activo)
-     // La autorización para el contenido del dashboard se puede hacer dentro del DashboardController
      Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-     // Este middleware Roles_Admin_Opera::class es un control de acceso inicial
-     // para usuarios que tienen el rol de administrador u operador.
+     
      Route::middleware([Roles_Admin_Opera::class])->group(function () {
-
-          // -------------------------------------------------------------------
-          // Módulo: Productos (Cultivos)
-          // Las Policies (`ProductoPolicy`) ya se encargan de los permisos específicos.
-          // Se usa middleware 'can' que delega a la Policy.
-          // -------------------------------------------------------------------
-          Route::prefix('productos')->name('productos.')->group(function () {
-               Route::get('/', [ProductoController::class, 'index'])->name('index')
-                    ->middleware('can:viewAny,' . Producto::class); // ver_productos
-
-               Route::get('/create', [ProductoController::class, 'create'])->name('create')
-                    ->middleware('can:create,' . Producto::class); // crear_productos
-
-               Route::post('/', [ProductoController::class, 'store'])->name('store')
-                    ->middleware('can:create,' . Producto::class); // crear_productos
-
-               Route::post('/importar-csv', [ProductoController::class, 'importarCSV'])->name('importar.csv')
-                    ->middleware('can:import,' . Producto::class); // importar_productos
-
-               Route::get('/exportar-csv', [ProductoController::class, 'exportarCSV'])->name('exportarCSV')
-                    ->middleware('can:export,' . Producto::class); // exportar_productos
-
-               Route::get('/{producto}/edit', [ProductoController::class, 'edit'])->name('edit')
-                    ->middleware('can:update,producto'); // editar_productos (Pasa la instancia de producto)
-
-               Route::get('/{producto}', [ProductoController::class, 'show'])->name('show')
-                    ->middleware('can:view,producto'); // ver_productos (Pasa la instancia de producto)
-
-               Route::put('/{producto}', [ProductoController::class, 'update'])->name('update')
-                    ->middleware('can:update,producto'); // editar_productos (Pasa la instancia de producto)
-
-               Route::delete('/{producto}', [ProductoController::class, 'destroy'])->name('destroy')
-                    ->middleware('can:delete,producto'); // eliminar_productos (Pasa la instancia de producto)
+          Route::prefix('producto')->name('productos.')->group(function () {
+               Route::get('/', [ProductoController::class, 'index'])->name('index');
+               Route::get('/create', [ProductoController::class, 'create'])->name('create');
+               Route::post('/', [ProductoController::class, 'store'])->name('store');
+               Route::post('/importar-csv', [ProductoController::class, 'importarCSV'])->name('importar.csv');
+               Route::get('/exportar-csv', [ProductoController::class, 'exportarCSV'])->name('exportarCSV');
+               Route::get('/{producto}/edit', [ProductoController::class, 'edit'])->name('edit');
+               Route::get('/{producto}', [ProductoController::class, 'show'])->name('show');
+               Route::put('/{producto}', [ProductoController::class, 'update'])->name('update');
+               Route::delete('/{producto}', [ProductoController::class, 'destroy'])->name('destroy');
           });
 
-
-          // -------------------------------------------------------------------
-          // Módulo: Boletines
-          // Asumo que tienes una `BoletinPolicy` similar a `ProductoPolicy`.
-          // -------------------------------------------------------------------
-          Route::prefix('boletines')->name('boletines.')->group(function () {
-               Route::get('/', [BoletinController::class, 'index'])->name('index')
-                    ->middleware('can:viewAny,' . Boletin::class); // ver_boletines
-
-               Route::get('/create', [BoletinController::class, 'create'])->name('create')
-                    ->middleware('can:create,' . Boletin::class); // crear_boletines
-
-               Route::post('/', [BoletinController::class, 'store'])->name('store')
-                    ->middleware('can:create,' . Boletin::class); // crear_boletines
-
-               Route::post('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf')
-                    ->middleware('can:import,' . Boletin::class); // importar_boletines
-
-               Route::get('/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('exportarCSV')
-                    ->middleware('can:export,' . Boletin::class); // exportar_boletines
-
-               Route::get('/{boletin}/edit', [BoletinController::class, 'edit'])->name('edit')
-                    ->middleware('can:update,boletin'); // editar_boletines
-
-               Route::put('/{boletin}', [BoletinController::class, 'update'])->name('update')
-                    ->middleware('can:update,boletin'); // editar_boletines
-
-               Route::delete('/{boletin}', [BoletinController::class, 'destroy'])->name('destroy')
-                    ->middleware('can:delete,boletin'); // eliminar_boletines
-
-               Route::get('/{boletin}', [BoletinController::class, 'show'])->name('show')
-                    ->middleware('can:view,boletin'); // ver_boletines
+          Route::prefix('boletin')->name('boletines.')->group(function () {
+               Route::get('/', [BoletinController::class, 'index'])->name('index');
+               Route::get('/create', [BoletinController::class, 'create'])->name('create');
+               Route::post('/', [BoletinController::class, 'store'])->name('store');
+               Route::post('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf');
+               Route::get('/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('exportarCSV');
+               Route::get('/{boletin}/edit', [BoletinController::class, 'edit'])->name('edit');
+               Route::put('/{boletin}', [BoletinController::class, 'update'])->name('update');
+               Route::delete('/{boletin}', [BoletinController::class, 'destroy'])->name('destroy');
+               Route::get('/{boletin}', [BoletinController::class, 'show'])->name('show');
           });
 
-          // -------------------------------------------------------------------
-          // Módulo: Usuarios (Gestión de Usuarios)
-          // Las Policies (`UserPolicy`) ya se encargan de los permisos específicos.
-          // -------------------------------------------------------------------
-          Route::prefix('usuarios')->name('usuarios.')->group(function () {
-               Route::get('/', [UsuarioController::class, 'index'])->name('index')
-                    ->middleware('can:viewAny,' . User::class); // ver_lista_usuarios
-
-               Route::get('/create', [UsuarioController::class, 'create'])->name('create')
-                    ->middleware('can:create,' . User::class); // crear_usuarios
-
-               Route::post('/', [UsuarioController::class, 'store'])->name('store')
-                    ->middleware('can:create,' . User::class); // crear_usuarios
-
-               Route::post('/importar-csv', [UsuarioController::class, 'importarCsv'])->name('importarCsv')
-                    ->middleware('can:import,' . User::class); // importar_usuarios
-
-               Route::get('/exportar', [UsuarioController::class, 'exportarCSV'])->name('exportar')
-                    ->middleware('can:export,' . User::class); // exportar_usuarios
-
-               Route::get('/{usuario}', [UsuarioController::class, 'show'])->name('show')
-                    ->middleware('can:view,usuario'); // ver lista de usuarios
-
-               Route::get('/{usuario}/edit', [UsuarioController::class, 'edit'])->name('edit')
-                    ->middleware('can:update,usuario'); // editar usuarios (update en la Policy)
-
-               Route::put('/{usuario}', [UsuarioController::class, 'update'])->name('update')
-                    ->middleware('can:update,usuario'); // editar usuarios (update en la Policy)
-
-               // Asumo que 'toggle' se gestiona por 'activar usuarios' o 'desactivar usuarios'
-               Route::patch('/{usuario}/toggle', [UsuarioController::class, 'toggle'])->name('toggle')
-                    ->middleware('can:toggle,usuario'); // Delega a UserPolicy@toggle
-
-               Route::delete('/{usuario}', [UsuarioController::class, 'destroy'])->name('destroy')
-                    ->middleware('can:delete,usuario'); // eliminar usuarios
+          Route::prefix('usuario')->name('usuarios.')->group(function () {
+               Route::get('/', [UsuarioController::class, 'index'])->name('index');
+               Route::get('/create', [UsuarioController::class, 'create'])->name('create');
+               Route::post('/', [UsuarioController::class, 'store'])->name('store');
+               Route::post('/importar-csv', [UsuarioController::class, 'importarCsv'])->name('importarCsv');
+               Route::get('/exportar', [UsuarioController::class, 'exportarCSV'])->name('exportar');
+               Route::get('/{usuario}', [UsuarioController::class, 'show'])->name('show');
+               /* Route::get('/{usuario}/edit', [UsuarioController::class, 'edit'])->name('edit'); */
+               Route::put('/{usuario}', [UsuarioController::class, 'update'])->name('update');
+               Route::patch('/{usuario}/toggle', [UsuarioController::class, 'toggle'])->name('toggle');
+               Route::delete('/{usuario}', [UsuarioController::class, 'destroy'])->name('destroy');
           });
 
-          Route::prefix('noticias')->name('noticias.')->group(function () {
-               // Rutas para la gestión de noticias (definidas individualmente)
+          Route::prefix('noticia')->name('noticias.')->group(function () {
                Route::get('noticias', [NoticiaController::class, 'index'])->name('noticias.index');
                Route::get('noticias/create', [NoticiaController::class, 'create'])->name('noticias.create');
                Route::post('noticias', [NoticiaController::class, 'store'])->name('noticias.store');
@@ -184,49 +102,20 @@ Route::middleware([
                Route::delete('noticias/{noticia}', [NoticiaController::class, 'destroy'])->name('noticias.destroy');
           });
 
-          // -------------------------------------------------------------------
-          // Módulo: Estadísticas (si fueran solo para admin)
-          // La Policy en StatisticController.php protegerá este acceso.
-          // -------------------------------------------------------------------
-          Route::get('admin/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index')
-               ->middleware('can:viewAny,\App\Models\Statistic'); // Asumo un modelo Statistic y un permiso.
+          Route::get('admin/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index');
+          Route::get('/generar-csv', [ExportarCsvController::class, 'generarCsv'])->name('generarCsv.general');
 
-          // -------------------------------------------------------------------
-          // Módulo: Generar usuarios masivos (Solo para propósitos de desarrollo/prueba)
-          // La Policy en ExportarCsvController.php protegerá este acceso.
-          // -------------------------------------------------------------------
-          Route::get('/generar-csv', [ExportarCsvController::class, 'generarCsv'])->name('generarCsv.general')
-               ->middleware('can:generateCsv,\App\Models\User'); // O el modelo/permiso apropiado
-
-          /*
-        |--------------------------------------------------------------------------
-        | Módulo: OPERADOR (Rutas específicas para el flujo del operador)
-        |--------------------------------------------------------------------------
-        */
-          // Las Policies (`ProductoPolicy` y `BoletinPolicy` con los métodos `validate` y `reject`)
-          // ya se encargan de los permisos específicos para el rol de operador.
           Route::prefix('operador')->name('operador.')->group(function () {
-               Route::get('/pendientes', [OperadorProductoController::class, 'pendientes'])->name('pendientes')
-                    ->middleware('can:viewAnyPending,' . Producto::class); // Asumo un permiso 'view_productos_pendientes' y un método 'viewAnyPending' en ProductoPolicy
+               Route::get('/pendientes', [OperadorProductoController::class, 'pendientes'])->name('pendientes');
 
-               Route::get('/productos/{producto}', [OperadorProductoController::class, 'showProducto'])->name('productos.show')
-                    ->middleware('can:view,producto'); // ver_productos
-
-               Route::post('/productos/{producto}/validar', [OperadorProductoController::class, 'validar'])->name('productos.validar')
-                    ->middleware('can:validate,producto'); // validar_productos
-
-               Route::post('/productos/{producto}/rechazar', [OperadorProductoController::class, 'rechazar'])->name('productos.rechazar')
-                    ->middleware('can:reject,producto'); // rechazar_productos
+               Route::get('/productos/{producto}', [OperadorProductoController::class, 'showProducto'])->name('productos.show');
+               Route::post('/productos/{producto}/validar', [OperadorProductoController::class, 'validar'])->name('productos.validar');
+               Route::post('/productos/{producto}/rechazar', [OperadorProductoController::class, 'rechazar'])->name('productos.rechazar');
 
                // Boletines para el operador
-               Route::get('/boletines/{boletin}', [OperadorProductoController::class, 'showBoletin'])->name('boletines.show')
-                    ->middleware('can:view,boletin'); // ver_boletines
-
-               Route::post('/boletines/{boletin}/validar', [OperadorProductoController::class, 'validarBoletin'])->name('boletines.validar')
-                    ->middleware('can:validate,boletin'); // validar_boletines
-
-               Route::post('/boletines/{boletin}/rechazar', [OperadorProductoController::class, 'rechazarBoletin'])->name('boletines.rechazar')
-                    ->middleware('can:reject,boletin'); // rechazar_boletines
+               Route::get('/boletines/{boletin}', [OperadorProductoController::class, 'showBoletin'])->name('boletines.show');
+               Route::post('/boletines/{boletin}/validar', [OperadorProductoController::class, 'validarBoletin'])->name('boletines.validar');
+               Route::post('/boletines/{boletin}/rechazar', [OperadorProductoController::class, 'rechazarBoletin'])->name('boletines.rechazar');
           });
      });
 });

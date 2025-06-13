@@ -10,9 +10,6 @@ class ExportarCsvController extends Controller
 {
     public function generarCsv()
     {
-        // Autorización: Solo usuarios con el permiso 'generar_usuarios_prueba' pueden ejecutar esta acción.
-        // Usamos User::class porque esta acción está relacionada con la generación de usuarios.
-        $this->authorize('generateCsv', User::class);
 
         $faker = Faker::create('es_ES');
 

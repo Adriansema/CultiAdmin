@@ -17,7 +17,6 @@ class UsuarioController extends Controller
 {
     public function index(Request $request, UserService $userService)
     {
-        $this->authorize('viewAny', User::class);
 
         $usuarios = $userService->obtenerUsuariosFiltrados($request);
         return view('usuarios.index', compact('usuarios'));
@@ -25,17 +24,12 @@ class UsuarioController extends Controller
 
     public function getFilteredUsers(Request $request, UserService $userService)
     {
-        // Autorización: Mismo permiso que viewAny.
-        $this->authorize('viewAny', User::class);
-
         $usuarios = $userService->obtenerUsuariosFiltrados($request);
         return response()->json($usuarios);
     }
 
     public function create()
     {
-        // Autorización: El usuario debe tener permiso para crear usuarios.
-        $this->authorize('create', User::class);
 
         $roles = Role::all();
         $usuario = new User();
@@ -44,8 +38,6 @@ class UsuarioController extends Controller
 
     public function store(Request $request)
     {
-        // Autorización: El usuario debe tener permiso para crear usuarios.
-        $this->authorize('create', User::class);
 
         $request->validate([
             'name'     => 'required|string|max:255',
@@ -60,31 +52,20 @@ class UsuarioController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Asignar el rol inicial
-        if ($request->filled('role')) {
-            $usuario->assignRole($request->role); // Usar assignRole para añadir el primer rol
-        }
+        $usuario->syncRoles([$request->role]);  // Asegura que solo este rol sea asignado al nuevo usuario
 
-        // Aquí no se autoriza porque el usuario se acaba de crear y el creador (el admin)
-        // tiene permiso para verlo/editarlo.
-        return redirect()->route('usuarios.edit', $usuario->id)->with('success', 'Usuario creado exitosamente. Ahora puedes asignar roles y permisos adicionales.');
+        return redirect()->route('usuarios.index', $usuario->id)->with('success', 'Usuario creado exitosamente.');
     }
 
 
     public function show(User $usuario)
     {
-        // Autorización: El usuario debe tener permiso para ver este usuario específico.
-        // O si es su propio perfil.
-        $this->authorize('view', $usuario);
 
         return view('usuarios.show', compact('usuario'));
     }
 
     public function toggle(User $usuario)
     {
-        // Autorización: El usuario debe tener permiso para activar/desactivar este usuario.
-        // La Policy ya incluye la lógica de no permitirse a sí mismo o a administradores.
-        $this->authorize('toggle', $usuario);
 
         // Alternar entre 'activo' e 'inactivo'
         $usuario->estado = $usuario->estado === 'activo' ? 'inactivo' : 'activo';
@@ -95,7 +76,6 @@ class UsuarioController extends Controller
 
     public function edit(User $usuario)
     {
-        $this->authorize('update', $usuario);
 
         // Obtener todos los roles y permisos disponibles en el sistema
         $roles = Role::all();
@@ -106,7 +86,7 @@ class UsuarioController extends Controller
         // --- ¡ESTA ES LA VARIABLE AÑADIDA PARA EL NUEVO FLUJO! ---
         $userPermissionsViaRoles = $usuario->getPermissionsViaRoles()->pluck('name')->toArray(); // Permisos que el usuario obtiene a través de sus roles
 
-        return view('usuarios.edit', compact(
+        return view('usuarios.index', compact(
             'usuario',
             'roles',
             'permissions',
@@ -118,8 +98,6 @@ class UsuarioController extends Controller
 
     public function update(Request $request, User $usuario)
     {
-        // Autorización para la acción de actualización general (ej. UserPolicy@update)
-        $this->authorize('update', $usuario);
 
         $validatedData = $request->validate([
             /* 'name'      => 'required|string|max:255',
@@ -148,14 +126,12 @@ class UsuarioController extends Controller
 
             return redirect()->route('usuarios.index', $usuario->id)->with('success', 'Usuario, roles y permisos actualizados exitosamente.');
         } else {
-            return redirect()->route('usuarios.edit', $usuario->id);
+            return redirect()->route('usuarios.index', $usuario->id);
         }
     }
 
     public function exportarCSV(Request $request)
     {
-        // Autorización: El usuario debe tener permiso para exportar usuarios.
-        $this->authorize('export', User::class);
 
         $query = $request->input('q');
         $rol = $request->input('rol');
@@ -214,8 +190,6 @@ class UsuarioController extends Controller
 
     public function importarCsv(Request $request)
     {
-        // Autorización: El usuario debe tener permiso para importar usuarios.
-        $this->authorize('import', User::class);
 
         $request->validate([
             'archivo' => 'required|file|mimes:csv,txt|max:2048',
@@ -252,9 +226,6 @@ class UsuarioController extends Controller
 
     public function destroy(User $usuario)
     {
-        // Autorización: El usuario debe tener permiso para eliminar este usuario.
-        // La Policy ya incluye la lógica de no eliminarse a sí mismo o a administradores.
-        $this->authorize('delete', $usuario);
         $usuario->delete();
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
