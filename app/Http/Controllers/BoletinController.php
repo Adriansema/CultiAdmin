@@ -18,52 +18,33 @@ class BoletinController extends Controller
 {
     public function index(Request $request, BoletinService $boletinService)
     {
-        // Autorización: El usuario debe tener permiso para ver cualquier boletín (para la lista).
-        $this->authorize('viewAny', Boletin::class);
-
         $boletines = $boletinService->obtenerBoletinFiltrados($request);
         return view('boletines.index', compact('boletines'));
     }
 
-    // Si también necesitas una respuesta JSON (ej. para una API o Vue/React):
     public function getFilteredBoletin(Request $request, BoletinService $boletinService)
     {
-        // Autorización: Mismo permiso que viewAny.
-        $this->authorize('viewAny', Boletin::class);
-
         $boletines = $boletinService->obtenerBoletinFiltrados($request);
         return response()->json($boletines);
     }
 
     public function create()
     {
-        // Autorización: El usuario debe tener permiso para crear boletines.
-        $this->authorize('create', Boletin::class);
-
         return view('boletines.create');
     }
 
     public function show(Boletin $boletin)
     {
-        // Autorización: El usuario debe tener permiso para ver este boletín específico.
-        $this->authorize('view', $boletin);
-
         return view('boletines.show', compact('boletin'));
     }
 
     public function edit(Boletin $boletin)
     {
-        // Autorización: El usuario debe tener permiso para actualizar este boletín específico.
-        $this->authorize('update', $boletin);
-
         return view('boletines.edit', compact('boletin'));
     }
 
     public function store(Request $request)
     {
-        // Autorización: El usuario debe tener permiso para crear boletines.
-        $this->authorize('create', Boletin::class);
-
         $validated = $request->validate([
             'contenido' => 'required|string',
             'archivo_upload' => 'nullable|file|mimes:pdf|max:5120',
@@ -92,9 +73,6 @@ class BoletinController extends Controller
 
     public function update(Request $request, Boletin $boletin)
     {
-        // Autorización: El usuario debe tener permiso para actualizar este boletín específico.
-        $this->authorize('update', $boletin);
-
         $rules = ([
             'contenido' => 'required|string|max:100',
             'archivo_upload' => 'nullable|file|mimes:pdf|max:5000',
@@ -156,9 +134,6 @@ class BoletinController extends Controller
 
     public function destroy(Boletin $boletin)
     {
-        // Autorización: El usuario debe tener permiso para eliminar este boletín específico.
-        $this->authorize('delete', $boletin);
-
         if ($boletin->archivo && Storage::disk('public')->exists($boletin->archivo)) {
             Storage::disk('public')->delete($boletin->archivo);
         }
@@ -170,9 +145,6 @@ class BoletinController extends Controller
 
     public function importarPdf(Request $request)
     {
-        // Autorización: El usuario debe tener permiso para importar boletines.
-        $this->authorize('import', Boletin::class);
-
         $request->validate([
             'archivo' => 'required|file|mimes:pdf|max:10240',
             'contenido' => 'nullable|string',
@@ -197,9 +169,6 @@ class BoletinController extends Controller
 
     public function exportarCSV(Request $request)
     {
-        // Autorización: El usuario debe tener permiso para exportar boletines.
-        $this->authorize('export', Boletin::class);
-
         $query = $request->input('q');
         $estado = $request->input('estado');
 

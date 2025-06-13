@@ -1,17 +1,6 @@
-{{-- resources/views/pqrs/create.blade.php --}}
+@extends('layouts.guest')
 
-@extends('layouts.guest') {{-- Importante: Especifica el layout que extiendes --}}
-
-@section('title', 'Formulario de PQR') {{-- Opcional: Define un título específico para esta página --}}
-
-@section('content') {{-- Abre la sección de contenido que se insertará en el @yield('content') del layout --}}
-
-    {{-- Tu contenido de fondo y el contenedor blanco del formulario --}}
-    {{-- NOTA: El div del gradiente y min-h-screen se movieron al <body> del layout.
-       Este div que envuelve tu formulario blanco ya no necesita las clases de fondo o altura de pantalla completa,
-       solo las clases de centrado si las necesitas para el contenedor blanco.
-       Sin embargo, en este caso, tu <body> ya maneja el centrado y altura.
-       Así que, este div principal ahora es solo el contenedor blanco de tu formulario. --}}
+@section('content')
 
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-xl">
 
@@ -157,4 +146,4 @@
         </form>
     </div>
 
-@endsection {{-- Cierra la sección de contenido --}}
+@endsection 

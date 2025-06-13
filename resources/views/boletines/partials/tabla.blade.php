@@ -1,4 +1,3 @@
-<!-- Contenedor/tabla del listado de boletines -->
 <div class="overflow-x-auto bg-white rounded shadow">
     <table class="min-w-full text-sm table-auto">
         <thead class="text-gray-700 bg-gray-100">

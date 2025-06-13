@@ -1,4 +1,3 @@
-<!-- Modal (se mantiene oculto por defecto) -->
 <div id="modal-ver-{{ $boletin->id }}" class="hidden">
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
         <div class="w-full max-w-xl p-6 bg-[var(--color-gris1)] rounded-lg shadow-xl space-y-4 ">
@@ -30,10 +29,11 @@
                         </p>
                     @endif
                     <div class="mt-4">
-                        <a href="{{ route('boletines.edit', $boletin->id) }}"
+                        {{-- <a href="{{ route('boletines.edit', $boletin->id) }}"
                             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Ir a Editar Boletín →
-                        </a>
+                        </a> --}}
+                        <p>Debes ir a editar el Boletin para que puedas Corregir tú error</p>
                     </div>
                 @elseif ($boletin->estado === 'aprobado')
                     <p class="text-sm mt-2">¡Tu boletín ha sido aprobado y está listo para ser consumido!</p>

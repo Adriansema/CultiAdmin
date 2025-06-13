@@ -6,11 +6,6 @@
 
 @section('content')
     <div class="max-w-6xl py-6 mx-auto">
-        @if (session('success'))
-            <div class="p-4 mb-4 text-green-800 bg-green-100 border border-green-300 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
         <div>
             <h1 class="flex items-center space-x-2 text-3xl font-bold text-gray-800">
                 <img src="{{ asset('images/reverse.svg') }}" alt="icono" class="w-5 h-5">
@@ -42,38 +37,31 @@
                         class="w-4 h-3 relative inset-0 hidden group-hover:block" alt="Icono de filtro hover">
                 </button>
 
-                {{-- Botón para Exportar CSV: Visible solo si el usuario puede 'exportar boletines' --}}
-                @can('export', App\Models\Boletin::class)
-                    <form method="GET" action="{{ route('boletines.exportarCSV') }}">
-                        <x-responsive-nav-link href="#" onclick="this.closest('form').submit(); return false;"
-                            class="inline-flex items-center group justify-center px-4 py-3 space-x-2 space-x-reverse transition-all duration-300 ease-in-out 
+                <form method="GET" action="{{ route('boletines.exportarCSV') }}">
+                    <x-responsive-nav-link href="#" onclick="this.closest('form').submit(); return false;"
+                        class="inline-flex items-center group justify-center px-4 py-3 space-x-2 space-x-reverse transition-all duration-300 ease-in-out 
                             bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] text-white rounded-full w-auto">
-                            <span class="text-xs font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
-                                {{ __('Exportar Csv') }}
-                            </span>
-                            <img src="{{ asset('images/export.svg') }}"
-                                class="relative inset-0 block w-5 h-4 group-hover:hidden" alt="Icono Exportar CSV">
-                            <img src="{{ asset('images/export-hover.svg') }}"
-                                class="relative inset-0 hidden w-5 h-4 group-hover:block" alt="Icono Exportar CSV">
-                        </x-responsive-nav-link>
-                    </form>
-                @endcan
-
-                {{-- Botón para Crear / Importar Boletín: Visible si el usuario puede 'crear boletines' O 'importar boletines' --}}
-                @canany(['create', 'import'], App\Models\Boletin::class)
-                    <x-responsive-nav-link>
-                        <div x-data="{ open: false }">
-                            <div class="mb-4">
-                                <button @click="open = true"
-                                    class="inline-flex items-center px-4 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900]
-                                            hover:bg-[#61BA33] text-white rounded-full w-auto">
-                                    + Crear / Importar Boletín
-                                </button>
-                            </div>
-                            @include('boletines.partials.modal-create')
-                        </div>
+                        <span class="text-xs font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
+                            {{ __('Exportar Csv') }}
+                        </span>
+                        <img src="{{ asset('images/export.svg') }}"
+                            class="relative inset-0 block w-5 h-4 group-hover:hidden" alt="Icono Exportar CSV">
+                        <img src="{{ asset('images/export-hover.svg') }}"
+                            class="relative inset-0 hidden w-5 h-4 group-hover:block" alt="Icono Exportar CSV">
                     </x-responsive-nav-link>
-                @endcanany
+                </form>
+                <x-responsive-nav-link>
+                    <div x-data="{ open: false }">
+                        <div class="mb-4">
+                            <button @click="open = true"
+                                class="inline-flex items-center px-4 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900]
+                                            hover:bg-[#61BA33] text-white rounded-full w-auto">
+                                + Crear / Importar Boletín
+                            </button>
+                        </div>
+                        @include('boletines.partials.modal-create')
+                    </div>
+                </x-responsive-nav-link>
             </div>
         </div>
 
@@ -145,20 +133,11 @@
         @include('boletines.partials.tabla')
 
         @forelse ($boletines as $boletin)
-            {{-- Incluir el modal de ver para cada boletín --}}
-            @can('view', $boletin)
-                @include('boletines.partials.modal-views', ['boletin' => $boletin])
-            @endcan
+            @include('boletines.partials.modal-views', ['boletin' => $boletin])
 
-            {{-- Incluir el modal de editar para cada boletín --}}
-            @can('update', $boletin)
-                @include('boletines.partials.modal-edit', ['boletin' => $boletin])
-            @endcan
+            @include('boletines.partials.modal-edit', ['boletin' => $boletin])
 
-            {{-- Incluir el modal de eliminar para cada boletín --}}
-            @can('delete', $boletin)
-                @include('boletines.partials.modal-delete', ['boletin' => $boletin])
-            @endcan
+            @include('boletines.partials.modal-delete', ['boletin' => $boletin])
         @empty
             {{-- Si no hay boletines, no se renderiza ningún modal --}}
         @endforelse

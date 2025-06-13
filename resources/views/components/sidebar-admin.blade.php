@@ -44,7 +44,7 @@
                 </div>
 
                 {{-- Cultivos --}}
-                <div
+                {{-- <div
                     :class="sidebarOpen
                         ?
                         'flex pl-2 py-2 ml-[20px] transition rounded-xl  hover:bg-[var(--color-sidebarhoverbtn)]' :
@@ -60,6 +60,52 @@
                             {{ __('Cultivos') }}
                         </span>
                     </x-responsive-nav-link>
+                </div> --}}
+
+                <div class="relative">
+                    <div :class="sidebarOpen
+                        ?
+                        'flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer ' :
+                        'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer '"
+                        @click.prevent="$refs.submenuCultivos.classList.toggle('hidden')">
+
+                        <img src="{{ asset('images/plant.svg') }}" class="w-4 h-4" alt="cultivos">
+
+                        <span x-show="sidebarOpen" x-transition
+                            class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
+                            {{ __('Cultivos') }}
+                        </span>
+                    </div>
+
+                    {{-- Este es el contenedor del submenú que se va a desplegar debajo --}}
+                    <div id="submenu-cultivos" x-ref="submenuCultivos"
+                        class="hidden space-y-0 transition-all duration-200 ease-in-out space-y-0 {{-- border-b-2 rounded-b-xl border-x-2 --}}"
+                        :class="sidebarOpen ? 'w-full pl-2' : 'w-9 -mx-1 flex flex-col items-center'"
+                        style="border-color: background-color: var(--color-sidebarhoverbtn);">
+
+                        {{-- Contenido del submenú --}}
+                        <div :class="sidebarOpen ? 'w-full' : 'flex justify-center'">
+                            <x-responsive-nav-link href="{{ route('productos.index') }}"
+                                class="flex items-center px-2 py-2 ml-[20px] text-sm border-2 border-transparent rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] transition-all duration-1000">
+                                <img src="{{ asset('images/flechita.svg') }}" alt="Cultivos"
+                                    :class="sidebarOpen ? 'w-4 h-4 ml-[20px]' : 'w-4 h-4'" />
+                                <span x-show="sidebarOpen"
+                                    class="text-xs font-medium text-[var(--color-text)] whitespace-nowrap ml-[16px]">{{ __('Lista de Productos') }}</span>
+                            </x-responsive-nav-link>
+                        </div>
+
+                        <hr class="border-gray-600 my-0 w-1/2 mx-auto">
+
+                        <div :class="sidebarOpen ? 'w-full' : 'flex justify-center'"> {{-- Opción: Cultivos --}}
+                            <x-responsive-nav-link href="{{ route('noticias.noticias.index') }}"
+                                class="flex items-center px-2 py-2 ml-[20px] text-sm border-2 border-transparent rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] transition-all duration-1000">
+                                <img src="{{ asset('images/flechita.svg') }}" alt="Cultivos"
+                                    :class="sidebarOpen ? 'w-4 h-4 ml-[20px]' : 'w-4 h-4'" />
+                                <span x-show="sidebarOpen"
+                                    class="text-xs font-medium text-[var(--color-text)] whitespace-nowrap ml-[16px]">{{ __('Noticias') }}</span>
+                            </x-responsive-nav-link>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Boletines --}}
@@ -198,7 +244,8 @@
                             'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]'">
 
                         <x-responsive-nav-link href="{{ route('logout') }}"
-                            onclick="event.preventDefault(); this.closest('form').submit();" class="flex items-center">
+                            onclick="event.preventDefault(); this.closest('form').submit();"
+                            class="flex items-center">
 
                             <img src="{{ asset('images/off.svg') }}" class="w-4 h-4" alt="Cerrar Sesión">
 

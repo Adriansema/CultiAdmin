@@ -13,18 +13,19 @@ class Finca extends Model
     protected $primaryKey = 'id_finca';
 
     protected $fillable = [
-        'nombre_finca',
-        'ubicacion',
-        'hectareas',
-        'fundacion',
-        'id_cultivo',
         'id_usuario',
+        'producto_id',
+        'nombrefinca',
+        'ubicacion',
+        'cultivo',
+        'fundacion',
+        'hectareas',
     ];
 
     // Relaciones
-    public function cultivo()
+    public function producto()
     {
-        return $this->belongsTo(Cultivo::class, 'id_cultivo', 'id_cultivos');
+        return $this->belongsTo(Producto::class, 'producto_id', 'producto_id');
     }
 
     public function usuario()

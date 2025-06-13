@@ -9,6 +9,8 @@ class Producto extends Model
 {
     use HasFactory;
 
+    protected $table = 'productos';
+
     protected $fillable = [
         'user_id',
         'tipo',
@@ -17,11 +19,6 @@ class Producto extends Model
         'rechazado_por_user_id', // <-- Nueva columna
         'observaciones',
         'imagen',
-        'detalles_json',
-    ];
-
-    protected $casts = [
-        'detalles_json' => 'array', // transforma JSON <=> array automáticamente
     ];
 
     public function user()
@@ -41,7 +38,7 @@ class Producto extends Model
         return $this->belongsTo(User::class, 'rechazado_por_user_id');
     }
 
-    // Relaciones con las tablas de detalle de café y mora (si las necesitas desde Producto)
+    // Relación para cafe y mora
     public function cafe()
     {
         return $this->hasOne(Cafe::class, 'producto_id', 'id');

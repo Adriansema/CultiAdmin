@@ -54,4 +54,20 @@ class User extends Authenticatable // Este modelo es ahora un "usuario autentica
     {
         return $this->hasRole('administrador');
     }
+
+    // Relación para los productos que el usuario ha creado
+    public function productos()
+    {
+        return $this->hasMany(Producto::class, 'user_id', 'id'); // 'user_id' es la FK en 'productos'
+    }
+
+     /**
+     * Define la relación hasMany con el modelo Noticia.
+     * Un Usuario puede tener muchas Noticias.
+     */
+    public function noticias()
+    {
+        // 'user_id' es la clave foránea en la tabla 'noticias'
+        return $this->hasMany(Noticia::class, 'user_id', 'id');
+    }
 }

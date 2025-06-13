@@ -1,4 +1,3 @@
-<!-- Modal (se mantiene oculto por defecto) -->
 <div id="modal-boletin-{{ $boletin->id }}" class="hidden">
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
         <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
