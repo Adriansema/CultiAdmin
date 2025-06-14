@@ -6,3 +6,4 @@ import './modal';
 import './UserSearch'; // buscador para los usuarios
 import './ProductSearch'; //buscador para los productos/cultivos
 import './BoletinSearch'; //buscador para los boletines
+import './NoticiaSearch'; //buscador para las noticias

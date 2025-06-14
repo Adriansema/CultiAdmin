@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Boletin;
+use App\Models\Noticia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; // Necesitamos importar DB para usar DB::raw()
 
-class BoletinService
+class NoticiaService
 {
     /**
      * Limpia el texto de búsqueda para una comparación robusta.
@@ -38,43 +38,47 @@ class BoletinService
     }
 
     /**
-     * Obtiene boletines filtrados con búsqueda robusta por la columna 'contenido'.
+     * Obtiene noticias filtradas con búsqueda robusta general.
      *
      * @param Request $request La solicitud HTTP con los parámetros de filtro.
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function obtenerBoletinFiltrados(Request $request)
+    public function obtenerNoticiaFiltradas(Request $request)
     {
         // Define la cantidad de elementos por página, con un valor por defecto y opciones válidas
         $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100])
             ? $request->input('per_page')
             : 5; // Por defecto 5
 
-        // Usamos 'q' para la búsqueda general.
-        $searchQuery = $request->input('q');
+        $query = $request->input('q');        // Búsqueda general
 
-        $boletines = Boletin::query();
+        $noticias = Noticia::query(); // Mejor usar query() en vez de with('') si no hay relaciones
 
-        // Búsqueda robusta solo en la columna 'contenido'
-        if ($searchQuery) {
+        // Búsqueda robusta general en múltiples columnas
+        if ($query) {
             // Limpiamos el texto de búsqueda ingresado por el usuario una vez
-            $cleanedSearchQuery = $this->cleanSearchQuery($searchQuery);
+            $cleanedQuery = $this->cleanSearchQuery($query);
 
-            $boletines->where(function ($q) use ($cleanedSearchQuery) {
-                // Función SQL para normalizar texto.
-                // Asumimos que 'contenido' es TEXT/VARCHAR.
+            $noticias->where(function ($q2) use ($cleanedQuery) {
+                // Función SQL para normalizar texto, para usar en múltiples columnas
                 $sqlNormalize = function($column) {
                     return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER({$column}), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                 };
 
-                // Búsqueda robusta únicamente en la columna 'contenido'
-                $q->whereRaw($sqlNormalize('contenido') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+                // Búsqueda robusta en la columna 'tipo'
+                $q2->whereRaw($sqlNormalize('tipo') . ' LIKE ?', ['%' . $cleanedQuery . '%'])
+                   // Búsqueda robusta en la columna 'titulo'
+                   ->orWhereRaw($sqlNormalize('titulo') . ' LIKE ?', ['%' . $cleanedQuery . '%'])
+                   // Búsqueda robusta en la columna 'autor'
+                   ->orWhereRaw($sqlNormalize('autor') . ' LIKE ?', ['%' . $cleanedQuery . '%'])
+                   // Búsqueda robusta en la columna 'clase'
+                   ->orWhereRaw($sqlNormalize('clase') . ' LIKE ?', ['%' . $cleanedQuery . '%'])
+                   // Búsqueda robusta en la columna 'numero_pagina' (CAST a TEXT)
+                   ->orWhereRaw($sqlNormalize('CAST(numero_pagina AS TEXT)') . ' LIKE ?', ['%' . $cleanedQuery . '%']);
             });
         }
 
-        // Ordena los boletines
-        $boletines->orderBy('contenido', 'asc'); // Mantiene tu ordenamiento original
-
-        return $boletines->paginate($perPage)->withQueryString();
+        // Retorna las noticias paginadas
+        return $noticias->paginate($perPage)->withQueryString(); // Agrega withQueryString()
     }
 }

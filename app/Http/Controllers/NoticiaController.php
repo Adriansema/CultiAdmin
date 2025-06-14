@@ -6,6 +6,8 @@ use App\Models\Noticia; // Importa el modelo Noticia
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // Para obtener el ID del usuario autenticado
 use Illuminate\Support\Facades\Storage; // Para manejar la carga de imágenes
+use Illuminate\Support\Facades\Response;
+use App\Services\NoticiaService;
 
 class NoticiaController extends Controller
 {
@@ -13,11 +15,18 @@ class NoticiaController extends Controller
      * Display a listing of the resource.
      * Muestra una lista de todas las noticias.
      */
-    public function index()
+    public function index(Request $request, NoticiaService $noticiaService)
     {
+        $noticias = $noticiaService->obtenerNoticiaFiltradas($request);
         // Carga todas las noticias, incluyendo la relación con User para mostrar quién la creó.
-        $noticias = Noticia::with('user')->get();
+        /* $noticias = Noticia::with('user')->get(); */
         return view('noticias.index', compact('noticias'));
+    }
+
+    public function getFilteredNoticy(Request $request, NoticiaService $noticiaService) 
+    {
+        $noticias = $noticiaService->obtenerNoticiaFiltradas($request);
+        return response()->json($noticias);
     }
 
     /**

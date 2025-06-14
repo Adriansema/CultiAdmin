@@ -9,7 +9,7 @@
              </tr>
          </thead>
 
-         <tbody id="usersTableBody">
+         <tbody>
              @if ($usuarios->total() === 0)
                  <tr>
                      <td colspan="4" class="px-6 py-4 text-center text-gray-500">
@@ -23,7 +23,7 @@
                  </tr>
              @else
                  @foreach ($usuarios as $usuario)
-                     <tr class="bg-white hover:bg-gray-300">
+                     <tr class="bg-white hover:bg-gray-200">
                          <td class="px-6 py-4 flex items-center group relative">
                              <span>{{ $usuario->roles->pluck('name')->join(', ') }}</span>
                              <a href="{{ route('usuarios.create', $usuario->id) }}">
