@@ -52,10 +52,10 @@
             </header>
         @endif
 
-        {{-- SE ELIMINÓ ESTA LINEA YA QUE ERA LA DEL PROBLEMA
+        {{-- SE ELIMINÓ ESTA LINEA YA QUE ERA LA DEL PROBLEMA --}}
         <main class="flex-1 h-full p-6 overflow-y-auto" :class="sidebarOpen ? 'pl-64' : 'pl-16'">
             @yield('content')
-        </main> --}}
+        </main>
     </div>
 
     @stack('modals')
