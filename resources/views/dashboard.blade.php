@@ -31,97 +31,99 @@
                     <button onclick="setFilter('año')" data-filtro="año"
                         class="flex items-center px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
                         Año
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ml-2" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                clip-rule="evenodd" />
                         </svg>
                     </button>
-                    <input type="text" id="yearPicker"
-                        class="absolute inset-0 opacity-0 cursor-pointer"
+                    <input type="text" id="yearPicker" class="absolute inset-0 opacity-0 cursor-pointer"
                         placeholder="Selecciona Año">
                 </div>
-                 <div id= "yearChartFiltersContainer" class="flex flex-wrap items-center mt-4 space-x-2 md:mt-0" style="display: none;">
-                <label for="chartSubFilter" class="sr-only">Filtrar por:</label>
-                <select id="chartSubFilter" class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300">
-                    <option value="month">Por Mes</option>
-                    <option value="quarter">Por Trimestre</option>
-                </select>
+                <div id="yearChartFiltersContainer" class="flex flex-wrap items-center mt-4 space-x-2 md:mt-0"
+                    style="display: none;">
+                    <label for="chartSubFilter" class="sr-only">Filtrar por:</label>
+                    <select id="chartSubFilter"
+                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300">
+                        <option value="month">Por Mes</option>
+                        <option value="quarter">Por Trimestre</option>
+                    </select>
+                </div>
             </div>
-        </div>
     </section>
 
     {{-- Sección de Gráfica de Usuarios Conectados y Métricas --}}
     {{-- QUITAMOS el div intermedio flex-1 p-6 overflow-y-auto que estaba causando el colapso --}}
-    <section id="usuarios-conectados" class="bg-[var(--color-gris1)] shadow rounded-lg p-6 mb-6 flex flex-col"> {{-- Añadimos flex flex-col para que el contenido se apile --}}
+    <section id="usuarios-conectados" class="bg-[var(--color-gris1)] shadow rounded-3xl p-6 mb-6 flex flex-col"> {{--
+        Añadimos flex flex-col para que el contenido se apile --}}
 
         <div class="flex items-center mb-3 space-x-2">
             <div class="bg-[var(--color-ICONOESTA)] p-0 rounded-full relative -top-1">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 17l6-6 4 4 7-7" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M3 17l6-6 4 4 7-7" />
                 </svg>
             </div>
 
-            <h2 class="text-xl font-bold text-[var(--color-usucone)] -mt-3">Usuarios Conectados</h2>
+            <h2 class="text-xl font-bold text-[var(--color-usucone)] -mt-3">Estadísticas de actividad</h2>
         </div>
 
-        {{-- Contenedor de la Gráfica: Aseguramos que tenga espacio --}}
-        <div class="flex-grow p-6 bg-white shadow-sm rounded-3xl"> {{-- flex-grow para que ocupe el espacio disponible --}}
-            <div id="chart" class="my-6 w-full h-[200px] md:h-[400px] lg:h-[450px]"></div>
-        </div>
 
-        {{-- Métricas generales --}}
-        <div class="grid grid-cols-1 gap-6 mt-8 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
-                <div class="absolute top-3 right-3 bg-[var(--color-iconos)] p-2 rounded-full">
-                    <img src="{{ asset('images/Icon.svg') }}" alt="usuario">
-                </div>
+      {{-- Ajustado 'gap-x-1' para solo espacio horizontal muy pequeño, y 'gap-y-2' para el vertical --}}
+        <div class="flex flex-col items-stretch lg:flex-row gap-x-6 gap-y-4">
 
-                <h3 class="text-2xl text-[var(--color-iconos)]">Usuarios</h3>
-                <p id="users-count" class="text-3xl font-bold text-gray-800">0</p>
-                <p id="users-percent" class="text-sm text-gray-800">0% de los usuarios</p>
+
+            {{-- Contenedor de la Gráfica (ocupa 3/4 del ancho en pantallas grandes) --}}
+            <div class="flex items-center justify-center flex-grow p-0 bg-white shadow-md rounded-3xl">
+                <div id="chart" class="w-full h-[300px]"></div>
             </div>
 
-            {{-- Registrados --}}
-            <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
-                <div class="absolute top-3 right-3 bg-[var(--color-iconos3)] p-2 rounded-full">
-                    <img src="{{ asset('images/regis.svg') }}" alt="registro">
+            {{-- Contenedor de las Métricas (ocupa 1/4 del ancho en pantallas grandes) --}}
+            {{-- CAMBIO CLAVE: Añadido 'flex-grow-0' para que no se estire y solo ocupe el espacio de sus hijos. --}}
+            {{-- CAMBIO CLAVE: Añadido 'lg:h-full' o un 'max-h-[XXXpx]' para que su altura se alinee con la gráfica --}}
+            <div class="flex flex-col gap-2  lg:w-[200px] flex-shrink-0 flex-grow-0"> {{-- Eliminado lg:h-full --}}
+                {{-- Métrica: Usuarios --}}
+                {{-- Ajustado padding a p-3 para equilibrio y texto a text-lg/text-xl --}}
+                <div class="relative w-full p-3 bg-white border border-gray-200 shadow-md rounded-2xl">
+                    <div class="absolute top-3 right-3 bg-[var(--color-iconos)] p-2 rounded-full">
+                        <img src="{{ asset('images/Icon.svg') }}" alt="usuario" class="w-4 h-4">
+                    </div>
+                    <h3 class="text-lg font-mediun text-[var(--color-iconos)]">Usuarios</h3>
+                    <p id="users-count" class="mt-1 text-3xl font-bold text-gray-800">0</p>
+                    <p id="users-percent" class="text-xs text-gray-600">0% de los usuarios</p>
                 </div>
 
-                <div>
-                    <h3 class="text-2xl text-[var(--color-iconos)]">{{ __('message.Register') }}</h3>
-                    <p id="registered-count" class="text-3xl font-bold text-gray-800">0</p>
-                    <p id="registered-percent" class="text-sm text-gray-800">0% de los usuarios</p>
-                </div>
-            </div>
-
-            <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
-                <div class="absolute top-3 right-3 bg-[var(--color-iconos2)] p-2 rounded-full">
-                    <img src="{{ asset('images/activos.svg') }}" alt="activos">
+                {{-- Métrica: Activos --}}
+                <div class="relative w-full p-3 bg-white border border-gray-200 shadow-md rounded-2xl">
+                    <div class="absolute top-3 right-3 bg-[var(--color-iconos2)] p-2 rounded-full">
+                        <img src="{{ asset('images/activos.svg') }}" alt="activos" class="w-4 h-4">
+                    </div>
+                    <h3 class="text-lg font-mediun text-[var(--color-iconos)]">Activos</h3>
+                    <p id="active-count" class="mt-1 text-3xl font-bold text-gray-800">0</p>
+                    <p id="active-percent" class="text-xs text-gray-600">0% de los usuarios</p>
                 </div>
 
-                <h3 class="text-2xl text-[var(--color-iconos)]">Activos</h3>
-                <p id="active-count" class="text-3xl font-bold text-gray-800">0</p>
-                <p id="active-percent" class="text-sm text-gray-800">0% de los usuarios</p>
-            </div>
-
-            <div class="relative p-4 rounded-md shadow-sm bg-gray-50">
-                <div class="absolute top-3 right-3 bg-[var(--color-iconos4)] p-2 rounded-full">
-                    <img src="{{ asset('images/conectados.svg') }}" alt="conectados">
+                {{-- Métrica: Conectados --}}
+                <div class="relative w-full p-3 bg-white border border-gray-200 shadow-md rounded-2xl">
+                    <div class="absolute top-3 right-3 bg-[var(--color-iconos4)] p-2 rounded-full">
+                        <img src="{{ asset('images/conectados.svg') }}" alt="conectados" class="w-4 h-4">
+                    </div>
+                    <h3 class="text-lg font-mediun text-[var(--color-iconos)]">Conectados</h3>
+                    <p id="connected-count" class="mt-1 text-3xl font-bold text-gray-800">0</p>
+                    <p id="connected-percent" class="text-xs text-gray-600">0% de los usuarios</p>
                 </div>
-
-                <h3 class="text-2xl text-[var(--color-iconos)]">Conectados</h3>
-                <p id="connected-count" class="text-3xl font-bold text-gray-800">0</p>
-                <p id="connected-percent" class="text-sm text-gray-800">0% de los usuarios</p>
             </div>
         </div>
     </section>
 
     {{-- Sección de Novedades y Boletines --}}
     {{-- Asegúrate de que esta sección tiene margen superior para no pegarse a la anterior --}}
-    <section id="novedades-boletines" class="relative grid gap-6 mt-8 md:grid-cols-2">
+    <section id="novedades-boletines" class="relative grid items-stretch mt-1 gap-7 md:grid-cols-2 rounded-xl">
 
-        <section id="mensajes" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
-            <div class="flex items-center justify-between mb-4">
+        <section id="mensajes" class="bg-[var(--color-gris1)] shadow p-4 flex flex-col rounded-3xl ">
+
+            <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center space-x-2">
                     <div
                         class="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--color-iconos)] text-white">
@@ -138,21 +140,24 @@
                 </x-responsive-nav-link>
             </div>
 
-            <div id="mensajes-novedades" class="p-4 bg-white rounded-lg shadow">
+            <div id="mensajes-novedades" class="p-4 bg-white shadow rounded-2xl">
                 <p class="text-gray-500">No hay novedades por ahora.</p>
             </div>
         </section>
 
-        <section id="boletines" class="bg-[var(--color-gris1)] shadow rounded-lg p-6">
+        <section id="boletines" class="bg-[var(--color-gris1)] shadow rounded-3xl p-6">
 
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center space-x-2">
                     <div
                         class="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--color-iconos)] text-white">
                         <img src="{{ asset('images/boletin.svg') }}" alt="boletines" class="w-5 h-5">
                     </div>
+
                     <h2 class="text-lg font-semibold text-[var(--color-iconos)]">Boletines</h2>
                 </div>
+
+
                 <x-responsive-nav-link href="{{ route('boletines.index') }}"
                     :active="request()->routeIs('accesibilidad')"
                     class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-gray-300">
@@ -160,6 +165,10 @@
                         <span class="text-ms">{{ __(' ver todo ↗') }}</span>
                     </div>
                 </x-responsive-nav-link>
+            </div>
+
+             <div id="mensajes-novedades" class="p-4 bg-white shadow rounded-2xl">
+                <p class="text-gray-500">No hay novedades por ahora.</p>
             </div>
 
             <style>
@@ -196,6 +205,7 @@
             </script>
             @endpush
         </section>
-    </section> {{-- ¡ATENCIÓN! ESTA SECCIÓN CIERRA EL PADRE DE LAS NOVEDADES Y BOLETINES, NO EL CONTENEDOR PRINCIPAL --}}
+    </section> {{-- ¡ATENCIÓN! ESTA SECCIÓN CIERRA EL PADRE DE LAS NOVEDADES Y BOLETINES, NO EL CONTENEDOR PRINCIPAL
+    --}}
 </main>
 @endsection
