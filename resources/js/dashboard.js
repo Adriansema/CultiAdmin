@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         yearDropdown.value = currentYear.toString();
 
-        yearDropdown.addEventListener('change', function() {
+        yearDropdown.addEventListener('change', function () {
             window.setFilter('año');
         });
     } else {
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // --- setFilter global para los onclick de los botones HTML ---
-    window.setFilter = function(filterType) {
+    window.setFilter = function (filterType) {
         filtroActual = filterType;
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.remove('active-filter-button');
@@ -152,93 +152,76 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- Función updateMetrics ---
     function updateMetrics(data) {
         document.getElementById('users-count').textContent = data.usuarios || 0;
-        document.getElementById('registered-count').textContent = data.registrados || 0;
         document.getElementById('active-count').textContent = data.activos || 0;
         document.getElementById('connected-count').textContent = data.conectados || 0;
 
         const totalUsers = data.usuarios || 0;
         document.getElementById('users-percent').textContent = `${(totalUsers > 0 ? (data.usuarios / totalUsers * 100) : 0).toFixed(0)}% of users`;
-        document.getElementById('registered-percent').textContent = `${(totalUsers > 0 ? (data.registrados / totalUsers * 100) : 0).toFixed(0)}% of users`;
         document.getElementById('active-percent').textContent = `${(totalUsers > 0 ? (data.activos / totalUsers * 100) : 0).toFixed(0)}% of users`;
         document.getElementById('connected-percent').textContent = `${(totalUsers > 0 ? (data.conectados / totalUsers * 100) : 0).toFixed(0)}% of users`;
     }
+
+
 
     // --- Initial load ---
     window.setFilter('ultimos3dias'); // Load 'ultimos3dias' filter on initial page load
 });
 
 
-// --- renderChart function (REPLACE YOUR ENTIRE renderChart FUNCTION WITH THIS) ---
+// --- renderChart function (¡VERSIÓN FINAL CORREGIDA PARA ANIMACIONES FLUIDAS Y TEXTOS DINÁMICOS!) ---
 function renderChart(data) {
     const chartDom = document.getElementById('chart');
 
     if (!chartDom) {
-        console.error("Error: Chart container with id 'chart' not found in DOM.");
+        console.error("ECharts Error: Contenedor de la gráfica con id 'chart' no encontrado en el DOM.");
         return;
     }
 
-    // CRITICAL LOGIC FOR HANDLING ZERO DIMENSIONS AND INFINITE LOOP
-    // If the container is not visible or has zero dimensions, retry.
     if (chartDom.offsetWidth === 0 || chartDom.offsetHeight === 0) {
-        console.warn(`Warning: Chart container has zero width or height (${chartDom.offsetWidth}x${chartDom.offsetHeight}). Retrying render in 200ms...`);
-        chartDom.innerHTML = `<div class="text-center text-gray-500 p-4">Loading chart...</div>`;
+        console.warn(`ECharts Advertencia: El contenedor de la gráfica tiene ancho o alto cero (${chartDom.offsetWidth}x${chartDom.offsetHeight}). Reintentando renderizar en 200ms...`);
+        chartDom.innerHTML = `<div class="text-center text-gray-500 p-4">Cargando gráfica...</div>`;
         setTimeout(() => renderChart(data), 200);
         return;
     }
 
-   
+    // Si llegamos aquí, chartDom tiene dimensiones válidas.
+    // Solo limpiar el HTML si la gráfica NO ha sido inicializada aún (para el mensaje de carga).
+    if (myChart === null) {
+        chartDom.innerHTML = '';
+        console.log("ECharts DEBUG: Limpiando innerHTML antes de la primera inicialización.");
+    }
 
-    // Logic for sorting and preparing data
+
     let datosOrdenados = [...data.vistas];
 
-    switch (filtroActual) {
+    if (!Array.isArray(datosOrdenados) || datosOrdenados.length === 0) {
+        chartDom.innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos válidos para mostrar para este período.</div>`;
+        updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 }); // Aunque no se use registrados, es buena práctica pasar 0
+        if (myChart) {
+            myChart.dispose(); // Si no hay datos, dispose de la instancia para liberar recursos
+            myChart = null;
+            console.log("ECharts DEBUG: Gráfica dispuesta y myChart a null debido a datos vacíos.");
+        }
+        return;
+    }
+
+    // Ordenamiento basado en el filtro actual para asegurar la secuencia correcta en la gráfica
+    switch (data.selectedFilter) {
         case 'ultimos3dias':
-            // Custom sorting for day names (assuming Spanish day names)
-            const dayNamesOrderUltimos3Dias = ['sábado', 'domingo', 'lunes']; // Adjust based on your expected order
+            const dayNamesOrderUltimos3Dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
             datosOrdenados.sort((a, b) => {
                 const indexA = dayNamesOrderUltimos3Dias.indexOf(a.grupo.toLowerCase());
                 const indexB = dayNamesOrderUltimos3Dias.indexOf(b.grupo.toLowerCase());
-                if (indexA === -1 || indexB === -1) return 0; // Maintain original order if not found
+                if (indexA === -1 || indexB === -1) {
+                    console.warn(`ECharts Advertencia: Día no reconocido en el ordenamiento: ${a.grupo} o ${b.grupo}`);
+                    return 0;
+                }
                 return indexA - indexB;
             });
             break;
 
         case 'semana':
-            // Use Date object for JavaScript, not Carbon
-            const today = new Date(); // Changed from Carbon.now() to new Date()
-
-            const formatearLabelSemana = (fecha) => {
-                const dias = ['dom.', 'lun.', 'mar.', 'mié.', 'jue.', 'vie.', 'sáb.'];
-                const meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.'];
-
-                const diaSemana = dias[fecha.getDay()];
-                const dia = fecha.getDate();
-                const mes = meses[fecha.getMonth()];
-                return `${diaSemana} ${dia} ${mes}`;
-            };
-
-            // Reconstruct the 7 days of the week and fill with zeros if no data.
-            // This assumes the backend returns 'grupo' like 'Día dd Mes' (e.g., 'lun. 17 jun.')
-            const tempMapSemana = new Map(datosOrdenados.map(item => [item.grupo, item.total]));
-            const labelsSemanaReconstruidos = [];
-
-            // Find the start of the current week (Sunday) based on today's date
-            const currentWeekStart = new Date(today);
-            currentWeekStart.setDate(today.getDate() - today.getDay()); // Set to Sunday of current week
-
-            for (let i = 0; i < 7; i++) {
-                const date = new Date(currentWeekStart);
-                date.setDate(currentWeekStart.getDate() + i);
-                const formattedLabel = formatearLabelSemana(date);
-                labelsSemanaReconstruidos.push({
-                    grupo: formattedLabel,
-                    total: tempMapSemana.has(formattedLabel) ? tempMapSemana.get(formattedLabel) : 0
-                });
-            }
-            datosOrdenados = labelsSemanaReconstruidos;
-
-            // Sort by actual date for the week
-            const monthNamesForSorting = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.'];
+            const monthNamesForSorting = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
             datosOrdenados.sort((a, b) => {
                 const parseDate = (label) => {
                     const parts = label.split(' ');
@@ -275,48 +258,70 @@ function renderChart(data) {
             break;
     }
 
-    // If the data array is truly empty or invalid, show a message.
-    if (!Array.isArray(datosOrdenados) || datosOrdenados.length === 0) {
-        chartDom.innerHTML = `<div class="text-center text-gray-500 p-4">No valid data to display for this period.</div>`;
-        updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 });
-        if (myChart) {
-            myChart.dispose();
-            myChart = null;
-        }
-        return;
-    }
-
-    // Prepare data for ECharts
     const labels = datosOrdenados.map(item => item.grupo);
     const values = datosOrdenados.map(item => parseInt(item.total));
 
-    // Initialize ECharts if it doesn't exist, or just update options
+    // Inicializar ECharts si no existe.
     if (myChart === null) {
+        console.log("ECharts DEBUG: Inicializando ECharts por primera vez.");
         myChart = echarts.init(chartDom);
+        // Añadir el listener de redimensionamiento una sola vez
         window.addEventListener('resize', function() {
-            if (myChart) myChart.resize();
+            if (myChart && !myChart.isDisposed()) {
+                 myChart.resize();
+                 console.log("ECharts DEBUG: Gráfica redimensionada.");
+            }
         });
     } else {
-        myChart.clear();
+        console.log("ECharts DEBUG: Actualizando ECharts con nuevos datos y opciones.");
+        // ¡No se llama a myChart.clear() aquí! ECharts manejará la animación de actualización automáticamente.
     }
 
+    // Determinar el nombre de la serie y el título de la gráfica dinámicamente
+    // Utiliza data.selectedFilter y data.chartSubFilter que vienen del backend
+    let seriesChartName = 'Visitas';
+    let chartTitleText = 'Visitas';
+
+    if (data.selectedFilter === 'año' && data.chartSubFilter === 'month') {
+        seriesChartName = 'Registros';
+        chartTitleText = 'Nuevos Registros por Mes';
+    } else if (data.selectedFilter === 'año' && data.chartSubFilter === 'week') {
+         seriesChartName = 'Registros';
+         chartTitleText = 'Nuevos Registros por Semana';
+    } else if (data.selectedFilter === 'año' && data.chartSubFilter === 'day') {
+         seriesChartName = 'Registros';
+         chartTitleText = 'Nuevos Registros por Día';
+    } else if (data.selectedFilter === 'año' && data.chartSubFilter === 'hour') {
+         seriesChartName = 'Registros';
+         chartTitleText = 'Nuevos Registros por Hora';
+    }
+
+
     const options = {
+        // Habilitar animaciones para la inicialización y actualización
+        animation: true,
+        animationDuration: 1000, // Duración de la animación inicial en ms (1 segundo)
+        animationEasing: 'cubicOut', // Tipo de curva de animación
+        // Animación al actualizar datos
+        animationDurationUpdate: 1000, // Duración de la animación al actualizar datos en ms (1 segundo)
+        animationEasingUpdate: 'cubicOut', // Tipo de curva de animación al actualizar
+
         tooltip: {
             trigger: 'axis',
             formatter: function (params) {
                 const dataPoint = params[0];
                 const valorActual = dataPoint.value;
-                const seriesName = dataPoint.seriesName || (filtroActual === 'año' ? 'Registros' : 'Visits');
+                const seriesName = seriesChartName; // <-- CORREGIDO: Usa la variable dinámica
 
                 let changeInfo = '';
                 const index = dataPoint.dataIndex;
                 if (index > 0 && values[index - 1] !== undefined) {
                     const previousValue = values[index - 1];
                     if (previousValue === 0) {
-                        changeInfo = `Change: N/A (from 0)`;
+                        changeInfo = `Cambio: N/A (desde 0)`; // Traducido
                     } else {
                         const percentageChange = ((valorActual - previousValue) / previousValue * 100).toFixed(1);
-                        changeInfo = `Change: ${percentageChange}%`;
+                        changeInfo = `Cambio: ${percentageChange}%`; // Traducido
                     }
                 }
 
@@ -355,7 +360,7 @@ function renderChart(data) {
             }
         },
         series: [{
-            name: (filtroActual === 'año' ? 'Registros' : 'Visits'),
+            name: seriesChartName, // <-- CORREGIDO: Usa la variable dinámica
             data: values,
             type: 'line',
             smooth: true,
@@ -374,12 +379,12 @@ function renderChart(data) {
             symbolSize: 8
         }],
         title: {
-            text: (filtroActual === 'año' ? 'New Registrations by Month' : 'Visits')
+            text: chartTitleText // <-- CORREGIDO: Usa la variable dinámica
         }
     };
 
     myChart.setOption(options);
     myChart.resize();
 
-    console.log("Chart rendered with data:", data.vistas);
+    console.log("ECharts DEBUG: Gráfica renderizada/actualizada con datos:", data.vistas);
 }
