@@ -47,7 +47,12 @@
                     {{ $header }}
                 </div>
             </header>
-        @endif        
+        @endif
+
+        {{-- SE ELIMINÓ ESTA LINEA YA QUE ERA LA DEL PROBLEMA --}}
+        <main class="flex-1 h-full p-6 overflow-y-auto" :class="sidebarOpen ? 'pl-64' : 'pl-16'">
+            @yield('content')
+        </main>
     </div>
 
     @stack('modals')
