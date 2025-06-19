@@ -143,7 +143,7 @@
 
     {{-- Modal usuario inactivo --}}
     @if (session('inactivo'))
-        <div id="inactivoModal" x-data="{ show: true }"
+        <div id="inactivoModal" x-data="{ show: true }" x-show="show" {{-- ¡Añade esta directiva x-show="show" aquí! --}}
             class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
             <div class="max-w-md p-6 text-center bg-white shadow-md rounded-3xl">
                 {{-- Icono --}}

@@ -36,7 +36,8 @@ class PqrsConfirmationMail extends Mailable
     {
         return new Envelope(
             subject: 'Confirmación de Recepción de tu PQR - Ref: ' . $this->pqrs->id, // Asunto del correo
-            from: config('mail.from.address', 'no-responder@tudominio.com'), // Email del remitente
+            // Utiliza la configuración de Laravel para el email del remitente
+            from: config('mail.from.address', 'noreply@tudominio.com'),
         );
     }
 

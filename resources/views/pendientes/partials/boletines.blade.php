@@ -30,21 +30,21 @@
                             class="text-blue-600 hover:underline">
                             Ver
                         </button>
-                        @include('operador.partials.modal-boletin-views')
+                        @include('pendientes.partials.modal-boletin-views')
 
 
                         <button type="button" onclick="mostrarModal('validar-boletin', '{{ $boletin->id }}')"
                             class="text-green-600 hover:underline">
                             Validar
                         </button>
-                        @include('operador.partials.modal-boletin-validar')
+                        @include('pendientes.partials.modal-boletin-validar')
 
                         <!-- Botón que abre el modal -->
                         <button type="button" onclick="mostrarModal('rechazar-boletin', '{{ $boletin->id }}')"
                             class="text-red-600 hover:underline">
                             Rechazar
                         </button>
-                        @include('operador.partials.modal-boletin-rechazar')
+                        @include('pendientes.partials.modal-boletin-rechazar')
                     </td>
                 </tr>
             @empty

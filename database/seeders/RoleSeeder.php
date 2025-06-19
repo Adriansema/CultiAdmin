@@ -1,154 +1,104 @@
 <?php
 
-//actualizacion 06/06/2025
-
-
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
-
 class RoleSeeder extends Seeder
-
 {
-
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
-
     {
+        // Importante: Reiniciar la caché de permisos de Spatie.
+        // Esto asegura que cualquier cambio en roles o permisos se refleje inmediatamente.
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // --- Permisos del Administrador ---
+        // --- 1. Definir TODOS los Permisos del sistema ---
+        // Se definen todos los permisos posibles que existiran en tu aplicación.
+        // Esto es crucial porque todos los permisos deben existir antes de asignarlos a roles.
+        $allSystemPermissions = [
 
-        $adminPermissions = [
+            // Permisos para el Módulo de Gestión de Usuarios
+            'crear usuario',
+            'editar usuario',
+            'actualizar usuario',
 
-            //Permisos para el Módulo de cultivos
-            'crear productos',
-            'ver productos',
-            'editar productos',
-            'eliminar productos',
-            'importar productos',
-            'exportar productos',
-            'enviar a validación',
+            // Permisos para Cultivos (Validar/Rechazar)
+            'ver productos pendiente',
 
+            // Permisos para Boletines (Validar/Rechazar)
+            'ver boletines pendiente',
 
-            //Permisos para el Módulo de boletines
-            'crear boletines',
-            'ver boletines',
-            'editar boletines',
-            'eliminar boletines',
-            'importar boletines',
-            'exportar boletines',
-            'enviar a validación',
+            // Permisos para el Módulo de Cultivos
+            'crear producto',
+            'editar producto',
+            'eliminar producto',
+            'actualizar producto',
 
+            // Permisos para el Módulo de Noticias 
+            'crear noticia',
+            'editar noticia',
+            'eliminar noticia',
+            'actualizar noticia',
 
-            //Permisos para el Módulo de gestion de usuarios
-            'ver lista de usuarios',
-            'crear usuarios',
-            'editar usuarios',
-            'activar usuarios',
-            'desactivar usuarios',
-            'importar usuarios',
-            'exportar usuarios',
-            'generar usuarios masivos',
-            'editar roles y permisos de usuario',
-
-            // Permisos para el Módulo de Accesibilidad
-            'administrar accesibilidad',
-
-            // Permisos para el Módulo de Centro de Ayuda
-            'ver centro de ayuda',
-            'ver formulario de contacto',
-            'buscar preguntas frecuentes',
-            'enviar mensaje en el boton contactenos',
-
-            // Permisos para el Módulo de Statistic
-            'ver estadisticas',
+            // Permisos para el Módulo de Boletines
+            'crear boletin',
+            'editar boletin',
+            'eliminar boletin',
+            'actualizar boletin',
         ];
 
-
-        // --- Permisos del Operador ---
-
-        $operadorPermissions = [
-
-            //cultivos
-            'ver productos pendientes',
-            'validar productos',
-            'rechazar productos',
-            'devolver para corrección',
-
-            //boletines
-            'ver boletines pendientes',
-            'validar boletines',
-            'rechazar boletines',
-            'devolver para corrección',
-
-            // Permisos para el Módulo de Accesibilidad
-            'administrar accesibilidad',
-
-            // Permisos para el Módulo de Centro de Ayuda
-            'ver centro de ayuda',
-            'ver formulario de contacto',
-            'buscar preguntas frecuentes',
-            'enviar mensaje en el boton contactenos',
-
-        ];
-
-        // Crear o actualizar permisos
-
-        $allPermissions = array_unique(array_merge($adminPermissions,              $operadorPermissions)); // Evitar duplicados
-
-        foreach ($allPermissions as $permission) {
-
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']); // Añadir guard_name
-
+        // --- 2. Crear todos los Permisos en la base de datos ---
+        // firstOrCreate crea el permiso si no existe. array_unique asegura que no haya duplicados.
+        foreach (array_unique($allSystemPermissions) as $permission) {
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
-        // Crear roles
+        // --- 3. Crear Roles y Asignar Permisos por Defecto ---
 
-        $adminRole = Role::firstOrCreate(['name' => 'administrador', 'guard_name' => 'web']); // Añadir guard_name
+        // Rol: SuperAdmin - Asignar TODOS los permisos creados
+        // Este rol es el controlador principal del sistema.
+        $superAdminRole = Role::firstOrCreate(['name' => 'SuperAdmin', 'guard_name' => 'web']);
+        $superAdminRole->givePermissionTo(Permission::all()); // Le damos todos los permisos existentes en el sistema
 
-        $operadorRole = Role::firstOrCreate(['name' => 'operador', 'guard_name' => 'web']); // Añadir guard_name
+        // Rol: Administrador - Con permisos básicos por defecto según tu especificación
+        $adminRole = Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => 'web']);
+        $adminRole->givePermissionTo([
+            'crear producto',
+            'crear usuario',
+        ]);
 
+        // Rol: Operario - Con permisos básicos por defecto según tu especificación
+        $operarioRole = Role::firstOrCreate(['name' => 'Operario', 'guard_name' => 'web']);
+        $operarioRole->givePermissionTo([
+            'crear noticia',
+        ]);
 
+        // Rol: Funcionario - Con permisos básicos por defecto según tu especificación
+        $funcionarioRole = Role::firstOrCreate(['name' => 'Funcionario', 'guard_name' => 'web']);
+        $funcionarioRole->givePermissionTo([
+            'crear boletin',
+        ]);
 
-        // Asignar permisos a cada rol
-
-        $adminRole->syncPermissions($adminPermissions);
-
-        $operadorRole->syncPermissions($operadorPermissions);
-
-        // -------------------------------------------------------------------
-        // 1. Crear o actualizar al usuario Administrador
-        // -------------------------------------------------------------------
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@cultiadmin.com'], // Condición de búsqueda
+        // --- 4. Crear o Actualizar Usuario SuperAdmin y Asignar Rol ---
+        // Este usuario será el punto de entrada inicial para gestionar el sistema.
+        $superAdminUser = User::firstOrCreate(
+            ['email' => 'super@admin.com'], // Condición de búsqueda: Email único
             [ // Datos a crear si no se encuentra
-                'name' => 'Administrador',
-                'password' => Hash::make('CultiAdmin_2025!'), // Contraseña segura
-                // Puedes añadir otros campos como 'email_verified_at' si los necesitas
-                'email_verified_at' => now(), // Opcional: marca el correo como verificado
+                'name'              => 'SuperAdmin', // Nombre descriptivo
+                'password'          => Hash::make('SuperAdmin_2025!'), // Contraseña segura
+                'email_verified_at' => now(), // Marca el correo como verificado
             ]
         );
-        // Asignar el rol al usuario
-        // `syncRoles` es útil para asegurar que solo tenga los roles especificados
-        $admin->syncRoles([$adminRole]);
-        echo "Usuario Administrador creado/actualizado y rol asignado.\n";
+        // Asignar el rol 'SuperAdmin' a este usuario.
+        $superAdminUser->syncRoles([$superAdminRole]);
 
-        // -------------------------------------------------------------------
-        // 2. Crear o actualizar al usuario Operador
-        // -------------------------------------------------------------------
-        $operador = User::firstOrCreate(
-            ['email' => 'opera@cultiopera.com'],
-            [
-                'name' => 'Operador',
-                'password' => Hash::make('CultiOpera_2025!'),
-                'email_verified_at' => now(), // Opcional
-            ]
-        );
-        // Asignar el rol al usuario
-        $operador->syncRoles([$operadorRole]);
-        echo "Usuario Operador creado/actualizado y rol asignado.\n";
+        $this->command->info('Roles y Permisos iniciales sembrados exitosamente.');
+        $this->command->info('Usuario SuperAdmin (super@admin.com) creado/actualizado.');
     }
 }

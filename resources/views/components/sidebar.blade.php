@@ -21,11 +21,9 @@
         </div>
 
         <nav class="flex-1 px-6 pt-4 space-y-2">
-            {{-- Inicio --}}
-            {{-- Cultivos --}}
-            {{-- Boletines --}}
             <div class="px-2 space-y-2">
-                {{-- Inicio --}}
+                
+                {{-- Inicio (Generalmente visible para todos) --}}
                 <div
                     :class="sidebarOpen
                         ?
@@ -43,160 +41,99 @@
                     </x-responsive-nav-link>
                 </div>
 
-                {{-- Cultivos --}}
-                {{-- <div
-                    :class="sidebarOpen
-                        ?
-                        'flex pl-2 py-2 ml-[20px] transition rounded-xl  hover:bg-[var(--color-sidebarhoverbtn)]' :
-                        'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]'">
+                {{-- Módulo de cultivos --}}
+                @canany(['crear producto'])
+                    <div
+                        :class="sidebarOpen
+                            ?
+                            'flex pl-2 py-2 ml-[20px] transition rounded-xl  hover:bg-[var(--color-sidebarhoverbtn)]' :
+                            'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]'">
 
-                    <x-responsive-nav-link href="{{ route('productos.index') }}"
-                        class="flex items-center transition-all duration-300 ease-in-out" :active="request()->routeIs('cultivos')">
+                        <x-responsive-nav-link href="{{ route('productos.index') }}"
+                            class="flex items-center transition-all duration-300 ease-in-out" :active="request()->routeIs('boletines')">
 
-                        <img src="{{ asset('images/plant.svg') }}" class="w-4 h-4" alt="Cultivos">
+                            <img src="{{ asset('images/plant.svg') }}" class="w-4 h-4" alt="cultivos">
 
-                        <span x-show="sidebarOpen" x-transition
-                            class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
-                            {{ __('Cultivos') }}
-                        </span>
-                    </x-responsive-nav-link>
-                </div> --}}
-
-                <div class="relative">
-                    <div :class="sidebarOpen
-                        ?
-                        'flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer ' :
-                        'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer '"
-                        @click.prevent="$refs.submenuCultivos.classList.toggle('hidden')">
-
-                        <img src="{{ asset('images/plant.svg') }}" class="w-4 h-4" alt="cultivos">
-
-                        <span x-show="sidebarOpen" x-transition
-                            class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
-                            {{ __('Cultivos') }}
-                        </span>
+                            <span x-show="sidebarOpen" x-transition
+                                class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
+                                {{ __('Cultivos') }}
+                            </span>
+                        </x-responsive-nav-link>
                     </div>
+                @endcanany
 
-                    {{-- Este es el contenedor del submenú que se va a desplegar debajo --}}
-                    <div id="submenu-cultivos" x-ref="submenuCultivos"
-                        class="hidden space-y-0 transition-all duration-200 ease-in-out space-y-0 {{-- border-b-2 rounded-b-xl border-x-2 --}}"
-                        :class="sidebarOpen ? 'w-full pl-2' : 'w-9 -mx-1 flex flex-col items-center'"
-                        style="border-color: background-color: var(--color-sidebarhoverbtn);">
+                {{-- Módulo de Noticias --}}
+                @canany(['crear noticia'])
+                    <div
+                        :class="sidebarOpen
+                            ?
+                            'flex pl-2 py-2 ml-[20px] transition rounded-xl  hover:bg-[var(--color-sidebarhoverbtn)]' :
+                            'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]'">
 
-                        {{-- Contenido del submenú --}}
-                        <div :class="sidebarOpen ? 'w-full' : 'flex justify-center'">
-                            <x-responsive-nav-link href="{{ route('productos.index') }}"
-                                class="flex items-center px-2 py-2 ml-[20px] text-sm border-2 border-transparent rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] transition-all duration-1000">
-                                <img src="{{ asset('images/flechita.svg') }}" alt="Cultivos"
-                                    :class="sidebarOpen ? 'w-4 h-4 ml-[20px]' : 'w-4 h-4'" />
-                                <span x-show="sidebarOpen"
-                                    class="text-xs font-medium text-[var(--color-text)] whitespace-nowrap ml-[16px]">{{ __('Lista de Productos') }}</span>
-                            </x-responsive-nav-link>
-                        </div>
+                        <x-responsive-nav-link href="{{ route('noticias.index') }}"
+                            class="flex items-center transition-all duration-300 ease-in-out" :active="request()->routeIs('boletines')">
 
-                        <hr class="border-gray-600 my-0 w-1/2 mx-auto">
+                            <img src="{{ asset('images/form.svg') }}" class="w-4 h-4" alt="cultivos">
 
-                        <div :class="sidebarOpen ? 'w-full' : 'flex justify-center'"> {{-- Opción: Cultivos --}}
-                            <x-responsive-nav-link href="{{ route('noticias.noticias.index') }}"
-                                class="flex items-center px-2 py-2 ml-[20px] text-sm border-2 border-transparent rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] transition-all duration-1000">
-                                <img src="{{ asset('images/flechita.svg') }}" alt="Cultivos"
-                                    :class="sidebarOpen ? 'w-4 h-4 ml-[20px]' : 'w-4 h-4'" />
-                                <span x-show="sidebarOpen"
-                                    class="text-xs font-medium text-[var(--color-text)] whitespace-nowrap ml-[16px]">{{ __('Noticias') }}</span>
-                            </x-responsive-nav-link>
-                        </div>
+                            <span x-show="sidebarOpen" x-transition
+                                class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
+                                {{ __('Noticias') }}
+                            </span>
+                        </x-responsive-nav-link>
                     </div>
-                </div>
+                @endcanany
 
-                {{-- Boletines --}}
-                <div
-                    :class="sidebarOpen
-                        ?
-                        'flex pl-2 py-2 ml-[20px] transition rounded-xl  hover:bg-[var(--color-sidebarhoverbtn)]' :
-                        'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]'">
+                {{-- Módulo de Boletines --}}
+                @canany(['crear boletin'])
+                    <div
+                        :class="sidebarOpen
+                            ?
+                            'flex pl-2 py-2 ml-[20px] transition rounded-xl  hover:bg-[var(--color-sidebarhoverbtn)]' :
+                            'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]'">
 
-                    <x-responsive-nav-link href="{{ route('boletines.index') }}"
-                        class="flex items-center transition-all duration-300 ease-in-out" :active="request()->routeIs('boletines')">
+                        <x-responsive-nav-link href="{{ route('boletines.index') }}"
+                            class="flex items-center transition-all duration-300 ease-in-out" :active="request()->routeIs('boletines')">
 
-                        <img src="{{ asset('images/form.svg') }}" class="w-4 h-4" alt="Boletines">
+                            <img src="{{ asset('images/dolar.svg') }}" class="w-4 h-4" alt="Boletines">
 
-                        <span x-show="sidebarOpen" x-transition
-                            class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
-                            {{ __('Boletines') }}
-                        </span>
-                    </x-responsive-nav-link>
-                </div>
+                            <span x-show="sidebarOpen" x-transition
+                                class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
+                                {{ __('Boletines') }}
+                            </span>
+                        </x-responsive-nav-link>
+                    </div>
+                @endcanany
             </div>
         </nav>
 
         <nav class="flex-1 px-6 pt-4 space-y-2">
-            {{-- Gestión de Usuarios --}}
-            {{-- Accesibilidad --}}
-            {{-- Centro de Ayuda --}}
-            {{-- Cerrar Sesión --}}
             <div class="px-2 space-y-2">
                 <div x-show="sidebarOpen" x-transition class="px-6 py-2 text-xs text-[var(--color-ajustes)]">
                     {{ __('Ajustes') }}
                 </div>
 
-                {{-- Gestión de Usuarios --}}
-                <div class="relative">
-                    <div :class="sidebarOpen
-                        ?
-                        'flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer ' :
-                        'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer '"
-                        @click.prevent="$refs.submenuGestionUsuarios.classList.toggle('hidden')">
+                {{-- Módulo de Gestión de Usuarios --}}
+                @canany(['crear usuario'])
+                    <div
+                        :class="sidebarOpen
+                            ?
+                            'flex pl-2 py-2 ml-[20px] transition rounded-xl  hover:bg-[var(--color-sidebarhoverbtn)]' :
+                            'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]'">
 
-                        <img src="{{ asset('images/Icon.svg') }}" class="w-4 h-4" alt="Usuarios">
+                        <x-responsive-nav-link href="{{ route('usuarios.index') }}"
+                            class="flex items-center transition-all duration-300 ease-in-out" :active="request()->routeIs('usuarios')">
 
-                        <span x-show="sidebarOpen" x-transition
-                            class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
-                            {{ __('Gestión de Usuarios') }}
-                        </span>
+                            <img src="{{ asset('images/Icon.svg') }}" class="w-4 h-4" alt="usuarios">
+
+                            <span x-show="sidebarOpen" x-transition
+                                class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
+                                {{ __('Gestion de Usuarios') }}
+                            </span>
+                        </x-responsive-nav-link>
                     </div>
+                @endcanany
 
-                    {{-- Este es el contenedor del submenú que se va a desplegar debajo --}}
-                    <div id="submenu-gestion-usuarios" x-ref="submenuGestionUsuarios"
-                        class="hidden space-y-0 transition-all duration-200 ease-in-out space-y-0 {{-- border-b-2 rounded-b-xl border-x-2 --}}"
-                        :class="sidebarOpen ? 'w-full pl-2' : 'w-9 -mx-1 flex flex-col items-center'"
-                        style="border-color: background-color: var(--color-sidebarhoverbtn);">
-
-                        {{-- Contenido del submenú --}}
-                        <div :class="sidebarOpen ? 'w-full' : 'flex justify-center'">
-                            <x-responsive-nav-link href="{{ route('usuarios.index') }}"
-                                class="flex items-center px-2 py-2 ml-[20px] text-sm border-2 border-transparent rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] transition-all duration-1000">
-                                <img src="{{ asset('images/flechita.svg') }}" alt="Cultivos"
-                                    :class="sidebarOpen ? 'w-4 h-4 ml-[20px]' : 'w-4 h-4'" />
-                                <span x-show="sidebarOpen"
-                                    class="text-xs font-medium text-[var(--color-text)] whitespace-nowrap ml-[16px]">{{ __('Lista de Usuarios') }}</span>
-                            </x-responsive-nav-link>
-                        </div>
-
-                        <hr class="border-gray-600 my-0 w-1/2 mx-auto">
-
-                        <div :class="sidebarOpen ? 'w-full' : 'flex justify-center'"> {{-- Opción: Cultivos --}}
-                            <x-responsive-nav-link href="{{ route('usuarios.create') }}"
-                                class="flex items-center px-2 py-2 ml-[20px] text-sm border-2 border-transparent rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] transition-all duration-1000">
-                                <img src="{{ asset('images/flechita.svg') }}" alt="Cultivos"
-                                    :class="sidebarOpen ? 'w-4 h-4 ml-[20px]' : 'w-4 h-4'" />
-                                <span x-show="sidebarOpen"
-                                    class="text-xs font-medium text-[var(--color-text)] whitespace-nowrap ml-[16px]">{{ __('Crear Usuarios') }}</span>
-                            </x-responsive-nav-link>
-                        </div>
-
-                        {{-- <div :class="sidebarOpen ? 'w-full' : 'flex justify-center'"> 
-                            <x-responsive-nav-link href="{{ route('usuarios.index')}}"
-                                class="flex items-center px-2 py-2 ml-[20px] text-sm border-2 border-transparent rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] transition-all duration-1000">
-                                <img src="{{ asset('images/flechita.svg') }}" alt="Boletines"
-                                    :class="sidebarOpen ? 'w-4 h-4 ml-[20px]' : 'w-4 h-4'" />
-                                <span x-show="sidebarOpen"
-                                    class="text-xs font-medium text-[var(--color-text)] whitespace-nowrap ml-[16px]">{{ __('Roles y Permisos') }}</span>
-                            </x-responsive-nav-link>
-                        </div> --}}
-                    </div>
-                </div>
-
-                {{-- Accesibilidad --}}
+                {{-- Accesibilidad (Generalmente visible para todos) --}}
                 <div
                     :class="sidebarOpen
                         ?
@@ -206,7 +143,7 @@
                     <x-responsive-nav-link href="{{ route('accesibilidad.index') }}"
                         class="flex items-center transition-all duration-300 ease-in-out" :active="request()->routeIs('accesibilidad')">
 
-                        <img src="{{ asset('images/accesi.svg') }}" class="w-4 h-4" alt="Usuarios">
+                        <img src="{{ asset('images/accesi.svg') }}" class="w-4 h-4" alt="Accesibilidad">
 
                         <span x-show="sidebarOpen" x-transition
                             class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
@@ -215,7 +152,7 @@
                     </x-responsive-nav-link>
                 </div>
 
-                {{-- Centro de Ayuda --}}
+                {{-- Centro de Ayuda (Generalmente visible para todos) --}}
                 <div
                     :class="sidebarOpen
                         ?
@@ -225,7 +162,7 @@
                     <x-responsive-nav-link href="{{ route('centroAyuda.index') }}"
                         class="flex items-center transition-all duration-300 ease-in-out" :active="request()->routeIs('centroAyuda')">
 
-                        <img src="{{ asset('images/preg.svg') }}" class="w-4 h-4" alt="Usuarios">
+                        <img src="{{ asset('images/preg.svg') }}" class="w-4 h-4" alt="Centro de Ayuda">
 
                         <span x-show="sidebarOpen" x-transition
                             class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
@@ -234,7 +171,7 @@
                     </x-responsive-nav-link>
                 </div>
 
-                {{-- Cerrar Sesión --}}
+                {{-- Cerrar Sesión (Generalmente visible para todos) --}}
                 <form method="POST" action="{{ route('logout') }}" class="mt-auto">
                     @csrf
                     <div
@@ -244,8 +181,7 @@
                             'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)]'">
 
                         <x-responsive-nav-link href="{{ route('logout') }}"
-                            onclick="event.preventDefault(); this.closest('form').submit();"
-                            class="flex items-center">
+                            onclick="event.preventDefault(); this.closest('form').submit();" class="flex items-center">
 
                             <img src="{{ asset('images/off.svg') }}" class="w-4 h-4" alt="Cerrar Sesión">
 
@@ -260,7 +196,7 @@
         </nav>
 
         <div class="px-6 py-16">
-            {{-- Perfil --}}
+            {{-- Perfil (Generalmente visible para todos) --}}
             <x-responsive-nav-link href="{{ route('profile.show') }}" class="rounded-3xl"
                 x-bind:class="sidebarOpen ? 'px-3 py-6' : 'flex justify-center p-0'">
 
@@ -280,6 +216,7 @@
                             {{ Auth::user()->name }}
                         </span>
                         <span class="text-sm text-gray-600">
+                            {{-- Muestra el primer rol del usuario o 'Usuario' por defecto --}}
                             {{ Auth::user()->getRoleNames()->first() ?? 'Usuario' }}
                         </span>
                     </div>
@@ -307,8 +244,8 @@
                 <div class="flex items-center px-4">
                     @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                         <div class="shrink-0 me-3">
-                            <img class="object-cover rounded-full size-10"
-                                src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
+                            <img class="object-cover rounded-full size-10" src="{{ Auth::user()->profile_photo_url }}"
+                                alt="{{ Auth::user()->name }}" />
                         </div>
                     @endif
 

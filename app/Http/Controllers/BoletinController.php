@@ -1,23 +1,22 @@
 <?php
 
-// actualizacion 09/04/2025 (y ahora con BoletinPolicy 06/06/2025)
-
 namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Boletin;
-use Illuminate\Support\Str; // Para usar Str::limit en la vista parcial
 use Illuminate\Http\Request;
 use App\Services\BoletinService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use App\Mail\NuevaRevisionPendienteMail;
 class BoletinController extends Controller
 {
     public function index(Request $request, BoletinService $boletinService)
     {
+        Gate::authorize('crear boletin');
         $boletines = $boletinService->obtenerBoletinFiltrados($request);
         return view('boletines.index', compact('boletines'));
     }
@@ -40,6 +39,7 @@ class BoletinController extends Controller
 
     public function edit(Boletin $boletin)
     {
+        Gate::authorize('editar boletin');
         return view('boletines.edit', compact('boletin'));
     }
 
@@ -63,7 +63,7 @@ class BoletinController extends Controller
             'archivo' => $filePath,
         ]);
 
-        $operadores = User::role('operador')->get();
+        $operadores = User::role('Operario')->get();
         foreach ($operadores as $operador) {
             Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
         }
@@ -73,6 +73,7 @@ class BoletinController extends Controller
 
     public function update(Request $request, Boletin $boletin)
     {
+        Gate::authorize('actualizar boletin');
         $rules = ([
             'contenido' => 'required|string|max:100',
             'archivo_upload' => 'nullable|file|mimes:pdf|max:5000',
@@ -111,7 +112,7 @@ class BoletinController extends Controller
         $boletin->save();
 
         if ($estadoCambiadoAPendiente) {
-            $operadores = User::role('operador')->get();
+            $operadores = User::role('Operario')->get();
             foreach ($operadores as $operador) {
                 Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
             }
@@ -134,6 +135,7 @@ class BoletinController extends Controller
 
     public function destroy(Boletin $boletin)
     {
+        Gate::authorize('eliminar boletin');
         if ($boletin->archivo && Storage::disk('public')->exists($boletin->archivo)) {
             Storage::disk('public')->delete($boletin->archivo);
         }
@@ -159,7 +161,7 @@ class BoletinController extends Controller
             'estado' => 'pendiente',
         ]);
 
-        $operadores = User::role('operador')->get();
+        $operadores = User::role('Operario')->get();
         foreach ($operadores as $operador) {
             Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
         }

@@ -57,12 +57,13 @@
                         </td>
                         <td class="px-6 py-4 text-sm">
                             <div class="flex items-center space-x-2">
-                                <a href="{{ route('noticias.noticias.show', $noticia->id_noticias) }}"
+                                <a href="{{ route('noticias.show', $noticia->id_noticias) }}"
                                     class="text-blue-600 hover:text-blue-900">Ver</a>
-                                <a href="{{ route('noticias.noticias.edit', $noticia->id_noticias) }}"
+
+                                <a href="{{ route('noticias.edit', $noticia->id_noticias) }}"
                                     class="text-yellow-600 hover:text-yellow-900">Editar</a>
-                                <form action="{{ route('noticias.noticias.destroy', $noticia->id_noticias) }}"
-                                    method="POST"
+
+                                <form action="{{ route('noticias.destroy', $noticia->id_noticias) }}" method="POST"
                                     onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta noticia?');">
                                     @csrf
                                     @method('DELETE')

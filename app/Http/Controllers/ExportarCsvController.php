@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
 use Faker\Factory as Faker;
-use App\Models\User; // Importa el modelo User para la Policy
-
 class ExportarCsvController extends Controller
 {
     public function generarCsv()
@@ -15,23 +13,33 @@ class ExportarCsvController extends Controller
 
         $usuarios = [];
 
-        // 30 administradores
-        for ($i = 0; $i < 30; $i++) {
+        // 6 Administradores
+        for ($i = 0; $i < 6; $i++) {
             $usuarios[] = [
                 'name' => $faker->name,
                 'email' => $faker->unique()->safeEmail,
                 'password' => 'password123',
-                'rol' => 'administrador',
+                'rol' => 'Administrador',
             ];
         }
 
-        // 70 operadores
-        for ($i = 0; $i < 40; $i++) {
+        // 5 Operarios
+        for ($i = 0; $i < 5; $i++) {
             $usuarios[] = [
                 'name' => $faker->name,
                 'email' => $faker->unique()->safeEmail,
                 'password' => 'password123',
-                'rol' => 'operador',
+                'rol' => 'Operario',
+            ];
+        }
+
+        // 5 Funcionario
+        for ($i = 0; $i < 5; $i++) {
+            $usuarios[] = [
+                'name' => $faker->name,
+                'email' => $faker->unique()->safeEmail,
+                'password' => 'password123',
+                'rol' => 'Funcionario',
             ];
         }
 

@@ -12,6 +12,19 @@
                     @elseif ($boletin->estado === 'rechazado') bg-red-100 text-red-800 border border-red-300
                     @elseif ($boletin->estado === 'pendiente') bg-yellow-100 text-yellow-800 border border-yellow-300
                     @else bg-gray-100 text-gray-800 border border-gray-300 @endif">
+
+                <p class="mb-2">
+                    <strong class="font-semibold">Usuario Creador:</strong>
+                    @if ($boletin->user)
+                        {{ $boletin->user->name }}
+                        @if ($boletin->user->roles->isNotEmpty())
+                            <span class="text-gray-600">({{ $boletin->user->roles->pluck('name')->join(', ') }})</span>
+                        @endif
+                    @else
+                        Usuario Desconocido
+                    @endif
+                </p>
+
                 <h3 class="text-base font-semibold">Estado Actual:
                     <span class="font-bold">{{ ucfirst($boletin->estado) }}</span>
                 </h3>

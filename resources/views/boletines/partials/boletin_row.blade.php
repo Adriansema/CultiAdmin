@@ -19,7 +19,6 @@
     </td>
 
     <td class="flex flex-col px-4 py-2 space-y-1 align-top md:space-y-0 md:space-x-2 md:flex-row boletin-acciones-cell">
-
         <button type="button" onclick="mostrarModal('ver', '{{ $boletin->id }}')"
             class="px-3 py-1 text-sm text-center text-white bg-green-600 rounded hover:bg-green-700">
             Ver
