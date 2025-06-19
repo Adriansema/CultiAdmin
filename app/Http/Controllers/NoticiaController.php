@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Noticia; // Importa el modelo Noticia
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth; // Para obtener el ID del usuario autenticado
 use Illuminate\Support\Facades\Storage; // Para manejar la carga de imágenes
+use Illuminate\Support\Facades\Response;
+use App\Services\NoticiaService;
 
 class NoticiaController extends Controller
 {
@@ -13,11 +16,19 @@ class NoticiaController extends Controller
      * Display a listing of the resource.
      * Muestra una lista de todas las noticias.
      */
-    public function index()
+    public function index(Request $request, NoticiaService $noticiaService)
     {
+        Gate::authorize('crear noticia');
+        $noticias = $noticiaService->obtenerNoticiaFiltradas($request);
         // Carga todas las noticias, incluyendo la relación con User para mostrar quién la creó.
-        $noticias = Noticia::with('user')->get();
+        /* $noticias = Noticia::with('user')->get(); */
         return view('noticias.index', compact('noticias'));
+    }
+
+    public function getFilteredNoticy(Request $request, NoticiaService $noticiaService) 
+    {
+        $noticias = $noticiaService->obtenerNoticiaFiltradas($request);
+        return response()->json($noticias);
     }
 
     /**
@@ -68,7 +79,7 @@ class NoticiaController extends Controller
         ]);
 
         // 4. Redirigir al índice de noticias con un mensaje de éxito.
-        return redirect()->route('noticias.noticias.index')->with('success', 'Noticia creada con éxito.');
+        return redirect()->route('noticias.index')->with('success', 'Noticia creada con éxito.');
     }
 
     /**
@@ -88,6 +99,7 @@ class NoticiaController extends Controller
      */
     public function edit(Noticia $noticia)
     {
+        Gate::authorize('editar noticia');
         return view('noticias.edit', compact('noticia'));
     }
 
@@ -97,6 +109,7 @@ class NoticiaController extends Controller
      */
     public function update(Request $request, Noticia $noticia)
     {
+        Gate::authorize('actualizar noticia');
         // 1. Validar los datos del formulario.
         $request->validate([
             'tipo' => 'required|string|max:255',
@@ -133,7 +146,7 @@ class NoticiaController extends Controller
         ]);
 
         // 4. Redirigir al índice de noticias con un mensaje de éxito.
-        return redirect()->route('noticias.noticias.index')->with('success', 'Noticia actualizada con éxito.');
+        return redirect()->route('noticias.index')->with('success', 'Noticia actualizada con éxito.');
     }
 
     /**
@@ -142,6 +155,7 @@ class NoticiaController extends Controller
      */
     public function destroy(Noticia $noticia)
     {
+        Gate::authorize('eliminar noticia');
         // 1. Eliminar la imagen asociada si existe.
         if ($noticia->imagen && Storage::disk('public')->exists($noticia->imagen)) {
             Storage::disk('public')->delete($noticia->imagen);
@@ -151,6 +165,6 @@ class NoticiaController extends Controller
         $noticia->delete();
 
         // 3. Redirigir al índice de noticias con un mensaje de éxito.
-        return redirect()->route('noticias.noticias.index')->with('success', 'Noticia eliminada con éxito.');
+        return redirect()->route('noticias.index')->with('success', 'Noticia eliminada con éxito.');
     }
 }

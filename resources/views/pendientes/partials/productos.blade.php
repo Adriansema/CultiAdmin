@@ -35,20 +35,20 @@
                         </span>
                     </td>
                     <td class="px-4 py-2 space-x-2">
-                        <a href="{{ route('operador.productos.show', $producto->id) }}"
+                        <a href="{{ route('productos.show', $producto->id) }}"
                             class="text-blue-600 hover:underline">Ver</a>
 
                         <button type="button" onclick="mostrarModal('validar-producto', '{{ $producto->id }}')"
                             class="text-green-600 hover:underline">
                             Validar
                         </button>
-                        @include('operador.partials.modal-producto-validar')
+                        @include('pendientes.partials.modal-producto-validar')
 
                         <button type="button" onclick="mostrarModal('rechazar-producto', '{{ $producto->id }}')"
                             class="text-red-600 hover:underline">
                             Rechazar
                         </button>
-                        @include('operador.partials.modal-producto-rechazar')
+                        @include('pendientes.partials.modal-producto-rechazar')
                     </td>
                 </tr>
             @empty

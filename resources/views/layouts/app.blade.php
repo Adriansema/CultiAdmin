@@ -35,12 +35,9 @@
 
     <x-banner />
 
-    <!-- Sidebar dinámico según el rol -->
-    @role('administrador')
-        <x-sidebar-admin />
-        @elserole('operador')
-        <x-sidebar-operador />
-    @endrole
+    <!-- Sidebar dinámico basado en permisos (anteriormente x-sidebar-admin) -->
+    {{-- Ahora incluimos un único sidebar para todos los roles --}}
+    <x-sidebar /> 
 
     <!-- Contenido principal -->
     <div class="flex flex-col flex-1 overflow-hidden bg-gray-2">
@@ -72,7 +69,7 @@
         const sessionError = @json(session('error', null));
     </script>
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
-   {{--  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script --}}>
+    {{-- <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script --}}>
 </body>
 
 </html>

@@ -1,103 +1,75 @@
 @extends('layouts.app') {{-- Asume que tienes un layout base --}}
 
 @section('content')
-<div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Listado de Noticias</h1>
 
-    <div class="mb-4">
-        <a href="{{ route('noticias.noticias.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Crear Nueva Noticia
-        </a>
-    </div>
-
-    @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-            {{ session('success') }}
+    @can('crear noticia')
+        <div class="mb-6">
+            <div class="flex items-center space-x-2">
+                <h1 class="text-3xl font-bold text-gray-800 flex items-center space-x-2">
+                    <img src="{{ asset('images/reverse.svg') }}" alt="icono" class="w-5 h-5">
+                    <span>Noticias</span>
+                </h1>
+            </div>
         </div>
-    @endif
 
-    @if ($noticias->isEmpty())
-        <p class="text-gray-600">No hay noticias registradas.</p>
-    @else
-        <div class="overflow-x-auto bg-white shadow-md rounded-lg">
-            <table class="min-w-full leading-normal">
-                <thead>
-                    <tr>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            ID Noticia
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Creador
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Autor Acreditado
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Tipo
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Título
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Clase
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Pág.
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Estado
-                        </th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Acciones
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($noticias as $noticia)
-                    <tr>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            {{ $noticia->id_noticias }}
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            {{ $noticia->user ? $noticia->user->name : 'Desconocido' }}
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            {{ $noticia->autor ?? 'N/A' }} {{-- ¡MOSTRANDO EL AUTOR! --}}
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            {{ $noticia->tipo }}
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            {{ Str::limit($noticia->titulo, 30) ?? 'N/A' }}
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            {{ $noticia->clase ?? 'N/A' }}
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            {{ $noticia->numero_pagina }}
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <span class="relative inline-block px-3 py-1 font-semibold leading-tight {{ $noticia->estado == 'aprobada' ? 'text-green-900' : ($noticia->estado == 'rechazada' ? 'text-red-900' : 'text-gray-900') }}">
-                                <span aria-hidden="true" class="absolute inset-0 opacity-50 rounded-full {{ $noticia->estado == 'aprobada' ? 'bg-green-200' : ($noticia->estado == 'rechazada' ? 'bg-red-200' : 'bg-gray-200') }}"></span>
-                                <span class="relative">{{ $noticia->estado }}</span>
+        <div class="w-full max-w-6xl px-6 py-1 mx-auto bg-[var(--color-Gestion)] rounded-xl">
+            <div class="flex items-center justify-between">
+
+                <form id="buscadorTabla" action="{{ route('noticias.index') }}" method="GET"
+                    class="flex items-center w-full max-w-xl">
+                    @include('noticias.partials.search')
+                </form>
+
+                <div class="flex items-center justify-end py-4 space-x-2">
+                    <button type="button" id="filtrosBotones"
+                        class="inline-flex group items-center justify-center px-4 py-3 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] rounded-full w-auto">
+                        <span class="text-xs font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
+                            {{ __('Filtrar') }}
+                        </span>
+                        <img src="{{ asset('images/filtro.svg') }}" class="w-4 h-3 relative inset-0 block group-hover:hidden"
+                            alt="Icono de filtro">
+                        <img src="{{ asset('images/filtro-hover.svg') }}"
+                            class="w-4 h-3 relative inset-0 hidden group-hover:block" alt="Icono de filtro hover">
+                    </button>
+
+                    <form method="GET" action="{{ route('noticias.create') }}">
+                        <x-responsive-nav-link href="#" onclick="this.closest('form').submit(); return false;"
+                            class="inline-flex items-center group justify-center px-4 py-3 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] text-white rounded-full w-auto">
+                            <span class="text-xs font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
+                                {{ __('Exportar Csv') }}
                             </span>
-                        </td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <div class="flex items-center space-x-2">
-                                <a href="{{ route('noticias.noticias.show', $noticia->id_noticias) }}" class="text-blue-600 hover:text-blue-900">Ver</a>
-                                <a href="{{ route('noticias.noticias.edit', $noticia->id_noticias) }}" class="text-yellow-600 hover:text-yellow-900">Editar</a>
-                                <form action="{{ route('noticias.noticias.destroy', $noticia->id_noticias) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta noticia?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900">Eliminar</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                            <img src="{{ asset('images/export.svg') }}"
+                                class="w-5 h-4 relative inset-0 block group-hover:hidden" alt="Icono Exportar CSV">
+                            <img src="{{ asset('images/export-hover.svg') }}"
+                                class="w-5 h-4 relative inset-0 hidden group-hover:block" alt="Icono Exportar CSV">
+                        </x-responsive-nav-link>
+                    </form>
+
+                    <x-responsive-nav-link href="{{ route('noticias.create') }}"
+                        class="inline-flex items-center px-4 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900] hover:bg-[#61BA33] text-white rounded-full w-auto">
+                        <img src="{{ asset('images/signo.svg') }}" class="w-4 h-3" alt="Icono Nuevo Usuario">
+                        <span class="text-xs font-medium whitespace-nowrap">
+                            {{ __('Nueva Noticia') }}
+                        </span>
+                    </x-responsive-nav-link>
+                </div>
+            </div>
+
+            @if (session('success'))
+                <div class="p-4 mb-4 text-green-800 bg-green-100 rounded shadow">{{ session('success') }}</div>
+            @endif
+
+            @if (session('error'))
+                <div class="p-4 mb-4 text-red-800 bg-red-100 rounded shadow">{{ session('error') }}</div>
+            @endif
+
+            @include('noticias.partials.tabla')
+
+            @if ($noticias->total() > 0 && $noticias->hasPages())
+                <div class="p-4 mt-4 rounded-b-xl">
+                    {{ $noticias->links('vendor.pagination.tailwind') }}
+                </div>
+            @endif
         </div>
-    @endif
-</div>
+    @endcan
 @endsection

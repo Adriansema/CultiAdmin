@@ -40,7 +40,6 @@
                 class="px-4 py-2 text-gray-700 bg-gray-300 rounded hover:bg-gray-400">
                 Cancelar
             </button>
-            {{-- <a href="{{ route('operador.pendientes') }}" class="btn btn-secondary">Volver</a> --}}
         </div>
     </div>
 </div>

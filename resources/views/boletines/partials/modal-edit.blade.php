@@ -1,7 +1,7 @@
 <div id="modal-editar-{{ $boletin->id }}" class="hidden">
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <form id="form-boletin-{{ $boletin->id }}" action="{{ route('boletines.update', $boletin) }}" method="POST" enctype="multipart/form-data"
-            class="bg-gray-200 px-4 py-6 space-y-4 rounded-xl">
+        <form id="form-boletin-{{ $boletin->id }}" action="{{ route('boletines.update', $boletin) }}" method="POST"
+            enctype="multipart/form-data" class="bg-gray-200 px-4 py-6 space-y-4 rounded-xl">
             @csrf
             @method('PUT')
 
@@ -24,20 +24,25 @@
                         <a href="{{ asset('storage/' . $boletin->archivo) }}" target="_blank"
                             class="flex flex-col items-center text-blue-600 hover:underline
                             transform transition-transform duration-300 ease-in-out hover:scale-105">
-                            <img src="{{ $iconSrc }}" alt="Icono de Archivo Actual" class="w-16 h-16 cursor-pointer">
-                            <span class="**archivo-extension-text**">Ver Archivo Actual ({{ strtoupper($extension) ?: 'Sin Ext.' }})</span>
+                            <img src="{{ $iconSrc }}" alt="Icono de Archivo Actual"
+                                class="w-16 h-16 cursor-pointer">
+                            <span class="**archivo-extension-text**">Ver Archivo Actual
+                                ({{ strtoupper($extension) ?: 'Sin Ext.' }})</span>
                         </a>
                         {{-- <span class="flex-grow text-sm text-gray-500 truncate">{{ basename($boletin->archivo) }}</span> --}}
                     </div>
-                    <p class="mt-2 text-sm text-gray-600 **info-archivo-subido**">Deja este campo vacío para mantener el archivo actual, o sube uno
+                    <p class="mt-2 text-sm text-gray-600 **info-archivo-subido**">Deja este campo vacío para mantener el
+                        archivo actual, o sube uno
                         nuevo para reemplazarlo.</p>
                 @else
-                    <p class="mt-2 text-sm text-gray-600 **no-archivo-mensaje**">No hay archivo adjunto actualmente. Puedes subir uno a
+                    <p class="mt-2 text-sm text-gray-600 **no-archivo-mensaje**">No hay archivo adjunto actualmente.
+                        Puedes subir uno a
                         continuación.</p>
                 @endif
 
                 {{-- Input para subir un nuevo archivo --}}
-                <input type="file" name="archivo_upload" id="archivo_upload" class="w-full p-2 mt-2 border rounded-lg">
+                <input type="file" name="archivo_upload" id="archivo_upload"
+                    class="w-full p-2 mt-2 border rounded-lg">
                 @error('archivo_upload')
                     {{-- El nombre debe coincidir con el del campo en el controlador --}}
                     <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
