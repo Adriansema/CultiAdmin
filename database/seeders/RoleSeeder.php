@@ -26,7 +26,6 @@ class RoleSeeder extends Seeder
             // Permisos para el Módulo de Gestión de Usuarios
             'crear usuario',
             'editar usuario',
-            'actualizar usuario',
 
             // Permisos para Cultivos (Validar/Rechazar)
             'ver productos pendiente',
@@ -38,19 +37,16 @@ class RoleSeeder extends Seeder
             'crear producto',
             'editar producto',
             'eliminar producto',
-            'actualizar producto',
 
             // Permisos para el Módulo de Noticias 
             'crear noticia',
             'editar noticia',
             'eliminar noticia',
-            'actualizar noticia',
 
             // Permisos para el Módulo de Boletines
             'crear boletin',
             'editar boletin',
             'eliminar boletin',
-            'actualizar boletin',
         ];
 
         // --- 2. Crear todos los Permisos en la base de datos ---

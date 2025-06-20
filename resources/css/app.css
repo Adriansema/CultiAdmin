@@ -100,7 +100,7 @@ html { font-size: 16px; }
 /*resources/views/usuarios/index.blade.php u otras vistas de esa carpeta*/
 @layer base {
   :root {
-        --color-Gestion: #E6EAED;
+        --color-Gestion: #E6EAED; 
         --color-formulario: #A5BFCC;
         --color-pag: #00304D;
         --color-hover: #39A900;

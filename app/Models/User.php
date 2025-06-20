@@ -3,16 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable; // Permite que este modelo maneje la autenticación (login/logout).
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Concerns\HasRelationships;
-use Illuminate\Contracts\Auth\CanResetPassword; // Asegúrate de importar esto
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements CanResetPassword // Este modelo es ahora un "usuario autenticable" para Laravel.
+class User extends Authenticatable 
 {
     use HasApiTokens;              // Para tokens de API (Sanctum).
     use HasRoles;                  // Para roles y permisos (Spatie).
@@ -27,8 +26,10 @@ class User extends Authenticatable implements CanResetPassword // Este modelo es
     protected $fillable = [
         'name',
         'email',
-        'password', // Se permite asignar el valor, pero siempre será un hash (no texto plano).
+        'password',
         'estado',
+        'type_document',
+        'document',     
     ];
 
     protected $hidden = [

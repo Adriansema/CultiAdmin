@@ -109,7 +109,7 @@ class NoticiaController extends Controller
      */
     public function update(Request $request, Noticia $noticia)
     {
-        Gate::authorize('actualizar noticia');
+        Gate::authorize('editar noticia');
         // 1. Validar los datos del formulario.
         $request->validate([
             'tipo' => 'required|string|max:255',
