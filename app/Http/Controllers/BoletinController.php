@@ -73,7 +73,7 @@ class BoletinController extends Controller
 
     public function update(Request $request, Boletin $boletin)
     {
-        Gate::authorize('actualizar boletin');
+        Gate::authorize('editar boletin');
         $rules = ([
             'contenido' => 'required|string|max:100',
             'archivo_upload' => 'nullable|file|mimes:pdf|max:5000',

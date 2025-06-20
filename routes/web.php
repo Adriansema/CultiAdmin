@@ -4,17 +4,20 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckUserEstado;
 use App\Http\Controllers\PqrsController;
+use App\Http\Controllers\NoticiaController;
 use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StatisticController;
-use App\Http\Controllers\NoticiaController;
 use App\Http\Controllers\CentroAyudaController;
 use App\Http\Controllers\ExportarCsvController;
-use App\Http\Controllers\AccesibilidadController;
 use App\Http\Controllers\PendienteBolController;
 use App\Http\Controllers\PendienteProController;
+use App\Http\Controllers\AccesibilidadController;
+use App\Http\Controllers\Auth\NewPasswordController;       // Para establecer la nueva contraseña
+use App\Http\Controllers\Auth\PasswordResetLinkController; // Para la solicitud de restablecimiento
+
 
 // ------------------------------------------------------------------------------------
 // Rutas PÚBLICAS (No requieren autenticación)
@@ -28,6 +31,16 @@ Route::prefix('pqrs')->name('pqrs.')->group(function () {
 
 // Ruta para verificar si el correo existe 
 Route::post('/check-email', [UsuarioController::class, 'checkEmailExists'])->name('check-email');
+
+// Para verificar si el documento existe 
+Route::post('/check-document', [UsuarioController::class, 'checkDocumentExists'])->name('check-document');
+
+// Para el reenvío del email de activación (PÚBLICAS por si el usuario no puede loguearse) 
+// Formulario para solicitar el reenvío del email de activación
+Route::get('/resend-activation', [UsuarioController::class, 'showResendActivationForm'])->name('resend.activation.form');
+
+// Procesa la solicitud de reenvío del email de activación
+Route::post('/resend-activation', [UsuarioController::class, 'resendActivationEmail'])->name('resend.activation.email');
 
 // Rutas de Centro de Ayuda
 Route::prefix('centro-ayuda')->name('centroAyuda.')->group(function () {
@@ -67,7 +80,7 @@ Route::middleware([
           Route::get('/exportar-csv', [ProductoController::class, 'exportarCSV'])->name('exportarCSV');
           Route::get('/{producto}/edit', [ProductoController::class, 'edit'])->name('edit')->middleware('can:editar producto');
           Route::get('/{producto}', [ProductoController::class, 'show'])->name('show');
-          Route::put('/{producto}', [ProductoController::class, 'update'])->name('update')->middleware('can:actualizar producto');
+          Route::put('/{producto}', [ProductoController::class, 'update'])->name('update')->middleware('can:editar producto');
           Route::delete('/{producto}', [ProductoController::class, 'destroy'])->name('destroy')->middleware('can:eliminar producto');
      });
 
@@ -79,7 +92,7 @@ Route::middleware([
           Route::post('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf');
           Route::get('/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('exportarCSV');
           Route::get('/{boletin}/edit', [BoletinController::class, 'edit'])->name('edit')->middleware('can:editar boletin');
-          Route::put('/{boletin}', [BoletinController::class, 'update'])->name('update')->middleware('can:actualizar boletin');
+          Route::put('/{boletin}', [BoletinController::class, 'update'])->name('update')->middleware('can:editar boletin');
           Route::delete('/{boletin}', [BoletinController::class, 'destroy'])->name('destroy')->middleware('can:eliminar boletin');
      });
 
@@ -110,7 +123,7 @@ Route::middleware([
           Route::post('/importar-csv', [UsuarioController::class, 'importarCsv'])->name('importarCsv');
           Route::get('/exportar', [UsuarioController::class, 'exportarCSV'])->name('exportar');
           Route::get('/{usuario}/edit', [UsuarioController::class, 'edit'])->name('edit')->middleware('can:editar usuario');
-          Route::put('/{usuario}', [UsuarioController::class, 'update'])->name('update')->middleware('can:actualizar usuario');
+          Route::put('/{usuario}', [UsuarioController::class, 'update'])->name('update')->middleware('can:editar usuario');
           Route::patch('/{usuario}/toggle', [UsuarioController::class, 'toggle'])->name('toggle');
      });
 
@@ -121,7 +134,7 @@ Route::middleware([
           Route::post('/', [NoticiaController::class, 'store'])->name('store');
           Route::get('/{noticia}', [NoticiaController::class, 'show'])->name('show');
           Route::get('/{noticia}/edit', [NoticiaController::class, 'edit'])->name('edit')->middleware('can:editar noticia');
-          Route::put('/{noticia}', [NoticiaController::class, 'update'])->name('update')->middleware('can:actualizar noticia');
+          Route::put('/{noticia}', [NoticiaController::class, 'update'])->name('update')->middleware('can:editar noticia');
           Route::delete('/{noticia}', [NoticiaController::class, 'destroy'])->name('destroy')->middleware('can:eliminar noticia');
      });
 

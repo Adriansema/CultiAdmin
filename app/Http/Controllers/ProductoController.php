@@ -135,7 +135,7 @@ class ProductoController extends Controller
      */
     public function update(Request $request, Producto $producto)
     {
-        Gate::authorize('actualizar producto');
+        Gate::authorize('editar producto');
         // 1. Definir las reglas de validación base para la actualización del producto.
         $rules = [
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
