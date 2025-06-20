@@ -11,25 +11,28 @@
             </div>
 
             <div class="flex flex-wrap items-center mt-4 space-x-2 md:mt-0" id="filter-buttons-container">
-                <button onclick="setFilter('ultimos3dias')" data-filtro="ultimos3dias"
-                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600 active-filter-button">
+                <!-- Botón "Últimos 3 días" - Sin borde inicial. El JS aplicará el borde y color al activarse. -->
+                <button onclick="window.setFilter('ultimos3dias')" data-filtro="ultimos3dias"
+                    class="px-4 py-2 text-green-600 transition-all duration-300 ease-in-out rounded-full filter-btn focus:outline-none hover:border hover:border-green-600">
                     Últimos 3 días
                 </button>
 
-                <button onclick="setFilter('semana')" data-filtro="semana"
-                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                <!-- Botón "Semana" - Sin borde inicial. El JS aplicará las clases de activo (incluyendo el borde). -->
+                <button onclick="window.setFilter('semana')" data-filtro="semana"
+                    class="px-4 py-2 text-green-600 transition-all duration-300 ease-in-out rounded-full filter-btn focus:outline-none hover:border hover:border-green-600">
                     Semana
                 </button>
 
-                <button onclick="setFilter('mes')" data-filtro="mes"
-                    class="px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                <!-- Botón "Mes" - Sin borde inicial. El JS aplicará el borde y color al activarse. -->
+                <button onclick="window.setFilter('mes')" data-filtro="mes"
+                    class="px-4 py-2 text-green-600 transition-all duration-300 ease-in-out rounded-full filter-btn focus:outline-none hover:border hover:border-green-600">
                     Mes
                 </button>
 
-                {{-- Botón "Año" con el selector de año de Flatpickr integrado --}}
+                {{-- Botón "Año" con el selector de año de Flatpickr integrado (Borde punteado azul siempre) --}}
                 <div class="relative inline-block">
-                    <button onclick="setFilter('año')" data-filtro="año"
-                        class="flex items-center px-4 py-2 text-green-600 transition-colors rounded-lg filter-btn hover:border focus:border-5 focus:border-green-600">
+                    <button onclick="window.setFilter('año')" data-filtro="año"
+                        class="flex items-center px-4 py-2 text-blue-600 transition-all duration-300 ease-in-out border-2 border-blue-400 border-dashed rounded-full filter-btn focus:outline-none hover:text-blue-800">
                         Año
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ml-2" viewBox="0 0 20 20"
                             fill="currentColor">
@@ -41,16 +44,21 @@
                     <input type="text" id="yearPicker" class="absolute inset-0 opacity-0 cursor-pointer"
                         placeholder="Selecciona Año">
                 </div>
+
+                {{-- Contenedor de sub-filtros de año --}}
                 <div id="yearChartFiltersContainer" class="flex flex-wrap items-center mt-4 space-x-2 md:mt-0"
                     style="display: none;">
                     <label for="chartSubFilter" class="sr-only">Filtrar por:</label>
                     <select id="chartSubFilter"
                         class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300">
                         <option value="month">Por Mes</option>
-                        <option value="quarter">Por Trimestre</option>
+                        <option value="week">Por Semana</option>
+                        <option value="day">Por Día</option>
+                        <option value="hour">Por Hora</option>
                     </select>
                 </div>
             </div>
+
     </section>
 
     {{-- Sección de Gráfica de Usuarios Conectados y Métricas --}}
@@ -70,7 +78,7 @@
         </div>
 
 
-      {{-- Ajustado 'gap-x-1' para solo espacio horizontal muy pequeño, y 'gap-y-2' para el vertical --}}
+        {{-- Ajustado 'gap-x-1' para solo espacio horizontal muy pequeño, y 'gap-y-2' para el vertical --}}
         <div class="flex flex-col items-stretch lg:flex-row gap-x-6 gap-y-4">
 
 
@@ -167,7 +175,7 @@
                 </x-responsive-nav-link>
             </div>
 
-             <div id="mensajes-novedades" class="p-4 bg-white shadow rounded-2xl">
+            <div id="mensajes-novedades" class="p-4 bg-white shadow rounded-2xl">
                 <p class="text-gray-500">No hay novedades por ahora.</p>
             </div>
 

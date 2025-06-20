@@ -64,16 +64,57 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // --- Función para activar/desactivar los botones de filtro ---
-    function setActiveFilterButton(filterId) {
+     // --- Función para activar/desactivar los botones de filtro ---
+    function setActiveFilterButton(filterType) {
         document.querySelectorAll('.filter-btn').forEach(button => {
-            button.classList.remove('active-filter-button');
+            const currentFilter = button.getAttribute('data-filtro');
+
+            // 1. Remover TODAS las clases de estado activo (fondo, texto, sombra, bordes sólidos)
+            button.classList.remove('bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600');
+
+            // 2. Remover TODAS las clases del botón Año para re-aplicar según estado
+            button.classList.remove('border-2', 'border-dashed', 'border-blue-400', 'text-blue-600', 'hover:text-blue-800');
+
+
+            // 3. Aplicar clases de estado INACTIVO por defecto a todos los botones
+            if (currentFilter === 'año') {
+                // El botón Año siempre tiene border-2 border-dashed border-blue-400 (definido en HTML en el estado base)
+                // Aquí solo gestionamos su color de texto para el estado inactivo
+                button.classList.add('border-2', 'border-dashed', 'border-blue-400', 'text-blue-600', 'hover:text-blue-800');
+            } else {
+                // Botones normales (3 días, Semana, Mes) cuando INACTIVOS:
+                // Tienen texto verde y NO deben tener borde sólido visible.
+                // El hover:border se gestiona desde el HTML base del botón
+                button.classList.add('text-green-600', 'hover:border', 'hover:border-green-600');
+            }
         });
-        const activeButton = document.getElementById(filterId);
+
+        // 4. Aplicar las clases de estado ACTIVO al botón seleccionado
+        const activeButton = document.querySelector(`.filter-btn[data-filtro="${filterType}"]`);
         if (activeButton) {
-            activeButton.classList.add('active-filter-button');
+            const activeFilter = activeButton.getAttribute('data-filtro');
+
+            // Remover las clases de inactivo del botón activo antes de añadir las de activo
+            if (activeFilter === 'año') {
+                activeButton.classList.remove('text-blue-600', 'hover:text-blue-800', 'border-2', 'border-dashed', 'border-blue-400');
+            } else {
+                activeButton.classList.remove('text-green-600', 'hover:border', 'hover:border-green-600');
+            }
+
+            // Añadir las clases de ACTIVO (fondo verde, texto blanco, sombra)
+            activeButton.classList.add('bg-green-600', 'text-white', 'shadow-md');
+
+            // Añadir el borde sólido verde si es un botón normal (no Año)
+            if (activeFilter !== 'año') {
+                activeButton.classList.add('border', 'border-green-600');
+            } else {
+                // Si es el botón Año, reaplicar su borde punteado azul permanente
+                activeButton.classList.add('border-2', 'border-dashed', 'border-blue-400');
+            }
         }
+        console.log(`DEBUG: Botón activo establecido a: ${filterType}`);
     }
+
 
 
     // --- setFilter global para los onclick de los botones HTML ---
@@ -280,7 +321,7 @@ function renderChart(data) {
     // Determinar el nombre de la serie y el título de la gráfica dinámicamente
     // Utiliza data.selectedFilter y data.chartSubFilter que vienen del backend
     let seriesChartName = 'Visitas';
-    let chartTitleText = 'Visitas';
+    let chartTitleText = '';
 
     if (data.selectedFilter === 'año' && data.chartSubFilter === 'month') {
         seriesChartName = 'Registros';

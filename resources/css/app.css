@@ -15,13 +15,6 @@
   }
 }
 
-.filter-btn {
-    @apply bg-green-400 hover:bg-green-100;
-    border: 1px solid #1fa700; /* Verde fuerte para el borde */
-    background-color: #e9fbe6; /* Verde suave para el fondo */
-    color: #1fa700; /* Mismo verde fuerte para el texto */
-    font-weight: bold;
-}
 
 
 @layer base {
@@ -245,9 +238,9 @@ html { font-size: 16px; }
  }
 
  .recuperar-form {
-  
+
   background-color: white;
-  padding: 30px; 
+  padding: 30px;
   margin: 30px;
 
   border-radius: 32px;
