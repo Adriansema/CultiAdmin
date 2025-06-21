@@ -125,6 +125,8 @@ Route::middleware([
           Route::get('/{usuario}/edit', [UsuarioController::class, 'edit'])->name('edit')->middleware('can:editar usuario');
           Route::put('/{usuario}', [UsuarioController::class, 'update'])->name('update')->middleware('can:editar usuario');
           Route::patch('/{usuario}/toggle', [UsuarioController::class, 'toggle'])->name('toggle');
+          // Nueva ruta para obtener datos de usuario por AJAX
+          Route::get('/usuarios/{usuario}/data', [UsuarioController::class, 'getUserData'])->name('users.data')->middleware('can:editar usuario');
      });
 
      // --- Módulo de NOTICIAS ---

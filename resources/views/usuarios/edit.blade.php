@@ -1,14 +1,11 @@
-@extends('layouts.app') 
+{{-- @extends('layouts.app') 
 
 @section('content')
-    {{-- Contenedor principal con ancho fijo y centrado --}}
+
     <div class="max-w-3xl mx-auto px-4 py-8">
-        {{-- Contenedor del formulario con fondo y sombra, más compacto --}}
         <div class="p-8 space-y-6 bg-white shadow-md rounded-3xl border border-gray-300">
 
-            {{-- Encabezado y navegación por pasos (como en la imagen) --}}
             <div class="flex justify-between items-center mb-6">
-                {{-- Título basado en la imagen "Nuevo usuario" --}}
                 <h1 class="text-2xl font-bold text-gray-800">Nuevo usuario</h1>
                 <button type="button" class="text-gray-500 hover:text-gray-700" onclick="window.history.back()">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -17,7 +14,6 @@
                 </button>
             </div>
 
-            {{-- Indicador de pasos --}}
             <div class="flex items-center justify-center mb-8">
                 <div class="flex items-center text-gray-700" :class="{ 'active': currentStep === 1, 'completed': currentStep > 1 }">
                     <img src="{{ asset('images/1paso.svg') }}" alt="paso 1" class="w-7 h-10 mr-2">
@@ -32,12 +28,10 @@
                 </div>
             </div>
 
-            {{-- Formulario para actualizar roles y permisos --}}
             <form action="{{ route('usuarios.update', $usuario->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
-                {{-- Sección para mostrar errores de validación (general) --}}
                 @if ($errors->any())
                     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
                         role="alert">
@@ -49,9 +43,6 @@
                     </div>
                 @endif
 
-                {{-- --- SELECCIÓN DE ROLES (checkbox BUTTONS - como en la imagen) --- --}}
-                {{-- La imagen sugiere checkbox buttons para roles, asumiendo un solo rol primario.
-                     Si necesitas múltiples roles (Spatie los permite), deberías usar checkboxes. --}}
                 <h4 class="text-md font-bold mb-6 flex items-center gap-4">
                     Rol
                     <div class="flex flex-wrap gap-2">
@@ -61,15 +52,15 @@
                                 {{ in_array($role->name, old('roles', $userRoles))
                                     ? 'bg-indigo-200 text-indigo-800'
                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
-                                data-role-name="{{ $role->name }}" {{-- Añadimos un atributo de datos --}}>
-                                {{-- Lógica para la imagen --}}
+                                data-role-name="{{ $role->name }}" >
+
                                 <img src="{{ asset('images/' . (in_array($role->name, old('roles', $userRoles)) ? 'con_marca.svg' : 'sin_marca.svg')) }}"
-                                    alt="Icono de selección de rol" class="w-5 h-5 mr-2 role-icon"> {{-- Añadimos una clase para JavaScript --}}
+                                    alt="Icono de selección de rol" class="w-5 h-5 mr-2 role-icon"> 
 
                                 <input type="checkbox" name="roles[]" value="{{ $role->name }}"
-                                    id="role_{{ \Illuminate\Support\Str::slug($role->name) }}" {{-- Añadimos un ID --}}
+                                    id="role_{{ \Illuminate\Support\Str::slug($role->name) }}" 
                                     {{ in_array($role->name, old('roles', $userRoles)) ? 'checked' : '' }}
-                                    class="hidden role-checkbox"> {{-- Añadimos una clase para JavaScript --}}
+                                    class="hidden role-checkbox"> 
                                 <span class="text-sm font-medium">{{ $role->name }}</span>
                             </label>
                         @endforeach
@@ -79,7 +70,6 @@
                     </div>
                 </h4>
 
-                {{-- --- TABLA PARA ASIGNACIÓN DE PERMISOS (DIRECTOS) --- --}}
                 <h4 class="text-md font-bold mb-1 flex items-center">
                     Permisos directos del usuario
                 </h4>
@@ -152,12 +142,10 @@
                             @endphp
 
                             @forelse ($groupedPermissions as $moduleName => $actions)
-                                {{-- Solo mostrar la fila si el módulo tiene al menos un permiso que se pueda seleccionar --}}
                                 @if (count(array_filter($actions)) > 0)
                                     <tr>
                                         <td
                                             class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center">
-                                            {{-- Iconos para módulos - Ajusta según tus necesidades y rutas de imágenes --}}
                                             @if ($moduleName === 'Productos')
                                                 <img src="{{ asset('images/planta.svg') }}" alt="Productos"
                                                     class="w-5 h-5 mr-2">
@@ -171,7 +159,6 @@
                                                 <img src="{{ asset('images/gestion.svg') }}" alt="Usuarios"
                                                     class="w-5 h-5 mr-2">
                                             @else
-                                                {{-- Icono por defecto si no hay un icono específico --}}
                                             @endif
                                             {{ $moduleName }}
                                         </td>
@@ -206,7 +193,6 @@
                     </table>
                 </div>
 
-                {{-- Botón "Siguiente" --}}
                 <div class="flex justify-between items-center">
                     <button type="button"
                         class="flex justify-start py-2 px-4 border border-gray-200 font-medium text-gray-700 rounded-full">
@@ -224,4 +210,5 @@
     </div>
 @endsection
 
- 
+  --}}
+
