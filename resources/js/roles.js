@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+/* document.addEventListener('DOMContentLoaded', function () {
     const roleLabels = document.querySelectorAll('.role-label');
 
     roleLabels.forEach(label => {
@@ -25,4 +25,4 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-});
+}); */

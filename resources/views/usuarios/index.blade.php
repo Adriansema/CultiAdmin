@@ -44,13 +44,20 @@
                         </x-responsive-nav-link>
                     </form>
 
-                    <x-responsive-nav-link href="{{ route('usuarios.create') }}"
+                    {{-- <x-responsive-nav-link href="{{ route('usuarios.create') }}"
                         class="inline-flex items-center px-4 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900] hover:bg-[#61BA33] text-white rounded-full w-auto">
                         <img src="{{ asset('images/signo.svg') }}" class="w-4 h-3" alt="Icono Nuevo Usuario">
                         <span class="text-xs font-medium whitespace-nowrap">
                             {{ __('Crear Usuario') }}
                         </span>
-                    </x-responsive-nav-link>
+                    </x-responsive-nav-link> --}}
+                    <button type="button"
+                        class="inline-flex items-center px-4 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900] hover:bg-[#61BA33] text-white rounded-full w-auto create-user-button">
+                        <img src="{{ asset('images/signo.svg') }}" class="w-4 h-3" alt="Icono Nuevo Usuario">
+                        <span class="text-xs font-medium whitespace-nowrap">
+                            {{ __('Crear Usuario') }}
+                        </span>
+                    </button>
                 </div>
             </div>
 
@@ -62,6 +69,13 @@
             @if (session('error'))
                 <div class="p-4 mb-4 text-red-800 bg-red-100 rounded shadow">{{ session('error') }}</div>
             @endif
+
+            {{-- Incluye el parcial del formulario modal --}}
+            {{-- Ya no se pasan las variables del usuario, el JS las cargará por AJAX --}}
+            @include('usuarios.partials.formulario', [
+                'roles' => $roles, // Estos sí se pasan, son roles del sistema
+                'permissions' => $permissions, // Estos también, son permisos del sistema
+            ])
 
             @include('usuarios.partials.tabla')
 

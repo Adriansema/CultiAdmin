@@ -26,7 +26,11 @@ class UsuarioController extends Controller
     {
         Gate::authorize('crear usuario');
         $usuarios = $userService->obtenerUsuariosFiltrados($request);
-        return view('usuarios.index', compact('usuarios'));
+        // Necesitamos pasar los roles y permisos disponibles para el modal
+        $roles = Role::all();
+        $permissions = Permission::all();
+
+        return view('usuarios.index', compact('usuarios', 'roles', 'permissions'));
     }
 
     /**
@@ -50,189 +54,325 @@ class UsuarioController extends Controller
             return redirect()->route('dashboard')->with('error', 'Tu rol no te permite crear usuarios.');
         }
 
-        $roles = Role::all();
-        $usuario = new User(); // Instancia de usuario vacía para el formulario
-        return view('usuarios.create', compact('roles', 'usuario'));
+        return redirect()->route('usuarios.index')->with('success', 'Preparado para crear un nuevo usuario.');
     }
 
+     /**
+     * Almacena un nuevo usuario.
+     * Si la solicitud proviene del Paso 1 del modal, solo creará el usuario inicial.
+     * Si la solicitud proviene del Paso 2, actualizará roles y permisos.
+     * ¡ESTE MÉTODO AHORA DEVUELVE JSON!
+     */
     public function store(Request $request)
     {
         // --- RESTRICCIÓN DE ROL: Operario/Funcionario no pueden crear usuarios ---
         if (Auth::user()->hasAnyRole(['Operario', 'Funcionario'])) {
+            // Devuelve un error JSON para que Alpine.js lo maneje
             return redirect()->route('dashboard')->with('error', 'Tu rol no te permite crear usuarios.');
         }
 
-        // 1. Validar la solicitud
-        $request->validate([
-            'name'          => 'required|string|max:255',
-            'email'         => 'required|email|unique:users,email',
-            'type_document' => 'required|string|max:10',
-            'document'      => 'required|string|max:20|unique:users,document',
-        ]);
+        // Determinar qué parte del formulario se está enviando
+        // Podemos usar un campo oculto, por ejemplo 'form_step'
+        $formStep = $request->input('form_step');
 
-        try {
-            // El número de documento se usará como contraseña inicial hasheada
-            $documentNumber = $request->document;
-
-            // 2. Crear el nuevo usuario
-            $user = User::create([
-                'name'              => $request->name,
-                'email'             => $request->email,
-                'type_document'     => $request->type_document,
-                'document'          => $documentNumber,
-                'password'          => Hash::make($documentNumber),
-                'estado'            => 'activo',
-                'email_verified_at' => null,
+        if ($formStep === 'step1') {
+            // Lógica para el primer paso: Creación inicial del usuario
+            $request->validate([
+                'name'          => 'required|string|max:255',
+                'email'         => 'required|email|unique:users,email',
+                'type_document' => 'required|string|max:10',
+                'document'      => 'required|string|max:20|unique:users,document',
+            ], [
+                'name.required' => 'El nombre es obligatorio.',
+                'email.required' => 'El correo es obligatorio.',
+                'email.email' => 'El correo debe ser una dirección de email válida.',
+                'email.unique' => 'Este correo ya está registrado.',
+                'type_document.required' => 'El tipo de documento es obligatorio.',
+                'document.required' => 'El número de documento es obligatorio.',
+                'document.unique' => 'Este número de documento ya está registrado.',
             ]);
 
-            // 3. Enviar el email para que el usuario establezca su contraseña real (y al mismo tiempo verifique su email)
-            $token = app('auth.password.broker')->createToken($user);
-            $resetUrl = route('password.reset', ['token' => $token, 'email' => $user->email]);
-            Mail::to($user->email)->send(new UserCreatedNotification($user, $resetUrl));
+            try {
+                $documentNumber = $request->document;
+                $user = User::create([
+                    'name'              => $request->name,
+                    'email'             => $request->email,
+                    'type_document'     => $request->type_document,
+                    'document'          => $documentNumber,
+                    'password'          => Hash::make($documentNumber),
+                    'estado'            => 'inactivo', // Inactivo hasta que establezca contraseña
+                    'email_verified_at' => null,
+                ]);
 
-            // 4. Registrar el log de creación de usuario
-            Log::info('Usuario creado manualmente (admin). Estado inicial: activo. Se envió email para establecer contraseña/activación.', [
-                'user_id'          => $user->id,
-                'email'            => $user->email,
-                'document'         => $user->document,
-                'created_by'       => Auth::id(),
-                'created_by_email' => Auth::user()->email,
-                'initial_estado'   => $user->estado,
+                // Enviar el email para que el usuario establezca su contraseña real
+                $token = app('auth.password.broker')->createToken($user);
+                $resetUrl = route('password.reset', ['token' => $token, 'email' => $user->email]);
+                Mail::to($user->email)->send(new UserCreatedNotification($user, $resetUrl));
+
+                Log::info('Usuario creado manualmente (admin) - Paso 1 completado. Se envió email para establecer contraseña.', [
+                    'user_id'          => $user->id,
+                    'email'            => $user->email,
+                    'created_by'       => Auth::id(),
+                ]);
+
+                // Devuelve una respuesta JSON con el ID del usuario y un mensaje
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Usuario básico creado. Proceda a asignar roles y permisos.',
+                    'user_id' => $user->id, // Esencial para el Paso 2
+                ]);
+
+            } catch (\Exception $e) {
+                Log::error('Error al crear usuario manualmente (admin) - Paso 1.', [
+                    'error'            => $e->getMessage(),
+                    'user_data'        => $request->except(['_token', 'password', 'document']),
+                    'created_by'       => Auth::id(),
+                    'ip_address'       => $request->ip(),
+                    'trace'            => $e->getTraceAsString(),
+                ]);
+                return response()->json(['message' => 'Ocurrió un error al crear el usuario. Por favor, inténtalo de nuevo.', 'errors' => ['general' => $e->getMessage()]], 500);
+            }
+        } elseif ($formStep === 'step2_create_mode') {
+            // Lógica para el segundo paso cuando se está creando un usuario
+            // Esto se ejecutaría si el paso 2 se enviara por separado para un nuevo usuario.
+            // Generalmente, el Paso 2 de un *nuevo* usuario se maneja con el método `update`
+            // después de que el usuario ya existe.
+            // Para simplificar, asumiremos que si llegamos a step2, es para actualizar un usuario existente
+            // o que la lógica de store se ha bifurcado para manejar creación Y asignación.
+            // Para un flujo más limpio, el Paso 2 de *creación* lo manejará el `update` después de obtener el `user_id`.
+
+             // Si el request incluye 'user_id', asumimos que es el Paso 2 de creación
+            $userId = $request->input('user_id');
+            $user = User::find($userId);
+
+            if (!$user) {
+                return response()->json(['message' => 'Usuario no encontrado para asignar roles/permisos.', 'errors' => ['user_id' => 'Usuario no válido.']], 404);
+            }
+
+            // Aplicar las mismas restricciones de seguridad que en el método `update`
+            $loggedInUser = Auth::user();
+            $targetUserRoles = $user->getRoleNames();
+
+            if ($loggedInUser->hasAnyRole(['Operario', 'Funcionario'])) {
+                return response()->json(['message' => 'Tu rol no te permite asignar roles/permisos.', 'errors' => ['roles' => 'Permiso denegado por rol.']], 403);
+            }
+            if ($loggedInUser->hasRole('Administrador')) {
+                if ($user->id === $loggedInUser->id) {
+                    return response()->json(['message' => 'Un Administrador no puede asignar roles/permisos a su propio perfil.', 'errors' => ['roles' => 'Permiso denegado.']], 403);
+                }
+                if ($targetUserRoles->contains('SuperAdmin') || $targetUserRoles->contains('Administrador')) {
+                    return response()->json(['message' => 'Un Administrador no puede asignar roles/permisos a un SuperAdmin o a otro Administrador.', 'errors' => ['roles' => 'Permiso denegado.']], 403);
+                }
+            }
+             // Validar roles y permisos
+            $request->validate([
+                'roles'         => 'nullable|array',
+                'roles.*'       => 'string|exists:roles,name',
+                'permissions'   => 'nullable|array',
+                'permissions.*' => 'string|exists:permissions,name',
             ]);
 
-            // 5. Redirigir a la vista de edición para asignar roles y permisos
-            return redirect()->route('usuarios.edit', $user->id)
-                ->with('success', 'Usuario creado exitosamente. Se ha enviado un enlace a su correo electrónico para que establezca su contraseña y active su cuenta. Por favor, asigna los roles y permisos necesarios.');
-        } catch (\Exception $e) {
-            Log::error('Error al crear usuario manualmente (admin).', [
-                'error'            => $e->getMessage(),
-                'user_data'        => $request->except(['document']),
-                'trace'            => $e->getTraceAsString(),
-                'created_by'       => Auth::id(),
-                'ip_address'       => $request->ip(),
-            ]);
-            return back()->withInput()->with('error', 'Ocurrió un error al crear el usuario. Por favor, inténtalo de nuevo.');
+            try {
+                $user->syncRoles($request->roles ?? []);
+                $user->syncPermissions($request->permissions ?? []);
+
+                Log::info('Roles y permisos asignados a usuario recién creado.', [
+                    'user_id'          => $user->id,
+                    'email'            => $user->email,
+                    'assigned_roles'   => $request->roles ?? [],
+                    'assigned_permissions' => $request->permissions ?? [],
+                    'updated_by'       => Auth::id(),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Usuario creado y roles/permisos asignados exitosamente.',
+                    'redirect' => route('usuarios.index') // Podrías redirigir o simplemente cerrar el modal
+                ]);
+
+            } catch (\Exception $e) {
+                Log::error('Error al asignar roles/permisos a usuario recién creado - Paso 2.', [
+                    'error'            => $e->getMessage(),
+                    'user_id'          => $userId,
+                    'request_data'     => $request->only(['roles', 'permissions']),
+                    'updated_by'       => Auth::id(),
+                    'ip_address'       => $request->ip(),
+                    'trace'            => $e->getTraceAsString(),
+                ]);
+                return response()->json(['message' => 'Ocurrió un error al asignar roles y permisos.', 'errors' => ['general' => $e->getMessage()]], 500);
+            }
+
         }
+
+        // Si no se especifica el paso, o no es reconocido
+        return response()->json(['message' => 'Paso de formulario no reconocido.', 'errors' => ['form_step' => 'Paso inválido.']], 400);
     }
 
+    /**
+     * Muestra el formulario para editar un usuario existente.
+     * Este método NO DEBERÍA SER ACCEDIDO DIRECTAMENTE para abrir el modal en el `index`.
+     * Solo para servir la página `usuarios.edit` si se carga directamente.
+     */
     public function edit(User $usuario)
     {
-        Gate::authorize('editar usuario'); // Permiso general para editar usuarios
+        // Si la intención es que la edición también se haga en el mismo modal del index
+        // y este método solo cargue los datos vía AJAX, entonces NO se retornaría una vista.
+        // Pero si mantienes una ruta /usuarios/{id}/edit para una página de edición dedicada,
+        // entonces esto es correcto.
+        Gate::authorize('editar usuario');
 
         $loggedInUser = Auth::user();
-        $targetUserRoles = $usuario->getRoleNames(); // Roles del usuario que se intenta editar
+        $targetUserRoles = $usuario->getRoleNames();
 
-        // --- RESTRICCIÓN DE ROL: Operario/Funcionario no pueden editar ningún usuario ---
         if ($loggedInUser->hasAnyRole(['Operario', 'Funcionario'])) {
+            // Devolver error si se accede vía AJAX o redirigir si es petición GET normal
             return redirect()->route('dashboard')->with('error', 'Tu rol no te permite editar perfiles de usuario.');
         }
 
-        // --- RESTRICCIÓN DE ROL: Administrador no puede editar SuperAdmin o a otro Administrador (incluido a sí mismo) ---
         if ($loggedInUser->hasRole('Administrador')) {
-            // Regla 1: Administrador no puede editar su propio perfil
             if ($usuario->id === $loggedInUser->id) {
                 return redirect()->route('usuarios.index')->with('error', 'Un Administrador no puede editar su propio perfil.');
             }
-            // Regla 2: Administrador no puede editar SuperAdmin o a otro Administrador
             if ($targetUserRoles->contains('SuperAdmin') || $targetUserRoles->contains('Administrador')) {
                 return redirect()->route('usuarios.index')->with('error', 'Un Administrador no puede editar el perfil de un SuperAdmin o de otro Administrador.');
             }
         }
 
-        // Si todas las verificaciones pasan, procede a cargar la vista
         $roles = Role::all();
         $permissions = Permission::all();
         $userRoles = $usuario->roles->pluck('name')->toArray();
         $allUserGrantedPermissions = $usuario->getAllPermissions()->pluck('name')->toArray();
 
+        // Si este método es llamado por AJAX para precargar el modal en el index:
+        // return response()->json(compact('usuario', 'roles', 'permissions', 'userRoles', 'allUserGrantedPermissions'));
+        // Pero si es para renderizar una página completa, como hasta ahora:
         return view('usuarios.edit', compact('usuario', 'roles', 'permissions', 'userRoles', 'allUserGrantedPermissions'));
     }
 
     /**
      * Actualiza los datos de un usuario y sus roles/permisos.
-     * Requiere el permiso 'actualizar usuario'.
+     * Este método será utilizado para el Paso 2 de la edición (o la creación si se envía todo junto).
+     * ¡ESTE MÉTODO AHORA DEVUELVE JSON!
      */
     public function update(Request $request, User $usuario)
     {
-        Gate::authorize('editar usuario'); // Permiso general para actualizar usuarios
+        // Autorización y restricciones de rol (idénticas a las de edit, lo cual es correcto)
+        Gate::authorize('editar usuario');
 
         $loggedInUser = Auth::user();
-        $targetUserRoles = $usuario->getRoleNames(); // Roles del usuario que se intenta actualizar
+        $targetUserRoles = $usuario->getRoleNames();
 
-        // --- RESTRICCIÓN DE ROL: Operario/Funcionario no pueden actualizar ningún usuario ---
         if ($loggedInUser->hasAnyRole(['Operario', 'Funcionario'])) {
-            return redirect()->route('dashboard')->with('error', 'Tu rol no te permite actualizar perfiles de usuario.');
+            return response()->json(['message' => 'Tu rol no te permite actualizar perfiles de usuario.', 'errors' => ['roles' => 'Permiso denegado por rol.']], 403);
         }
 
-        // --- RESTRICCIÓN DE ROL: Administrador no puede actualizar SuperAdmin o a otro Administrador (incluido a sí mismo) ---
         if ($loggedInUser->hasRole('Administrador')) {
-            // Regla 1: Administrador no puede actualizar su propio perfil
             if ($usuario->id === $loggedInUser->id) {
-                return redirect()->route('usuarios.index')->with('error', 'Un Administrador no puede actualizar su propio perfil.');
+                return response()->json(['message' => 'Un Administrador no puede actualizar su propio perfil.', 'errors' => ['roles' => 'Permiso denegado.']], 403);
             }
-            // Regla 2: Administrador no puede actualizar SuperAdmin o a otro Administrador
             if ($targetUserRoles->contains('SuperAdmin') || $targetUserRoles->contains('Administrador')) {
-                return redirect()->route('usuarios.index')->with('error', 'Un Administrador no puede actualizar el perfil de un SuperAdmin o de otro Administrador.');
+                return response()->json(['message' => 'Un Administrador no puede actualizar el perfil de un SuperAdmin o de otro Administrador.', 'errors' => ['roles' => 'Permiso denegado.']], 403);
             }
         }
 
-        // Restablecer las reglas de validación y añadir las nuevas columnas
-        // Mantener las validaciones de los otros campos comentadas si no se van a usar ahora
-        // pero se desean para el futuro. Sin embargo, para roles/permisos, sí deben validarse.
+        // Validación para roles y permisos (ahora para el Paso 2, o si se editan otros campos)
         $request->validate([
-            // 'name'          => 'required|string|max:255', // Comentar si no se actualiza el nombre
-            // 'email'         => 'required|email|unique:users,email,' . $usuario->id, // Comentar si no se actualiza el email
-            // 'type_document' => 'required|string|max:10', // Comentar si no se actualiza el tipo de documento
-            // 'document'      => 'required|string|unique:users,document,' . $usuario->id, // Comentar si no se actualiza el documento
-            // 'password'      => 'nullable|string|min:8|max:15', // Comentar si no se actualiza la contraseña
+            // Incluir validación para campos básicos si este 'update' también los maneja,
+            // si no, se asume que solo se actualizan roles y permisos.
+            // Para la edición en un solo modal, probablemente necesites validar todos los campos.
+            'name'          => 'required|string|max:255',
+            'email'         => 'required|email|unique:users,email,' . $usuario->id,
+            'type_document' => 'required|string|max:10',
+            'document'      => 'required|string|max:20|unique:users,document,' . $usuario->id,
             'roles'         => 'nullable|array',
             'roles.*'       => 'string|exists:roles,name',
             'permissions'   => 'nullable|array',
             'permissions.*' => 'string|exists:permissions,name',
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'email.required' => 'El correo es obligatorio.',
+            'email.email' => 'El correo debe ser una dirección de email válida.',
+            'email.unique' => 'Este correo ya está registrado.',
+            'type_document.required' => 'El tipo de documento es obligatorio.',
+            'document.required' => 'El número de documento es obligatorio.',
+            'document.unique' => 'Este número de documento ya está registrado.',
         ]);
 
         try {
-            // --- CÓDIGO COMENTADO PARA NO ACTUALIZAR OTROS CAMPOS POR AHORA ---
-            // $userData = [
-            //     'name'          => $request->name,
-            //     'email'         => $request->email,
-            //     'type_document' => $request->type_document,
-            //     'document'      => $request->document,     
-            // ];
+            // Actualizar campos básicos si se editan en el mismo formulario
+            $usuario->update([
+                'name'          => $request->name,
+                'email'         => $request->email,
+                'type_document' => $request->type_document,
+                'document'      => $request->document,
+                // Si la contraseña se edita desde este modal, añadir lógica aquí:
+                // 'password'      => $request->filled('password') ? Hash::make($request->password) : $usuario->password,
+            ]);
 
-            // if ($request->filled('password')) {
-            //     $userData['password'] = Hash::make($request->password);
-            // }
-
-            // $usuario->update($userData); // <-- Esta línea se comenta
-            // ---------------------------------------------------------------
-
-            // --- LÓGICA DE ACTUALIZACIÓN DE ROLES Y PERMISOS (Activa) ---
+            // Actualización de roles y permisos
             $usuario->syncRoles($request->roles ?? []);
             $usuario->syncPermissions($request->permissions ?? []);
 
-            // **LOGGING:** Registrar la actualización de roles/permisos
-            Log::info('Roles y permisos de usuario actualizados manualmente.', [
+            Log::info('Usuario actualizado (modal en index).', [
                 'user_id'          => $usuario->id,
                 'email'            => $usuario->email,
                 'updated_by'       => Auth::id(),
-                'updated_by_email' => Auth::user()->email,
-                'assigned_roles'   => $request->roles ?? [], // Log de los roles asignados
-                'assigned_permissions' => $request->permissions ?? [], // Log de los permisos asignados
+                'assigned_roles'   => $request->roles ?? [],
+                'assigned_permissions' => $request->permissions ?? [],
             ]);
 
-            return redirect()->route('usuarios.index')->with('success', 'Roles y permisos del usuario actualizados exitosamente.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Usuario y sus roles/permisos actualizados exitosamente.'
+            ]);
+
         } catch (\Exception $e) {
-            Log::error('Error al actualizar roles y permisos del usuario manualmente.', [
+            Log::error('Error al actualizar usuario (modal en index).', [
                 'error'            => $e->getMessage(),
                 'user_id'          => $usuario->id,
-                'request_data'     => $request->only(['roles', 'permissions']), // Solo loguear datos relevantes
-                'trace'            => $e->getTraceAsString(),
+                'request_data'     => $request->all(),
                 'updated_by'       => Auth::id(),
-                'ip_address'       => $request->ip(), // Asegúrate de loguear la IP también
+                'ip_address'       => $request->ip(),
+                'trace'            => $e->getTraceAsString(),
             ]);
-            return back()->withInput()->with('error', 'Ocurrió un error al actualizar los roles y permisos del usuario. Por favor, inténtalo de nuevo.');
+            return response()->json(['message' => 'Ocurrió un error al actualizar el usuario.', 'errors' => ['general' => $e->getMessage()]], 500);
         }
+    }
+
+    // Nuevo método para cargar datos de usuario por AJAX para la edición
+    public function getUserData(User $usuario)
+    {
+        Gate::authorize('editar usuario');
+
+        $loggedInUser = Auth::user();
+        $targetUserRoles = $usuario->getRoleNames();
+
+        // Las mismas restricciones de seguridad que en `edit` y `update`
+        if ($loggedInUser->hasAnyRole(['Operario', 'Funcionario'])) {
+            return response()->json(['message' => 'Tu rol no te permite ver este perfil.', 'errors' => ['auth' => 'Permiso denegado por rol.']], 403);
+        }
+        if ($loggedInUser->hasRole('Administrador')) {
+            if ($usuario->id === $loggedInUser->id) {
+                return response()->json(['message' => 'Un Administrador no puede ver su propio perfil.', 'errors' => ['auth' => 'Permiso denegado.']], 403);
+            }
+            if ($targetUserRoles->contains('SuperAdmin') || $targetUserRoles->contains('Administrador')) {
+                return response()->json(['message' => 'Un Administrador no puede ver el perfil de un SuperAdmin o de otro Administrador.', 'errors' => ['auth' => 'Permiso denegado.']], 403);
+            }
+        }
+
+        // Obtener roles y permisos asociados al usuario
+        $userRoles = $usuario->roles->pluck('name')->toArray();
+        $allUserGrantedPermissions = $usuario->getAllPermissions()->pluck('name')->toArray();
+
+        return response()->json([
+            'id' => $usuario->id,
+            'name' => $usuario->name,
+            'email' => $usuario->email,
+            'type_document' => $usuario->type_document,
+            'document' => $usuario->document,
+            'userRoles' => $userRoles,
+            'allUserGrantedPermissions' => $allUserGrantedPermissions,
+        ]);
     }
 
     /**
