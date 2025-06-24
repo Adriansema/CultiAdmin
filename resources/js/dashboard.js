@@ -13,30 +13,119 @@ let myChart = null;
 
 // Variable global para el filtro actual
 let filtroActual = 'ultimos3dias';
+let yearFlatpickrIntance = null;  //esta es la instancia global de flatpickr para el selector del año
+
+window.setFilter = function (filterType, selectecYearValue = null) {
+    console.log(`DEBUG: setFilter llamado con filterType: ${filterType}, selectedYearValue: ${selectedYearValue}`);
+
+    filtroActual = filterType; // Actualiza la variable global del filtro actual
+
+    // 1. Actualiza los estilos de los botones de filtro
+    setActiveFilterButton(filterType);
+
+    // 2. Gestiona la visibilidad y apertura/cierre del selector de año
+    const yearFlatpickrContainer = document.getElementById('yearFlatpickrContainer');
+    if (yearFlatpickrContainer) {
+        if (filterType === 'año') {
+            yearFlatpickrContainer.style.display = 'block'; // Muestra la "casilla" del año
+            // Si Flatpickr ya está inicializado y el filtro es 'año', ábrelo
+            if (yearFlatpickrInstance) {
+                yearFlatpickrInstance.open();
+                console.log("DEBUG: Flatpickr de año abierto.");
+            } else {
+                console.warn("ADVERTENCIA: yearFlatpickrInstance no inicializado. El selector de año no se abrirá automáticamente.");
+            }
+        } else {
+            yearFlatpickrContainer.style.display = 'none'; // Oculta la "casilla" del año
+            // Si Flatpickr está abierto y cambiamos a otro filtro, ciérralo
+            if (yearFlatpickrInstance) {
+                yearFlatpickrInstance.close();
+                console.log("DEBUG: Flatpickr de año cerrado y contenedor oculto.");
+            }
+        }
+    }
+
+    // 3. Llama a la función para cargar los datos desde la API
+    if (filterType === 'año') {
+        // Usa el año pasado como argumento, o el año seleccionado en Flatpickr, o el año actual por defecto
+        const yearToLoad = selectedYearValue || (yearFlatpickrInstance && yearFlatpickrInstance.selectedDates.length > 0 ? yearFlatpickrInstance.selectedDates[0].getFullYear() : new Date().getFullYear());
+        console.log(`DEBUG: Solicitando carga de datos para el Año: ${yearToLoad}`);
+        loadData('año', yearToLoad);
+    } else {
+        console.log(`DEBUG: Solicitando carga de datos para el filtro: ${filterType}`);
+        loadData(filterType);
+    }
+};
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    // --- Inicialización y poblar el dropdown de años ---
-    const yearDropdown = document.getElementById('yearPicker');
-    if (yearDropdown) {
-        const currentYear = new Date().getFullYear();
-        const startYear = 2025;
+    console.log("DEBUG: DOMContentLoaded - Inicializando dashboard.js");
 
-        for (let year = currentYear; year >= startYear; year--) {
-            let option = document.createElement('option');
-            option.value = year.toString();
-            option.textContent = year.toString();
-            yearDropdown.appendChild(option);
-        }
-        yearDropdown.value = currentYear.toString();
+    // --- Inicialización de Flatpickr para el selector de AÑO ---
+    const yearFlatpickrTargetInput = document.getElementById('yearFlatpickrTargetInput'); // Input oculto
+    const yearFlatpickrContainer = document.getElementById('yearFlatpickrContainer'); // Contenedor visible para el altInput y calendario
 
-        yearDropdown.addEventListener('change', function () {
-            window.setFilter('año');
+    if (yearFlatpickrTargetInput && yearFlatpickrContainer) {
+        yearFlatpickrInstance = flatpickr(yearFlatpickrTargetInput, {
+            dateFormat: "Y",       // Formato que se guardará en el input (solo año)
+            altInput: true,        // CRÍTICO: Crea un input visible (la "casilla") para el usuario
+            altFormat: "Y",        // Formato para el input visible
+
+            // Clases de Tailwind para el input ALT que Flatpickr genera.
+            // Esto le dará el estilo de "casilla" que buscas, con el borde y fondo blanco.
+            altInputClass: "px-4 py-2 rounded-full bg-white border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition duration-150 ease-in-out text-gray-700 flex items-center", // Añadido flex y items-center para SVG si lo pones.
+
+            minDate: "2025-01-01", // Fecha mínima seleccionable (corresponde al año 2025)
+            maxDate: new Date(),   // Fecha máxima seleccionable (hasta hoy, que permite seleccionar el año actual)
+
+            // CRÍTICO: Adjunta el calendario (y el altInput) dentro de nuestro contenedor.
+            // Esto nos permite controlar su visibilidad de forma sencilla.
+            appendTo: yearFlatpickrContainer,
+
+            locale: Spanish, // Establece el idioma del calendario a español
+
+            // Callbacks de Flatpickr para manejar eventos
+            onReady: function(selectedDates, dateStr, instance) {
+                // Al cargar Flatpickr, selecciona el año actual por defecto
+                const currentYear = new Date().getFullYear();
+                instance.setDate(currentYear.toString());
+
+                // Asegúrate de que el contenedor de la casilla del año esté oculto al inicio
+                yearFlatpickrContainer.style.display = 'none';
+
+                // Si la casilla no tiene valor (ej. primera carga), establece un placeholder
+                if (!instance.altInput.value) {
+                    instance.altInput.placeholder = "Seleccionar Año";
+                }
+                console.log("DEBUG: Flatpickr de año inicializado y listo. Año por defecto:", currentYear);
+            },
+            onChange: function(selectedDates, dateStr, instance) {
+                // Se ejecuta cuando el usuario selecciona un año del calendario de Flatpickr
+                if (selectedDates.length > 0) {
+                    console.log(`DEBUG: Año seleccionado en Flatpickr (onChange): ${selectedDates[0].getFullYear()}`);
+                    // Llama a window.setFilter para actualizar la UI del botón y cargar los datos
+                    window.setFilter('año', selectedDates[0].getFullYear());
+                }
+            },
+            onClose: function(selectedDates, dateStr, instance) {
+                // Se ejecuta cuando el calendario de Flatpickr se cierra
+                // Si el filtro actual NO es 'año', ocultamos la casilla de año.
+                // Esto evita que la casilla quede visible si el usuario cambia a otro filtro.
+                if (filtroActual !== 'año') {
+                    yearFlatpickrContainer.style.display = 'none';
+                    console.log("DEBUG: Flatpickr de año cerrado y contenedor oculto.");
+                }
+            },
         });
     } else {
-        console.error("Error: Elemento con ID 'yearPicker' no encontrado. No se pudo inicializar el dropdown de año.");
+        console.error("ERROR: Elemento con ID 'yearFlatpickrTargetInput' o 'yearFlatpickrContainer' no encontrado. No se pudo inicializar el selector de año.");
     }
 
+    // --- Carga inicial de datos del dashboard ---
+    // Carga el filtro 'semana' al inicio para que el dashboard muestre datos al cargar.
+    window.setFilter('semana');
+    console.log("DEBUG: Dashboard inicializado. Filtro 'semana' aplicado por defecto.");
+});
 
     // --- Inicialización de Flatpickr para el selector de rango de fechas (#dateRangePicker) ---
     const dateRangePickerInput = document.getElementById("dateRangePicker");
@@ -64,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-     // --- Función para activar/desactivar los botones de filtro ---
+    // --- Función para activar/desactivar los botones de filtro ---
     function setActiveFilterButton(filterType) {
         document.querySelectorAll('.filter-btn').forEach(button => {
             const currentFilter = button.getAttribute('data-filtro');
@@ -205,8 +294,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // --- Initial load ---
-    window.setFilter('ultimos3dias'); // Load 'ultimos3dias' filter on initial page load
-});
+    window.setFilter('ultimos3dias'); // Load 'ultimos3dias' filter on initial page load);
 
 
 // --- renderChart function (¡VERSIÓN FINAL CORREGIDA PARA ANIMACIONES FLUIDAS Y TEXTOS DINÁMICOS!) ---
@@ -307,10 +395,10 @@ function renderChart(data) {
         console.log("ECharts DEBUG: Inicializando ECharts por primera vez.");
         myChart = echarts.init(chartDom);
         // Añadir el listener de redimensionamiento una sola vez
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
             if (myChart && !myChart.isDisposed()) {
-                 myChart.resize();
-                 console.log("ECharts DEBUG: Gráfica redimensionada.");
+                myChart.resize();
+                console.log("ECharts DEBUG: Gráfica redimensionada.");
             }
         });
     } else {
@@ -327,14 +415,14 @@ function renderChart(data) {
         seriesChartName = 'Registros';
         chartTitleText = 'Nuevos Registros por Mes';
     } else if (data.selectedFilter === 'año' && data.chartSubFilter === 'week') {
-         seriesChartName = 'Registros';
-         chartTitleText = 'Nuevos Registros por Semana';
+        seriesChartName = 'Registros';
+        chartTitleText = 'Nuevos Registros por Semana';
     } else if (data.selectedFilter === 'año' && data.chartSubFilter === 'day') {
-         seriesChartName = 'Registros';
-         chartTitleText = 'Nuevos Registros por Día';
+        seriesChartName = 'Registros';
+        chartTitleText = 'Nuevos Registros por Día';
     } else if (data.selectedFilter === 'año' && data.chartSubFilter === 'hour') {
-         seriesChartName = 'Registros';
-         chartTitleText = 'Nuevos Registros por Hora';
+        seriesChartName = 'Registros';
+        chartTitleText = 'Nuevos Registros por Hora';
     }
 
 

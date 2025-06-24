@@ -29,33 +29,22 @@
                     Mes
                 </button>
 
-                {{-- Botón "Año" con el selector de año de Flatpickr integrado (Borde punteado azul siempre) --}}
-                <div class="relative inline-block">
-                    <button onclick="window.setFilter('año')" data-filtro="año"
-                        class="flex items-center px-4 py-2 text-blue-600 transition-all duration-300 ease-in-out border-2 border-blue-400 border-dashed rounded-full filter-btn focus:outline-none hover:text-blue-800">
-                        Año
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ml-2" viewBox="0 0 20 20"
-                            fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                    <input type="text" id="yearPicker" class="absolute inset-0 opacity-0 cursor-pointer"
-                        placeholder="Selecciona Año">
-                </div>
+                
+                {{-- Botón "Año" --}}
+                <button onclick="window.setFilter('año')" data-filtro="año"
+                    class="flex items-center px-4 py-2 transition-all duration-300 ease-in-out rounded-full filter-btn focus:outline-none">
+                    Año
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
 
-                {{-- Contenedor de sub-filtros de año --}}
-                <div id="yearChartFiltersContainer" class="flex flex-wrap items-center mt-4 space-x-2 md:mt-0"
-                    style="display: none;">
-                    <label for="chartSubFilter" class="sr-only">Filtrar por:</label>
-                    <select id="chartSubFilter"
-                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300">
-                        <option value="month">Por Mes</option>
-                        <option value="week">Por Semana</option>
-                        <option value="day">Por Día</option>
-                        <option value="hour">Por Hora</option>
-                    </select>
+                {{-- Contenedor de la "Casilla de Año" y su Flatpickr (inicialmente oculto) --}}
+                <div id="yearFlatpickrContainer" class="ml-2" style="display: none;">
+                    {{-- Flatpickr inyectará aquí su input visible (altInput) y el calendario --}}
+                    <input type="text" id="yearFlatpickrTargetInput" class="hidden">
                 </div>
             </div>
 
