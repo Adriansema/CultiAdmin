@@ -15,10 +15,11 @@ class Producto extends Model
         'user_id',
         'tipo',
         'estado',
-        'validado_por_user_id', // <-- Nueva columna
-        'rechazado_por_user_id', // <-- Nueva columna
+        'validado_por_user_id',
+        'rechazado_por_user_id',
         'observaciones',
         'imagen',
+        'RutaVideo',
     ];
 
     public function user()

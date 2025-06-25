@@ -48,6 +48,7 @@ class ProductoController extends Controller
             'tipo' => 'required|string|in:café,mora', // Asegura que el tipo sea 'café' o 'mora'
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validación para la imagen
             'observaciones' => 'nullable|string', // Campo opcional de observaciones
+            'RutaVideo' => 'nullable|url|max:255',
         ];
 
         // 2. Añadir reglas de validación condicionalmente según el tipo de producto.
@@ -77,6 +78,7 @@ class ProductoController extends Controller
             'observaciones' => $request->observaciones,
             'imagen' => $imagen,
             'tipo' => $request->tipo,
+            'RutaVideo' => $request->RutaVideo,
         ]);
 
         $tipoProducto = $request->input('tipo');
@@ -138,8 +140,10 @@ class ProductoController extends Controller
         Gate::authorize('editar producto');
         // 1. Definir las reglas de validación base para la actualización del producto.
         $rules = [
+            'tipo' => 'required|string|in:café,mora',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'observaciones' => 'nullable|string',
+            'RutaVideo' => 'nullable|url|max:255',
         ];
 
         // 2. Añadir reglas de validación condicionalmente según el tipo ACTUAL del producto.
@@ -171,13 +175,13 @@ class ProductoController extends Controller
 
         // 6. Actualizar los demás campos del producto principal.
         $producto->observaciones = $request->observaciones;
+         $producto->RutaVideo = $request->RutaVideo;
 
         // 7. Lógica para cambiar el estado a 'pendiente' si el producto fue editado
         // y su estado anterior era 'aprobado' o 'rechazado'.
         $estadoCambiadoAPendiente = false;
         if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
             $producto->estado = 'pendiente';
-            // Opcional: limpiar la observación del operador al volver a pendiente.
             $producto->observaciones_operador = null; // Asumiendo que tienes un campo para esto
             $estadoCambiadoAPendiente = true;
         }
@@ -237,8 +241,8 @@ class ProductoController extends Controller
             'user', // Para mostrar quién lo creó
             'cafe', // Carga el modelo Cafe relacionado
             'mora', // Carga el modelo Mora relacionado
-            // 'validador', // Mantengo si estos modelos/relaciones existen en tu app
-            // 'rechazador', // Mantengo si estos modelos/relaciones existen en tu app
+            'validador', // Mantengo si estos modelos/relaciones existen en tu app
+            'rechazador', // Mantengo si estos modelos/relaciones existen en tu app
         ]);
 
         return view('productos.show', compact('producto'));
