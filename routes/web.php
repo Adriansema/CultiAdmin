@@ -127,6 +127,9 @@ Route::middleware([
           Route::patch('/{usuario}/toggle', [UsuarioController::class, 'toggle'])->name('toggle');
           // Nueva ruta para obtener datos de usuario por AJAX
           Route::get('/usuarios/{usuario}/data', [UsuarioController::class, 'getUserData'])->name('users.data')->middleware('can:editar usuario');
+
+          // La ruta completa será: /usuario/role-permissions-map
+          Route::get('role-permissions-map', [UsuarioController::class, 'getRolePermissionsMap'])->name('role-permissions-map');
      });
 
      // --- Módulo de NOTICIAS ---

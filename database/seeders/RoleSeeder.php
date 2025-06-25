@@ -28,10 +28,13 @@ class RoleSeeder extends Seeder
             'editar usuario',
 
             // Permisos para Cultivos (Validar/Rechazar)
-            'ver productos pendiente',
+            'validar producto',
+
+            // Permisos para Noticias (Validar/Rechazar)
+            'validar noticia',
 
             // Permisos para Boletines (Validar/Rechazar)
-            'ver boletines pendiente',
+            'validar boletin',
 
             // Permisos para el Módulo de Cultivos
             'crear producto',
