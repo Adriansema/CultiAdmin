@@ -1,7 +1,10 @@
 <div id="userFormModal"
-    class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center hidden">
+    class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center 
+    transition-opacity duration-300 ease-out opacity-0 pointer-events-none">
+
     <div class="relative p-8 bg-white shadow-lg rounded-3xl border border-gray-300 max-w-lg w-full m-4"
         onclick="event.stopPropagation();">
+
         <button id="closeModalButton"
             class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none focus:outline-none">&times;</button>
 
@@ -11,14 +14,14 @@
 
         <div class="flex items-center justify-center mb-8">
             <div id="step1Indicator" class="flex items-center text-gray-700">
-                <img src="{{ asset('images/1_Dpaso.svg') }}" alt="paso 1" class="w-7 h-10 mr-2">
+                <img src="{{ asset('images/paso1_activo.svg') }}" alt="paso 1" class="w-7 h-10 mr-2">
                 <span class="font-semibold">Datos básicos</span>
             </div>
             <div class="mx-4 text-gray-400">
                 <img src="{{ asset('images/medio_1_2.svg') }}" alt="flecha" class="w-2 h-3 mr-2">
             </div>
             <div id="step2Indicator" class="flex items-center text-gray-400">
-                <img src="{{ asset('images/2_Dpaso.svg') }}" alt="paso 2" class="w-7 h-10 mr-2">
+                <img src="{{ asset('images/paso2_inactivo.svg') }}" alt="paso 2" class="w-7 h-10 mr-2">
                 <span class="font-semibold">Roles y permisos</span>
             </div>
         </div>
@@ -101,7 +104,7 @@
             <div id="step2Content" class="step-content hidden">
                 <h4 class="text-md font-bold mb-6 flex items-center gap-4">
                     Rol
-                    <div class="flex flex-wrap gap-2">
+                    <div id="rolesContainer" class="flex flex-wrap gap-2">
                         @foreach ($roles as $role)
                             <label
                                 class="inline-flex items-center px-4 py-2 rounded-lg cursor-pointer transition-all duration-300 role-label
@@ -155,25 +158,27 @@
                                 $groupedPermissions = [];
                                 $actionTypes = ['crear', 'editar', 'validar', 'eliminar'];
                                 $moduleMappings = [
-                                    'usuario' => 'Usuarios',
-                                    'producto' => 'Productos',
-                                    'noticia' => 'Noticias',
-                                    'boletin' => 'Boletines',
+                                    'producto' => 'productos',
+                                    'noticia' => 'noticias',
+                                    'boletin' => 'boletines',
+                                    'usuario' => 'usuarios',
                                 ];
 
-                                foreach ($moduleMappings as $prefix => $moduleName) {
-                                    $groupedPermissions[$moduleName] = [];
+                                foreach ($moduleMappings as $prefix => $moduleJsKey) {
+                                    // Cambiado $moduleName a $moduleJsKey
+                                    $groupedPermissions[$moduleJsKey] = []; // Usa la clave JS aquí
                                     foreach ($actionTypes as $action) {
-                                        $groupedPermissions[$moduleName][$action] = null;
+                                        $groupedPermissions[$moduleJsKey][$action] = null;
                                     }
                                 }
 
                                 foreach ($permissions as $p) {
-                                    foreach ($moduleMappings as $prefix => $moduleName) {
+                                    foreach ($moduleMappings as $prefix => $moduleJsKey) {
+                                        // Iterar con $moduleJsKey
                                         foreach ($actionTypes as $action) {
-                                            $expectedPermissionName = $action . ' ' . $prefix;
+                                            $expectedPermissionName = $action . ' ' . $prefix; // Construye el nombre de Spatie
                                             if ($p->name === $expectedPermissionName) {
-                                                $groupedPermissions[$moduleName][$action] = $p->name;
+                                                $groupedPermissions[$moduleJsKey][$action] = $p->name; // Asigna con la clave JS
                                                 break 2;
                                             }
                                         }
@@ -181,25 +186,25 @@
                                 }
                             @endphp
 
-                            @forelse ($groupedPermissions as $moduleName => $actions)
+                            @forelse ($groupedPermissions as $moduleJsKey => $actions)
                                 @if (count(array_filter($actions)) > 0)
                                     <tr>
                                         <td
                                             class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center">
-                                            @if ($moduleName === 'Productos')
+                                            @if ($moduleJsKey === 'productos')
+                                                <!-- Compara con la clave JS -->
                                                 <img src="{{ asset('images/planta.svg') }}" alt="Productos"
-                                                    class="w-5 h-5 mr-2">
-                                            @elseif ($moduleName === 'Noticias')
+                                                    class="w-5 h-5 mr-2"> Productos
+                                            @elseif ($moduleJsKey === 'noticias')
                                                 <img src="{{ asset('images/noticia.svg') }}" alt="Noticias"
-                                                    class="w-5 h-5 mr-2">
-                                            @elseif ($moduleName === 'Boletines')
+                                                    class="w-5 h-5 mr-2"> Noticias
+                                            @elseif ($moduleJsKey === 'boletines')
                                                 <img src="{{ asset('images/boletin.svg') }}" alt="Boletines"
-                                                    class="w-5 h-5 mr-2">
-                                            @elseif ($moduleName === 'Usuarios')
+                                                    class="w-5 h-5 mr-2"> Boletines
+                                            @elseif ($moduleJsKey === 'usuarios')
                                                 <img src="{{ asset('images/gestion.svg') }}" alt="Usuarios"
-                                                    class="w-5 h-5 mr-2">
+                                                    class="w-5 h-5 mr-2"> Usuarios
                                             @endif
-                                            {{ $moduleName }}
                                         </td>
                                         @foreach ($actionTypes as $actionType)
                                             <td class="px-4 py-3 whitespace-nowrap text-center text-sm">
@@ -244,8 +249,11 @@
                 <div class="flex space-x-3">
                     <button type="button" id="prevStepButton"
                         class="btn-secondary px-4 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 hidden">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2 transform rotate-180" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2 transform rotate-180"
+                            viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                clip-rule="evenodd" />
                         </svg>
                         Atrás
                     </button>
@@ -267,18 +275,21 @@
     </div>
 </div>
 
-<div id="confirmModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center z-50">
+<div id="confirmModal"
+    class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden flex items-center justify-center z-50">
     <div class="relative p-8 bg-white w-full max-w-lg mx-auto rounded-lg shadow-xl transform transition-all sm:my-8 sm:w-full sm:max-w-md"
-         role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+        role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
         <div class="text-center">
             <h3 class="text-xl font-bold text-gray-900 mb-4" id="confirmModalTitle">Confirmar Acción</h3>
             <div id="confirmMessageBody" class="text-left text-gray-700 leading-relaxed mb-6">
-                </div>
+            </div>
             <div class="flex justify-end gap-3 mt-4">
-                <button type="button" id="confirmCancelButton" class="btn-secondary px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button type="button" id="confirmCancelButton"
+                    class="btn-secondary px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Cancelar
                 </button>
-                <button type="button" id="confirmActionButton" class="btn-primary bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <button type="button" id="confirmActionButton"
+                    class="btn-primary bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                     Confirmar
                 </button>
             </div>

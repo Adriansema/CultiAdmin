@@ -57,7 +57,7 @@ class UsuarioController extends Controller
         return redirect()->route('usuarios.index')->with('success', 'Preparado para crear un nuevo usuario.');
     }
 
-     /**
+    /**
      * Almacena un nuevo usuario.
      * Si la solicitud proviene del Paso 1 del modal, solo creará el usuario inicial.
      * Si la solicitud proviene del Paso 2, actualizará roles y permisos.
@@ -82,6 +82,7 @@ class UsuarioController extends Controller
                 'email'         => 'required|email|unique:users,email',
                 'type_document' => 'required|string|max:10',
                 'document'      => 'required|string|max:20|unique:users,document',
+                'form_step'     => 'required|string|in:step1', // Para confirmar que es el paso 1
             ], [
                 'name.required' => 'El nombre es obligatorio.',
                 'email.required' => 'El correo es obligatorio.',
@@ -121,11 +122,10 @@ class UsuarioController extends Controller
                     'message' => 'Usuario básico creado. Proceda a asignar roles y permisos.',
                     'user_id' => $user->id, // Esencial para el Paso 2
                 ]);
-
             } catch (\Exception $e) {
                 Log::error('Error al crear usuario manualmente (admin) - Paso 1.', [
                     'error'            => $e->getMessage(),
-                    'user_data'        => $request->except(['_token', 'password', 'document']),
+                    'user_data'        => $request->except(['_token', 'password', 'document', 'form_step']),
                     'created_by'       => Auth::id(),
                     'ip_address'       => $request->ip(),
                     'trace'            => $e->getTraceAsString(),
@@ -141,7 +141,7 @@ class UsuarioController extends Controller
             // o que la lógica de store se ha bifurcado para manejar creación Y asignación.
             // Para un flujo más limpio, el Paso 2 de *creación* lo manejará el `update` después de obtener el `user_id`.
 
-             // Si el request incluye 'user_id', asumimos que es el Paso 2 de creación
+            // Si el request incluye 'user_id', asumimos que es el Paso 2 de creación
             $userId = $request->input('user_id');
             $user = User::find($userId);
 
@@ -164,7 +164,7 @@ class UsuarioController extends Controller
                     return response()->json(['message' => 'Un Administrador no puede asignar roles/permisos a un SuperAdmin o a otro Administrador.', 'errors' => ['roles' => 'Permiso denegado.']], 403);
                 }
             }
-             // Validar roles y permisos
+            // Validar roles y permisos
             $request->validate([
                 'roles'         => 'nullable|array',
                 'roles.*'       => 'string|exists:roles,name',
@@ -189,7 +189,6 @@ class UsuarioController extends Controller
                     'message' => 'Usuario creado y roles/permisos asignados exitosamente.',
                     'redirect' => route('usuarios.index') // Podrías redirigir o simplemente cerrar el modal
                 ]);
-
             } catch (\Exception $e) {
                 Log::error('Error al asignar roles/permisos a usuario recién creado - Paso 2.', [
                     'error'            => $e->getMessage(),
@@ -201,7 +200,6 @@ class UsuarioController extends Controller
                 ]);
                 return response()->json(['message' => 'Ocurrió un error al asignar roles y permisos.', 'errors' => ['general' => $e->getMessage()]], 500);
             }
-
         }
 
         // Si no se especifica el paso, o no es reconocido
@@ -243,9 +241,6 @@ class UsuarioController extends Controller
         $userRoles = $usuario->roles->pluck('name')->toArray();
         $allUserGrantedPermissions = $usuario->getAllPermissions()->pluck('name')->toArray();
 
-        // Si este método es llamado por AJAX para precargar el modal en el index:
-        // return response()->json(compact('usuario', 'roles', 'permissions', 'userRoles', 'allUserGrantedPermissions'));
-        // Pero si es para renderizar una página completa, como hasta ahora:
         return view('usuarios.edit', compact('usuario', 'roles', 'permissions', 'userRoles', 'allUserGrantedPermissions'));
     }
 
@@ -305,13 +300,18 @@ class UsuarioController extends Controller
                 'email'         => $request->email,
                 'type_document' => $request->type_document,
                 'document'      => $request->document,
-                // Si la contraseña se edita desde este modal, añadir lógica aquí:
-                // 'password'      => $request->filled('password') ? Hash::make($request->password) : $usuario->password,
             ]);
 
             // Actualización de roles y permisos
             $usuario->syncRoles($request->roles ?? []);
-            $usuario->syncPermissions($request->permissions ?? []);
+
+            // Sincronizar permisos directos (recibe directamente el array del frontend)
+            if ($request->has('permissions') && is_array($request->permissions)) {
+                $usuario->syncPermissions($request->permissions);
+            } else {
+                // Si no se enviaron permisos o no es un array, desvincula todos los permisos directos
+                $usuario->syncPermissions([]);
+            }
 
             Log::info('Usuario actualizado (modal en index).', [
                 'user_id'          => $usuario->id,
@@ -325,7 +325,6 @@ class UsuarioController extends Controller
                 'success' => true,
                 'message' => 'Usuario y sus roles/permisos actualizados exitosamente.'
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error al actualizar usuario (modal en index).', [
                 'error'            => $e->getMessage(),
@@ -364,6 +363,14 @@ class UsuarioController extends Controller
         $userRoles = $usuario->roles->pluck('name')->toArray();
         $allUserGrantedPermissions = $usuario->getAllPermissions()->pluck('name')->toArray();
 
+        // NUEVA LÓGICA: Obtener permisos por defecto para CADA rol usando Spatie
+        $allRoles = Role::all();
+        $roleDefaultPermissions = [];
+
+        foreach ($allRoles as $role) {
+            $roleDefaultPermissions[$role->name] = $role->permissions->pluck('name')->toArray();
+        }
+
         return response()->json([
             'id' => $usuario->id,
             'name' => $usuario->name,
@@ -372,7 +379,26 @@ class UsuarioController extends Controller
             'document' => $usuario->document,
             'userRoles' => $userRoles,
             'allUserGrantedPermissions' => $allUserGrantedPermissions,
+            'roleDefaultPermissions' => $roleDefaultPermissions, 
         ]);
+    }
+
+    /**
+     * Devuelve el mapeo de permisos por defecto para cada rol.
+     *
+     * @param  \Spatie\Permission\Models\Role  $roleModel // Inyectamos el modelo Role
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getRolePermissionsMap(Role $roleModel)
+    {
+        $allRoles = $roleModel->all(); // Usamos la instancia inyectada del modelo
+        $roleDefaultPermissions = [];
+
+        foreach ($allRoles as $role) {
+            $roleDefaultPermissions[$role->name] = $role->permissions->pluck('name')->toArray();
+        }
+
+        return response()->json(['roleDefaultPermissions' => $roleDefaultPermissions]);
     }
 
     /**

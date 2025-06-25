@@ -1,8 +1,8 @@
-@extends('layouts.app') {{-- Asume que tienes un layout base --}}
+@extends('layouts.app')
 
 @section('content')
 
-    @can('editar productos')
+    @can('editar producto')
         <div class="container mx-auto p-4">
             <h1 class="text-2xl font-bold mb-4">Editar Producto: {{ $producto->tipo }} - ID: {{ $producto->id }}</h1>
 
@@ -93,6 +93,16 @@
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
+                        <div class="mb-4">
+                            <label for="RutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del Video:</label>
+                            <input type="url" name="RutaVideo" id="RutaVideo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                value="{{ old('RutaVideo', $producto->RutaVideo) }}"
+                                placeholder="https://ejemplo.com/tu-video.mp4">
+                            @error('RutaVideo')
+                                <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 @endif
 
@@ -120,11 +130,22 @@
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="mora_data_informacion" class="block text-gray-700 text-sm font-bold mb-2">Información de
+                            <label for="mora_data_informacion" class="block text-gray-700 text-sm font-bold mb-2">Información
+                                de
                                 Mora:</label>
                             <textarea name="mora_data[informacion]" id="mora_data_informacion" rows="5"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('mora_data.informacion', $producto->mora->informacion) }}</textarea>
                             @error('mora_data.informacion')
+                                <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="mb-4">
+                            <label for="RutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del Video:</label>
+                            <input type="url" name="RutaVideo" id="RutaVideo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                value="{{ old('RutaVideo', $producto->RutaVideo) }}"
+                                placeholder="https://ejemplo.com/tu-video.mp4">
+                            @error('RutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>

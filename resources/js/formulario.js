@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
     console.log('*** formulario.js: DOMContentLoaded disparado. ***');
 
     const userFormModal = document.getElementById('userFormModal');
@@ -21,19 +21,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const documentInput = document.getElementById('document');
 
     // Referencias a los inputs del Paso 2 (roles y permisos)
-    const roleCheckboxes = document.querySelectorAll('.role-checkbox');
+    const roleCheckboxes = document.querySelectorAll('input[name="roles[]"]');
     const permissionCheckboxes = document.querySelectorAll('input[name="permissions[]"]');
 
-    // ELEMENTOS DEL MODAL DE CONFIRMACIÓN (asegúrate de que su HTML esté presente)
+    // ELEMENTOS DEL MODAL DE CONFIRMACIÓN
     const confirmModal = document.getElementById('confirmModal');
     const confirmMessageBody = document.getElementById('confirmMessageBody');
     const confirmCancelButton = document.getElementById('confirmCancelButton');
     const confirmActionButton = document.getElementById('confirmActionButton');
 
-    // Verificaciones iniciales de elementos (solo para los que esperas que existan)
+    // Verificaciones iniciales de elementos
     if (!userFormModal) { console.error('ERROR: userFormModal no encontrado.'); return; }
     if (!nextButton) console.error('ERROR: nextStepButton no encontrado. ¡Este es crucial!');
-
     if (!confirmModal) console.error('ERROR: confirmModal no encontrado. Asegúrate de añadir su HTML.');
     if (!confirmMessageBody) console.error('ERROR: confirmMessageBody no encontrado.');
     if (!confirmCancelButton) console.error('ERROR: confirmCancelButton no encontrado.');
@@ -44,36 +43,168 @@ document.addEventListener('DOMContentLoaded', function () {
         isOpen: false,
         isEditMode: false,
         currentStep: 1,
-        userId: null, // ¡Este será clave para el flujo de la Opción B!
+        userId: null,
         nombre: '',
         correo: '',
         tipoDocumento: '',
         numeroDocumento: '',
         rolSeleccionado: '',
+
+        // Estructura de permisos en el frontend (debe coincidir con tus checkboxes)
         permisos: {
             productos: { crear: false, editar: false, validar: false, eliminar: false },
             noticias: { crear: false, editar: false, validar: false, eliminar: false },
             boletines: { crear: false, editar: false, validar: false, eliminar: false },
-            usuarios: { crear: false, editar: false, validar: false, eliminar: false }
+            usuarios: { crear: false, editar: false }
         },
-        errors: {},
-        successMessage: '',
+
+        // Mapeo de nombres de permiso de Spatie a sus módulos
+        // Debe ser EXACTAMENTE como tus permisos de Spatie.
         modulePermissionMap: {
             'productos': ['crear producto', 'editar producto', 'validar producto', 'eliminar producto'],
             'noticias': ['crear noticia', 'editar noticia', 'validar noticia', 'eliminar noticia'],
             'boletines': ['crear boletin', 'editar boletin', 'validar boletin', 'eliminar boletin'],
-            'usuarios': ['crear usuario', 'editar usuario', 'validar usuario', 'eliminar usuario']
+            'usuarios': ['crear usuario', 'editar usuario']
         },
+
+        // Aquí guardaremos el mapeo de rol a permisos por defecto que viene del backend
+        rolePermissionsMapping: {}, // Esto se llenará con fetchRolePermissionsMapping()
+        errors: {},
+        successMessage: '',
         csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     };
+
+    // ! Funciones Auxiliares
+
+    // Carga el mapeo de roles a permisos por defecto una única vez
+    async function fetchRolePermissionsMapping() {
+        try {
+            const response = await fetch('/usuario/role-permissions-map'); 
+            const data = await response.json();
+            if (response.ok && data.roleDefaultPermissions) {
+                modalData.rolePermissionsMapping = data.roleDefaultPermissions;
+                console.log('JS: Mapeo de permisos por rol cargado globalmente:', modalData.rolePermissionsMapping);
+            } else {
+                console.error('Error al cargar mapeo de permisos por rol:', data.message || response.statusText);
+            }
+        } catch (error) {
+            console.error('Error de red al cargar mapeo de permisos por rol:', error);
+        }
+    }
+    // AWAIT la carga del mapeo para asegurar que esté disponible cuando se usen los roles
+    await fetchRolePermissionsMapping();
+
+
+    // Función para restablecer todos los permisos en modalData.permisos a false
+    function resetPermissions() {
+        for (const moduleKey in modalData.permisos) {
+            for (const actionkey in modalData.permisos[moduleKey]) {
+                modalData.permisos[moduleKey][actionkey] = false;
+            }
+        }
+    }
+
+    // se utiliza updateModalDataPermission para marcar todos los permisos que el usuario tiene.
+    // asegurando que ningún módulo quede excluido.
+    function updateModalDataPermission(spatiePerName, setState) {
+        for (const moduleKey in modalData.modulePermissionMap) {
+            //verifica si el permiso Spatie está en el mapra de este modulo
+            if (modalData.modulePermissionMap[moduleKey].includes(spatiePerName)) {
+                let actionKey = '';
+
+                //determina la 'actionkey' basada en el nombre del permisos de Spatie
+                if (spatiePerName.includes('crear')) {
+                    actionKey = 'crear';
+                } else if (spatiePerName.includes('editar')) {
+                    actionKey = 'editar';
+                } else if (spatiePerName.includes('eliminar')) {
+                    actionKey = 'eliminar';
+                } else if (spatiePerName.includes('validar')) {
+                    actionKey = 'validar';
+                }
+                //agrega mas else if si tienes otras acciones (ej. 'ver')
+
+                // Asegurate de que la accion y el modluo exitesn en modalData.permisos
+                if (actionKey && modalData.permisos[moduleKey] && modalData.permisos[moduleKey][actionKey] !== undefined) {
+                    modalData.permisos[moduleKey][actionKey] = setState;
+                    console.log(`Permiso '${spatiePerName}' mapeado a ${moduleKey}.${actionKey} y establecido a ${setState}`);
+                    return true; // Exito en el mapeo
+                } else {
+                    console.warn(`[Mapeo Fallido] Acción '${actionKey}' o modulo '${moduleKey}' no definido para '${spatiePerName}' en modalData.permisos.`);
+                }
+            }
+        }
+        console.warn(`[Mapeo Fallido] Permiso Spatie '${spatiePerName}' no encontrado en modulePermissionMap.`);
+        return false; //Fallo en el mapeo
+    }
+
+    // cada vez que seleccionas un rol. ¡Esto auto-marca los permisos por defecto! (Punto 3)
+    function applyRoleDefaultPermissions(roleName) {
+        console.log('JS: Aplicando permisos por defecto para el rol:', roleName);
+        resetPermissions(); // Primero desmarca TODOS los permisos actuales
+
+        const defaultPermsForRole = modalData.rolePermissionsMapping[roleName];
+        console.log('JS: Permisos por defecto para este rol:', defaultPermsForRole);
+
+        if (defaultPermsForRole && defaultPermsForRole.length > 0) {
+            defaultPermsForRole.forEach(permName => {
+                updateModalDataPermission(permName, true); // Usa la función auxiliar para marcar
+            });
+        }
+        updateFormValues(); // Actualiza la UI para que los checkboxes se muestren marcados
+    }
+
+    // Función para restablecer todos los datos del formulario a su estado inicial
+    function resetForm() {
+        modalData.currentStep = 1;
+        modalData.userId = null;
+        modalData.nombre = '';
+        modalData.correo = '';
+        modalData.tipoDocumento = '';
+        modalData.numeroDocumento = '';
+        modalData.rolSeleccionado = '';
+        resetPermissions(); // Llama a resetPermissions para limpiar los checkboxes
+        modalData.errors = {};
+        modalData.successMessage = '';
+
+        // Limpiar los inputs del DOM
+        if (nameInput) nameInput.value = '';
+        if (emailInput) emailInput.value = '';
+        if (typeDocumentSelect) typeDocumentSelect.value = '';
+        if (documentInput) documentInput.value = '';
+
+        // Resetear visualmente los radio buttons de rol y sus estilos
+        roleCheckboxes.forEach(radio => {
+            radio.checked = false;
+            const label = radio.closest('.role-label');
+            const icon = label ? label.querySelector('.role-icon') : null;
+            if (label) {
+                label.classList.remove('bg-indigo-200', 'text-indigo-800');
+                label.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
+                if (icon) icon.src = icon.src.replace('con_marca.svg', 'sin_marca.svg');
+            } else {
+                label.classList.remove('bg-indigo-200', 'text-indigo-800');
+                label.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
+                if (icon) icon.src = icon.src.replace('con_marca.svg', 'sin_marca.svg');
+            }
+        });
+
+        // Es importante llamar a updateFormValues después de resetear modalData
+        updateFormValues();
+    }
+    // ! Fin de Funciones Auxiliares
 
     function updateModalUI() {
         console.log('JS: updateModalUI llamado. Paso actual:', modalData.currentStep, 'Modo:', modalData.isEditMode ? 'Editar' : 'Crear');
 
-        modalData.isOpen ? userFormModal.classList.remove('hidden') : userFormModal.classList.add('hidden');
+        // Control de visibilidad del modal principal (usando opacity y pointer-events)
         if (modalData.isOpen) {
-            document.body.classList.add('overflow-hidden');
+            userFormModal.classList.remove('opacity-0', 'pointer-events-none');
+            userFormModal.classList.add('opacity-100');
+            document.body.classList.add('overflow-hidden'); // Para evitar scroll en el body
         } else {
+            userFormModal.classList.remove('opacity-100');
+            userFormModal.classList.add('opacity-0', 'pointer-events-none');
             document.body.classList.remove('overflow-hidden');
         }
 
@@ -84,20 +215,38 @@ document.addEventListener('DOMContentLoaded', function () {
         if (step1Content) step1Content.classList.toggle('hidden', modalData.currentStep !== 1);
         if (step2Content) step2Content.classList.toggle('hidden', modalData.currentStep !== 2);
 
-        // Actualizar indicadores de paso
+        // Actualizar indicadores de paso  (íconos y texto)
         if (step1Indicator && step2Indicator) {
             const imgStep1 = step1Indicator.querySelector('img');
             const spanStep1 = step1Indicator.querySelector('span');
             const imgStep2 = step2Indicator.querySelector('img');
             const spanStep2 = step2Indicator.querySelector('span');
 
-            imgStep1.src = modalData.currentStep >= 1 ? '/images/1paso.svg' : '/images/1paso_gray.svg';
-            spanStep1.classList.toggle('text-green-700', modalData.currentStep >= 1);
-            spanStep1.classList.toggle('text-gray-400', modalData.currentStep < 1);
+            // --- Lógica para el Paso 1 ---
+            if (modalData.currentStep === 1) {
+                // Si estamos en el Paso 1: icono activo para el Paso 1, texto gris oscuro (activo)
+                imgStep1.src = '/images/paso1_activo.svg';
+                spanStep1.classList.remove('text-gray-400'); // Asegura que no tenga gris claro
+                spanStep1.classList.add('text-gray-700');   // Activo: gris oscuro
+            } else if (modalData.currentStep === 2) {
+                // Si estamos en el Paso 2 (Paso 1 ya completado): icono de completado para el Paso 1, texto gris oscuro (completado)
+                imgStep1.src = '/images/paso1_completado.svg';
+                spanStep1.classList.remove('text-gray-400'); // Asegura que no tenga gris claro
+                spanStep1.classList.add('text-gray-700');   // Completado: gris oscuro (según tu indicación de solo gris)
+            }
 
-            imgStep2.src = modalData.currentStep === 2 ? '/images/2paso.svg' : '/images/2paso_gray.svg';
-            spanStep2.classList.toggle('text-green-700', modalData.currentStep === 2);
-            spanStep2.classList.toggle('text-gray-400', modalData.currentStep < 2);
+            // --- Lógica para el Paso 2 ---
+            if (modalData.currentStep === 2) {
+                // Si estamos en el Paso 2: icono activo para el Paso 2, texto gris oscuro (activo)
+                imgStep2.src = '/images/paso2_completado.svg'; // Este es el icono de "2 activo" según tu descripción
+                spanStep2.classList.remove('text-gray-400'); // Asegura que no tenga gris claro
+                spanStep2.classList.add('text-gray-700');   // Activo: gris oscuro
+            } else if (modalData.currentStep === 1) {
+                // Si estamos en el Paso 1 (Paso 2 está inactivo/pendiente): icono inactivo para el Paso 2, texto gris claro
+                imgStep2.src = '/images/paso2_inactivo.svg';
+                spanStep2.classList.remove('text-gray-700'); // Asegura que no tenga gris oscuro
+                spanStep2.classList.add('text-gray-400');   // Inactivo: gris claro
+            }
         }
 
         // CONTROL DE VISIBILIDAD DE LOS BOTONES DE NAVEGACIÓN (solo nextButton en este caso)
@@ -118,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         renderErrors();
         renderSuccessMessage();
-        updateFormValues();
+        updateFormValues(); // Llama a esta función para reflejar modalData en la UI
     }
 
     function renderErrors() {
@@ -143,12 +292,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 errorMessage.textContent = modalData.errors[field];
                 inputElement.parentNode.appendChild(errorMessage);
             } else if (field === 'roles' || field === 'rolSeleccionado') {
-                const roleContainer = roleCheckboxes[0]?.closest('.flex.flex-wrap.gap-2');
+                // Asumiendo que tus radio buttons de rol están en un contenedor que podemos apuntar
+                const roleContainer = document.querySelector('.rolesContainer');
                 if (roleContainer) {
                     const errorMessage = document.createElement('p');
                     errorMessage.classList.add('text-red-500', 'text-xs', 'mt-1', 'w-full', 'error-message');
                     errorMessage.textContent = modalData.errors[field];
                     roleContainer.appendChild(errorMessage);
+                } else {
+                    console.warn(`Contenedor de rol con ID 'rolesContainer' no encontrado para el campo '${field}'.`);
                 }
             }
         }
@@ -163,22 +315,25 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Función para actualizar los valores de los inputs y el estado de los checkboxes/radios
     function updateFormValues() {
+        // 1. Llenar campos de texto del Paso 1
         if (nameInput) nameInput.value = modalData.nombre;
         if (emailInput) emailInput.value = modalData.correo;
         if (typeDocumentSelect) typeDocumentSelect.value = modalData.tipoDocumento;
         if (documentInput) documentInput.value = modalData.numeroDocumento;
 
-        roleCheckboxes.forEach(checkbox => {
-            checkbox.checked = checkbox.value === modalData.rolSeleccionado;
-            const label = checkbox.closest('.role-label');
-            const icon = label ? label.querySelector('.role-icon') : null;
+        // 2. Marcar el Radio Button del Rol (Punto 1 y 3)
+        roleCheckboxes.forEach(radio => {
+            radio.checked = (radio.value === modalData.rolSeleccionado);
+            const label = radio.closest('.role-label'); // Asumo que tienes una clase 'role-label' en tu HTML
+            const icon = label ? label.querySelector('.role-icon') : null; // Asumo que tienes una clase 'role-icon'
 
             if (label) {
-                if (checkbox.checked) {
+                if (radio.checked) {
                     label.classList.remove('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
                     label.classList.add('bg-indigo-200', 'text-indigo-800');
-                    if (icon) icon.src = icon.src.replace('sin_marca.svg', 'con_marca.svg');
+                    if (icon) icon.src = icon.src.replace('sin_marca.svg', 'con_marca.svg'); //iconos de marca
                 } else {
                     label.classList.remove('bg-indigo-200', 'text-indigo-800');
                     label.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
@@ -187,29 +342,37 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        // 3. Marcar los Checkboxes de Permisos (Punto 2 y 3)
         permissionCheckboxes.forEach(checkbox => {
+            const spatiePermName = checkbox.value; // El valor del checkbox es el nombre del permiso de Spatie
+
             let isChecked = false;
-            for (const moduleKey in modalData.permisos) {
-                for (const actionKey in modalData.permisos[moduleKey]) {
-                    const expectedPermissionName = `${actionKey} ${moduleKey.slice(0, -1)}`;
-                    if (checkbox.value === expectedPermissionName && modalData.permisos[moduleKey][actionKey]) {
-                        isChecked = true;
-                        break;
+            // Recorre el modulePermissionMap para determinar si el permiso está marcado en modalData.permisos
+            for (const moduleKey in modalData.modulePermissionMap) {
+                if (modalData.modulePermissionMap[moduleKey].includes(spatiePermName)) {
+                    // determianr la 'actionkey' para acceder a modalData.permisos
+                    let actionKey = '';
+                    if (spatiePermName.includes('crear')) actionKey = 'crear';
+                    else if (spatiePermName.includes('editar')) actionKey = 'editar';
+                    else if (spatiePermName.includes('eliminar')) actionKey = 'eliminar';
+                    else if (spatiePermName.includes('validar')) actionKey = 'validar';
+
+                    if (actionKey && modalData.permisos[moduleKey] && modalData.permisos[moduleKey][actionKey] !== undefined) {
+                        isChecked = modalData.permisos[moduleKey][actionKey]; // Leer el estado de modalData.permisos
+                        break; // Salir del bucle de módulos una vez encontrado
                     }
                 }
-                if (isChecked) break;
             }
             checkbox.checked = isChecked;
         });
     }
 
-    // --- Funciones públicas para interactuar con el modal principal ---
-
     window.openCreateModal = function () {
         console.log('JS: openCreateModal función llamada.');
         resetForm();
         modalData.isEditMode = false;
-        modalData.isOpen = true;
+        modalData.userId = null; // Asegúrate de que no haya userId de una sesión anterior
+        modalData.isOpen = true;  // Esto ahora activará la lógica de 'opacity' en updateModalUI
         modalData.currentStep = 1;
         modalData.successMessage = '';
         modalData.errors = {};
@@ -218,14 +381,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.openEditModal = async function (userId) {
         console.log('JS: openEditModal función llamada para userId:', userId);
+
         resetForm(); // Limpia el formulario antes de cargar nuevos datos
         modalData.isEditMode = true;
         modalData.userId = userId; // Asigna el ID del usuario
-        modalData.isOpen = true;
+        modalData.isOpen = true; // Esto ahora activará la lógica de 'opacity' en updateModalUI
         modalData.currentStep = 1; // Siempre iniciar en el paso 1 para edición
         modalData.successMessage = '';
         modalData.errors = {};
-        updateModalUI(); // Muestra el modal vacío por un momento
+        updateModalUI(); // Muestra el modal (transparente inicialmente)
 
         try {
             // ¡Ajusta esta URL para que coincida con tu prefijo de ruta en web.php!
@@ -242,36 +406,42 @@ document.addEventListener('DOMContentLoaded', function () {
             modalData.tipoDocumento = data.type_document || '';
             modalData.numeroDocumento = data.document || '';
 
-            //Asignar rol
-            modalData.rolSeleccionado = data.userRoles && data.userRoles.length > 0 ? data.userRoles[0].name : '';
 
-            //Asignar permisos
+            // 2. Asignar el rol del usuario (Punto 1)
+            // userRoles es un array, tomamos el primero si existe
+            modalData.rolSeleccionado = data.userRoles && data.userRoles.length > 0 ? data.userRoles[0] : '';
+            console.log('Rol del usuario cargado:', modalData.rolSeleccionado);
+
+
+            /* // 3. Almacenar el mapeo de permisos por rol (para Punto 3) AHORA SE COMENTO, PUESTO A QUE SE PUSO UNA NUEVA FUNCION EN EL INICO DE LAS FUNCIONES AUXILIARES
+            modalData.rolePermissionsMapping = data.roleDefaultPermissions || {};
+            console.log('Mapeo de permisos por rol cargado:', modalData.rolePermissionsMapping); */
+
+            // 4. Resetear todos los permisos a false antes de marcarlos (Punto 2)
             resetPermissions(); // Primero limpiar todos los permisos
-            if (data.allUserGrantedPermissions) { // Usar 'allUserGrantedPermissions' que es lo que devuelve el backend
-                data.allUserGrantedPermissions.forEach(userPermName => {
-                    for (const moduleKey in modalData.permisos) {
-                        for (const actionKey in modalData.permisos[moduleKey]) {
-                            const expectedPermissionName = `${actionKey} ${moduleKey.slice(0, -1)}`; // Formato 'crear producto'
-                            if (userPermName === expectedPermissionName) {
-                                modalData.permisos[moduleKey][actionKey] = true;
-                                break; // Romper el bucle interno una vez encontrado
-                            }
-                        }
-                    }
+
+            // 5. Marcar los permisos que el usuario YA tiene asignados (Punto 2)
+            if (data.allUserGrantedPermissions && data.allUserGrantedPermissions.length > 0) {
+                console.log('Permisos individuales del usuario cargados:', data.allUserGrantedPermissions);
+                data.allUserGrantedPermissions.forEach(permName => {
+                    updateModalDataPermission(permName, true); // Usa la función auxiliar para marcar
                 });
             }
-            updateFormValues(); // Llenar los campos del formulario con los datos cargados
+
+            // 6. Actualizar la UI con todos los datos y selecciones
+            updateFormValues(); // Esto llenará los campos y marcará el rol y los permisos
+
         } catch (error) {
             console.error('Error al cargar datos para edición:', error);
             modalData.errors.general = error.message;
-            modalData.isOpen = false; // Cerrar el modal si hay un error crítico
+            modalData.isOpen = false; // Esto ahora activará la lógica de 'opacity' en updateModalUI para ocultar
             updateModalUI();
         }
     };
 
     window.closeModal = function () {
         console.log('JS: closeModal función llamada.');
-        modalData.isOpen = false;
+        modalData.isOpen = false; // Esto ahora activará la lógica de 'opacity' en updateModalUI para ocultar
         resetForm();
         modalData.errors = {};
         modalData.successMessage = '';
@@ -310,14 +480,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } else if (modalData.currentStep === 2) {
             // Validaciones del Paso 2 (roles y permisos)
-            let selectedRole = false;
-            roleCheckboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    selectedRole = true;
-                    modalData.rolSeleccionado = checkbox.value; // Asegurarse que esté actualizado
+            let selectedRoleFound = false;
+            roleCheckboxes.forEach(radio => {
+                if (radio.checked) {
+                    selectedRoleFound = true;
+                    modalData.rolSeleccionado = radio.value; // Asegurarse que esté actualizado
                 }
             });
-            if (!selectedRole) {
+
+            if (!selectedRoleFound) {
                 modalData.errors.rolSeleccionado = 'Debe seleccionar al menos un rol.';
                 hasError = true;
             }
@@ -331,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function () {
         updateModalUI(); // Actualiza la UI para reflejar el cambio de paso o mostrar errores
     }
 
-    // NUEVA FUNCIÓN: Maneja el envío de datos del Paso 1 en modo creación
+    // Maneja el envío de datos del Paso 1 en modo creación
     async function submitStep1ForCreation() {
         console.log('JS: submitStep1ForCreation llamado.');
         modalData.errors = {};
@@ -351,7 +522,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Deshabilita el botón Siguiente mientras se envía
         nextButton.disabled = true;
         const originalNextBtnText = nextButton.innerHTML;
-        nextButton.innerHTML = `Validando... <img src="/images/siguiente.svg" alt="cargando" class="w-5 h-6 ml-2">`; // Puedes poner un spinner aquí
+        nextButton.innerHTML = `Siguiente <img src="/images/cargando_.svg" alt="Cargando..." class="w-6 h-5 ml-2 animate-spin">`; // Icono animado
 
         try {
             const response = await fetch(url, {
@@ -394,15 +565,14 @@ document.addEventListener('DOMContentLoaded', function () {
             nextButton.innerHTML = originalNextBtnText;
         }
     }
-    // ************* FIN FUNCIÓN PRINCIPAL DE AVANCE / CONFIRMACIÓN *************
 
-
-    // ************* NUEVAS FUNCIONES PARA EL MODAL DE CONFIRMACIÓN *************
+    // *************  FUNCIONES PARA EL MODAL DE CONFIRMACIÓN *************
     function openConfirmModal() {
         console.log('JS: openConfirmModal llamado.');
-        userFormModal.classList.add('hidden'); // Ocultar el modal principal
         confirmModal.classList.remove('hidden');
         confirmModal.classList.add('flex');
+        modalData.isOpen = false; // Oculta el modal principal
+        updateModalUI(); // Actualiza la UI para ocultar el modal principal
 
         let rolesHtml = '';
         if (modalData.rolSeleccionado) {
@@ -411,18 +581,26 @@ document.addEventListener('DOMContentLoaded', function () {
             rolesHtml += `<li>(Ninguno seleccionado)</li>`;
         }
 
-        let permissionsHtml = '';
-        let selectedPermissions = [];
-        for (const moduleKey in modalData.permisos) {
-            for (const actionKey in modalData.permisos[moduleKey]) {
-                if (modalData.permisos[moduleKey][actionKey]) {
-                    const permName = `${actionKey} ${moduleKey.slice(0, -1)}`;
-                    selectedPermissions.push(permName);
-                }
+        const selectedPermissionsSet = new Set(); // ¡USA UN SET PARA ASEGURAR PERMISOS ÚNICOS!
+        permissionCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedPermissionsSet.add(checkbox.value); // Añade al Set, ignora duplicados
             }
-        }
-        if (selectedPermissions.length > 0) {
-            selectedPermissions.forEach(perm => {
+        });
+
+        let permissionsHtml = '';
+        // Convierte el Set de nuevo a un Array para iterar y mostrar
+        const selectedPermissionsForConfirm = Array.from(selectedPermissionsSet);
+
+        /* const selectedPermissionsForConfirm = []; // Recopila permisos marcados para la confirmación //SE COMENTA PARA REALIZAR PRUEBAS
+        permissionCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedPermissionsForConfirm.push(checkbox.value);
+            }
+        }); */
+
+        if (selectedPermissionsForConfirm.length > 0) {
+            selectedPermissionsForConfirm.forEach(perm => {
                 permissionsHtml += `<li>${perm}</li>`;
             });
         } else {
@@ -451,9 +629,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function closeConfirmModal() {
         console.log('JS: closeConfirmModal llamado.');
-        confirmModal.classList.add('hidden');
+        confirmModal.classList.add('hidden'); // Esto está bien para el modal de confirmación
         confirmModal.classList.remove('flex');
-        userFormModal.classList.remove('hidden'); // Volver a mostrar el modal principal
+        modalData.isOpen = true; // Para asegurar que el modal principal se muestre
+        updateModalUI(); // Llama a updateModalUI para que aplique opacity-100 al modal principal
     }
 
     async function submitFormConfirmed() {
@@ -466,7 +645,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const actionButton = confirmActionButton;
         const originalBtnText = actionButton.textContent;
         actionButton.disabled = true;
-        actionButton.textContent = 'Enviando...';
+        actionButton.innerHTML = `Siguiente <img src="/images/cargando.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">`;
 
         // El método de la petición Fetch siempre será 'POST'
         // porque Laravel interpreta _method='PUT' dentro de un POST.
@@ -484,46 +663,63 @@ document.addEventListener('DOMContentLoaded', function () {
         formData.append('type_document', modalData.tipoDocumento);
         formData.append('document', modalData.numeroDocumento);
 
-        // Manejo de Roles
-        // Si hay un rol seleccionado, lo adjuntamos como un elemento de array.
-        // Si no hay rol seleccionado, no adjuntamos el campo 'roles[]' al FormData.
-        // Laravel, con tu validación 'nullable|array', interpretará la ausencia como null,
-        // y tu backend con `syncRoles($request->roles ?? [])` lo manejará como un array vacío.
+        // Manejo de Roles 
         if (modalData.rolSeleccionado) {
             formData.append('roles[]', modalData.rolSeleccionado);
+        } else {
+            // Si no hay rol seleccionado, envía un array vacío explícitamente para que Laravel reciba un array válido
+            formData.append('roles[]', ''); // Esto resultará en [''] en el backend, que es manejable por syncRoles
         }
 
-        // Manejo de Permisos
+        // Manejo de Permisos (Punto 2 y 3)
         const selectedPermissions = [];
-        // Itera sobre los módulos y acciones para construir el array de nombres de permisos.
-        for (const moduleKey in modalData.permisos) {
+        // Itera sobre los módulos y acciones para construir el array de nombres de permisos. 
+        //! LO COMENTE PARA HACER UNA PRUEBA , YA AHORA LA NUEVA LOGICA ES LA DE ABAJO 
+        /*  for (const moduleKey in modalData.permisos) {
             for (const actionKey in modalData.permisos[moduleKey]) {
                 if (modalData.permisos[moduleKey][actionKey]) {
                     const permName = `${actionKey} ${moduleKey.slice(0, -1)}`; // Ejemplo: 'crear usuario'
                     selectedPermissions.push(permName);
                 }
             }
-        }
+        } */
+        // ! ESTA DE AQUÍ
+        permissionCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedPermissions.push(checkbox.value); // Los valores ya son los nombres de Spatie
+            }
+        });
 
-        // ¡ESTE ES EL CAMBIO CRÍTICO Y CORRECTO PARA PERMISOS!
-        // Si hay permisos seleccionados, adjunta cada uno individualmente como 'permissions[]'.
-        // Si no hay permisos, no adjuntes el campo 'permissions[]' al FormData.
-        // Laravel, con tu validación 'nullable|array', interpretará la ausencia como null,
-        // y tu backend con `syncPermissions($request->permissions ?? [])` lo manejará como un array vacío.
+        // Adjunta CADA permiso individualmente para que Laravel reciba un array ('permissions[]')
         if (selectedPermissions.length > 0) {
             selectedPermissions.forEach(permission => {
                 formData.append('permissions[]', permission); // Envía cada permiso como un elemento del array
             });
+        } else {
+            // Si no hay permisos seleccionados, envía un array vacío explícitamente
+            formData.append('permissions[]', ''); // Esto resultará en [''] en el backend, manejable por syncPermissions
         }
 
         let url = ''; // La URL que se usará para el fetch.
 
-        // La lógica para la URL es ahora más simple: siempre será una actualización a un usuario existente.
-        // Ya sea que se acabe de crear (modalData.userId ya está asignado) o se esté editando.
-        if (!modalData.userId) {
+        // ! LA COMENTE PARA HACER PRUBAS, AHORA SERA LA DE ABAJO QUE HAY QUE ENSAYAR
+        /* if (!modalData.userId) {
             console.error('ERROR: userId no definido para la operación de actualización/finalización del formulario.');
             modalData.errors.general = 'Error interno: No se pudo obtener el ID del usuario para finalizar la operación. Por favor, cancela y vuelve a intentar.';
-            userFormModal.classList.remove('hidden');
+            userFormModal.classList.remove('opacity-0'); // Asegura visibilidad para el error
+            userFormModal.classList.add('opacity-100');
+            updateModalUI();
+            actionButton.disabled = false;
+            actionButton.textContent = originalBtnText;
+            return;
+        } 
+        */
+
+        // ! ESTA DE AQUÍ
+        if (!modalData.userId) {
+            console.error('ERROR: userId no definido para la operación de actualización/finalización del formulario.');
+            modalData.errors.general = 'Error interno: ID de usuario no disponible para finalizar la operación. Por favor, cancela y vuelve a intentar.';
+            modalData.isOpen = true; // Asegura visibilidad para el error
             updateModalUI();
             actionButton.disabled = false;
             actionButton.textContent = originalBtnText;
@@ -531,12 +727,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // La URL para ambas situaciones (finalizar creación y edición) apunta al método PUT de Laravel:
-        // Route::put('/{usuario}', [UsuarioController::class, 'update'])->name('update');
-        // que está dentro de Route::prefix('usuario'), por lo tanto, la URL es /usuario/{id}
-        url = `/usuario/${modalData.userId}`; // ESTE ES EL CAMBIO CLAVE EN LA URL
-
+        url = `/usuario/${modalData.userId}`;
         console.log(`JS: Enviando solicitud de ${modalData.isEditMode ? 'EDICIÓN' : 'FINALIZACIÓN DE CREACIÓN'} a URL: ${url} con método simulado PUT.`);
-
 
         try {
             const response = await fetch(url, {
@@ -553,7 +745,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (response.status === 422 && data.errors) {
                     // Laravel envió errores de validación (422)
                     modalData.errors = data.errors; // Asignamos los errores específicos
-                    console.error('Errores de validación del backend:', data.errors); // *** ¡ESTO ES LO QUE NECESITAMOS VER! ***
+                    console.error('Errores de validación del backend:', data.errors);
                     // También loguea los errores de cada campo si existen
                     for (const key in data.errors) {
                         if (data.errors.hasOwnProperty(key)) {
@@ -566,7 +758,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     modalData.errors.general = data.message || `Error ${response.status}: ${response.statusText || 'Desconocido'}.`;
                     console.error('Error del servidor no 422:', data);
                 }
-                userFormModal.classList.remove('hidden'); // Asegura que el modal principal esté visible
+                modalData.isOpen = true; // Asegura que el modal principal esté visible para ver errores
                 updateModalUI(); // Actualiza la UI para mostrar los errores
                 return; // Detener la ejecución para que el usuario vea el error
             }
@@ -584,52 +776,11 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (error) {
             console.error('Error de red o parsing JSON:', error);
             modalData.errors.general = 'Ocurrió un error de red o inesperado. Por favor, inténtalo de nuevo.';
-            userFormModal.classList.remove('hidden');
+            modalData.isOpen = true; // Asegura visibilidad para el error
             updateModalUI();
         } finally {
             actionButton.disabled = false;
             actionButton.textContent = originalBtnText;
-        }
-    }
-    // ************* FIN NUEVAS FUNCIONES PARA EL MODAL DE CONFIRMACIÓN *************
-
-
-    function resetForm() {
-        modalData.currentStep = 1;
-        modalData.userId = null;
-        modalData.nombre = '';
-        modalData.correo = '';
-        modalData.tipoDocumento = '';
-        modalData.numeroDocumento = '';
-        modalData.rolSeleccionado = '';
-        resetPermissions();
-        modalData.errors = {};
-        modalData.successMessage = '';
-
-        if (nameInput) nameInput.value = '';
-        if (emailInput) emailInput.value = '';
-        if (typeDocumentSelect) typeDocumentSelect.value = '';
-        if (documentInput) documentInput.value = '';
-
-        roleCheckboxes.forEach(checkbox => {
-            checkbox.checked = false;
-            const label = checkbox.closest('.role-label');
-            const icon = label ? label.querySelector('.role-icon') : null;
-            if (label) {
-                label.classList.remove('bg-indigo-200', 'text-indigo-800');
-                label.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
-                if (icon) icon.src = icon.src.replace('con_marca.svg', 'sin_marca.svg');
-            }
-        });
-        permissionCheckboxes.forEach(checkbox => checkbox.checked = false);
-        updateFormValues();
-    }
-
-    function resetPermissions() {
-        for (const moduleName in modalData.permisos) {
-            for (const actionType in modalData.permisos[moduleName]) {
-                modalData.permisos[moduleName][actionType] = false;
-            }
         }
     }
 
@@ -665,57 +816,38 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeDocumentSelect) typeDocumentSelect.addEventListener('change', (e) => modalData.tipoDocumento = e.target.value);
     if (documentInput) documentInput.addEventListener('input', (e) => modalData.numeroDocumento = e.target.value);
 
-    // Lógica para el manejo de roles (click en labels)
+    // Listener para los cambios en los radio buttons de rol (Punto 3)
+    roleCheckboxes.forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (this.checked) { // Solo si este checkbox fue el que se marcó
+                modalData.rolSeleccionado = this.value; // Actualiza el rol seleccionado en modalData
+                applyRoleDefaultPermissions(modalData.rolSeleccionado); // ¡Aplica los permisos por defecto!
+            }
+        });
+    });
+
+    // Listener para los cambios en los checkboxes de permisos (Punto 2)
+    permissionCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            // Cuando un checkbox de permiso cambia, actualiza modalData.permisos
+            // Necesitas la misma lógica de mapeo para saber a qué propiedad de modalData.permisos corresponde
+            updateModalDataPermission(this.value, this.checked);
+        });
+    });
+
+    // Lógica para el manejo de roles (click en el label para el estilo)
+    // Ya lo tienes dentro de updateFormValues, esto es para el evento click en el LABEL
     const roleLabels = document.querySelectorAll('.role-label');
     roleLabels.forEach(label => {
-        label.addEventListener('click', function (e) {
-            e.preventDefault();
-            const checkbox = this.querySelector('.role-checkbox');
-
-            roleCheckboxes.forEach(cb => {
-                if (cb !== checkbox) {
-                    cb.checked = false;
-                    const otherLabel = cb.closest('.role-label');
-                    const otherIcon = otherLabel ? otherLabel.querySelector('.role-icon') : null;
-                    if (otherLabel) {
-                        otherLabel.classList.remove('bg-indigo-200', 'text-indigo-800');
-                        otherLabel.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
-                        if (otherIcon) otherIcon.src = otherIcon.src.replace('con_marca.svg', 'sin_marca.svg');
-                    }
-                }
-            });
-
-            checkbox.checked = !checkbox.checked;
-            modalData.rolSeleccionado = checkbox.checked ? checkbox.value : '';
-
-            const icon = this.querySelector('.role-icon');
-            if (checkbox.checked) {
-                this.classList.remove('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
-                this.classList.add('bg-indigo-200', 'text-indigo-800');
-                if (icon) icon.src = icon.src.replace('sin_marca.svg', 'con_marca.svg');
-            } else {
-                this.classList.remove('bg-indigo-200', 'text-indigo-800');
-                this.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
-                if (icon) icon.src = icon.src.replace('con_marca.svg', 'sin_marca.svg');
+        label.addEventListener('click', function () {
+            const radio = this.querySelector('input[name="roles[]"]');
+            if (radio && !radio.checked) {
+                // Si el radio no estaba marcado, el 'change' listener de arriba lo manejará.
+                // Esta lógica es más para la UX de hacer clic en el label.
+                radio.checked = true;
+                // Disparar manualmente el evento 'change' si el navegador no lo hace automáticamente al cambiar 'checked'
+                radio.dispatchEvent(new Event('change'));
             }
         });
     });
-
-    permissionCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', (e) => {
-            const idParts = checkbox.id.split('_');
-            if (idParts.length >= 3 && idParts[0] === 'permission') {
-                const action = idParts[1];
-                const moduleSingular = idParts[2];
-                const modulePlural = moduleSingular + 's';
-                if (modalData.permisos[modulePlural] && typeof modalData.permisos[modulePlural][action] !== 'undefined') {
-                    modalData.permisos[modulePlural][action] = e.target.checked;
-                }
-            }
-        });
-    });
-
-    // Inicializar el formulario al cargar la página
-    resetForm();
-    updateModalUI();
 });

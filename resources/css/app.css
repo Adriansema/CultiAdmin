@@ -255,3 +255,13 @@ html { font-size: 16px; }
   /* max-width: 48rem; */
   width: 100%;
  }
+
+ /* En tu archivo CSS principal (por ejemplo, resources/css/app.css) */
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
