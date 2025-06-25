@@ -1,519 +1,396 @@
-// Asegúrate de que esta línea esté al principio de tu archivo
-import * as echarts from 'echarts';
-import flatpickr from 'flatpickr';
-import "flatpickr/dist/flatpickr.min.css";
-import { Spanish } from 'flatpickr/dist/l10n/es.js';
-
-// Si MonthSelectPlugin es necesario para yearPicker, asegúrate de que se use
-// import MonthSelectPlugin from 'flatpickr/dist/plugins/monthSelect/index.js';
+// Importaciones necesarias
+import * as echarts from 'echarts'; // Para las gráficas de datos
+// Flatpickr ya NO se importará para el selector de año, ya que usaremos una UI personalizada.
 
 
-// Declarar myChart globalmente para la instancia de ECharts
-let myChart = null;
+// =========================================================================
+// VARIABLES GLOBALES
+// =========================================================================
+let myChart = null; // Instancia global de ECharts para poder actualizarla
+let filtroActual = 'semana'; // Define el filtro por defecto al cargar la página
+let currentSelectedYear = new Date().getFullYear(); // Variable global para el año actualmente seleccionado
 
-// Variable global para el filtro actual
-let filtroActual = 'ultimos3dias';
-let yearFlatpickrIntance = null;  //esta es la instancia global de flatpickr para el selector del año
 
-window.setFilter = function (filterType, selectecYearValue = null) {
-    console.log(`DEBUG: setFilter llamado con filterType: ${filterType}, selectedYearValue: ${selectedYearValue}`);
+// =========================================================================
+// FUNCIONES GLOBALES (accesibles desde el HTML - window.setFilter)
+// =========================================================================
+
+/**
+ * @function window.setFilter
+ * @description Función global llamada por los eventos `onclick` de los botones de filtro.
+ * Controla el filtro activo, la visibilidad del selector de año y la carga de datos.
+ * @param {string} filterType - El tipo de filtro a activar (ej. 'semana', 'año').
+ * @param {number} [yearToLoadValue=null] - El año específico si el filtro es 'año' (opcional, para uso interno).
+ */
+window.setFilter = function(filterType, yearToLoadValue = null) {
+    console.log(`DEBUG: setFilter llamado. Tipo de filtro: ${filterType}, Año Seleccionado (directo): ${yearToLoadValue}`);
 
     filtroActual = filterType; // Actualiza la variable global del filtro actual
 
-    // 1. Actualiza los estilos de los botones de filtro
+    // 1. Actualiza los estilos de los botones de filtro (ESTO AHORA MANEJA LA VISIBILIDAD DEL customYearSelector)
     setActiveFilterButton(filterType);
 
-    // 2. Gestiona la visibilidad y apertura/cierre del selector de año
-    const yearFlatpickrContainer = document.getElementById('yearFlatpickrContainer');
-    if (yearFlatpickrContainer) {
-        if (filterType === 'año') {
-            yearFlatpickrContainer.style.display = 'block'; // Muestra la "casilla" del año
-            // Si Flatpickr ya está inicializado y el filtro es 'año', ábrelo
-            if (yearFlatpickrInstance) {
-                yearFlatpickrInstance.open();
-                console.log("DEBUG: Flatpickr de año abierto.");
-            } else {
-                console.warn("ADVERTENCIA: yearFlatpickrInstance no inicializado. El selector de año no se abrirá automáticamente.");
-            }
-        } else {
-            yearFlatpickrContainer.style.display = 'none'; // Oculta la "casilla" del año
-            // Si Flatpickr está abierto y cambiamos a otro filtro, ciérralo
-            if (yearFlatpickrInstance) {
-                yearFlatpickrInstance.close();
-                console.log("DEBUG: Flatpickr de año cerrado y contenedor oculto.");
-            }
+    // 2. Solo actualiza el valor del año mostrado si el filtro es 'año'
+    if (filterType === 'año') {
+        // Si se pasa un año específico (ej. desde los botones de navegación), actualiza currentSelectedYear
+        if (yearToLoadValue !== null) {
+            currentSelectedYear = yearToLoadValue;
         }
+        // Actualiza el texto visible del año
+        const currentYearDisplay = document.getElementById('currentYearDisplay');
+        if (currentYearDisplay) {
+            currentYearDisplay.textContent = currentSelectedYear;
+        }
+        console.log(`DEBUG: Año seleccionado en UI personalizada: ${currentSelectedYear}`);
     }
+    // NOTA: La visibilidad de customYearSelector ahora se controla COMPLETAMENTE desde setActiveFilterButton.
 
     // 3. Llama a la función para cargar los datos desde la API
     if (filterType === 'año') {
-        // Usa el año pasado como argumento, o el año seleccionado en Flatpickr, o el año actual por defecto
-        const yearToLoad = selectedYearValue || (yearFlatpickrInstance && yearFlatpickrInstance.selectedDates.length > 0 ? yearFlatpickrInstance.selectedDates[0].getFullYear() : new Date().getFullYear());
-        console.log(`DEBUG: Solicitando carga de datos para el Año: ${yearToLoad}`);
-        loadData('año', yearToLoad);
+        loadData('año', currentSelectedYear); // Usa el año global actualizado
     } else {
-        console.log(`DEBUG: Solicitando carga de datos para el filtro: ${filterType}`);
         loadData(filterType);
     }
 };
 
 
+// =========================================================================
+// INICIALIZACIÓN DE DOMContentLoaded (Para tareas que requieren el DOM completo)
+// =========================================================================
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("DEBUG: DOMContentLoaded - Inicializando dashboard.js");
+    console.log("DEBUG: DOMContentLoaded - El DOM está completamente cargado. Iniciando componentes.");
 
-    // --- Inicialización de Flatpickr para el selector de AÑO ---
-    const yearFlatpickrTargetInput = document.getElementById('yearFlatpickrTargetInput'); // Input oculto
-    const yearFlatpickrContainer = document.getElementById('yearFlatpickrContainer'); // Contenedor visible para el altInput y calendario
+    // --- Configuración inicial del año y sus botones ---
+    const currentYearDisplay = document.getElementById('currentYearDisplay');
+    const prevYearBtn = document.getElementById('prevYearBtn');
+    const nextYearBtn = document.getElementById('nextYearBtn');
 
-    if (yearFlatpickrTargetInput && yearFlatpickrContainer) {
-        yearFlatpickrInstance = flatpickr(yearFlatpickrTargetInput, {
-            dateFormat: "Y",       // Formato que se guardará en el input (solo año)
-            altInput: true,        // CRÍTICO: Crea un input visible (la "casilla") para el usuario
-            altFormat: "Y",        // Formato para el input visible
-
-            // Clases de Tailwind para el input ALT que Flatpickr genera.
-            // Esto le dará el estilo de "casilla" que buscas, con el borde y fondo blanco.
-            altInputClass: "px-4 py-2 rounded-full bg-white border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition duration-150 ease-in-out text-gray-700 flex items-center", // Añadido flex y items-center para SVG si lo pones.
-
-            minDate: "2025-01-01", // Fecha mínima seleccionable (corresponde al año 2025)
-            maxDate: new Date(),   // Fecha máxima seleccionable (hasta hoy, que permite seleccionar el año actual)
-
-            // CRÍTICO: Adjunta el calendario (y el altInput) dentro de nuestro contenedor.
-            // Esto nos permite controlar su visibilidad de forma sencilla.
-            appendTo: yearFlatpickrContainer,
-
-            locale: Spanish, // Establece el idioma del calendario a español
-
-            // Callbacks de Flatpickr para manejar eventos
-            onReady: function(selectedDates, dateStr, instance) {
-                // Al cargar Flatpickr, selecciona el año actual por defecto
-                const currentYear = new Date().getFullYear();
-                instance.setDate(currentYear.toString());
-
-                // Asegúrate de que el contenedor de la casilla del año esté oculto al inicio
-                yearFlatpickrContainer.style.display = 'none';
-
-                // Si la casilla no tiene valor (ej. primera carga), establece un placeholder
-                if (!instance.altInput.value) {
-                    instance.altInput.placeholder = "Seleccionar Año";
-                }
-                console.log("DEBUG: Flatpickr de año inicializado y listo. Año por defecto:", currentYear);
-            },
-            onChange: function(selectedDates, dateStr, instance) {
-                // Se ejecuta cuando el usuario selecciona un año del calendario de Flatpickr
-                if (selectedDates.length > 0) {
-                    console.log(`DEBUG: Año seleccionado en Flatpickr (onChange): ${selectedDates[0].getFullYear()}`);
-                    // Llama a window.setFilter para actualizar la UI del botón y cargar los datos
-                    window.setFilter('año', selectedDates[0].getFullYear());
-                }
-            },
-            onClose: function(selectedDates, dateStr, instance) {
-                // Se ejecuta cuando el calendario de Flatpickr se cierra
-                // Si el filtro actual NO es 'año', ocultamos la casilla de año.
-                // Esto evita que la casilla quede visible si el usuario cambia a otro filtro.
-                if (filtroActual !== 'año') {
-                    yearFlatpickrContainer.style.display = 'none';
-                    console.log("DEBUG: Flatpickr de año cerrado y contenedor oculto.");
-                }
-            },
-        });
-    } else {
-        console.error("ERROR: Elemento con ID 'yearFlatpickrTargetInput' o 'yearFlatpickrContainer' no encontrado. No se pudo inicializar el selector de año.");
+    if (currentYearDisplay) {
+        currentYearDisplay.textContent = currentSelectedYear; // Establece el año inicial al cargar
     }
 
-    // --- Carga inicial de datos del dashboard ---
-    // Carga el filtro 'semana' al inicio para que el dashboard muestre datos al cargar.
+    if (prevYearBtn) {
+        prevYearBtn.addEventListener('click', () => {
+            currentSelectedYear--;
+            // Llama a setFilter para actualizar la UI (el texto del año) y cargar los nuevos datos.
+            window.setFilter('año', currentSelectedYear);
+        });
+    }
+
+    if (nextYearBtn) {
+        nextYearBtn.addEventListener('click', () => {
+            currentSelectedYear++;
+            // Llama a setFilter para actualizar la UI (el texto del año) y cargar los nuevos datos.
+            window.setFilter('año', currentSelectedYear);
+        });
+    }
+
+    // --- Carga inicial de datos al cargar la página ---
     window.setFilter('semana');
-    console.log("DEBUG: Dashboard inicializado. Filtro 'semana' aplicado por defecto.");
+    console.log("DEBUG: Carga inicial de dashboard con filtro 'semana'.");
 });
 
-    // --- Inicialización de Flatpickr para el selector de rango de fechas (#dateRangePicker) ---
-    const dateRangePickerInput = document.getElementById("dateRangePicker");
-    let dateRangePicker = null;
-    if (dateRangePickerInput) {
-        dateRangePicker = flatpickr(dateRangePickerInput, {
-            mode: "range",
-            dateFormat: "Y-m-d",
-            altFormat: "F j, Y",
-            altInput: true,
-            defaultViewDate: new Date(new Date().getFullYear(), 0, 1),
-            defaultDate: [new Date(new Date().getFullYear(), 0, 1), "today"],
-            maxDate: "today",
-            allowInput: false,
-            // plugins: [new MonthSelectPlugin({ shorthand: true, dateFormat: "M Y" })], // Ejemplo si usas MonthSelectPlugin
-            onChange: function (selectedDates, dateStr, instance) {
-                if (selectedDates.length === 2) {
-                    filtroActual = 'rangoPersonalizado';
-                    loadData(filtroActual, dateStr);
-                }
-            },
-        });
-    } else {
-        console.warn("Advertencia: Elemento con ID 'dateRangePicker' no encontrado. El selector de rango de fechas no se inicializará. Asegúrate de que existe o elimínalo si no lo usas.");
+
+// =========================================================================
+// OTRAS FUNCIONES (no necesitan ser globales, llamadas internamente)
+// =========================================================================
+
+/**
+ * @function setActiveFilterButton
+ * @description Gestiona las clases de Tailwind para los botones de filtro, incluyendo el grupo "Año".
+ * Controla la visibilidad del selector de año personalizado.
+ * @param {string} filterType - El tipo de filtro que debe estar activo.
+ */
+function setActiveFilterButton(filterType) {
+    // 1. Restablecer estilos para todos los botones estándar
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.classList.remove('bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600');
+        button.classList.add('text-green-600', 'border', 'border-transparent', 'hover:border-green-500', 'hover:bg-green-50');
+    });
+
+    // 2. Restablecer estilos para el grupo de filtro "Año"
+    const yearFilterGroup = document.getElementById('yearFilterGroup');
+    const customYearSelector = document.getElementById('customYearSelector'); // Obtener referencia al selector personalizado
+
+    if (yearFilterGroup) {
+        yearFilterGroup.classList.remove('bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600');
+        yearFilterGroup.classList.add('text-blue-600', 'border', 'border-transparent', 'hover:border-blue-400', 'hover:bg-blue-50');
+
+        // Restablecer colores de texto para elementos dentro de yearFilterGroup (incluyendo el span "Año")
+        const yearTextSpan = yearFilterGroup.querySelector('span'); // El primer span es el texto "Año"
+        const yearIconSvg = yearFilterGroup.querySelector('span svg'); // El SVG del icono del año
+        const currentYearSpan = yearFilterGroup.querySelector('#currentYearDisplay');
+        const prevYearSvg = yearFilterGroup.querySelector('#prevYearBtn svg');
+        const nextYearSvg = yearFilterGroup.querySelector('#nextYearBtn svg');
+
+        if (yearTextSpan) {
+             yearTextSpan.classList.remove('text-white'); // Asegurar que el texto "Año" no esté blanco
+             yearTextSpan.classList.add('text-blue-600'); // O el color original inactivo si es diferente
+        }
+        if (yearIconSvg) {
+            yearIconSvg.classList.remove('text-white');
+            yearIconSvg.classList.add('text-blue-600'); // Color original del icono
+        }
+        if (currentYearSpan) {
+            currentYearSpan.classList.remove('text-white');
+            currentYearSpan.classList.add('text-gray-800'); // Asegurar default text color para el año numérico
+        }
+        if (prevYearSvg) {
+            prevYearSvg.classList.remove('text-white');
+            prevYearSvg.classList.add('text-gray-600'); // Asegurar default icon color
+        }
+        if (nextYearSvg) {
+            nextYearSvg.classList.remove('text-white');
+            nextYearSvg.classList.add('text-gray-600'); // Asegurar default icon color
+        }
+
+        // Ocultar customYearSelector por defecto (se mostrará solo si 'año' está activo)
+        if (customYearSelector) {
+            customYearSelector.style.display = 'none';
+        }
     }
 
 
-    // --- Función para activar/desactivar los botones de filtro ---
-    function setActiveFilterButton(filterType) {
-        document.querySelectorAll('.filter-btn').forEach(button => {
-            const currentFilter = button.getAttribute('data-filtro');
+    // 3. Aplicar estilos al elemento activo
+    if (filterType === 'año') {
+        if (yearFilterGroup) {
+            yearFilterGroup.classList.remove('text-blue-600', 'border', 'border-transparent', 'hover:border-blue-400', 'hover:bg-blue-50');
+            yearFilterGroup.classList.add('bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600');
 
-            // 1. Remover TODAS las clases de estado activo (fondo, texto, sombra, bordes sólidos)
-            button.classList.remove('bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600');
-
-            // 2. Remover TODAS las clases del botón Año para re-aplicar según estado
-            button.classList.remove('border-2', 'border-dashed', 'border-blue-400', 'text-blue-600', 'hover:text-blue-800');
-
-
-            // 3. Aplicar clases de estado INACTIVO por defecto a todos los botones
-            if (currentFilter === 'año') {
-                // El botón Año siempre tiene border-2 border-dashed border-blue-400 (definido en HTML en el estado base)
-                // Aquí solo gestionamos su color de texto para el estado inactivo
-                button.classList.add('border-2', 'border-dashed', 'border-blue-400', 'text-blue-600', 'hover:text-blue-800');
-            } else {
-                // Botones normales (3 días, Semana, Mes) cuando INACTIVOS:
-                // Tienen texto verde y NO deben tener borde sólido visible.
-                // El hover:border se gestiona desde el HTML base del botón
-                button.classList.add('text-green-600', 'hover:border', 'hover:border-green-600');
+            // Mostrar customYearSelector
+            if (customYearSelector) {
+                customYearSelector.style.display = 'flex';
             }
-        });
 
-        // 4. Aplicar las clases de estado ACTIVO al botón seleccionado
+            // Cambiar colores de texto/iconos a blanco para los elementos dentro de yearFilterGroup (incluyendo el span "Año")
+            const yearTextSpan = yearFilterGroup.querySelector('span'); // El primer span es el texto "Año"
+            const yearIconSvg = yearFilterGroup.querySelector('span svg'); // El SVG del icono del año
+            const currentYearSpan = yearFilterGroup.querySelector('#currentYearDisplay');
+            const prevYearSvg = yearFilterGroup.querySelector('#prevYearBtn svg');
+            const nextYearSvg = yearFilterGroup.querySelector('#nextYearBtn svg');
+
+            if (yearTextSpan) yearTextSpan.classList.add('text-white');
+            if (yearIconSvg) yearIconSvg.classList.add('text-white');
+            if (currentYearSpan) currentYearSpan.classList.add('text-white');
+            if (prevYearSvg) prevYearSvg.classList.add('text-white');
+            if (nextYearSvg) nextYearSvg.classList.add('text-white');
+        }
+    } else {
         const activeButton = document.querySelector(`.filter-btn[data-filtro="${filterType}"]`);
         if (activeButton) {
-            const activeFilter = activeButton.getAttribute('data-filtro');
-
-            // Remover las clases de inactivo del botón activo antes de añadir las de activo
-            if (activeFilter === 'año') {
-                activeButton.classList.remove('text-blue-600', 'hover:text-blue-800', 'border-2', 'border-dashed', 'border-blue-400');
-            } else {
-                activeButton.classList.remove('text-green-600', 'hover:border', 'hover:border-green-600');
-            }
-
-            // Añadir las clases de ACTIVO (fondo verde, texto blanco, sombra)
-            activeButton.classList.add('bg-green-600', 'text-white', 'shadow-md');
-
-            // Añadir el borde sólido verde si es un botón normal (no Año)
-            if (activeFilter !== 'año') {
-                activeButton.classList.add('border', 'border-green-600');
-            } else {
-                // Si es el botón Año, reaplicar su borde punteado azul permanente
-                activeButton.classList.add('border-2', 'border-dashed', 'border-blue-400');
-            }
+            activeButton.classList.remove('text-green-600', 'border', 'border-transparent', 'hover:border-green-500', 'hover:bg-green-50');
+            activeButton.classList.add('bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600');
         }
-        console.log(`DEBUG: Botón activo establecido a: ${filterType}`);
+    }
+    console.log(`DEBUG: Botón activo establecido a: ${filterType}`);
+}
+
+
+/**
+ * @function loadData
+ * @description Realiza una solicitud fetch a la API para obtener datos de estadísticas.
+ * @param {string} filterType - El tipo de filtro solicitado (ej. 'semana', 'año').
+ * @param {string|number} [value=null] - Valor adicional del filtro (ej. el año para 'año').
+ */
+function loadData(filterType, value = null) {
+    let url = `/api/estadisticas?`;
+
+    if (filterType === 'año' && value) {
+        url += `filter=año&year=${value}`;
+    } else if (['ultimos3dias', 'semana', 'mes', 'todo'].includes(filterType)) {
+        url += `filter=${filterType}`;
+    } else {
+        url += `filter=semana`; // Fallback
+        filtroActual = 'semana';
     }
 
+    console.log("DEBUG: Realizando fetch a la URL:", url);
 
-
-    // --- setFilter global para los onclick de los botones HTML ---
-    window.setFilter = function (filterType) {
-        filtroActual = filterType;
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active-filter-button');
+    fetch(url)
+        .then(response => {
+            console.log("DEBUG: Respuesta HTTP recibida del fetch:", response);
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    throw new Error(`Error HTTP! Estado: ${response.status}, Detalle: ${errorData.detalle || response.statusText}`);
+                }).catch(() => {
+                    throw new Error(`Error HTTP! Estado: ${response.status}, Texto: ${response.statusText}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("DEBUG: Datos JSON recibidos de la API (loadData):", data);
+            localStorage.setItem('dashboardData', JSON.stringify(data));
+            renderChart(data);
+            updateMetrics(data);
+        })
+        .catch(error => {
+            console.error('ERROR: Error al obtener estadísticas en loadData:', error);
+            const chartDom = document.getElementById('chart');
+            if (chartDom) {
+                chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-red-500 p-4">Error al cargar la gráfica: ${error.message}.</div>`;
+                if (myChart) { myChart.dispose(); myChart = null; }
+            }
+            updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 });
         });
-        const activeBtn = document.querySelector(`.filter-btn[data-filtro="${filterType}"]`);
-        if (activeBtn) {
-            activeBtn.classList.add('active-filter-button');
-        }
+}
 
-        if (dateRangePicker && filterType !== 'rangoPersonalizado') {
-            dateRangePicker.clear();
-        }
+/**
+ * @function updateMetrics
+ * @description Actualiza los valores y porcentajes en las tarjetas de métricas.
+ * @param {object} data - Objeto con los datos de usuarios, activos, conectados, registrados.
+ */
+function updateMetrics(data) {
+    const usersCountElement = document.getElementById('users-count');
+    const registeredCountElement = document.getElementById('registered-count');
+    const activeCountElement = document.getElementById('active-count');
+    const connectedCountElement = document.getElementById('connected-count');
 
-        const yearChartFiltersContainer = document.getElementById('yearChartFiltersContainer');
-        if (yearChartFiltersContainer) {
-            yearChartFiltersContainer.style.display = (filterType === 'año') ? 'flex' : 'none';
-        }
+    const usersPercentElement = document.getElementById('users-percent');
+    const registeredPercentElement = document.getElementById('registered-percent');
+    const activePercentElement = document.getElementById('active-percent');
+    const connectedPercentElement = document.getElementById('connected-percent');
 
-        if (filterType === 'año' && yearDropdown) {
-            loadData('año', yearDropdown.value, 'month');
-        } else {
-            loadData(filterType);
-        }
-    };
+    if (usersCountElement) usersCountElement.textContent = data.usuarios || 0;
+    if (registeredCountElement) registeredCountElement.textContent = data.registrados || 0;
+    if (activeCountElement) activeCountElement.textContent = data.activos || 0;
+    if (connectedCountElement) connectedCountElement.textContent = data.conectados || 0;
 
+    const totalUsers = data.usuarios || 0;
 
-    // --- Adaptar la función loadData ---
-    function loadData(filterType, value = null, subFilter = null) {
-        let url = `/api/estadisticas?`;
-
-        if (filterType === 'rangoPersonalizado' && value) {
-            const [startDate, endDate] = value.split(' to ');
-            url += `startDate=${startDate}&endDate=${endDate}`;
-        } else if (filterType === 'ultimos3dias' || filterType === 'semana' || filterType === 'mes' || filterType === 'todo') {
-            url += `filter=${filterType}`;
-        } else if (filterType === 'año' && value) {
-            url += `filter=año&year=${value}&subFilter=${subFilter || 'month'}`;
-        } else {
-            url += `filter=ultimos3dias`;
-            filtroActual = 'ultimos3dias';
-        }
-
-        console.log("Cargando datos de la URL:", url);
-        fetch(url)
-            .then(response => {
-                console.log("Respuesta HTTP:", response);
-                if (!response.ok) {
-                    return response.json().then(errorData => {
-                        throw new Error(`Error HTTP! Status: ${response.status}, Detail: ${errorData.detalle || response.statusText}`);
-                    }).catch(() => {
-                        throw new Error(`Error HTTP! Status: ${response.status}, Text: ${response.statusText}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("JSON data received from API:", data);
-                localStorage.setItem('dashboardData', JSON.stringify(data));
-                renderChart(data);
-                updateMetrics(data);
-            })
-            .catch(error => {
-                console.error('Error getting statistics:', error);
-                const chartDom = document.getElementById('chart');
-                if (chartDom) {
-                    chartDom.innerHTML = `<div class="text-center text-red-500 p-4">Error loading chart: ${error.message}.</div>`;
-                    if (myChart) { myChart.dispose(); myChart = null; }
-                }
-            });
+    if (usersPercentElement) {
+        usersPercentElement.textContent = `${(totalUsers > 0 ? (data.usuarios / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`;
     }
-
-    // --- Función updateMetrics ---
-    function updateMetrics(data) {
-        document.getElementById('users-count').textContent = data.usuarios || 0;
-        document.getElementById('active-count').textContent = data.activos || 0;
-        document.getElementById('connected-count').textContent = data.conectados || 0;
-
-        const totalUsers = data.usuarios || 0;
-        document.getElementById('users-percent').textContent = `${(totalUsers > 0 ? (data.usuarios / totalUsers * 100) : 0).toFixed(0)}% of users`;
-        document.getElementById('active-percent').textContent = `${(totalUsers > 0 ? (data.activos / totalUsers * 100) : 0).toFixed(0)}% of users`;
-        document.getElementById('connected-percent').textContent = `${(totalUsers > 0 ? (data.conectados / totalUsers * 100) : 0).toFixed(0)}% of users`;
+    if (registeredPercentElement) {
+        registeredPercentElement.textContent = `${(totalUsers > 0 ? (data.registrados / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`;
     }
+    if (activePercentElement) {
+        activePercentElement.textContent = `${(totalUsers > 0 ? (data.activos / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`;
+    }
+    if (connectedPercentElement) {
+        connectedPercentElement.textContent = `${(totalUsers > 0 ? (data.conectados / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`;
+    }
+}
 
-
-
-    // --- Initial load ---
-    window.setFilter('ultimos3dias'); // Load 'ultimos3dias' filter on initial page load);
-
-
-// --- renderChart function (¡VERSIÓN FINAL CORREGIDA PARA ANIMACIONES FLUIDAS Y TEXTOS DINÁMICOS!) ---
+/**
+ * @function renderChart
+ * @description Renderiza o actualiza la gráfica ECharts.
+ * @param {object} data - Objeto con los datos de 'vistas' y 'selectedFilter' de la API.
+ */
 function renderChart(data) {
     const chartDom = document.getElementById('chart');
 
     if (!chartDom) {
-        console.error("ECharts Error: Contenedor de la gráfica con id 'chart' no encontrado en el DOM.");
+        console.error("ECharts ERROR: Contenedor de la gráfica con id 'chart' no encontrado.");
         return;
     }
 
     if (chartDom.offsetWidth === 0 || chartDom.offsetHeight === 0) {
-        console.warn(`ECharts Advertencia: El contenedor de la gráfica tiene ancho o alto cero (${chartDom.offsetWidth}x${chartDom.offsetHeight}). Reintentando renderizar en 200ms...`);
-        chartDom.innerHTML = `<div class="text-center text-gray-500 p-4">Cargando gráfica...</div>`;
+        console.warn(`ECharts ADVERTENCIA: Contenedor de la gráfica tiene dimensiones cero (${chartDom.offsetWidth}x${chartDom.offsetHeight}). Reintentando renderizar en 200ms...`);
+        chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-gray-500">Ajustando la gráfica...</div>`;
         setTimeout(() => renderChart(data), 200);
         return;
     }
 
-    // Si llegamos aquí, chartDom tiene dimensiones válidas.
-    // Solo limpiar el HTML si la gráfica NO ha sido inicializada aún (para el mensaje de carga).
-    if (myChart === null) {
-        chartDom.innerHTML = '';
-        console.log("ECharts DEBUG: Limpiando innerHTML antes de la primera inicialización.");
+    if (myChart === null || myChart.isDisposed()) {
+        console.log("ECharts DEBUG: Inicializando ECharts por primera vez o re-inicializando.");
+        myChart = echarts.init(chartDom);
+        window.addEventListener('resize', function() {
+            if (myChart && !myChart.isDisposed()) {
+                 myChart.resize();
+                 console.log("ECharts DEBUG: Gráfica redimensionada.");
+            }
+        });
+    } else {
+        console.log("ECharts DEBUG: Actualizando ECharts con nuevos datos.");
     }
 
-
-    let datosOrdenados = [...data.vistas];
+    let datosOrdenados = [...(data.vistas || [])];
 
     if (!Array.isArray(datosOrdenados) || datosOrdenados.length === 0) {
-        chartDom.innerHTML = `<div class="text-center text-gray-500 p-4">No hay datos válidos para mostrar para este período.</div>`;
-        updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 }); // Aunque no se use registrados, es buena práctica pasar 0
-        if (myChart) {
-            myChart.dispose(); // Si no hay datos, dispose de la instancia para liberar recursos
-            myChart = null;
-            console.log("ECharts DEBUG: Gráfica dispuesta y myChart a null debido a datos vacíos.");
-        }
+        chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-gray-500">No hay datos válidos para mostrar para este período.</div>`;
+        updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 });
+        if (myChart) { myChart.clear(); myChart.dispose(); myChart = null; }
         return;
     }
 
-    // Ordenamiento basado en el filtro actual para asegurar la secuencia correcta en la gráfica
+    // Lógica de ordenamiento para el eje X
     switch (data.selectedFilter) {
         case 'ultimos3dias':
-            const dayNamesOrderUltimos3Dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+            const dayNamesOrderUltimos3Días = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
             datosOrdenados.sort((a, b) => {
-                const indexA = dayNamesOrderUltimos3Dias.indexOf(a.grupo.toLowerCase());
-                const indexB = dayNamesOrderUltimos3Dias.indexOf(b.grupo.toLowerCase());
-                if (indexA === -1 || indexB === -1) {
-                    console.warn(`ECharts Advertencia: Día no reconocido en el ordenamiento: ${a.grupo} o ${b.grupo}`);
-                    return 0;
-                }
+                const indexA = dayNamesOrderUltimos3Días.indexOf(a.grupo.toLowerCase());
+                const indexB = dayNamesOrderUltimos3Días.indexOf(b.grupo.toLowerCase());
+                if (indexA === -1 && indexB === -1) return 0;
+                if (indexA === -1) return 1;
+                if (indexB === -1) return -1;
                 return indexA - indexB;
             });
             break;
-
         case 'semana':
             const monthNamesForSorting = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
             datosOrdenados.sort((a, b) => {
                 const parseDate = (label) => {
                     const parts = label.split(' ');
+                    if (parts.length < 3) return new Date(0);
                     const day = parseInt(parts[1]);
-                    const month = monthNamesForSorting.indexOf(parts[2].replace('.', '').toLowerCase());
+                    const month = monthNamesForSorting.indexOf(parts[2].toLowerCase());
                     const year = new Date().getFullYear();
                     return new Date(year, month, day);
                 };
                 return parseDate(a.grupo) - parseDate(b.grupo);
             });
             break;
-
         case 'mes':
-            datosOrdenados.sort((a, b) => {
-                const weekNumA = parseInt(a.grupo.replace('Semana ', ''));
-                const weekNumB = parseInt(b.grupo.replace('Semana ', ''));
-                return weekNumA - weekNumB;
-            });
+            datosOrdenados.sort((a, b) => parseInt(a.grupo.replace('Semana ', '')) - parseInt(b.grupo.replace('Semana ', '')));
             break;
-
         case 'año':
             const mesesOrden = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-            datosOrdenados.sort((a, b) =>
-                mesesOrden.indexOf(a.grupo.toLowerCase()) - mesesOrden.indexOf(b.grupo.toLowerCase())
-            );
+            datosOrdenados.sort((a, b) => mesesOrden.indexOf(a.grupo.toLowerCase()) - mesesOrden.indexOf(b.grupo.toLowerCase()));
             break;
-
-        case 'rangoPersonalizado':
-            datosOrdenados.sort((a, b) => new Date(a.grupo) - new Date(b.grupo));
-            break;
-
         case 'todo':
             datosOrdenados.sort((a, b) => parseInt(a.grupo) - parseInt(b.grupo));
+            break;
+        default:
             break;
     }
 
     const labels = datosOrdenados.map(item => item.grupo);
     const values = datosOrdenados.map(item => parseInt(item.total));
 
-    // Inicializar ECharts si no existe.
-    if (myChart === null) {
-        console.log("ECharts DEBUG: Inicializando ECharts por primera vez.");
-        myChart = echarts.init(chartDom);
-        // Añadir el listener de redimensionamiento una sola vez
-        window.addEventListener('resize', function () {
-            if (myChart && !myChart.isDisposed()) {
-                myChart.resize();
-                console.log("ECharts DEBUG: Gráfica redimensionada.");
-            }
-        });
-    } else {
-        console.log("ECharts DEBUG: Actualizando ECharts con nuevos datos y opciones.");
-        // ¡No se llama a myChart.clear() aquí! ECharts manejará la animación de actualización automáticamente.
-    }
-
-    // Determinar el nombre de la serie y el título de la gráfica dinámicamente
-    // Utiliza data.selectedFilter y data.chartSubFilter que vienen del backend
     let seriesChartName = 'Visitas';
-    let chartTitleText = '';
 
-    if (data.selectedFilter === 'año' && data.chartSubFilter === 'month') {
+    if (data.selectedFilter === 'año') {
         seriesChartName = 'Registros';
-        chartTitleText = 'Nuevos Registros por Mes';
-    } else if (data.selectedFilter === 'año' && data.chartSubFilter === 'week') {
-        seriesChartName = 'Registros';
-        chartTitleText = 'Nuevos Registros por Semana';
-    } else if (data.selectedFilter === 'año' && data.chartSubFilter === 'day') {
-        seriesChartName = 'Registros';
-        chartTitleText = 'Nuevos Registros por Día';
-    } else if (data.selectedFilter === 'año' && data.chartSubFilter === 'hour') {
-        seriesChartName = 'Registros';
-        chartTitleText = 'Nuevos Registros por Hora';
     }
-
 
     const options = {
-        // Habilitar animaciones para la inicialización y actualización
-        animation: true,
-        animationDuration: 1000, // Duración de la animación inicial en ms (1 segundo)
-        animationEasing: 'cubicOut', // Tipo de curva de animación
-        // Animación al actualizar datos
-        animationDurationUpdate: 1000, // Duración de la animación al actualizar datos en ms (1 segundo)
-        animationEasingUpdate: 'cubicOut', // Tipo de curva de animación al actualizar
-
-        tooltip: {
-            trigger: 'axis',
-            formatter: function (params) {
-                const dataPoint = params[0];
-                const valorActual = dataPoint.value;
-                const seriesName = seriesChartName; // <-- CORREGIDO: Usa la variable dinámica
-
-                let changeInfo = '';
-                const index = dataPoint.dataIndex;
-                if (index > 0 && values[index - 1] !== undefined) {
-                    const previousValue = values[index - 1];
-                    if (previousValue === 0) {
-                        changeInfo = `Cambio: N/A (desde 0)`; // Traducido
-                    } else {
-                        const percentageChange = ((valorActual - previousValue) / previousValue * 100).toFixed(1);
-                        changeInfo = `Cambio: ${percentageChange}%`; // Traducido
-                    }
-                }
-
-                return `
-                    <div class="p-2">
-                        <strong>${dataPoint.name}</strong><br>
-                        ${seriesName}: <strong>${valorActual}</strong><br>
-                        ${changeInfo}
-                    </div>`;
+        animation: true, animationDuration: 1000, animationEasing: 'cubicOut', animationDurationUpdate: 1000, animationEasingUpdate: 'cubicOut',
+        tooltip: { trigger: 'axis', formatter: function (params) {
+            const dataPoint = params[0]; const valorActual = dataPoint.value; const seriesName = seriesChartName;
+            let changeInfo = ''; const index = dataPoint.dataIndex;
+            if (index > 0 && values[index - 1] !== undefined) {
+                const previousValue = values[index - 1];
+                if (previousValue === 0) { changeInfo = `Cambio: N/A (desde 0)`; }
+                else { const percentageChange = ((valorActual - previousValue) / previousValue * 100).toFixed(1); changeInfo = `Cambio: ${percentageChange}%`; }
             }
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            top: '10%',
-            bottom: '3%',
-            containLabel: true
-        },
-        xAxis: {
-            type: 'category',
-            data: labels,
-            axisLabel: {
-                color: '#000',
-                fontSize: 12,
-                interval: 0,
-                rotate: 30
-            }
-        },
-        yAxis: {
-            type: 'value',
-            minInterval: 1,
-            axisLabel: {
-                formatter: function (value) {
-                    return value % 1 === 0 ? value : '';
-                }
-            }
-        },
+            return `<div class="p-2"><strong>${dataPoint.name}</strong><br>${seriesName}: <strong>${valorActual}</strong><br>${changeInfo}</div>`;
+        }},
+        grid: { left: '3%', right: '4%', top: '10%', bottom: '3%', containLabel: true },
+        xAxis: { type: 'category', data: labels, axisLabel: { color: '#000', fontSize: 12, interval: 0, rotate: 30 } },
+        yAxis: { type: 'value', minInterval: 1, axisLabel: { formatter: function (value) { return value % 1 === 0 ? value : ''; } } },
         series: [{
-            name: seriesChartName, // <-- CORREGIDO: Usa la variable dinámica
-            data: values,
-            type: 'line',
-            smooth: true,
-            areaStyle: {
-                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    { offset: 0, color: '#22c55e' },
-                    { offset: 1, color: '#ffffff' }
-                ])
-            },
-            itemStyle: {
-                color: '#22c55e'
-            },
-            lineStyle: {
-                width: 1.5
-            },
-            symbolSize: 8
+            name: seriesChartName, data: values, type: 'line', smooth: true,
+            areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#22c55e' }, { offset: 1, color: '#ffffff' }]) },
+            itemStyle: { color: '#22c55e' }, lineStyle: { width: 1.5 }, symbolSize: 8
         }],
         title: {
-            text: chartTitleText // <-- CORREGIDO: Usa la variable dinámica
+            text: '',
+            left: 'center', top: '2%', textStyle: { color: '#333', fontSize: 18, fontWeight: 'bold' }
         }
     };
 
     myChart.setOption(options);
     myChart.resize();
-
     console.log("ECharts DEBUG: Gráfica renderizada/actualizada con datos:", data.vistas);
 }
