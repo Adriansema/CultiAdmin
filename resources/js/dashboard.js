@@ -96,95 +96,143 @@ document.addEventListener("DOMContentLoaded", function () {
 // =========================================================================
 
 /**
- * @function setActiveFilterButton
- * @description Gestiona las clases de Tailwind para los botones de filtro, incluyendo el grupo "Año".
- * Controla la visibilidad del selector de año personalizado.
- * @param {string} filterType - El tipo de filtro que debe estar activo.
- */
+  */
 function setActiveFilterButton(filterType) {
-    // 1. Restablecer estilos para todos los botones estándar
+    // 1. Restablecer estilos para todos los botones estándar (Ultimos 3 días, Semana, Mes, Todo)
     document.querySelectorAll('.filter-btn').forEach(button => {
-        button.classList.remove('bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600');
-        button.classList.add('text-green-600', 'border', 'border-transparent', 'hover:border-green-500', 'hover:bg-green-50');
+        // Remover TODAS las clases de estado activo/hover que pueda tener
+        button.classList.remove(
+            'bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600',
+            'hover:bg-green-50', 'hover:border-green-500'
+        );
+        // Aplicar las clases de su estado inactivo
+        button.classList.add(
+            'text-green-600',
+            'border', 'border-transparent',
+            'hover:border-green-500',
+            'hover:bg-green-50'
+        );
     });
 
-    // 2. Restablecer estilos para el grupo de filtro "Año"
+    // 2. Restablecer estilos para el grupo de filtro "Año" (yearFilterGroup)
     const yearFilterGroup = document.getElementById('yearFilterGroup');
-    const customYearSelector = document.getElementById('customYearSelector'); // Obtener referencia al selector personalizado
+    const customYearSelector = document.getElementById('customYearSelector');
+    const yearLabel = document.getElementById('yearLabel');
+    const calendarIcon = document.getElementById('calendarIcon');
+    const currentYearSpan = document.getElementById('currentYearDisplay');
+    const prevYearSvg = yearFilterGroup.querySelector('#prevYearBtn svg');
+    const nextYearSvg = yearFilterGroup.querySelector('#nextYearBtn svg');
 
     if (yearFilterGroup) {
-        yearFilterGroup.classList.remove('bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600');
-        yearFilterGroup.classList.add('text-blue-600', 'border', 'border-transparent', 'hover:border-blue-400', 'hover:bg-blue-50');
+        // Remover TODAS las clases de estado activo/hover que pueda tener el GRUPO del año
+        yearFilterGroup.classList.remove(
+            'bg-darkblue', 'text-white', 'shadow-md', 'border', 'border-darkblue', // Estado ACTIVO anterior (fondo azul oscuro)
+            'hover:bg-blue-50', 'hover:border-darkblue', // Clases de hover inactivo anteriores
+            'bg-transparent' // Asegurar que no tenga un fondo transparente residual
+        );
+        // Aplicamos las clases de su estado INACTIVO (ahora será un botón con texto e icono azul oscuro, sin fondo, borde transparente)
+        yearFilterGroup.classList.add(
+            'text-darkblue',          // COLOR DEL TEXTO PRINCIPAL "Año" (grupo) cuando INACTIVO: #00304D
+            'border', 'border-transparent', // BORDE INVISIBLE por defecto cuando inactivo
+            'hover:border-darkblue',  // COLOR DEL BORDE al hacer HOVER (INACTIVO): #00304D
+            'hover:bg-blue-50'        // COLOR DE FONDO al hacer HOVER (INACTIVO): azul claro
+        );
 
-        // Restablecer colores de texto para elementos dentro de yearFilterGroup (incluyendo el span "Año")
-        const yearTextSpan = yearFilterGroup.querySelector('span'); // El primer span es el texto "Año"
-        const yearIconSvg = yearFilterGroup.querySelector('span svg'); // El SVG del icono del año
-        const currentYearSpan = yearFilterGroup.querySelector('#currentYearDisplay');
-        const prevYearSvg = yearFilterGroup.querySelector('#prevYearBtn svg');
-        const nextYearSvg = yearFilterGroup.querySelector('#nextYearBtn svg');
-
-        if (yearTextSpan) {
-             yearTextSpan.classList.remove('text-white'); // Asegurar que el texto "Año" no esté blanco
-             yearTextSpan.classList.add('text-blue-600'); // O el color original inactivo si es diferente
+        // Resetear colores individuales de los elementos a su estado INACTIVO
+        if (yearLabel) {
+             yearLabel.classList.remove('text-white');
+             yearLabel.classList.add('text-darkblue'); // COLOR DEL TEXTO "Año" (interno) cuando INACTIVO: #00304D
         }
-        if (yearIconSvg) {
-            yearIconSvg.classList.remove('text-white');
-            yearIconSvg.classList.add('text-blue-600'); // Color original del icono
+        if (calendarIcon) {
+            calendarIcon.classList.remove('text-white');
+            calendarIcon.classList.add('text-darkblue'); // COLOR DEL ICONO DE CALENDARIO cuando INACTIVO: #00304D
         }
         if (currentYearSpan) {
             currentYearSpan.classList.remove('text-white');
-            currentYearSpan.classList.add('text-gray-800'); // Asegurar default text color para el año numérico
+            currentYearSpan.classList.add('text-gray-800'); // COLOR DEL TEXTO NUMÉRICO "2025" cuando INACTIVO: gris oscuro
         }
         if (prevYearSvg) {
             prevYearSvg.classList.remove('text-white');
-            prevYearSvg.classList.add('text-gray-600'); // Asegurar default icon color
+            prevYearSvg.classList.add('text-gray-600'); // COLOR DE LA FLECHA izquierda cuando INACTIVO: gris
         }
         if (nextYearSvg) {
             nextYearSvg.classList.remove('text-white');
-            nextYearSvg.classList.add('text-gray-600'); // Asegurar default icon color
+            nextYearSvg.classList.add('text-gray-600'); // COLOR DE LA FLECHA derecha cuando INACTIVO: gris
         }
 
-        // Ocultar customYearSelector por defecto (se mostrará solo si 'año' está activo)
+        // Ocultar customYearSelector cuando el grupo "Año" no está activo
         if (customYearSelector) {
             customYearSelector.style.display = 'none';
         }
     }
 
 
-    // 3. Aplicar estilos al elemento activo
-    if (filterType === 'año') {
+    // 3. Aplicar estilos al elemento que fue activado
+    if (filterType === 'año') { // Si el filtro activo es "Año"
         if (yearFilterGroup) {
-            yearFilterGroup.classList.remove('text-blue-600', 'border', 'border-transparent', 'hover:border-blue-400', 'hover:bg-blue-50');
-            yearFilterGroup.classList.add('bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600');
+            // Remover las clases INACTIVAS del GRUPO del año
+            yearFilterGroup.classList.remove(
+                'text-darkblue', 'border', 'border-transparent', 'hover:border-darkblue', 'hover:bg-blue-50'
+            );
+            // Y aplicamos las clases de estado ACTIVO para el GRUPO COMPLETO:
+            // ESTAS SON LAS LÍNEAS CLAVE PARA EL COLOR AZUL OSCURO DEL ESTADO ACTIVO
+            yearFilterGroup.classList.add(
+                'bg-transparent',     // FONDO cuando el grupo "Año" está ACTIVO: SIN FONDO (Transparente)
+                'shadow-md',          // Sombra
+                'border', 'border-darkblue' // BORDE cuando el grupo "Año" está ACTIVO: #00304D
+            );
 
-            // Mostrar customYearSelector
+            // Mostrar customYearSelector cuando el grupo "Año" está activo
             if (customYearSelector) {
                 customYearSelector.style.display = 'flex';
             }
 
-            // Cambiar colores de texto/iconos a blanco para los elementos dentro de yearFilterGroup (incluyendo el span "Año")
-            const yearTextSpan = yearFilterGroup.querySelector('span'); // El primer span es el texto "Año"
-            const yearIconSvg = yearFilterGroup.querySelector('span svg'); // El SVG del icono del año
-            const currentYearSpan = yearFilterGroup.querySelector('#currentYearDisplay');
-            const prevYearSvg = yearFilterGroup.querySelector('#prevYearBtn svg');
-            const nextYearSvg = yearFilterGroup.querySelector('#nextYearBtn svg');
+            // Cambiar colores de texto/iconos a AZUL OSCURO para los elementos internos del grupo "Año"
+            if (yearLabel) {
+                yearLabel.classList.remove('text-white'); // Asegurar que no tenga blanco de un estado anterior
+                yearLabel.classList.add('text-darkblue'); // COLOR DEL TEXTO "Año" (interno) cuando ACTIVO: #00304D
+            }
+            if (calendarIcon) {
+                calendarIcon.classList.remove('text-white');
+                calendarIcon.classList.add('text-darkblue'); // COLOR DEL ICONO DE CALENDARIO cuando ACTIVO: #00304D
+            }
+            if (currentYearSpan) {
+                currentYearSpan.classList.remove('text-white');
+                currentYearSpan.classList.add('text-darkblue'); // COLOR DEL TEXTO NUMÉRICO "2025" cuando ACTIVO: #00304D
+            }
+            if (prevYearSvg) {
+                prevYearSvg.classList.remove('text-white');
+                prevYearSvg.classList.add('text-darkblue'); // COLOR DE LA FLECHA izquierda cuando ACTIVO: #00304D
+            }
+            if (nextYearSvg) {
+                nextYearSvg.classList.remove('text-white');
+                nextYearSvg.classList.add('text-darkblue'); // COLOR DE LA FLECHA derecha cuando ACTIVO: #00304D
+            }
 
-            if (yearTextSpan) yearTextSpan.classList.add('text-white');
-            if (yearIconSvg) yearIconSvg.classList.add('text-white');
-            if (currentYearSpan) currentYearSpan.classList.add('text-white');
-            if (prevYearSvg) prevYearSvg.classList.add('text-white');
-            if (nextYearSvg) nextYearSvg.classList.add('text-white');
+            // Asegurarse de que los botones de flecha no tengan un hover de color gris cuando están activos
+            const prevBtn = yearFilterGroup.querySelector('#prevYearBtn');
+            const nextBtn = yearFilterGroup.querySelector('#nextYearBtn');
+            if (prevBtn) prevBtn.classList.remove('hover:bg-gray-100');
+            if (nextBtn) nextBtn.classList.remove('hover:bg-gray-100');
+            // Opcional: si quieres un hover distinto para las flechas cuando el filtro Año está activo
+            // if (prevBtn) prevBtn.classList.add('hover:bg-blue-100');
+            // if (nextBtn) nextBtn.classList.add('hover:bg-blue-100');
         }
-    } else {
+    } else { // Si el filtro activo NO es "Año" (es Semana, Mes, etc.)
         const activeButton = document.querySelector(`.filter-btn[data-filtro="${filterType}"]`);
         if (activeButton) {
-            activeButton.classList.remove('text-green-600', 'border', 'border-transparent', 'hover:border-green-500', 'hover:bg-green-50');
-            activeButton.classList.add('bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600');
+            activeButton.classList.remove(
+                'text-green-600', 'border', 'border-transparent', 'hover:border-green-500', 'hover:bg-green-50'
+            );
+            activeButton.classList.add(
+                'bg-green-600',
+                'text-white',
+                'shadow-md',
+                'border', 'border-green-600'
+            );
         }
     }
-    console.log(`DEBUG: Botón activo establecido a: ${filterType}`);
 }
-
 
 /**
  * @function loadData

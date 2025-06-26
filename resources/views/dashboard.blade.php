@@ -29,30 +29,30 @@
                 <div id="yearFilterGroup" data-filtro="año" onclick="window.setFilter('año')"
                      class="filter-btn-group flex items-center rounded-full px-6 py-2.5 space-x-2 cursor-pointer
                             transition-all duration-300 ease-in-out group relative
-                            text-blue-600 border border-transparent hover:border-blue-400 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            text-darkblue border border-transparent hover:border-darkblue hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400">
 
-                    {{-- Texto "Año" y su icono, ahora un span dentro del grupo --}}
-                    <span class="flex items-center">
-                        Año
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </span>
+                    {{-- Icono de calendario (AHORA AL PRINCIPIO, a la izquierda) --}}
+                    <svg id="calendarIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-darkblue" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                            clip-rule="evenodd" />
+                    </svg>
 
-                    {{-- Selector de Año Personalizado, ahora dentro del mismo contenedor que "Año" --}}
+                    <span id="yearLabel" class="text-darkblue">Año</span> {{-- Texto 'Año' --}}
+
+                    {{-- Selector de Año Personalizado (2025 con flechas) - Oculto por defecto --}}
+                    {{-- Se mostrará al activar el filtro 'Año', quedando entre el texto 'Año' y el icono --}}
                     <div id="customYearSelector" class="flex items-center space-x-1" style="display: none;">
-                        <button id="prevYearBtn" class="p-1.5 rounded-full hover:bg-gray-100 group-hover:bg-green-700 transition-colors duration-200 focus:outline-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-600 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button id="prevYearBtn" class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
                         </button>
-                        <span id="currentYearDisplay" class="px-2 py-1 text-base font-semibold text-gray-800 cursor-pointer group-hover:text-white">
-                            2025 {{-- Este valor será actualizado por JS --}}
+                        <span id="currentYearDisplay" class="px-2 py-1 text-base font-semibold text-gray-800 cursor-pointer">
+                            2025
                         </span>
-                        <button id="nextYearBtn" class="p-1.5 rounded-full hover:bg-gray-100 group-hover:bg-green-700 transition-colors duration-200 focus:outline-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-600 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button id="nextYearBtn" class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
                         </button>
