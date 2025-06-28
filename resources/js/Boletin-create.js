@@ -1,5 +1,4 @@
 // resources/js/Boletin-create.js
-// resources/js/Boletin-create.js
 
 // Registramos la función 'uploadForm' como un componente de datos de Alpine
 Alpine.data('uploadForm', () => ({
@@ -8,20 +7,42 @@ Alpine.data('uploadForm', () => ({
     producto: 'cafe', // valor por defecto
     nombreBoletin: '', // Para el nombre del boletín
     descripcionBoletin: '', // Para la descripción
-    open: false, // Controla la visibilidad general del modal
+    open: false, // Controla la visibilidad general del modal (x-show)
     currentStep: 1, // 1 para selección de archivo, 2 para formulario de detalles
     isDragging: false, // Para el estilo de arrastrar y soltar
 
-    // Acceso a las variables del modal de éxito/error global
-    get globalModalState() {
-        const globalElement = document.querySelector('[x-data*="showSuccessModal"]');
-        if (globalElement && globalElement._x_dataStack && globalElement._x_dataStack.length > 0) {
-            return globalElement._x_dataStack[0];
-        }
-        return { modalMessage: '', showSuccessModal: false, showErrorModal: false };
+    // Inicialización del componente
+    init() {
+        this.$watch('open', value => {
+            if (value) {
+                this.resetForm();
+            }
+        });
     },
 
-    // Función para manejar el arrastre de archivos
+    // Función para mostrar mensajes globales
+    showGlobalMessage(message, isError = false) {
+        const globalElement = document.querySelector('[x-data*="showSuccessModal"]');
+        if (globalElement && window.Alpine && Alpine.get) {
+            try {
+                const globalModalState = Alpine.get(globalElement);
+                if (globalModalState) {
+                    globalModalState.modalMessage = message;
+                    globalModalState.showSuccessModal = !isError;
+                    globalModalState.showErrorModal = isError;
+                } else {
+                    Swal.fire(isError ? 'Error' : 'Éxito', message, isError ? 'error' : 'success');
+                }
+            } catch (e) {
+                console.error("Error al acceder a la instancia global de Alpine para mensajes:", e);
+                Swal.fire(isError ? 'Error' : 'Éxito', message, isError ? 'error' : 'success');
+            }
+        } else {
+            Swal.fire(isError ? 'Error' : 'Éxito', message, isError ? 'error' : 'success');
+        }
+    },
+
+    // Manejo de arrastre de archivos
     handleDrop(event) {
         this.isDragging = false;
         if (event.dataTransfer.files.length > 0) {
@@ -29,12 +50,11 @@ Alpine.data('uploadForm', () => ({
         }
     },
 
-    // Función para manejar el cambio de archivo (selección o arrastre)
+    // Manejo del cambio de archivo (selección o arrastre)
     handleFileChange(event) {
         this.file = event.target.files[0];
         if (this.file) {
             this.progress = 0;
-            // Simular una subida con barra de progreso
             let simulatedProgress = 0;
             const interval = setInterval(() => {
                 simulatedProgress += 10;
@@ -42,7 +62,6 @@ Alpine.data('uploadForm', () => ({
                     this.progress = simulatedProgress;
                 } else {
                     clearInterval(interval);
-                    // Una vez que la "subida" simulada está completa, pasar al Paso 2
                     this.currentStep = 2;
                 }
             }, 100);
@@ -51,14 +70,14 @@ Alpine.data('uploadForm', () => ({
         }
     },
 
-    // Función para resetear el formulario a su estado inicial
+    // Resetea el formulario a su estado inicial
     resetForm() {
         this.file = null;
         this.progress = 0;
         this.producto = 'cafe';
         this.nombreBoletin = '';
         this.descripcionBoletin = '';
-        this.currentStep = 1; // Volver al primer paso
+        this.currentStep = 1;
         this.isDragging = false;
         const pdfFileInput = document.getElementById('pdfFileInput');
         if (pdfFileInput) {
@@ -66,36 +85,46 @@ Alpine.data('uploadForm', () => ({
         }
     },
 
-    // MÉTODO PARA CERRAR EL MODAL
+    // Método interno para abrir el modal
+    _openModalInternal() {
+        this.open = true;
+        this.resetForm();
+    },
+
+    // Método para cerrar el modal
     closeModal() {
-        this.open = false; // Cierra el modal
-        this.resetForm();  // Resetea el formulario a su estado inicial (Paso 1, campos vacíos)
+        this.open = false;
+        this.resetForm();
     },
 
     // Función para manejar el envío del archivo y datos del boletín
-    uploadFile() {
+    async uploadFile() {
+        console.log('DEBUG: uploadFile iniciado.'); // DEBUG
         if (!this.file) {
-            this.globalModalState.modalMessage = 'Por favor, selecciona un archivo PDF.';
-            this.globalModalState.showErrorModal = true;
+            this.showGlobalMessage('Por favor, selecciona un archivo PDF.', true);
             return;
         }
         if (!this.nombreBoletin.trim()) {
-            this.globalModalState.modalMessage = 'Por favor, ingresa el nombre del boletín.';
-            this.globalModalState.showErrorModal = true;
+            this.showGlobalMessage('Por favor, ingresa el nombre del boletín.', true);
             return;
         }
         if (!this.producto.trim()) {
-            this.globalModalState.modalMessage = 'Por favor, selecciona un producto.';
-            this.globalModalState.showErrorModal = true;
+            this.showGlobalMessage('Por favor, selecciona un producto.', true);
             return;
         }
         if (!this.descripcionBoletin.trim()) {
-            this.globalModalState.modalMessage = 'Por favor, ingresa la descripción del boletín.';
-            this.globalModalState.showErrorModal = true;
+            this.showGlobalMessage('Por favor, ingresa la descripción del boletín.', true);
             return;
         }
 
-        const form = this.$el.querySelector('form');
+        const form = document.getElementById('createBoletinForm');
+        if (!form) {
+            console.error("ERROR: Formulario 'createBoletinForm' no encontrado."); // DEBUG
+            this.showGlobalMessage('Error interno: El formulario no se pudo encontrar.', true);
+            return;
+        }
+        console.log('DEBUG: Formulario encontrado:', form); // DEBUG
+
         const formData = new FormData();
         formData.append('archivo', this.file);
         formData.append('nombre_boletin', this.nombreBoletin);
@@ -107,8 +136,7 @@ Alpine.data('uploadForm', () => ({
             formData.append('_token', csrfToken.getAttribute('content'));
         } else {
             console.error('CSRF token not found!');
-            this.globalModalState.modalMessage = 'Error de seguridad: CSRF token no encontrado.';
-            this.globalModalState.showErrorModal = true;
+            this.showGlobalMessage('Error de seguridad: CSRF token no encontrado.', true);
             return;
         }
 
@@ -121,18 +149,54 @@ Alpine.data('uploadForm', () => ({
             }
         });
 
-        xhr.onload = () => {
+        xhr.onload = async () => {
+            console.log('DEBUG: xhr.onload disparado. Status:', xhr.status); // DEBUG
             if (xhr.status === 200 || xhr.status === 201) {
-                this.open = false;
-                this.resetForm();
+                this.closeModal(); // Cierra el modal al éxito
 
-                this.globalModalState.modalMessage = 'Boletín creado exitosamente.';
-                this.globalModalState.showSuccessModal = true;
+                try {
+                    const responseData = JSON.parse(xhr.responseText);
+                    const boletinId = responseData.boletin_id;
+                    console.log('DEBUG: Boletín creado en backend. ID recibido:', boletinId); // DEBUG
 
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
+                    const boletinesTableBody = document.getElementById('boletines-table-body');
+                    console.log('DEBUG: Elemento boletinesTableBody:', boletinesTableBody); // DEBUG
+
+                    if (boletinId && boletinesTableBody) {
+                        console.log(`DEBUG: Intentando obtener HTML de fila para boletín ID: ${boletinId}`); // DEBUG
+                        const rowResponse = await fetch(`/boletines/${boletinId}/row-html`);
+                        console.log('DEBUG: Respuesta de fetch row-html. Status:', rowResponse.status, 'OK:', rowResponse.ok); // DEBUG
+
+                        if (!rowResponse.ok) {
+                            throw new Error(`HTTP error al obtener fila: ${rowResponse.status} - ${rowResponse.statusText}`); // Más detalle en el error
+                        }
+                        const newRowHtml = await rowResponse.text();
+                        console.log('DEBUG: HTML de nueva fila recibido:', newRowHtml); // DEBUG
+
+                        const noBoletinesRow = document.getElementById('no-boletines-row');
+                        if (noBoletinesRow) {
+                            console.log('DEBUG: Removiendo fila "no-boletines-row".'); // DEBUG
+                            noBoletinesRow.remove();
+                        }
+
+                        boletinesTableBody.insertAdjacentHTML('afterbegin', newRowHtml);
+                        this.showGlobalMessage('Boletín creado y tabla actualizada.', false);
+                        console.log('DEBUG: Nueva fila de boletín añadida a la tabla. Todo ok.'); // DEBUG
+                        // Ya no recargamos la página aquí
+                    } else {
+                        console.warn('ADVERTENCIA: ID de boletín no recibido o tbody de la tabla no encontrado. La tabla NO se actualizó dinámicamente.'); // DEBUG
+                        this.showGlobalMessage('Boletín creado, pero la tabla no se pudo actualizar. Por favor, recargue la página.', false);
+                        setTimeout(() => window.location.reload(), 2000);
+                    }
+
+                } catch (e) {
+                    console.error('ERROR EN LA FASE DE ACTUALIZACIÓN DE TABLA DINÁMICA:', e); // DEBUG
+                    this.showGlobalMessage('Boletín creado, pero hubo un problema al actualizar la tabla en vivo. Por favor, recargue la página.', true);
+                    setTimeout(() => window.location.reload(), 2000);
+                }
+
             } else {
+                // Manejo de errores de la subida del formulario (HTTP status no 200/201)
                 let errorMessage = 'Error al subir el archivo.';
                 try {
                     const response = JSON.parse(xhr.responseText);
@@ -142,34 +206,30 @@ Alpine.data('uploadForm', () => ({
                         errorMessage = Object.values(response.errors).flat().join('\n');
                     }
                 } catch (e) {
-                    console.error("Error parsing XHR error response:", e);
+                    console.error("ERROR: parsing XHR error response:", e); // DEBUG
                 }
-
-                this.open = false;
-                this.globalModalState.modalMessage = errorMessage;
-                this.globalModalState.showErrorModal = true;
+                this.closeModal();
+                this.showGlobalMessage(errorMessage, true);
             }
         };
 
         xhr.onerror = () => {
-            this.open = false;
-            this.globalModalState.modalMessage = 'Error de red o conexión al servidor.';
-            this.globalModalState.showErrorModal = true;
+            console.error('ERROR: xhr.onerror disparado (error de red).'); // DEBUG
+            this.closeModal();
+            this.showGlobalMessage('Error de red o conexión al servidor. Inténtalo de nuevo.', true);
         };
 
         xhr.send(formData);
     }
 }));
 
-// FUNCIÓN GLOBAL PARA ABRIR EL MODAL (ACCESIBLE DESDE CUALQUIER LUGAR)
+// FUNCIÓN GLOBAL PARA ABRIR EL MODAL (usada desde el botón)
 window.openCreateBoletinModal = function() {
     const modalElement = document.getElementById('createBoletinModal');
-    if (modalElement && modalElement.__x && modalElement.__x.$data) {
-        const modalAlpineInstance = modalElement.__x.$data;
-        modalAlpineInstance.open = true;
-        modalAlpineInstance.resetForm(); // Asegura que el modal siempre se abra en el Paso 1 y limpio
+    if (modalElement && modalElement.__x) {
+        modalElement.__x.$data._openModalInternal();
     } else {
-        console.warn("No se pudo encontrar la instancia de Alpine.js para el modal de boletín. Intentando abrir sin Alpine.");
+        console.warn("ADVERTENCIA: No se pudo encontrar el modal con ID 'createBoletinModal' o su instancia Alpine.js."); // DEBUG
         if (modalElement) {
             modalElement.style.display = 'flex';
         }

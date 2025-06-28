@@ -49,18 +49,20 @@
                 </x-responsive-nav-link>
             </form>
 
-            <x-responsive-nav-link>
-                {{-- Ya no necesitamos x-data en este div, ni x-ref en el modal, --}}
-                <div>
-                    <div class="mb-4">
-                        <button type="button" @click="window.openCreateBoletinModal()" class="inline-flex items-center px-4 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900]
-                        hover:bg-[#61BA33] text-white rounded-full w-auto">
-                            + Crear / Importar Boletín
-                        </button>
-                    </div>
-                    @include('boletines.partials.modal-create')
-                </div>
-            </x-responsive-nav-link>
+             <x-responsive-nav-link>
+                        <div>
+                            <div class="mb-4">
+                                {{-- Este botón ahora llama a la función global directamente --}}
+                                <button type="button" @click="window.openCreateBoletinModal()"
+                                    class="inline-flex items-center px-4 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900]
+                                hover:bg-[#61BA33] text-white rounded-full w-auto">
+                                    + Crear / Importar Boletín
+                                </button>
+                            </div>
+                            {{-- Incluimos el modal aquí, con x-data para Alpine.js y x-ref --}}
+                            @include('boletines.partials.modal-create')
+                        </div>
+             </x-responsive-nav-link>
         </div>
     </div>
 

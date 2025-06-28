@@ -1,15 +1,12 @@
 // Importaciones necesarias
 import * as echarts from 'echarts'; // Para las gráficas de datos
-// Flatpickr ya NO se importará para el selector de año, ya que usaremos una UI personalizada.
-
 
 // =========================================================================
-// VARIABLES GLOBALES
+// VARIABLES GLOBALES (Solo inicializarlas si el script se va a ejecutar)
 // =========================================================================
-let myChart = null; // Instancia global de ECharts para poder actualizarla
-let filtroActual = 'semana'; // Define el filtro por defecto al cargar la página
-let currentSelectedYear = new Date().getFullYear(); // Variable global para el año actualmente seleccionado
-
+let myChart = null;
+let filtroActual = 'semana';
+let currentSelectedYear = new Date().getFullYear();
 
 // =========================================================================
 // FUNCIONES GLOBALES (accesibles desde el HTML - window.setFilter)
@@ -23,31 +20,35 @@ let currentSelectedYear = new Date().getFullYear(); // Variable global para el a
  * @param {number} [yearToLoadValue=null] - El año específico si el filtro es 'año' (opcional, para uso interno).
  */
 window.setFilter = function(filterType, yearToLoadValue = null) {
+    // Si el elemento principal del dashboard (la gráfica) no existe, salimos
+    const chartDom = document.getElementById('chart');
+    if (!chartDom) {
+        console.warn('ADVERTENCIA: setFilter llamado en una página sin el elemento "chart". Ignorando.');
+        return;
+    }
+
     console.log(`DEBUG: setFilter llamado. Tipo de filtro: ${filterType}, Año Seleccionado (directo): ${yearToLoadValue}`);
 
-    filtroActual = filterType; // Actualiza la variable global del filtro actual
+    filtroActual = filterType;
 
-    // 1. Actualiza los estilos de los botones de filtro (ESTO AHORA MANEJA LA VISIBILIDAD DEL customYearSelector)
+    // 1. Actualiza los estilos de los botones de filtro
     setActiveFilterButton(filterType);
 
     // 2. Solo actualiza el valor del año mostrado si el filtro es 'año'
     if (filterType === 'año') {
-        // Si se pasa un año específico (ej. desde los botones de navegación), actualiza currentSelectedYear
         if (yearToLoadValue !== null) {
             currentSelectedYear = yearToLoadValue;
         }
-        // Actualiza el texto visible del año
         const currentYearDisplay = document.getElementById('currentYearDisplay');
-        if (currentYearDisplay) {
+        if (currentYearDisplay) { // Añadir verificación de existencia
             currentYearDisplay.textContent = currentSelectedYear;
         }
         console.log(`DEBUG: Año seleccionado en UI personalizada: ${currentSelectedYear}`);
     }
-    // NOTA: La visibilidad de customYearSelector ahora se controla COMPLETAMENTE desde setActiveFilterButton.
 
     // 3. Llama a la función para cargar los datos desde la API
     if (filterType === 'año') {
-        loadData('año', currentSelectedYear); // Usa el año global actualizado
+        loadData('año', currentSelectedYear);
     } else {
         loadData(filterType);
     }
@@ -60,27 +61,34 @@ window.setFilter = function(filterType, yearToLoadValue = null) {
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DEBUG: DOMContentLoaded - El DOM está completamente cargado. Iniciando componentes.");
 
+    // *** VERIFICACIÓN CRÍTICA: Solo si el elemento 'chart' existe, inicializamos el dashboard ***
+    const chartDom = document.getElementById('chart');
+    if (!chartDom) {
+        console.warn("ADVERTENCIA: Elemento 'chart' no encontrado. Dashboard.js no se inicializará en esta página.");
+        return; // Salir de la función si no estamos en la página del dashboard
+    }
+    // *** FIN VERIFICACIÓN CRÍTICA ***
+
+
     // --- Configuración inicial del año y sus botones ---
     const currentYearDisplay = document.getElementById('currentYearDisplay');
     const prevYearBtn = document.getElementById('prevYearBtn');
     const nextYearBtn = document.getElementById('nextYearBtn');
 
-    if (currentYearDisplay) {
-        currentYearDisplay.textContent = currentSelectedYear; // Establece el año inicial al cargar
+    if (currentYearDisplay) { // Añadir verificación de existencia
+        currentYearDisplay.textContent = currentSelectedYear;
     }
 
-    if (prevYearBtn) {
+    if (prevYearBtn) { // Añadir verificación de existencia
         prevYearBtn.addEventListener('click', () => {
             currentSelectedYear--;
-            // Llama a setFilter para actualizar la UI (el texto del año) y cargar los nuevos datos.
             window.setFilter('año', currentSelectedYear);
         });
     }
 
-    if (nextYearBtn) {
+    if (nextYearBtn) { // Añadir verificación de existencia
         nextYearBtn.addEventListener('click', () => {
             currentSelectedYear++;
-            // Llama a setFilter para actualizar la UI (el texto del año) y cargar los nuevos datos.
             window.setFilter('año', currentSelectedYear);
         });
     }
@@ -96,16 +104,17 @@ document.addEventListener("DOMContentLoaded", function () {
 // =========================================================================
 
 /**
-  */
+ * @function setActiveFilterButton
+ * @description Actualiza los estilos de los botones de filtro y la visibilidad del selector de año.
+ * @param {string} filterType - El tipo de filtro activo.
+ */
 function setActiveFilterButton(filterType) {
-    // 1. Restablecer estilos para todos los botones estándar (Ultimos 3 días, Semana, Mes, Todo)
+    // 1. Restablecer estilos para todos los botones estándar
     document.querySelectorAll('.filter-btn').forEach(button => {
-        // Remover TODAS las clases de estado activo/hover que pueda tener
         button.classList.remove(
             'bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600',
             'hover:bg-green-50', 'hover:border-green-500'
         );
-        // Aplicar las clases de su estado inactivo
         button.classList.add(
             'text-green-600',
             'border', 'border-transparent',
@@ -120,107 +129,65 @@ function setActiveFilterButton(filterType) {
     const yearLabel = document.getElementById('yearLabel');
     const calendarIcon = document.getElementById('calendarIcon');
     const currentYearSpan = document.getElementById('currentYearDisplay');
-    const prevYearSvg = yearFilterGroup.querySelector('#prevYearBtn svg');
-    const nextYearSvg = yearFilterGroup.querySelector('#nextYearBtn svg');
+
+    // Asegurarse de que los elementos existan antes de intentar manipularlos
+    const prevYearSvg = yearFilterGroup ? yearFilterGroup.querySelector('#prevYearBtn svg') : null;
+    const nextYearSvg = yearFilterGroup ? yearFilterGroup.querySelector('#nextYearBtn svg') : null;
 
     if (yearFilterGroup) {
-        // Remover TODAS las clases de estado activo/hover que pueda tener el GRUPO del año
         yearFilterGroup.classList.remove(
-            'bg-darkblue', 'text-white', 'shadow-md', 'border', 'border-darkblue', // Estado ACTIVO anterior (fondo azul oscuro)
-            'hover:bg-blue-50', 'hover:border-darkblue', // Clases de hover inactivo anteriores
-            'bg-transparent' // Asegurar que no tenga un fondo transparente residual
+            'bg-darkblue', 'text-white', 'shadow-md', 'border', 'border-darkblue',
+            'hover:bg-blue-50', 'hover:border-darkblue',
+            'bg-transparent'
         );
-        // Aplicamos las clases de su estado INACTIVO (ahora será un botón con texto e icono azul oscuro, sin fondo, borde transparente)
         yearFilterGroup.classList.add(
-            'text-darkblue',          // COLOR DEL TEXTO PRINCIPAL "Año" (grupo) cuando INACTIVO: #00304D
-            'border', 'border-transparent', // BORDE INVISIBLE por defecto cuando inactivo
-            'hover:border-darkblue',  // COLOR DEL BORDE al hacer HOVER (INACTIVO): #00304D
-            'hover:bg-blue-50'        // COLOR DE FONDO al hacer HOVER (INACTIVO): azul claro
+            'text-darkblue',
+            'border', 'border-transparent',
+            'hover:border-darkblue',
+            'hover:bg-blue-50'
         );
 
-        // Resetear colores individuales de los elementos a su estado INACTIVO
-        if (yearLabel) {
-             yearLabel.classList.remove('text-white');
-             yearLabel.classList.add('text-darkblue'); // COLOR DEL TEXTO "Año" (interno) cuando INACTIVO: #00304D
-        }
-        if (calendarIcon) {
-            calendarIcon.classList.remove('text-white');
-            calendarIcon.classList.add('text-darkblue'); // COLOR DEL ICONO DE CALENDARIO cuando INACTIVO: #00304D
-        }
-        if (currentYearSpan) {
-            currentYearSpan.classList.remove('text-white');
-            currentYearSpan.classList.add('text-gray-800'); // COLOR DEL TEXTO NUMÉRICO "2025" cuando INACTIVO: gris oscuro
-        }
-        if (prevYearSvg) {
-            prevYearSvg.classList.remove('text-white');
-            prevYearSvg.classList.add('text-gray-600'); // COLOR DE LA FLECHA izquierda cuando INACTIVO: gris
-        }
-        if (nextYearSvg) {
-            nextYearSvg.classList.remove('text-white');
-            nextYearSvg.classList.add('text-gray-600'); // COLOR DE LA FLECHA derecha cuando INACTIVO: gris
-        }
+        if (yearLabel) { yearLabel.classList.remove('text-white'); yearLabel.classList.add('text-darkblue'); }
+        if (calendarIcon) { calendarIcon.classList.remove('text-white'); calendarIcon.classList.add('text-darkblue'); }
+        if (currentYearSpan) { currentYearSpan.classList.remove('text-white'); currentYearSpan.classList.add('text-gray-800'); }
+        if (prevYearSvg) { prevYearSvg.classList.remove('text-white'); prevYearSvg.classList.add('text-gray-600'); }
+        if (nextYearSvg) { nextYearSvg.classList.remove('text-white'); nextYearSvg.classList.add('text-gray-600'); }
 
-        // Ocultar customYearSelector cuando el grupo "Año" no está activo
         if (customYearSelector) {
             customYearSelector.style.display = 'none';
         }
     }
 
-
     // 3. Aplicar estilos al elemento que fue activado
-    if (filterType === 'año') { // Si el filtro activo es "Año"
+    if (filterType === 'año') {
         if (yearFilterGroup) {
-            // Remover las clases INACTIVAS del GRUPO del año
             yearFilterGroup.classList.remove(
                 'text-darkblue', 'border', 'border-transparent', 'hover:border-darkblue', 'hover:bg-blue-50'
             );
-            // Y aplicamos las clases de estado ACTIVO para el GRUPO COMPLETO:
-            // ESTAS SON LAS LÍNEAS CLAVE PARA EL COLOR AZUL OSCURO DEL ESTADO ACTIVO
             yearFilterGroup.classList.add(
-                'bg-transparent',     // FONDO cuando el grupo "Año" está ACTIVO: SIN FONDO (Transparente)
-                'shadow-md',          // Sombra
-                'border', 'border-darkblue' // BORDE cuando el grupo "Año" está ACTIVO: #00304D
+                'bg-transparent',
+                'shadow-md',
+                'border', 'border-darkblue'
             );
 
-            // Mostrar customYearSelector cuando el grupo "Año" está activo
             if (customYearSelector) {
                 customYearSelector.style.display = 'flex';
             }
 
-            // Cambiar colores de texto/iconos a AZUL OSCURO para los elementos internos del grupo "Año"
-            if (yearLabel) {
-                yearLabel.classList.remove('text-white'); // Asegurar que no tenga blanco de un estado anterior
-                yearLabel.classList.add('text-darkblue'); // COLOR DEL TEXTO "Año" (interno) cuando ACTIVO: #00304D
-            }
-            if (calendarIcon) {
-                calendarIcon.classList.remove('text-white');
-                calendarIcon.classList.add('text-darkblue'); // COLOR DEL ICONO DE CALENDARIO cuando ACTIVO: #00304D
-            }
-            if (currentYearSpan) {
-                currentYearSpan.classList.remove('text-white');
-                currentYearSpan.classList.add('text-darkblue'); // COLOR DEL TEXTO NUMÉRICO "2025" cuando ACTIVO: #00304D
-            }
-            if (prevYearSvg) {
-                prevYearSvg.classList.remove('text-white');
-                prevYearSvg.classList.add('text-darkblue'); // COLOR DE LA FLECHA izquierda cuando ACTIVO: #00304D
-            }
-            if (nextYearSvg) {
-                nextYearSvg.classList.remove('text-white');
-                nextYearSvg.classList.add('text-darkblue'); // COLOR DE LA FLECHA derecha cuando ACTIVO: #00304D
-            }
+            if (yearLabel) { yearLabel.classList.remove('text-white'); yearLabel.classList.add('text-darkblue'); }
+            if (calendarIcon) { calendarIcon.classList.remove('text-white'); calendarIcon.classList.add('text-darkblue'); }
+            if (currentYearSpan) { currentYearSpan.classList.remove('text-white'); currentYearSpan.classList.add('text-darkblue'); }
+            if (prevYearSvg) { prevYearSvg.classList.remove('text-white'); prevYearSvg.classList.add('text-darkblue'); }
+            if (nextYearSvg) { nextYearSvg.classList.remove('text-white'); nextYearSvg.classList.add('text-darkblue'); }
 
-            // Asegurarse de que los botones de flecha no tengan un hover de color gris cuando están activos
             const prevBtn = yearFilterGroup.querySelector('#prevYearBtn');
             const nextBtn = yearFilterGroup.querySelector('#nextYearBtn');
             if (prevBtn) prevBtn.classList.remove('hover:bg-gray-100');
             if (nextBtn) nextBtn.classList.remove('hover:bg-gray-100');
-            // Opcional: si quieres un hover distinto para las flechas cuando el filtro Año está activo
-            // if (prevBtn) prevBtn.classList.add('hover:bg-blue-100');
-            // if (nextBtn) nextBtn.classList.add('hover:bg-blue-100');
         }
-    } else { // Si el filtro activo NO es "Año" (es Semana, Mes, etc.)
+    } else {
         const activeButton = document.querySelector(`.filter-btn[data-filtro="${filterType}"]`);
-        if (activeButton) {
+        if (activeButton) { // Añadir verificación de existencia
             activeButton.classList.remove(
                 'text-green-600', 'border', 'border-transparent', 'hover:border-green-500', 'hover:bg-green-50'
             );
@@ -275,7 +242,7 @@ function loadData(filterType, value = null) {
         .catch(error => {
             console.error('ERROR: Error al obtener estadísticas en loadData:', error);
             const chartDom = document.getElementById('chart');
-            if (chartDom) {
+            if (chartDom) { // Añadir verificación de existencia
                 chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-red-500 p-4">Error al cargar la gráfica: ${error.message}.</div>`;
                 if (myChart) { myChart.dispose(); myChart = null; }
             }
@@ -306,18 +273,10 @@ function updateMetrics(data) {
 
     const totalUsers = data.usuarios || 0;
 
-    if (usersPercentElement) {
-        usersPercentElement.textContent = `${(totalUsers > 0 ? (data.usuarios / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`;
-    }
-    if (registeredPercentElement) {
-        registeredPercentElement.textContent = `${(totalUsers > 0 ? (data.registrados / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`;
-    }
-    if (activePercentElement) {
-        activePercentElement.textContent = `${(totalUsers > 0 ? (data.activos / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`;
-    }
-    if (connectedPercentElement) {
-        connectedPercentElement.textContent = `${(totalUsers > 0 ? (data.conectados / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`;
-    }
+    if (usersPercentElement) { usersPercentElement.textContent = `${(totalUsers > 0 ? (data.usuarios / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`; }
+    if (registeredPercentElement) { registeredPercentElement.textContent = `${(totalUsers > 0 ? (data.registrados / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`; }
+    if (activePercentElement) { activePercentElement.textContent = `${(totalUsers > 0 ? (data.activos / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`; }
+    if (connectedPercentElement) { connectedPercentElement.textContent = `${(totalUsers > 0 ? (data.conectados / totalUsers * 100) : 0).toFixed(0)}% de los usuarios`; }
 }
 
 /**
