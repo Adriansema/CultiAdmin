@@ -90,6 +90,10 @@ class RoleSeeder extends Seeder
             ['email' => 'super@admin.com'], // Condición de búsqueda: Email único
             [ // Datos a crear si no se encuentra
                 'name'              => 'SuperAdmin', // Nombre descriptivo
+                'lastname'          => 'SuperAdministrador',
+                'phone'             => '3156489578',
+                'type_document'     => 'CC',
+                'document'          => '1000000000',
                 'password'          => Hash::make('SuperAdmin_2025!'), // Contraseña segura
                 'email_verified_at' => now(), // Marca el correo como verificado
             ]

@@ -60,9 +60,10 @@
                              @endphp
 
                              @if ($canEditTargetUser && $loggedInUser)
-                                 <button type="button" class="ml-2 edit-user-button" data-user-id="{{ $usuario->id }}">
-                                    <img src="{{ asset('images/lapiz.svg') }}" class="w-4 h-4" alt="editar">
-                                </button>
+                                 <button type="button" class="ml-2 edit-user-button"
+                                     data-user-id="{{ $usuario->id }}">
+                                     <img src="{{ asset('images/lapiz.svg') }}" class="w-4 h-4" alt="editar">
+                                 </button>
                              @else
                                  {{-- Muestra el icono pero lo hace no interactivo y un poco opaco --}}
                                  <span class="ml-2 cursor-not-allowed">

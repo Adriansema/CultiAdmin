@@ -29,6 +29,9 @@ Route::prefix('pqrs')->name('pqrs.')->group(function () {
      Route::post('/store', [PqrsController::class, 'store'])->name('store');
 });
 
+// Ruta para generar masivos usuarios
+Route::get('/exportar-csv', [ExportarCsvController::class, 'generarCsv']);
+
 // Ruta para verificar si el correo existe 
 Route::post('/check-email', [UsuarioController::class, 'checkEmailExists'])->name('check-email');
 
@@ -55,9 +58,6 @@ Route::get('/accesibilidad', [AccesibilidadController::class, 'index'])->name('a
 
 // Ruta de Estadística publica
 Route::get('/public-statistics', [StatisticController::class, 'index'])->name('statistics.index.public');
-
-// Ruta para generar masivos usuarios
-Route::get('/generar-csv', [ExportarCsvController::class, 'generarCsv'])->name('generarCsv.general');
 
 // ------------------------------------------------------------------------------------
 // Grupo de rutas que requieren AUTENTICACIÓN y verificación de correo electrónico
@@ -122,6 +122,7 @@ Route::middleware([
           Route::post('/', [UsuarioController::class, 'store'])->name('store');
           Route::post('/importar-csv', [UsuarioController::class, 'importarCsv'])->name('importarCsv');
           Route::get('/exportar', [UsuarioController::class, 'exportarCSV'])->name('exportar');
+          Route::post('/check-duplicates', [UsuarioController::class, 'checkCsvDuplicates']);
           Route::get('/{usuario}/edit', [UsuarioController::class, 'edit'])->name('edit')->middleware('can:editar usuario');
           Route::put('/{usuario}', [UsuarioController::class, 'update'])->name('update')->middleware('can:editar usuario');
           Route::patch('/{usuario}/toggle', [UsuarioController::class, 'toggle'])->name('toggle');

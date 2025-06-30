@@ -7,52 +7,39 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Cultiva Sena') }}</title>
-    <!-- SE CAMBIO EL NOMBRE DE LA PESTAÑA DE NAVEGACION POR "Cultiva Sena" -->
-
-    <!-- Favicon -->
     <link rel="icon" href="{{ asset('images/Favicon.svg') }}">
-    <!-- SE AGREGA ESTA LINEA PARA QUE MUESTRE EL ICONO DE LA PESTAÑA DE NAVEGACIÓN -->
-
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-    <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <!-- Styles -->
     @livewireStyles
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="flex flex-col h-screen overflow-hidden font-sans antialiased">
+<body class="flex flex-col h-screen overflow-hidden font-sans antialiased" x-data="{ sidebarOpen: true }">
 
-    <!-- Cinta GOV.CO -->
     <div class="p-1 bg-blue-500">
         <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="Logo GOV.CO" width="100px">
     </div>
 
     <x-banner />
 
-    <!-- Sidebar dinámico basado en permisos (anteriormente x-sidebar-admin) -->
-    {{-- Ahora incluimos un único sidebar para todos los roles --}}
-    <x-sidebar /> 
+    <div class="relative flex flex-1 overflow-hidden">
+        <x-sidebar />
 
-    <!-- Contenido principal -->
-    <div class="flex flex-col flex-1 overflow-hidden bg-gray-2">
-        @if (isset($header))
-            <header class="px-4 py-6 bg-white shadow">
-                <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
-        @endif
-
-        {{-- SE ELIMINÓ ESTA LINEA YA QUE ERA LA DEL PROBLEMA --}}
-        <main class="flex-1 h-full p-6 overflow-y-auto" :class="sidebarOpen ? 'pl-64' : 'pl-16'">
-            @yield('content')
-        </main>
+        <div class="flex flex-col flex-1 w-full overflow-hidden" :class="sidebarOpen ? 'ml-8' : 'ml-4'">
+            @if (isset($header))
+                <header class="px-4 py-6 bg-white shadow">
+                    <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endif
+            <main class="flex-1 h-full overflow-y-auto">
+                @yield('content')
+            </main>
+        </div>
     </div>
 
     @stack('modals')
@@ -60,7 +47,6 @@
     @livewireScripts
 
     <script>
-        // Inyecta las variables de sesión de Laravel en variables JavaScript globales
         const sessionStatusProducto = @json(session('status_producto', null));
         const sessionProductoIdForRedirect = @json(session('producto_id_for_redirect', null));
         const sessionStatusBoletin = @json(session('status_boletin', null));
@@ -69,7 +55,6 @@
         const sessionError = @json(session('error', null));
     </script>
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
-    {{-- <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script --}}>
 </body>
 
 </html>

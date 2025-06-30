@@ -1,22 +1,34 @@
+// Importamos el nuevo módulo ImportaCsv
+import { openImportCsvModal } from './ImportaCsv.js';
+
 document.addEventListener('DOMContentLoaded', async function () {
     console.log('*** formulario.js: DOMContentLoaded disparado. ***');
 
     const userFormModal = document.getElementById('userFormModal');
     const closeModalButton = document.getElementById('closeModalButton');
-    const nextButton = document.getElementById('nextStepButton'); // Este es el único botón de navegación principal que tienes.
+    const nextButton = document.getElementById('nextStepButton');
+    const prevButton = document.getElementById('prevStepButton');
+    const generatePasswordButton = document.getElementById('generatePasswordButton');
+    const cancelButton = document.getElementById('cancelButton');
+    const importCsvButton = document.getElementById('importCsvButton'); // Referencia al botón Importar CSV
 
     const step1Content = document.getElementById('step1Content');
     const step2Content = document.getElementById('step2Content');
+    const step3Content = document.getElementById('step3Content');
+
     const modalTitle = document.getElementById('modalTitle');
     const successMessageContainer = document.getElementById('successMessage');
     const generalErrorMessageContainer = document.getElementById('generalErrorMessage');
+
     const step1Indicator = document.getElementById('step1Indicator');
     const step2Indicator = document.getElementById('step2Indicator');
-    const form = userFormModal ? userFormModal.querySelector('form') : null;
+    const step3Indicator = document.getElementById('step3Indicator');
 
     // Referencias a los inputs del Paso 1
     const nameInput = document.getElementById('name');
+    const lastnameInput = document.getElementById('lastname');
     const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
     const typeDocumentSelect = document.getElementById('type_document');
     const documentInput = document.getElementById('document');
 
@@ -24,33 +36,53 @@ document.addEventListener('DOMContentLoaded', async function () {
     const roleCheckboxes = document.querySelectorAll('input[name="roles[]"]');
     const permissionCheckboxes = document.querySelectorAll('input[name="permissions[]"]');
 
+    // Referencias a los inputs del Paso 3 (contraseña)
+    const passwordInput = document.getElementById('password');
+    const passwordConfirmationInput = document.getElementById('password_confirmation');
+    const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
+    const toggleConfirmPasswordVisibility = document.getElementById('toggleConfirmPasswordVisibility');
+
     // ELEMENTOS DEL MODAL DE CONFIRMACIÓN
     const confirmModal = document.getElementById('confirmModal');
     const confirmMessageBody = document.getElementById('confirmMessageBody');
     const confirmCancelButton = document.getElementById('confirmCancelButton');
     const confirmActionButton = document.getElementById('confirmActionButton');
 
-    // Verificaciones iniciales de elementos
+    // Verificaciones iniciales de elementos (importante para depuración)
     if (!userFormModal) { console.error('ERROR: userFormModal no encontrado.'); return; }
     if (!nextButton) console.error('ERROR: nextStepButton no encontrado. ¡Este es crucial!');
-    if (!confirmModal) console.error('ERROR: confirmModal no encontrado. Asegúrate de añadir su HTML.');
+    if (!prevButton) console.error('ERROR: prevButton no encontrado.');
+    if (!generatePasswordButton) console.error('ERROR: generatePasswordButton no encontrado.');
+    if (!importCsvButton) console.error('ERROR: importCsvButton no encontrado.'); 
+    if (!step3Content) console.error('ERROR: step3Content no encontrado.');
+    if (!step3Indicator) console.error('ERROR: step3Indicator no encontrado.');
+    if (!passwordInput) console.error('ERROR: passwordInput no encontrado.');
+    if (!passwordConfirmationInput) console.error('ERROR: passwordConfirmationInput no encontrado.');
+    if (!confirmModal) console.error('ERROR: confirmModal no encontrado.');
     if (!confirmMessageBody) console.error('ERROR: confirmMessageBody no encontrado.');
     if (!confirmCancelButton) console.error('ERROR: confirmCancelButton no encontrado.');
     if (!confirmActionButton) console.error('ERROR: confirmActionButton no encontrado.');
+    if (!lastnameInput) console.error('ERROR: lastnameInput no encontrado.');
+    if (!phoneInput) console.error('ERROR: phoneInput no encontrado.');
 
 
+    // Estado global del modal
     let modalData = {
-        isOpen: false,
+        isOpen: false, // Indica si el modal principal está abierto
         isEditMode: false,
         currentStep: 1,
         userId: null,
-        nombre: '',
-        correo: '',
-        tipoDocumento: '',
-        numeroDocumento: '',
-        rolSeleccionado: '',
+        name: '',
+        lastname: '',
+        email: '',
+        phone: '',
+        type_document: '',
+        document: '',
+        selectedRole: '',
+        password: '',
+        passwordConfirmation: '',
 
-        // Estructura de permisos en el frontend (debe coincidir con tus checkboxes)
+        // Estructura de permisos en el frontend
         permisos: {
             productos: { crear: false, editar: false, validar: false, eliminar: false },
             noticias: { crear: false, editar: false, validar: false, eliminar: false },
@@ -59,7 +91,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         },
 
         // Mapeo de nombres de permiso de Spatie a sus módulos
-        // Debe ser EXACTAMENTE como tus permisos de Spatie.
         modulePermissionMap: {
             'productos': ['crear producto', 'editar producto', 'validar producto', 'eliminar producto'],
             'noticias': ['crear noticia', 'editar noticia', 'validar noticia', 'eliminar noticia'],
@@ -67,8 +98,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             'usuarios': ['crear usuario', 'editar usuario']
         },
 
-        // Aquí guardaremos el mapeo de rol a permisos por defecto que viene del backend
-        rolePermissionsMapping: {}, // Esto se llenará con fetchRolePermissionsMapping()
+        // Mapeo de rol a permisos por defecto que viene del backend
+        rolePermissionsMapping: {},
         errors: {},
         successMessage: '',
         csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -76,10 +107,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // ! Funciones Auxiliares
 
-    // Carga el mapeo de roles a permisos por defecto una única vez
     async function fetchRolePermissionsMapping() {
         try {
-            const response = await fetch('/usuario/role-permissions-map'); 
+            const response = await fetch('/usuario/role-permissions-map');
             const data = await response.json();
             if (response.ok && data.roleDefaultPermissions) {
                 modalData.rolePermissionsMapping = data.roleDefaultPermissions;
@@ -91,11 +121,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.error('Error de red al cargar mapeo de permisos por rol:', error);
         }
     }
-    // AWAIT la carga del mapeo para asegurar que esté disponible cuando se usen los roles
     await fetchRolePermissionsMapping();
 
-
-    // Función para restablecer todos los permisos en modalData.permisos a false
     function resetPermissions() {
         for (const moduleKey in modalData.permisos) {
             for (const actionkey in modalData.permisos[moduleKey]) {
@@ -104,15 +131,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // se utiliza updateModalDataPermission para marcar todos los permisos que el usuario tiene.
-    // asegurando que ningún módulo quede excluido.
     function updateModalDataPermission(spatiePerName, setState) {
         for (const moduleKey in modalData.modulePermissionMap) {
-            //verifica si el permiso Spatie está en el mapra de este modulo
             if (modalData.modulePermissionMap[moduleKey].includes(spatiePerName)) {
                 let actionKey = '';
-
-                //determina la 'actionkey' basada en el nombre del permisos de Spatie
                 if (spatiePerName.includes('crear')) {
                     actionKey = 'crear';
                 } else if (spatiePerName.includes('editar')) {
@@ -122,58 +144,70 @@ document.addEventListener('DOMContentLoaded', async function () {
                 } else if (spatiePerName.includes('validar')) {
                     actionKey = 'validar';
                 }
-                //agrega mas else if si tienes otras acciones (ej. 'ver')
 
-                // Asegurate de que la accion y el modluo exitesn en modalData.permisos
                 if (actionKey && modalData.permisos[moduleKey] && modalData.permisos[moduleKey][actionKey] !== undefined) {
                     modalData.permisos[moduleKey][actionKey] = setState;
                     console.log(`Permiso '${spatiePerName}' mapeado a ${moduleKey}.${actionKey} y establecido a ${setState}`);
-                    return true; // Exito en el mapeo
+                    return true;
                 } else {
-                    console.warn(`[Mapeo Fallido] Acción '${actionKey}' o modulo '${moduleKey}' no definido para '${spatiePerName}' en modalData.permisos.`);
+                    console.warn(`[Mapeo Fallido] Acción '${actionKey}' o módulo '${moduleKey}' no definido para '${spatiePerName}' en modalData.permisos.`);
                 }
             }
         }
         console.warn(`[Mapeo Fallido] Permiso Spatie '${spatiePerName}' no encontrado en modulePermissionMap.`);
-        return false; //Fallo en el mapeo
+        return false;
     }
 
-    // cada vez que seleccionas un rol. ¡Esto auto-marca los permisos por defecto! (Punto 3)
     function applyRoleDefaultPermissions(roleName) {
         console.log('JS: Aplicando permisos por defecto para el rol:', roleName);
-        resetPermissions(); // Primero desmarca TODOS los permisos actuales
+        resetPermissions();
 
         const defaultPermsForRole = modalData.rolePermissionsMapping[roleName];
         console.log('JS: Permisos por defecto para este rol:', defaultPermsForRole);
 
         if (defaultPermsForRole && defaultPermsForRole.length > 0) {
             defaultPermsForRole.forEach(permName => {
-                updateModalDataPermission(permName, true); // Usa la función auxiliar para marcar
+                updateModalDataPermission(permName, true);
             });
         }
-        updateFormValues(); // Actualiza la UI para que los checkboxes se muestren marcados
+        updateFormValues();
     }
 
-    // Función para restablecer todos los datos del formulario a su estado inicial
+    function generateRandomPassword() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+        let password = "";
+        const length = 12;
+        for (let i = 0; i < length; i++) {
+            password += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return password;
+    }
+
     function resetForm() {
         modalData.currentStep = 1;
         modalData.userId = null;
-        modalData.nombre = '';
-        modalData.correo = '';
-        modalData.tipoDocumento = '';
-        modalData.numeroDocumento = '';
-        modalData.rolSeleccionado = '';
-        resetPermissions(); // Llama a resetPermissions para limpiar los checkboxes
+        modalData.name = '';
+        modalData.lastname = '';
+        modalData.email = '';
+        modalData.phone = '';
+        modalData.type_document = '';
+        modalData.document = '';
+        modalData.selectedRole = '';
+        modalData.password = '';
+        modalData.passwordConfirmation = '';
+        resetPermissions();
         modalData.errors = {};
         modalData.successMessage = '';
 
-        // Limpiar los inputs del DOM
         if (nameInput) nameInput.value = '';
+        if (lastnameInput) lastnameInput.value = '';
         if (emailInput) emailInput.value = '';
+        if (phoneInput) phoneInput.value = '';
         if (typeDocumentSelect) typeDocumentSelect.value = '';
         if (documentInput) documentInput.value = '';
+        if (passwordInput) passwordInput.value = '';
+        if (passwordConfirmationInput) passwordConfirmationInput.value = '';
 
-        // Resetear visualmente los radio buttons de rol y sus estilos
         roleCheckboxes.forEach(radio => {
             radio.checked = false;
             const label = radio.closest('.role-label');
@@ -189,7 +223,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         });
 
-        // Es importante llamar a updateFormValues después de resetear modalData
         updateFormValues();
     }
     // ! Fin de Funciones Auxiliares
@@ -197,11 +230,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     function updateModalUI() {
         console.log('JS: updateModalUI llamado. Paso actual:', modalData.currentStep, 'Modo:', modalData.isEditMode ? 'Editar' : 'Crear');
 
-        // Control de visibilidad del modal principal (usando opacity y pointer-events)
+        // Control de visibilidad del modal principal
         if (modalData.isOpen) {
             userFormModal.classList.remove('opacity-0', 'pointer-events-none');
             userFormModal.classList.add('opacity-100');
-            document.body.classList.add('overflow-hidden'); // Para evitar scroll en el body
+            document.body.classList.add('overflow-hidden');
         } else {
             userFormModal.classList.remove('opacity-100');
             userFormModal.classList.add('opacity-0', 'pointer-events-none');
@@ -212,62 +245,88 @@ document.addEventListener('DOMContentLoaded', async function () {
             modalTitle.textContent = modalData.isEditMode ? 'Editar Usuario' : 'Registrar Nuevo Usuario';
         }
 
+        // Control de visibilidad del contenido de los pasos
         if (step1Content) step1Content.classList.toggle('hidden', modalData.currentStep !== 1);
         if (step2Content) step2Content.classList.toggle('hidden', modalData.currentStep !== 2);
+        if (step3Content) step3Content.classList.toggle('hidden', modalData.currentStep !== 3);
 
-        // Actualizar indicadores de paso  (íconos y texto)
-        if (step1Indicator && step2Indicator) {
+        // Actualizar indicadores de paso (íconos y texto)
+        if (step1Indicator && step2Indicator && step3Indicator) {
             const imgStep1 = step1Indicator.querySelector('img');
             const spanStep1 = step1Indicator.querySelector('span');
             const imgStep2 = step2Indicator.querySelector('img');
             const spanStep2 = step2Indicator.querySelector('span');
+            const imgStep3 = step3Indicator.querySelector('img');
+            const spanStep3 = step3Indicator.querySelector('span');
 
-            // --- Lógica para el Paso 1 ---
-            if (modalData.currentStep === 1) {
-                // Si estamos en el Paso 1: icono activo para el Paso 1, texto gris oscuro (activo)
-                imgStep1.src = '/images/paso1_activo.svg';
-                spanStep1.classList.remove('text-gray-400'); // Asegura que no tenga gris claro
-                spanStep1.classList.add('text-gray-700');   // Activo: gris oscuro
-            } else if (modalData.currentStep === 2) {
-                // Si estamos en el Paso 2 (Paso 1 ya completado): icono de completado para el Paso 1, texto gris oscuro (completado)
-                imgStep1.src = '/images/paso1_completado.svg';
-                spanStep1.classList.remove('text-gray-400'); // Asegura que no tenga gris claro
-                spanStep1.classList.add('text-gray-700');   // Completado: gris oscuro (según tu indicación de solo gris)
+            // Resetear todos los estados visuales (poner todos en inactivo primero)
+            imgStep1.src = '/images/paso1_inactivo.svg';
+            spanStep1.classList.remove('text-gray-700');
+            spanStep1.classList.add('text-gray-400');
+
+            imgStep2.src = '/images/paso2_inactivo.svg';
+            spanStep2.classList.remove('text-gray-700');
+            spanStep2.classList.add('text-gray-400');
+
+            imgStep3.src = '/images/paso3_inactivo.svg';
+            spanStep3.classList.remove('text-gray-700');
+            spanStep3.classList.add('text-gray-400');
+
+            // Establecer estados según el paso actual
+            if (modalData.currentStep >= 1) {
+                imgStep1.src = (modalData.currentStep === 1) ? '/images/paso1_activo.svg' : '/images/paso1_completado.svg';
+                spanStep1.classList.remove('text-gray-400');
+                spanStep1.classList.add('text-gray-700');
             }
 
-            // --- Lógica para el Paso 2 ---
-            if (modalData.currentStep === 2) {
-                // Si estamos en el Paso 2: icono activo para el Paso 2, texto gris oscuro (activo)
-                imgStep2.src = '/images/paso2_completado.svg'; // Este es el icono de "2 activo" según tu descripción
-                spanStep2.classList.remove('text-gray-400'); // Asegura que no tenga gris claro
-                spanStep2.classList.add('text-gray-700');   // Activo: gris oscuro
-            } else if (modalData.currentStep === 1) {
-                // Si estamos en el Paso 1 (Paso 2 está inactivo/pendiente): icono inactivo para el Paso 2, texto gris claro
-                imgStep2.src = '/images/paso2_inactivo.svg';
-                spanStep2.classList.remove('text-gray-700'); // Asegura que no tenga gris oscuro
-                spanStep2.classList.add('text-gray-400');   // Inactivo: gris claro
+            if (modalData.currentStep >= 2) {
+                imgStep2.src = (modalData.currentStep === 2) ? '/images/paso2_completado.svg' : '/images/paso1_completado.svg';
+                spanStep2.classList.remove('text-gray-400');
+                spanStep2.classList.add('text-gray-700');
+            }
+
+            if (modalData.currentStep >= 3) {
+                imgStep3.src = (modalData.currentStep === 3) ? '/images/paso3_activo.svg' : '/images/paso2_completado.svg';
+                spanStep3.classList.remove('text-gray-400');
+                spanStep3.classList.add('text-gray-700');
             }
         }
 
-        // CONTROL DE VISIBILIDAD DE LOS BOTONES DE NAVEGACIÓN (solo nextButton en este caso)
+        // CONTROL DE VISIBILIDAD DE LOS BOTONES DE NAVEGACIÓN
         if (nextButton) {
-            // El botón "Siguiente" ahora es el único botón de acción principal.
-            // Su texto y comportamiento cambiarán según el paso.
-            if (modalData.currentStep === 1) {
-                nextButton.classList.remove('hidden');
+            nextButton.classList.remove('hidden');
+
+            if (modalData.currentStep === 1 || modalData.currentStep === 2) {
                 nextButton.innerHTML = `Siguiente <img src="/images/siguiente.svg" alt="siguiente" class="w-5 h-6 ml-2">`;
-                // El botón "Importar CSV" que mencionaste en tu HTML estaría aquí, si es necesario ocultarlo/mostrarlo
-            } else if (modalData.currentStep === 2) {
-                nextButton.classList.remove('hidden');
-                nextButton.innerHTML = `${modalData.isEditMode ? 'Actualizar' : 'Registrar'} <img src="/images/siguiente.svg" alt="enviar" class="w-5 h-6 ml-2">`; // Puedes cambiar el icono si quieres
+            } else if (modalData.currentStep === 3) {
+                nextButton.innerHTML = `${modalData.isEditMode ? 'Actualizar' : 'Asignar'} <img src="/images/siguiente.svg" alt="enviar" class="w-5 h-6 ml-2">`;
             } else {
-                nextButton.classList.add('hidden'); // Ocultar si hay más pasos o estados
+                nextButton.classList.add('hidden');
             }
+        }
+
+        // Botón "Atrás" (Regresar): visible en Paso 2 y 3, oculto en Paso 1
+        if (prevButton) {
+            prevButton.classList.toggle('hidden', modalData.currentStep === 1);
+        }
+
+        // Botón "Generar Contraseña"
+        if (generatePasswordButton) {
+            generatePasswordButton.classList.toggle('hidden', modalData.currentStep !== 3 || modalData.isEditMode);
+        }
+
+        // Botón "Importar CSV": visible solo en Paso 1, oculto en Paso 2 y 3
+        if (importCsvButton) {
+            importCsvButton.classList.toggle('hidden', modalData.currentStep !== 1);
+        }
+
+        if (cancelButton) {
+            cancelButton.classList.add('hidden');
         }
 
         renderErrors();
         renderSuccessMessage();
-        updateFormValues(); // Llama a esta función para reflejar modalData en la UI
+        updateFormValues();
     }
 
     function renderErrors() {
@@ -291,9 +350,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 errorMessage.classList.add('text-red-500', 'text-xs', 'mt-1', 'error-message');
                 errorMessage.textContent = modalData.errors[field];
                 inputElement.parentNode.appendChild(errorMessage);
-            } else if (field === 'roles' || field === 'rolSeleccionado') {
-                // Asumiendo que tus radio buttons de rol están en un contenedor que podemos apuntar
-                const roleContainer = document.querySelector('.rolesContainer');
+            } else if (field === 'roles' || field === 'selectedRole') {
+                const roleContainer = document.querySelector('#rolesContainer');
                 if (roleContainer) {
                     const errorMessage = document.createElement('p');
                     errorMessage.classList.add('text-red-500', 'text-xs', 'mt-1', 'w-full', 'error-message');
@@ -301,6 +359,14 @@ document.addEventListener('DOMContentLoaded', async function () {
                     roleContainer.appendChild(errorMessage);
                 } else {
                     console.warn(`Contenedor de rol con ID 'rolesContainer' no encontrado para el campo '${field}'.`);
+                }
+            } else if (field === 'password' || field === 'password_confirmation') {
+                const passwordInputParent = document.getElementById('password').closest('.relative');
+                if (passwordInputParent) {
+                    const errorMessage = document.createElement('p');
+                    errorMessage.classList.add('text-red-500', 'text-xs', 'mt-1', 'error-message');
+                    errorMessage.textContent = modalData.errors[field];
+                    passwordInputParent.parentNode.appendChild(errorMessage);
                 }
             }
         }
@@ -318,22 +384,28 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Función para actualizar los valores de los inputs y el estado de los checkboxes/radios
     function updateFormValues() {
         // 1. Llenar campos de texto del Paso 1
-        if (nameInput) nameInput.value = modalData.nombre;
-        if (emailInput) emailInput.value = modalData.correo;
-        if (typeDocumentSelect) typeDocumentSelect.value = modalData.tipoDocumento;
-        if (documentInput) documentInput.value = modalData.numeroDocumento;
+        if (nameInput) nameInput.value = modalData.name;
+        if (lastnameInput) lastnameInput.value = modalData.lastname;
+        if (emailInput) emailInput.value = modalData.email;
+        if (phoneInput) phoneInput.value = modalData.phone;
+        if (typeDocumentSelect) typeDocumentSelect.value = modalData.type_document;
+        if (documentInput) documentInput.value = modalData.document;
 
-        // 2. Marcar el Radio Button del Rol (Punto 1 y 3)
+        // 2. Llenar campos de contraseña del Paso 3
+        if (passwordInput) passwordInput.value = modalData.password;
+        if (passwordConfirmationInput) passwordConfirmationInput.value = modalData.passwordConfirmation;
+
+        // 3. Marcar el Radio Button del Rol
         roleCheckboxes.forEach(radio => {
-            radio.checked = (radio.value === modalData.rolSeleccionado);
-            const label = radio.closest('.role-label'); // Asumo que tienes una clase 'role-label' en tu HTML
-            const icon = label ? label.querySelector('.role-icon') : null; // Asumo que tienes una clase 'role-icon'
+            radio.checked = (radio.value === modalData.selectedRole);
+            const label = radio.closest('.role-label');
+            const icon = label ? label.querySelector('.role-icon') : null;
 
             if (label) {
                 if (radio.checked) {
                     label.classList.remove('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
                     label.classList.add('bg-indigo-200', 'text-indigo-800');
-                    if (icon) icon.src = icon.src.replace('sin_marca.svg', 'con_marca.svg'); //iconos de marca
+                    if (icon) icon.src = icon.src.replace('sin_marca.svg', 'con_marca.svg');
                 } else {
                     label.classList.remove('bg-indigo-200', 'text-indigo-800');
                     label.classList.add('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
@@ -342,15 +414,13 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         });
 
-        // 3. Marcar los Checkboxes de Permisos (Punto 2 y 3)
+        // 4. Marcar los Checkboxes de Permisos
         permissionCheckboxes.forEach(checkbox => {
-            const spatiePermName = checkbox.value; // El valor del checkbox es el nombre del permiso de Spatie
+            const spatiePermName = checkbox.value;
 
             let isChecked = false;
-            // Recorre el modulePermissionMap para determinar si el permiso está marcado en modalData.permisos
             for (const moduleKey in modalData.modulePermissionMap) {
                 if (modalData.modulePermissionMap[moduleKey].includes(spatiePermName)) {
-                    // determianr la 'actionkey' para acceder a modalData.permisos
                     let actionKey = '';
                     if (spatiePermName.includes('crear')) actionKey = 'crear';
                     else if (spatiePermName.includes('editar')) actionKey = 'editar';
@@ -358,8 +428,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                     else if (spatiePermName.includes('validar')) actionKey = 'validar';
 
                     if (actionKey && modalData.permisos[moduleKey] && modalData.permisos[moduleKey][actionKey] !== undefined) {
-                        isChecked = modalData.permisos[moduleKey][actionKey]; // Leer el estado de modalData.permisos
-                        break; // Salir del bucle de módulos una vez encontrado
+                        isChecked = modalData.permisos[moduleKey][actionKey];
+                        break;
                     }
                 }
             }
@@ -371,8 +441,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         console.log('JS: openCreateModal función llamada.');
         resetForm();
         modalData.isEditMode = false;
-        modalData.userId = null; // Asegúrate de que no haya userId de una sesión anterior
-        modalData.isOpen = true;  // Esto ahora activará la lógica de 'opacity' en updateModalUI
+        modalData.userId = null;
+        modalData.isOpen = true;
         modalData.currentStep = 1;
         modalData.successMessage = '';
         modalData.errors = {};
@@ -381,18 +451,16 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     window.openEditModal = async function (userId) {
         console.log('JS: openEditModal función llamada para userId:', userId);
-
-        resetForm(); // Limpia el formulario antes de cargar nuevos datos
+        resetForm();
         modalData.isEditMode = true;
-        modalData.userId = userId; // Asigna el ID del usuario
-        modalData.isOpen = true; // Esto ahora activará la lógica de 'opacity' en updateModalUI
-        modalData.currentStep = 1; // Siempre iniciar en el paso 1 para edición
+        modalData.userId = userId;
+        modalData.isOpen = true;
+        modalData.currentStep = 1;
         modalData.successMessage = '';
         modalData.errors = {};
-        updateModalUI(); // Muestra el modal (transparente inicialmente)
+        updateModalUI();
 
         try {
-            // ¡Ajusta esta URL para que coincida con tu prefijo de ruta en web.php!
             const response = await fetch(`/usuario/usuarios/${userId}/data`);
             const data = await response.json();
 
@@ -400,48 +468,43 @@ document.addEventListener('DOMContentLoaded', async function () {
                 throw new Error(data.message || 'Error al cargar datos del usuario para edición.');
             }
 
-            //Asignar datos basicos
-            modalData.nombre = data.name || '';
-            modalData.correo = data.email || '';
-            modalData.tipoDocumento = data.type_document || '';
-            modalData.numeroDocumento = data.document || '';
+            // Asignar datos básicos (incluyendo nuevos campos)
+            modalData.name = data.name || '';
+            modalData.lastname = data.lastname || '';
+            modalData.email = data.email || '';
+            modalData.phone = data.phone || '';
+            modalData.type_document = data.type_document || '';
+            modalData.document = data.document || '';
 
+            // Asignar el rol del usuario
+            modalData.selectedRole = data.userRoles && data.userRoles.length > 0 ? data.userRoles[0] : '';
+            console.log('Rol del usuario cargado:', modalData.selectedRole);
 
-            // 2. Asignar el rol del usuario (Punto 1)
-            // userRoles es un array, tomamos el primero si existe
-            modalData.rolSeleccionado = data.userRoles && data.userRoles.length > 0 ? data.userRoles[0] : '';
-            console.log('Rol del usuario cargado:', modalData.rolSeleccionado);
-
-
-            /* // 3. Almacenar el mapeo de permisos por rol (para Punto 3) AHORA SE COMENTO, PUESTO A QUE SE PUSO UNA NUEVA FUNCION EN EL INICO DE LAS FUNCIONES AUXILIARES
-            modalData.rolePermissionsMapping = data.roleDefaultPermissions || {};
-            console.log('Mapeo de permisos por rol cargado:', modalData.rolePermissionsMapping); */
-
-            // 4. Resetear todos los permisos a false antes de marcarlos (Punto 2)
-            resetPermissions(); // Primero limpiar todos los permisos
-
-            // 5. Marcar los permisos que el usuario YA tiene asignados (Punto 2)
+            // Asignar los permisos que el usuario YA tiene asignados
+            resetPermissions();
             if (data.allUserGrantedPermissions && data.allUserGrantedPermissions.length > 0) {
                 console.log('Permisos individuales del usuario cargados:', data.allUserGrantedPermissions);
                 data.allUserGrantedPermissions.forEach(permName => {
-                    updateModalDataPermission(permName, true); // Usa la función auxiliar para marcar
+                    updateModalDataPermission(permName, true);
                 });
             }
 
-            // 6. Actualizar la UI con todos los datos y selecciones
-            updateFormValues(); // Esto llenará los campos y marcará el rol y los permisos
+            // En modo edición, los campos de contraseña se mantienen vacíos,
+            modalData.password = '';
+            modalData.passwordConfirmation = '';
 
+            updateFormValues();
         } catch (error) {
             console.error('Error al cargar datos para edición:', error);
             modalData.errors.general = error.message;
-            modalData.isOpen = false; // Esto ahora activará la lógica de 'opacity' en updateModalUI para ocultar
+            modalData.isOpen = false;
             updateModalUI();
         }
     };
 
     window.closeModal = function () {
         console.log('JS: closeModal función llamada.');
-        modalData.isOpen = false; // Esto ahora activará la lógica de 'opacity' en updateModalUI para ocultar
+        modalData.isOpen = false;
         resetForm();
         modalData.errors = {};
         modalData.successMessage = '';
@@ -451,32 +514,27 @@ document.addEventListener('DOMContentLoaded', async function () {
     // ************* FUNCIÓN PRINCIPAL DE AVANCE / CONFIRMACIÓN *************
     function handleNextAction() {
         console.log('JS: handleNextAction llamado. Paso actual:', modalData.currentStep);
-        modalData.errors = {}; // Limpia errores antes de cada acción
+        modalData.errors = {};
         let hasError = false;
 
         if (modalData.currentStep === 1) {
             // Validaciones del Paso 1
-            modalData.nombre = nameInput.value.trim();
-            modalData.correo = emailInput.value.trim();
-            modalData.tipoDocumento = typeDocumentSelect.value;
-            modalData.numeroDocumento = documentInput.value.trim();
+            modalData.name = nameInput.value.trim();
+            modalData.lastname = lastnameInput.value.trim();
+            modalData.email = emailInput.value.trim();
+            modalData.phone = phoneInput.value.trim();
+            modalData.type_document = typeDocumentSelect.value;
+            modalData.document = documentInput.value.trim();
 
-            if (!modalData.nombre) { modalData.errors.nombre = 'El nombre es obligatorio.'; hasError = true; }
-            if (!modalData.correo || !/\S+@\S+\.\S+/.test(modalData.correo)) { modalData.errors.correo = 'El correo no es válido.'; hasError = true; }
-            if (!modalData.tipoDocumento) { modalData.errors.tipoDocumento = 'Debe seleccionar un tipo de documento.'; hasError = true; }
-            if (!modalData.numeroDocumento) { modalData.errors.numeroDocumento = 'El número de documento es obligatorio.'; hasError = true; }
+            if (!modalData.name) { modalData.errors.name = 'El nombre es obligatorio.'; hasError = true; }
+            if (!modalData.lastname) { modalData.errors.lastname = 'El apellido es obligatorio.'; hasError = true; }
+            if (!modalData.email || !/\S+@\S+\.\S+/.test(modalData.email)) { modalData.errors.email = 'El correo no es válido.'; hasError = true; }
+            if (!modalData.phone) { modalData.errors.phone = 'El teléfono es obligatorio.'; hasError = true; }
+            if (!modalData.type_document) { modalData.errors.type_document = 'Debe seleccionar un tipo de documento.'; hasError = true; }
+            if (!modalData.document) { modalData.errors.document = 'El número de documento es obligatorio.'; hasError = true; }
 
             if (!hasError) {
-                // Si estamos creando un usuario y los datos del paso 1 son válidos
-                if (!modalData.isEditMode) {
-                    // ANTES de ir al Paso 2, enviamos los datos básicos para crear el usuario
-                    // Esto nos dará un userId para el Paso 2
-                    submitStep1ForCreation(); // Nueva función para manejar esta petición
-                    return; // Importante: Salir para no avanzar al paso 2 directamente
-                } else {
-                    // Si es edición o si ya creamos el usuario en un flujo anterior (aunque no lo necesitemos aquí)
-                    modalData.currentStep = 2; // Avanza al paso 2
-                }
+                modalData.currentStep = 2;
             }
         } else if (modalData.currentStep === 2) {
             // Validaciones del Paso 2 (roles y permisos)
@@ -484,45 +542,263 @@ document.addEventListener('DOMContentLoaded', async function () {
             roleCheckboxes.forEach(radio => {
                 if (radio.checked) {
                     selectedRoleFound = true;
-                    modalData.rolSeleccionado = radio.value; // Asegurarse que esté actualizado
+                    modalData.selectedRole = radio.value;
                 }
             });
-
             if (!selectedRoleFound) {
-                modalData.errors.rolSeleccionado = 'Debe seleccionar al menos un rol.';
+                modalData.errors.selectedRole = 'Debe seleccionar al menos un rol.';
                 hasError = true;
             }
+            if (!hasError) {
+                modalData.currentStep = 3;
+            }
+        } else if (modalData.currentStep === 3) {
+            modalData.password = passwordInput.value;
+            modalData.passwordConfirmation = passwordConfirmationInput.value;
 
-            // Si no hay errores en el paso 2, abre el modal de confirmación
+            // Validaciones de contraseña (solo si NO estamos en modo edición o si la contraseña no está vacía)
+            if (!modalData.isEditMode || (modalData.isEditMode && (modalData.password || modalData.passwordConfirmation))) {
+                if (!modalData.password) {
+                    modalData.errors.password = 'La contraseña es obligatoria.';
+                    hasError = true;
+                } else if (modalData.password.length < 8) {
+                    modalData.errors.password = 'La contraseña debe tener al menos 8 caracteres.';
+                    hasError = true;
+                }
+                if (modalData.password !== modalData.passwordConfirmation) {
+                    modalData.errors.password_confirmation = 'Las contraseñas no coinciden.';
+                    hasError = true;
+                }
+            }
+
             if (!hasError) {
                 openConfirmModal();
-                return; // Importante: Salir para no llamar a updateModalUI dos veces o avanzar
+                return;
             }
         }
-        updateModalUI(); // Actualiza la UI para reflejar el cambio de paso o mostrar errores
+        updateModalUI();
     }
 
-    // Maneja el envío de datos del Paso 1 en modo creación
-    async function submitStep1ForCreation() {
-        console.log('JS: submitStep1ForCreation llamado.');
+    // ************* FUNCIÓN DE RETROCESO DE PASO *************
+    function handlePrevAction() {
+        console.log('JS: handlePrevAction llamado. Paso actual:', modalData.currentStep);
         modalData.errors = {};
+        if (modalData.currentStep > 1) {
+            modalData.currentStep--;
+        }
         updateModalUI();
+    }
 
-        const url = '/usuario'; // Tu ruta POST /usuarios
-        const method = 'POST';
+    // ************* NUEVA FUNCIÓN PARA IMPORTAR CSV *************
+    function handleImportCsv() {
+        console.log('JS: handleImportCsv llamado. Iniciando flujo de importación CSV.');
+        // Ocultar el modal principal de creación/edición de usuario
+        if (userFormModal) {
+            userFormModal.classList.remove('opacity-100');
+            userFormModal.classList.add('opacity-0', 'pointer-events-none');
+            // NO REMOVER document.body.classList.remove('overflow-hidden') aquí, el modal de importación lo manejará
+        }
+        // Llamar a la función para abrir el modal de importación CSV del nuevo módulo
+        openImportCsvModal();
+    }
+
+    // ************* FUNCIONES PARA EL MODAL DE CONFIRMACIÓN *************
+    function openConfirmModal() {
+        console.log('JS: openConfirmModal llamado.');
+        // Ocultar el modal principal antes de mostrar el de confirmación
+        userFormModal.classList.remove('opacity-100');
+        userFormModal.classList.add('opacity-0', 'pointer-events-none');
+
+        confirmModal.classList.remove('opacity-0', 'pointer-events-none');
+        confirmModal.classList.add('opacity-100', 'flex');
+        document.body.classList.add('overflow-hidden');
+
+        let rolesHtml = '';
+        if (modalData.selectedRole) {
+            // Replicando el estilo del radio button seleccionado: bg-indigo-200, text-indigo-800, con_marca.svg
+            rolesHtml += `
+                <span class="bg-indigo-200 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold inline-flex items-center mr-2 mb-2">
+                    <img src="/images/con_marca.svg" alt="icono de verificación" class="w-4 h-4 mr-1">
+                    ${modalData.selectedRole}
+                </span>
+            `;
+        } else {
+            rolesHtml += `<span class="text-gray-600">(Ninguno seleccionado)</span>`;
+        }
+
+        const selectedPermissionsSet = new Set();
+        permissionCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedPermissionsSet.add(checkbox.value);
+            }
+        });
+        let permissionsHtml = '';
+        const selectedPermissionsForConfirm = Array.from(selectedPermissionsSet);
+        if (selectedPermissionsForConfirm.length > 0) {
+            // Generar los permisos como tags/chips con clases de Tailwind
+            permissionsHtml = selectedPermissionsForConfirm.map(perm =>
+                `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold inline-block mr-2 mb-2">${perm}</span>`
+            ).join(''); // Unir sin comas, los márgenes ya separan
+        } else {
+            permissionsHtml += `<span class="text-gray-600">(Ninguno seleccionado)</span>`;
+        }
+
+        let passwordDisplayHtml = '';
+        if (!modalData.isEditMode && modalData.password) {
+            passwordDisplayHtml = `
+                <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contraseña generada:</h4>
+                <div class="relative flex items-center mb-4 bg-gray-100 p-3 rounded-lg border border-gray-200">
+                    <input type="text" value="${modalData.password}" readonly
+                        class="w-full bg-transparent text-gray-800 text-base font-mono focus:outline-none cursor-not-allowed" />
+                    <button type="button" class="absolute right-3 text-gray-500 hover:text-gray-700" title="Copiar contraseña" onclick="copyPasswordToClipboard('${modalData.password}')">
+                        <img src="/images/copy.svg" alt="copiar" class="w-5 h-5" />
+                    </button>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">Esta contraseña se enviará al correo del usuario.</p>
+            `;
+        } else if (modalData.isEditMode && modalData.password) {
+            passwordDisplayHtml = `
+                <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contraseña a actualizar:</h4>
+                <p class="text-gray-600 text-sm mb-4">Se actualizará la contraseña a la ingresada.</p>
+            `;
+        }
+
+
+        confirmMessageBody.innerHTML = `
+            <p class="text-gray-700 text-lg mb-6">Estás a punto de <span class="font-bold">${modalData.isEditMode ? 'actualizar' : 'registrar'}</span> un usuario con la siguiente información:</p>
+            
+            <div class="bg-gray-50 p-4 rounded-lg shadow-inner mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Nombre Completo:</p>
+                        <p class="text-gray-900 font-semibold">${modalData.name} ${modalData.lastname}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Documento:</p>
+                        <p class="text-gray-900 font-semibold">${modalData.type_document} ${modalData.document}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Correo Electrónico:</p>
+                        <p class="text-gray-900 font-semibold">${modalData.email}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Teléfono:</p>
+                        <p class="text-gray-900 font-semibold">${modalData.phone}</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="text-sm font-medium text-gray-500 mb-1">Rol Asignado:</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${rolesHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h4 class="font-semibold text-gray-700 mb-2">Permisos directos asignados:</h4>
+            <div class="flex flex-wrap gap-2 mb-6 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                ${permissionsHtml}
+            </div>
+            
+            ${passwordDisplayHtml}
+            
+            <p class="text-gray-700 text-lg mt-6 font-semibold">¿Confirmas ${modalData.isEditMode ? 'la actualización' : 'la creación'} de este usuario con estas atribuciones?</p>
+        `;
+
+        // Ajustar el contenedor de botones para el espacio
+        const confirmModalFooter = confirmModal.querySelector('.flex.justify-end.gap-3.mt-4');
+        if (confirmModalFooter) {
+            confirmModalFooter.classList.remove('justify-end', 'gap-3');
+            confirmModalFooter.classList.add('justify-between', 'w-full', 'mt-6');
+        }
+    }
+
+    function closeConfirmModal() {
+        console.log('JS: closeConfirmModal llamado.');
+        confirmModal.classList.remove('opacity-100', 'flex');
+        confirmModal.classList.add('opacity-0', 'pointer-events-none');
+        // Mostrar el modal principal si aún debería estar abierto
+        if (modalData.isOpen) {
+            userFormModal.classList.remove('opacity-0', 'pointer-events-none');
+            userFormModal.classList.add('opacity-100');
+        }
+    }
+
+    // Función para copiar la contraseña al portapapeles
+    window.copyPasswordToClipboard = function (password) {
+        const tempInput = document.createElement('textarea');
+        tempInput.value = password;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        try {
+            document.execCommand('copy');
+            console.log('¡Contraseña copiada al portapapeles!');
+        } catch (err) {
+            console.error('Error al copiar la contraseña: ', err);
+            console.log('No se pudo copiar la contraseña automáticamente. Por favor, cópiala manualmente.');
+        }
+        document.body.removeChild(tempInput);
+    };
+
+
+    async function submitFormConfirmed() {
+        console.log('JS: submitFormConfirmed llamado. Iniciando envío.');
+        closeConfirmModal(); // Cierra el modal de confirmación, esto también re-muestra el modal principal
+        modalData.errors = {};
+        modalData.successMessage = '';
+        updateModalUI(); // Actualiza la UI del modal principal para mostrar errores/carga
+
+        const actionButton = confirmActionButton;
+        const originalBtnText = actionButton.innerHTML;
+        actionButton.disabled = true;
+        actionButton.innerHTML = `Confirmando <img src="/images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">`;
 
         const formData = new FormData();
         formData.append('_token', modalData.csrfToken);
-        formData.append('name', modalData.nombre);
-        formData.append('email', modalData.correo);
-        formData.append('type_document', modalData.tipoDocumento);
-        formData.append('document', modalData.numeroDocumento);
-        formData.append('form_step', 'step1'); // Indicar al backend que es el paso 1
 
-        // Deshabilita el botón Siguiente mientras se envía
-        nextButton.disabled = true;
-        const originalNextBtnText = nextButton.innerHTML;
-        nextButton.innerHTML = `Siguiente <img src="/images/cargando_.svg" alt="Cargando..." class="w-6 h-5 ml-2 animate-spin">`; // Icono animado
+        let url = '';
+        let method = 'POST';
+
+        if (modalData.isEditMode) {
+            url = `/usuario/${modalData.userId}`;
+            formData.append('_method', 'PUT');
+        } else {
+            url = `/usuario`;
+        }
+
+        // AÑADIR TODOS LOS DATOS RECOPILADOS DE TODOS LOS PASOS
+        formData.append('name', modalData.name);
+        formData.append('lastname', modalData.lastname);
+        formData.append('email', modalData.email);
+        formData.append('phone', modalData.phone);
+        formData.append('type_document', modalData.type_document);
+        formData.append('document', modalData.document);
+
+        formData.append('password', modalData.password);
+        formData.append('password_confirmation', modalData.passwordConfirmation);
+
+        // Rol
+        if (modalData.selectedRole) {
+            formData.append('roles[]', modalData.selectedRole);
+        } else {
+            formData.append('roles[]', '');
+        }
+
+        // Permisos
+        const selectedPermissions = [];
+        permissionCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedPermissions.push(checkbox.value);
+            }
+        });
+        if (selectedPermissions.length > 0) {
+            selectedPermissions.forEach(permission => {
+                formData.append('permissions[]', permission);
+            });
+        } else {
+            formData.append('permissions[]', '');
+        }
+
+        console.log(`JS: Enviando solicitud de ${modalData.isEditMode ? 'EDICIÓN' : 'CREACIÓN'} a URL: ${url} con método ${method}.`);
 
         try {
             const response = await fetch(url, {
@@ -538,229 +814,22 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (!response.ok) {
                 if (response.status === 422 && data.errors) {
                     modalData.errors = data.errors;
-                } else {
-                    modalData.errors.general = data.message || 'Error al crear usuario básico.';
-                }
-                // No avanzamos, mostramos errores en el Paso 1
-                modalData.currentStep = 1;
-                updateModalUI();
-                return;
-            }
-
-            // Éxito: Guardar el user_id retornado por el backend
-            modalData.userId = data.user_id;
-            console.log('Usuario básico creado. userId:', modalData.userId);
-
-            modalData.currentStep = 2; // Avanzar al paso 2
-            modalData.successMessage = data.message; // Mensaje de éxito del backend
-            updateModalUI();
-
-        } catch (error) {
-            console.error('Error en el envío del Paso 1:', error);
-            modalData.errors.general = 'Error de red al crear el usuario básico. Inténtalo de nuevo.';
-            modalData.currentStep = 1; // Si falla, quedarse en el paso 1
-            updateModalUI();
-        } finally {
-            nextButton.disabled = false;
-            nextButton.innerHTML = originalNextBtnText;
-        }
-    }
-
-    // *************  FUNCIONES PARA EL MODAL DE CONFIRMACIÓN *************
-    function openConfirmModal() {
-        console.log('JS: openConfirmModal llamado.');
-        confirmModal.classList.remove('hidden');
-        confirmModal.classList.add('flex');
-        modalData.isOpen = false; // Oculta el modal principal
-        updateModalUI(); // Actualiza la UI para ocultar el modal principal
-
-        let rolesHtml = '';
-        if (modalData.rolSeleccionado) {
-            rolesHtml += `<li>${modalData.rolSeleccionado}</li>`;
-        } else {
-            rolesHtml += `<li>(Ninguno seleccionado)</li>`;
-        }
-
-        const selectedPermissionsSet = new Set(); // ¡USA UN SET PARA ASEGURAR PERMISOS ÚNICOS!
-        permissionCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                selectedPermissionsSet.add(checkbox.value); // Añade al Set, ignora duplicados
-            }
-        });
-
-        let permissionsHtml = '';
-        // Convierte el Set de nuevo a un Array para iterar y mostrar
-        const selectedPermissionsForConfirm = Array.from(selectedPermissionsSet);
-
-        /* const selectedPermissionsForConfirm = []; // Recopila permisos marcados para la confirmación //SE COMENTA PARA REALIZAR PRUEBAS
-        permissionCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                selectedPermissionsForConfirm.push(checkbox.value);
-            }
-        }); */
-
-        if (selectedPermissionsForConfirm.length > 0) {
-            selectedPermissionsForConfirm.forEach(perm => {
-                permissionsHtml += `<li>${perm}</li>`;
-            });
-        } else {
-            permissionsHtml += `<li>(Ninguno seleccionado)</li>`;
-        }
-
-        confirmMessageBody.innerHTML = `
-            <p class="text-gray-700 text-lg mb-4">Estás a punto de ${modalData.isEditMode ? 'actualizar un usuario existente.' : 'crear un nuevo usuario.'}</p>
-            <p class="mb-2"><strong>Nombre:</strong> ${modalData.nombre}</p>
-            <p class="mb-2"><strong>Correo:</strong> ${modalData.correo}</p>
-            <p class="mb-2"><strong>Documento:</strong> ${modalData.tipoDocumento} ${modalData.numeroDocumento}</p>
-
-            <h4 class="font-semibold text-gray-800 mt-4 mb-2">Roles asignados:</h4>
-            <ul class="list-disc list-inside text-gray-600">
-                ${rolesHtml}
-            </ul>
-
-            <h4 class="font-semibold text-gray-800 mt-4 mb-2">Permisos directos asignados:</h4>
-            <ul class="list-disc list-inside text-gray-600">
-                ${permissionsHtml}
-            </ul>
-
-            <p class="text-gray-700 text-lg mt-6 font-semibold">¿Confirmas ${modalData.isEditMode ? 'la actualización' : 'la creación'} de este usuario con estas atribuciones?</p>
-        `;
-    }
-
-    function closeConfirmModal() {
-        console.log('JS: closeConfirmModal llamado.');
-        confirmModal.classList.add('hidden'); // Esto está bien para el modal de confirmación
-        confirmModal.classList.remove('flex');
-        modalData.isOpen = true; // Para asegurar que el modal principal se muestre
-        updateModalUI(); // Llama a updateModalUI para que aplique opacity-100 al modal principal
-    }
-
-    async function submitFormConfirmed() {
-        console.log('JS: submitFormConfirmed llamado. Iniciando envío.');
-        closeConfirmModal();
-        modalData.errors = {};
-        modalData.successMessage = '';
-        updateModalUI();
-
-        const actionButton = confirmActionButton;
-        const originalBtnText = actionButton.textContent;
-        actionButton.disabled = true;
-        actionButton.innerHTML = `Siguiente <img src="/images/cargando.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">`;
-
-        // El método de la petición Fetch siempre será 'POST'
-        // porque Laravel interpreta _method='PUT' dentro de un POST.
-        const method = 'POST';
-
-        const formData = new FormData();
-        formData.append('_token', modalData.csrfToken);
-        formData.append('_method', 'PUT'); // ¡Importante! Esto le dice a Laravel que es un PUT.
-
-        // AÑADIR SIEMPRE TODOS LOS DATOS AQUI, independientemente del modo.
-        // Esto se debe a que tu UsuarioController@update espera todos estos campos
-        // para actualizar el usuario (tanto si es recién creado como si es edición).
-        formData.append('name', modalData.nombre);
-        formData.append('email', modalData.correo);
-        formData.append('type_document', modalData.tipoDocumento);
-        formData.append('document', modalData.numeroDocumento);
-
-        // Manejo de Roles 
-        if (modalData.rolSeleccionado) {
-            formData.append('roles[]', modalData.rolSeleccionado);
-        } else {
-            // Si no hay rol seleccionado, envía un array vacío explícitamente para que Laravel reciba un array válido
-            formData.append('roles[]', ''); // Esto resultará en [''] en el backend, que es manejable por syncRoles
-        }
-
-        // Manejo de Permisos (Punto 2 y 3)
-        const selectedPermissions = [];
-        // Itera sobre los módulos y acciones para construir el array de nombres de permisos. 
-        //! LO COMENTE PARA HACER UNA PRUEBA , YA AHORA LA NUEVA LOGICA ES LA DE ABAJO 
-        /*  for (const moduleKey in modalData.permisos) {
-            for (const actionKey in modalData.permisos[moduleKey]) {
-                if (modalData.permisos[moduleKey][actionKey]) {
-                    const permName = `${actionKey} ${moduleKey.slice(0, -1)}`; // Ejemplo: 'crear usuario'
-                    selectedPermissions.push(permName);
-                }
-            }
-        } */
-        // ! ESTA DE AQUÍ
-        permissionCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                selectedPermissions.push(checkbox.value); // Los valores ya son los nombres de Spatie
-            }
-        });
-
-        // Adjunta CADA permiso individualmente para que Laravel reciba un array ('permissions[]')
-        if (selectedPermissions.length > 0) {
-            selectedPermissions.forEach(permission => {
-                formData.append('permissions[]', permission); // Envía cada permiso como un elemento del array
-            });
-        } else {
-            // Si no hay permisos seleccionados, envía un array vacío explícitamente
-            formData.append('permissions[]', ''); // Esto resultará en [''] en el backend, manejable por syncPermissions
-        }
-
-        let url = ''; // La URL que se usará para el fetch.
-
-        // ! LA COMENTE PARA HACER PRUBAS, AHORA SERA LA DE ABAJO QUE HAY QUE ENSAYAR
-        /* if (!modalData.userId) {
-            console.error('ERROR: userId no definido para la operación de actualización/finalización del formulario.');
-            modalData.errors.general = 'Error interno: No se pudo obtener el ID del usuario para finalizar la operación. Por favor, cancela y vuelve a intentar.';
-            userFormModal.classList.remove('opacity-0'); // Asegura visibilidad para el error
-            userFormModal.classList.add('opacity-100');
-            updateModalUI();
-            actionButton.disabled = false;
-            actionButton.textContent = originalBtnText;
-            return;
-        } 
-        */
-
-        // ! ESTA DE AQUÍ
-        if (!modalData.userId) {
-            console.error('ERROR: userId no definido para la operación de actualización/finalización del formulario.');
-            modalData.errors.general = 'Error interno: ID de usuario no disponible para finalizar la operación. Por favor, cancela y vuelve a intentar.';
-            modalData.isOpen = true; // Asegura visibilidad para el error
-            updateModalUI();
-            actionButton.disabled = false;
-            actionButton.textContent = originalBtnText;
-            return;
-        }
-
-        // La URL para ambas situaciones (finalizar creación y edición) apunta al método PUT de Laravel:
-        url = `/usuario/${modalData.userId}`;
-        console.log(`JS: Enviando solicitud de ${modalData.isEditMode ? 'EDICIÓN' : 'FINALIZACIÓN DE CREACIÓN'} a URL: ${url} con método simulado PUT.`);
-
-        try {
-            const response = await fetch(url, {
-                method: method, // Siempre 'POST' en el fetch
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                },
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                if (response.status === 422 && data.errors) {
-                    // Laravel envió errores de validación (422)
-                    modalData.errors = data.errors; // Asignamos los errores específicos
                     console.error('Errores de validación del backend:', data.errors);
-                    // También loguea los errores de cada campo si existen
-                    for (const key in data.errors) {
-                        if (data.errors.hasOwnProperty(key)) {
-                            console.error(`Campo '${key}':`, data.errors[key]);
-                        }
-                    }
-
                 } else {
-                    // Otros errores del servidor (ej. 403, 500)
                     modalData.errors.general = data.message || `Error ${response.status}: ${response.statusText || 'Desconocido'}.`;
                     console.error('Error del servidor no 422:', data);
                 }
-                modalData.isOpen = true; // Asegura que el modal principal esté visible para ver errores
-                updateModalUI(); // Actualiza la UI para mostrar los errores
-                return; // Detener la ejecución para que el usuario vea el error
+                modalData.isOpen = true;
+                const firstErrorField = Object.keys(modalData.errors)[0];
+                if (firstErrorField === 'name' || firstErrorField === 'lastname' || firstErrorField === 'email' || firstErrorField === 'phone' || firstErrorField === 'type_document' || firstErrorField === 'document') {
+                    modalData.currentStep = 1;
+                } else if (firstErrorField === 'roles' || firstErrorField === 'selectedRole' || firstErrorField === 'permissions') {
+                    modalData.currentStep = 2;
+                } else if (firstErrorField === 'password' || firstErrorField === 'password_confirmation') {
+                    modalData.currentStep = 3;
+                }
+                updateModalUI();
+                return;
             }
 
             // Éxito
@@ -776,11 +845,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         } catch (error) {
             console.error('Error de red o parsing JSON:', error);
             modalData.errors.general = 'Ocurrió un error de red o inesperado. Por favor, inténtalo de nuevo.';
-            modalData.isOpen = true; // Asegura visibilidad para el error
+            modalData.isOpen = true;
             updateModalUI();
         } finally {
             actionButton.disabled = false;
-            actionButton.textContent = originalBtnText;
+            actionButton.innerHTML = originalBtnText;
         }
     }
 
@@ -798,56 +867,94 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     if (closeModalButton) closeModalButton.addEventListener('click', closeModal);
 
-    // ************* nextButton ahora maneja todo el flujo de avance *************
     if (nextButton) {
         nextButton.addEventListener('click', function (event) {
             event.preventDefault();
-            handleNextAction(); // Llama a la función que decide si avanza o abre confirmación
+            handleNextAction();
         });
     }
 
-    // ************* LISTENERS PARA EL MODAL DE CONFIRMACIÓN *************
+    if (prevButton) {
+        prevButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            handlePrevAction();
+        });
+    }
+
+    if (generatePasswordButton) {
+        generatePasswordButton.addEventListener('click', function () {
+            const newPassword = generateRandomPassword();
+            passwordInput.value = newPassword;
+            passwordConfirmationInput.value = newPassword;
+            modalData.password = newPassword;
+            modalData.passwordConfirmation = newPassword;
+            delete modalData.errors.password;
+            delete modalData.errors.password_confirmation;
+            renderErrors();
+        });
+    }
+
+    // NUEVO: Event Listener para el botón Importar CSV
+    if (importCsvButton) {
+        importCsvButton.addEventListener('click', handleImportCsv);
+    }
+
     if (confirmCancelButton) confirmCancelButton.addEventListener('click', closeConfirmModal);
     if (confirmActionButton) confirmActionButton.addEventListener('click', submitFormConfirmed);
 
     // Actualizar `modalData` cuando los inputs cambian
-    if (nameInput) nameInput.addEventListener('input', (e) => modalData.nombre = e.target.value);
-    if (emailInput) emailInput.addEventListener('input', (e) => modalData.correo = e.target.value);
-    if (typeDocumentSelect) typeDocumentSelect.addEventListener('change', (e) => modalData.tipoDocumento = e.target.value);
-    if (documentInput) documentInput.addEventListener('input', (e) => modalData.numeroDocumento = e.target.value);
+    if (nameInput) nameInput.addEventListener('input', (e) => modalData.name = e.target.value);
+    if (lastnameInput) lastnameInput.addEventListener('input', (e) => modalData.lastname = e.target.value);
+    if (emailInput) emailInput.addEventListener('input', (e) => modalData.email = e.target.value);
+    if (phoneInput) phoneInput.addEventListener('input', (e) => modalData.phone = e.target.value);
+    if (typeDocumentSelect) typeDocumentSelect.addEventListener('change', (e) => modalData.type_document = e.target.value);
+    if (documentInput) documentInput.addEventListener('input', (e) => modalData.document = e.target.value);
+    if (passwordInput) passwordInput.addEventListener('input', (e) => modalData.password = e.target.value);
+    if (passwordConfirmationInput) passwordConfirmationInput.addEventListener('input', (e) => modalData.passwordConfirmation = e.target.value);
 
-    // Listener para los cambios en los radio buttons de rol (Punto 3)
+    // Listener para los cambios en los radio buttons de rol
     roleCheckboxes.forEach(radio => {
         radio.addEventListener('change', function () {
-            if (this.checked) { // Solo si este checkbox fue el que se marcó
-                modalData.rolSeleccionado = this.value; // Actualiza el rol seleccionado en modalData
-                applyRoleDefaultPermissions(modalData.rolSeleccionado); // ¡Aplica los permisos por defecto!
+            if (this.checked) {
+                modalData.selectedRole = this.value;
+                applyRoleDefaultPermissions(modalData.selectedRole);
             }
         });
     });
 
-    // Listener para los cambios en los checkboxes de permisos (Punto 2)
+    // Listener para los cambios en los checkboxes de permisos
     permissionCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function () {
-            // Cuando un checkbox de permiso cambia, actualiza modalData.permisos
-            // Necesitas la misma lógica de mapeo para saber a qué propiedad de modalData.permisos corresponde
             updateModalDataPermission(this.value, this.checked);
         });
     });
 
     // Lógica para el manejo de roles (click en el label para el estilo)
-    // Ya lo tienes dentro de updateFormValues, esto es para el evento click en el LABEL
     const roleLabels = document.querySelectorAll('.role-label');
     roleLabels.forEach(label => {
         label.addEventListener('click', function () {
             const radio = this.querySelector('input[name="roles[]"]');
             if (radio && !radio.checked) {
-                // Si el radio no estaba marcado, el 'change' listener de arriba lo manejará.
-                // Esta lógica es más para la UX de hacer clic en el label.
                 radio.checked = true;
-                // Disparar manualmente el evento 'change' si el navegador no lo hace automáticamente al cambiar 'checked'
                 radio.dispatchEvent(new Event('change'));
             }
         });
     });
+
+    // ************* Funciones para mostrar/ocultar contraseña (Paso 3) *************
+    if (togglePasswordVisibility) {
+        togglePasswordVisibility.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+        });
+    }
+
+    if (toggleConfirmPasswordVisibility) {
+        toggleConfirmPasswordVisibility.addEventListener('click', function () {
+            const type = passwordConfirmationInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordConfirmationInput.setAttribute('type', type);
+            this.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+        });
+    }
 });
