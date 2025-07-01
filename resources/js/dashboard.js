@@ -384,7 +384,7 @@ function renderChart(data) {
             return `<div class="p-2"><strong>${dataPoint.name}</strong><br>${seriesName}: <strong>${valorActual}</strong><br>${changeInfo}</div>`;
         }},
         grid: { left: '3%', right: '4%', top: '10%', bottom: '3%', containLabel: true },
-        xAxis: { type: 'category', data: labels, axisLabel: { color: '#000', fontSize: 12, interval: 0, rotate: 30 } },
+        xAxis: { type: 'category', data: labels, axisLabel: { color: '#000', fontSize: 12, interval: 0, rotate: 0 } },
         yAxis: { type: 'value', minInterval: 1, axisLabel: { formatter: function (value) { return value % 1 === 0 ? value : ''; } } },
         series: [{
             name: seriesChartName, data: values, type: 'line', smooth: true,
