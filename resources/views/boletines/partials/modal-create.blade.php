@@ -135,7 +135,7 @@
                     </div>
                 </div>
 
-                {{-- *** NUEVA SECCIÓN: Principales indicadores *** --}}
+                {{-- Sección: Principales indicadores --}}
                 <div class="mb-6">
                     <h4 class="block mb-4 text-sm font-semibold text-gray-700">Principales indicadores</h4>
                     
@@ -151,10 +151,10 @@
                             class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                             placeholder="Ingresar precio" x-model="precioMasAlto">
                         
-                        {{-- Input para Lugar Precio Más Alto --}}
+                        {{-- Input para Lugar Precio Más Alto (¡x-model correcto!) --}}
                         <input type="text" id="lugarPrecioMasAlto" name="lugar_precio_mas_alto" maxlength="255"
                             class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                            placeholder="Ingresar lugar" x-model="lugarPrecioMasAlto">
+                            placeholder="Ingresar lugar" x-model="lugarPrecioMasAlto"> {{-- x-model vinculado a la propiedad correcta --}}
                     </div>
 
                     {{-- Indicador de Precio Más Bajo --}}
@@ -169,14 +169,12 @@
                             class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                             placeholder="Ingresar precio" x-model="precioMasBajo">
                         
-                        {{-- Input para Lugar Precio Más Bajo --}}
+                        {{-- Input para Lugar Precio Más Bajo (¡x-model correcto!) --}}
                         <input type="text" id="lugarPrecioMasBajo" name="lugar_precio_mas_bajo" maxlength="255"
                             class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                            placeholder="Ingresar lugar" x-model="lugarPrecioMasBajo">
+                            placeholder="Ingresar lugar" x-model="lugarPrecioMasBajo"> {{-- x-model vinculado a la propiedad correcta --}}
                     </div>
                 </div>
-                {{-- *** FIN NUEVA SECCIÓN *** --}}
-
             </div>
 
             {{-- Footer del Modal (Botones de acción, SIEMPRE visible) --}}

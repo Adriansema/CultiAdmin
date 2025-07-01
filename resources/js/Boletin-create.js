@@ -11,17 +11,24 @@ Alpine.data('uploadForm', () => ({
     currentStep: 1, // 1 para selección de archivo, 2 para formulario de detalles
     isDragging: false, // Para el estilo de arrastrar y soltar
 
+    // *** PROPIEDADES PARA LOS INDICADORES ***
+    precioMasAlto: '',
+    lugarPrecioMasAlto: '',
+    precioMasBajo: '',
+    lugarPrecioMasBajo: '',
+    // ***************************************
+
     // Inicialización del componente
     init() {
         this.$watch('open', value => {
-            console.log(`DEBUG: Alpine 'open' property changed to: ${value}`); // Log para rastrear el estado 'open'
+            console.log(`DEBUG: Alpine 'open' property changed to: ${value}`);
             if (value) {
                 this.resetForm();
             }
         });
     },
 
-    // Función para mostrar mensajes globales (usando la instancia global de Alpine para los modales de éxito/error)
+    // Función para mostrar mensajes globales
     showGlobalMessage(message, isError = false) {
         const globalElement = document.querySelector('[x-data*="showSuccessModal"]');
         if (globalElement && window.Alpine && Alpine.get) {
@@ -31,9 +38,7 @@ Alpine.data('uploadForm', () => ({
                     globalModalState.modalMessage = message;
                     globalModalState.showSuccessModal = !isError;
                     globalModalState.showErrorModal = isError;
-                    // El watch en x-init de index.blade.php ya maneja el showModal y el setTimeout.
                 } else {
-                    // Fallback a SweetAlert2 si el componente global no se encuentra o no está listo
                     Swal.fire(isError ? 'Error' : 'Éxito', message, isError ? 'error' : 'success');
                 }
             } catch (e) {
@@ -86,18 +91,24 @@ Alpine.data('uploadForm', () => ({
         if (pdfFileInput) {
             pdfFileInput.value = '';
         }
+        // *** RESETEAR PROPIEDADES DE INDICADORES ***
+        this.precioMasAlto = '';
+        this.lugarPrecioMasAlto = '';
+        this.precioMasBajo = '';
+        this.lugarPrecioMasBajo = '';
+        // *******************************************
     },
 
     // Método interno para abrir el modal
     _openModalInternal() {
-        console.log('DEBUG: _openModalInternal llamado. Estableciendo open = true.'); // Log de apertura
+        console.log('DEBUG: _openModalInternal llamado. Estableciendo open = true.');
         this.open = true;
         this.resetForm();
     },
 
     // Método para cerrar el modal
     closeModal() {
-        console.log('DEBUG: closeModal llamado. Estableciendo open = false.'); // Log de cierre
+        console.log('DEBUG: closeModal llamado. Estableciendo open = false.');
         this.open = false;
         this.resetForm();
     },
@@ -122,6 +133,22 @@ Alpine.data('uploadForm', () => ({
             return;
         }
 
+        // *** VALIDACIÓN DE INDICADORES: Asegurar que si uno se llena, el otro también ***
+        const hasPrecioAlto = this.precioMasAlto !== null && this.precioMasAlto !== '';
+        const hasLugarAlto = this.lugarPrecioMasAlto.trim() !== '';
+        const hasPrecioBajo = this.precioMasBajo !== null && this.precioMasBajo !== '';
+        const hasLugarBajo = this.lugarPrecioMasBajo.trim() !== '';
+
+        if ((hasPrecioAlto && !hasLugarAlto) || (!hasPrecioAlto && hasLugarAlto)) {
+            this.showGlobalMessage('Para el precio más alto, por favor ingresa tanto el precio como el lugar, o déjalos ambos vacíos.', true);
+            return;
+        }
+        if ((hasPrecioBajo && !hasLugarBajo) || (!hasPrecioBajo && hasLugarBajo)) {
+            this.showGlobalMessage('Para el precio más bajo, por favor ingresa tanto el precio como el lugar, o déjalos ambos vacíos.', true);
+            return;
+        }
+        // ********************************************************************************
+
         const form = document.getElementById('createBoletinForm');
         if (!form) {
             console.error("ERROR: Formulario 'createBoletinForm' no encontrado.");
@@ -134,7 +161,21 @@ Alpine.data('uploadForm', () => ({
         formData.append('archivo', this.file);
         formData.append('nombre_boletin', this.nombreBoletin);
         formData.append('producto', this.producto);
-        formData.append('contenido', this.descripcionBoletin);
+        formData.append('contenido', this.descripcionBoletin); // 'contenido' es la descripción
+
+        // *** AÑADIR NUEVOS CAMPOS DE INDICADORES AL FORM DATA ***
+        // Solo añadir si tienen valor para evitar enviar cadenas vacías o null
+        if (hasPrecioAlto) formData.append('precio_mas_alto', this.precioMasAlto);
+        if (hasLugarAlto) formData.append('lugar_precio_mas_alto', this.lugarPrecioMasAlto);
+        if (hasPrecioBajo) formData.append('precio_mas_bajo', this.precioMasBajo);
+        if (hasLugarBajo) formData.append('lugar_precio_mas_bajo', this.lugarPrecioMasBajo);
+
+        // *** LOG DE LOS DATOS ENVIADOS ***
+        console.log('DEBUG: Datos de formData a enviar:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+        // **********************************
 
         const csrfToken = document.querySelector('meta[name="csrf-token"]');
         if (csrfToken) {
@@ -189,16 +230,14 @@ Alpine.data('uploadForm', () => ({
                         let newRowHtml = await rowResponse.text();
                         console.log('DEBUG: HTML de nueva fila recibido (crudo):', newRowHtml);
 
-                        // Limpiamos el HTML de cualquier espacio en blanco o caracter invisible
                         newRowHtml = newRowHtml.trim();
                         console.log('DEBUG: HTML de nueva fila recibido (trim):', newRowHtml);
 
-                        // Añadimos una depuración extra para ver si el HTML es realmente un <tr>
                         if (!newRowHtml.startsWith('<tr')) {
                             console.error('ERROR: El HTML recibido no comienza con <tr>:', newRowHtml);
                             this.showGlobalMessage('Boletín creado, pero el HTML de la fila es inesperado. Recargue la página.', true);
                             setTimeout(() => window.location.reload(), 2000);
-                            return; // Salir si el HTML no es un <tr>
+                            return;
                         }
 
                         boletinesTableBody.insertAdjacentHTML('afterbegin', newRowHtml);

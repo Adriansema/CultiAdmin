@@ -62,12 +62,13 @@ class BoletinController extends Controller
             'nombre_boletin' => 'required|string|max:100', 
             'producto' => 'required|string|in:cafe,mora', 
             'contenido' => 'required|string|max:500', 
-            // *** NUEVAS REGLAS DE VALIDACIÓN PARA INDICADORES ***
+            // *** REGLAS DE VALIDACIÓN PARA INDICADORES ***
+            // Usamos 'nullable' para que no sean obligatorios si no se envían
             'precio_mas_alto' => 'nullable|numeric|min:0',
             'lugar_precio_mas_alto' => 'nullable|string|max:255',
             'precio_mas_bajo' => 'nullable|numeric|min:0',
             'lugar_precio_mas_bajo' => 'nullable|string|max:255',
-            // ***************************************************
+            // *********************************************
         ]);
 
         $filePath = $request->file('archivo')->store('public/boletines'); 
@@ -79,12 +80,12 @@ class BoletinController extends Controller
             'nombre_boletin' => $validated['nombre_boletin'], 
             'producto' => $validated['producto'],             
             'ruta_pdf' => Storage::url($filePath), 
-            // *** GUARDAR NUEVOS CAMPOS ***
+            // *** GUARDAR NUEVOS CAMPOS (usar null si no vienen) ***
             'precio_mas_alto' => $validated['precio_mas_alto'] ?? null,
             'lugar_precio_mas_alto' => $validated['lugar_precio_mas_alto'] ?? null,
             'precio_mas_bajo' => $validated['precio_mas_bajo'] ?? null,
             'lugar_precio_mas_bajo' => $validated['lugar_precio_mas_bajo'] ?? null,
-            // ****************************
+            // ******************************************************
         ]);
 
         $operadores = User::role('Operario')->get();
