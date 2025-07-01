@@ -12,19 +12,28 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('productos', function (Blueprint $table) {
-            $table->id(); // id (Bigserial)
-
-            // user_id (int8) - Clave foránea, no nulo según tu especificación
+            $table->id();
             $table->foreignId('user_id')
-                  ->constrained() // Asume 'users' tabla y 'id' columna, no nulo
+                  ->constrained() 
                   ->onDelete('cascade'); // Si un usuario es eliminado, también se borran sus productos
 
             $table->string('tipo', 255)->default(''); // Tipo (varchar(255), Por defecto '')
-            $table->string('estado', 255)->default('pendiente'); // Estado (varchar(255), Por defecto 'pendiente')
-            $table->text('observaciones')->nullable(); // Observaciones (text, puede ser nulo)
-            // ¡COLUMNA 'descripcion' ELIMINADA!
             $table->string('imagen', 255)->nullable(); // Imagen (varchar(255), no nulo)
-            $table->timestamps(); // created_at y updated_at (timestamp(0))
+            $table->string('RutaVideo', 255)->nullable();
+            $table->text('observaciones')->nullable(); // Observaciones (text, puede ser nulo)
+            $table->string('estado', 255)->default('pendiente'); // Estado (varchar(255), Por defecto 'pendiente')
+
+            $table->foreignId('validado_por_user_id')
+                  ->nullable() // Puede ser nulo si aún no ha sido validado
+                  ->constrained('users') // Referencia a la tabla 'users'
+                  ->onDelete('set null'); 
+            
+            $table->foreignId('rechazado_por_user_id')
+                  ->nullable()
+                  ->constrained('users')
+                  ->onDelete('set null')
+                  ->after('validado_por_user_id'); 
+            $table->timestamps();
         });
     }
 

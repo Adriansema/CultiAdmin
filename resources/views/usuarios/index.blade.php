@@ -30,6 +30,7 @@
                         <img src="{{ asset('images/filtro-hover.svg') }}"
                             class="w-4 h-3 relative inset-0 hidden group-hover:block" alt="Icono de filtro hover">
                     </button>
+
                     <form method="GET" action="{{ route('usuarios.exportar') }}">
                         {{-- ! Exportar CSV: Un botón para exportar la lista de usuarios a un archivo CSV, también con un efecto de cambio de icono al hacer hover. Este botón, aunque es un enlace de navegación, está dentro de un formulario que envía una solicitud GET para la exportación. --}}
                         <x-responsive-nav-link href="#" onclick="this.closest('form').submit(); return false;"
@@ -44,15 +45,9 @@
                         </x-responsive-nav-link>
                     </form>
 
-                    {{-- <x-responsive-nav-link href="{{ route('usuarios.create') }}"
-                        class="inline-flex items-center px-4 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900] hover:bg-[#61BA33] text-white rounded-full w-auto">
-                        <img src="{{ asset('images/signo.svg') }}" class="w-4 h-3" alt="Icono Nuevo Usuario">
-                        <span class="text-xs font-medium whitespace-nowrap">
-                            {{ __('Crear Usuario') }}
-                        </span>
-                    </x-responsive-nav-link> --}}
-                    <button type="button"
-                        class="inline-flex items-center px-4 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900] hover:bg-[#61BA33] text-white rounded-full w-auto create-user-button">
+                    <button type="button" id="create-user-button" {{-- AÑADE ESTE ID --}}
+                        class="inline-flex items-center px-4 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900] 
+                        hover:bg-[#61BA33] text-white rounded-full w-auto create-user-button">
                         <img src="{{ asset('images/signo.svg') }}" class="w-4 h-3" alt="Icono Nuevo Usuario">
                         <span class="text-xs font-medium whitespace-nowrap">
                             {{ __('Crear Usuario') }}
@@ -70,8 +65,6 @@
                 <div class="p-4 mb-4 text-red-800 bg-red-100 rounded shadow">{{ session('error') }}</div>
             @endif
 
-            {{-- Incluye el parcial del formulario modal --}}
-            {{-- Ya no se pasan las variables del usuario, el JS las cargará por AJAX --}}
             @include('usuarios.partials.formulario', [
                 'roles' => $roles, // Estos sí se pasan, son roles del sistema
                 'permissions' => $permissions, // Estos también, son permisos del sistema

@@ -9,21 +9,24 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Markdown; // Importa Markdown para usar la vista Blade de Markdown
 
 class UserCreatedNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $user;
-    public $resetUrl;
+    public $appName;
+    public $generatedPassword; // Nueva propiedad para la contraseña generada
 
     /**
      * Create a new message instance.
      */
-    public function __construct(User $user, string $resetUrl)
+    public function __construct(User $user, string $generatedPassword) // Añade $generatedPassword al constructor
     {
         $this->user = $user;
-        $this->resetUrl = $resetUrl;
+        $this->appName = config('app.name'); // Obtiene el nombre de la aplicación
+        $this->generatedPassword = $generatedPassword; // Asigna la contraseña
     }
 
     /**
@@ -32,7 +35,7 @@ class UserCreatedNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '¡Tu Cuenta ha sido Creada en [Tu Aplicación]!',
+            subject: 'Tu cuenta ha sido creada en ' . $this->appName,
         );
     }
 
@@ -42,11 +45,11 @@ class UserCreatedNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.user-created', // Usaremos una vista Markdown
+            markdown: 'emails.user-created-notification', // Usa tu vista markdown
             with: [
                 'userName' => $this->user->name,
-                'resetUrl' => $this->resetUrl,
-                'appName' => config('app.name'), // Obtiene el nombre de tu app de .env
+                'appName' => $this->appName,
+                'generatedPassword' => $this->generatedPassword, // Pasa la contraseña a la vista
             ],
         );
     }

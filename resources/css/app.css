@@ -92,6 +92,12 @@ html { font-size: 16px; }
         --color-text: #F6F6F6;
         --color-ajustes: #D1D1D1;
         --color-sidebarhoverbtn: #547488;
+        --color-regresar:#335971;
+        --color-hoveregresar: #547488;
+        --color-hoversgt: #61BA33;
+        --color-sgt: #39A900;
+        --color-generador: #1870a7;
+        --color-hovergener: #1870a7e1;
     }
 }
 
