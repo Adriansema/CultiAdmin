@@ -1,6 +1,6 @@
 {{-- Este div contiene solo el HTML del sidebar --}}
 <div :class="sidebarOpen ? 'w-64' : 'w-24'"
-    class="h-auto flex flex-col transition-all duration-1000 bg-[#00304D] text-white flex-shrink-0 overflow-y-auto">
+    class="h-full flex flex-col transition-all duration-1000 bg-[#00304D] text-white flex-shrink-0 overflow-y-auto">
 
     <div class="flex items-center justify-between px-4 py-3">
         {{-- Logo + botón de colapsar --}}
