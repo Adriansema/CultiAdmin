@@ -14,13 +14,14 @@ Alpine.data('uploadForm', () => ({
     // Inicialización del componente
     init() {
         this.$watch('open', value => {
+            console.log(`DEBUG: Alpine 'open' property changed to: ${value}`); // Log para rastrear el estado 'open'
             if (value) {
                 this.resetForm();
             }
         });
     },
 
-    // Función para mostrar mensajes globales
+    // Función para mostrar mensajes globales (usando la instancia global de Alpine para los modales de éxito/error)
     showGlobalMessage(message, isError = false) {
         const globalElement = document.querySelector('[x-data*="showSuccessModal"]');
         if (globalElement && window.Alpine && Alpine.get) {
@@ -30,7 +31,9 @@ Alpine.data('uploadForm', () => ({
                     globalModalState.modalMessage = message;
                     globalModalState.showSuccessModal = !isError;
                     globalModalState.showErrorModal = isError;
+                    // El watch en x-init de index.blade.php ya maneja el showModal y el setTimeout.
                 } else {
+                    // Fallback a SweetAlert2 si el componente global no se encuentra o no está listo
                     Swal.fire(isError ? 'Error' : 'Éxito', message, isError ? 'error' : 'success');
                 }
             } catch (e) {
@@ -87,19 +90,21 @@ Alpine.data('uploadForm', () => ({
 
     // Método interno para abrir el modal
     _openModalInternal() {
+        console.log('DEBUG: _openModalInternal llamado. Estableciendo open = true.'); // Log de apertura
         this.open = true;
         this.resetForm();
     },
 
     // Método para cerrar el modal
     closeModal() {
+        console.log('DEBUG: closeModal llamado. Estableciendo open = false.'); // Log de cierre
         this.open = false;
         this.resetForm();
     },
 
     // Función para manejar el envío del archivo y datos del boletín
     async uploadFile() {
-        console.log('DEBUG: uploadFile iniciado.'); // DEBUG
+        console.log('DEBUG: uploadFile iniciado.');
         if (!this.file) {
             this.showGlobalMessage('Por favor, selecciona un archivo PDF.', true);
             return;
@@ -119,11 +124,11 @@ Alpine.data('uploadForm', () => ({
 
         const form = document.getElementById('createBoletinForm');
         if (!form) {
-            console.error("ERROR: Formulario 'createBoletinForm' no encontrado."); // DEBUG
+            console.error("ERROR: Formulario 'createBoletinForm' no encontrado.");
             this.showGlobalMessage('Error interno: El formulario no se pudo encontrar.', true);
             return;
         }
-        console.log('DEBUG: Formulario encontrado:', form); // DEBUG
+        console.log('DEBUG: Formulario encontrado:', form);
 
         const formData = new FormData();
         formData.append('archivo', this.file);
@@ -142,6 +147,7 @@ Alpine.data('uploadForm', () => ({
 
         const xhr = new XMLHttpRequest();
         xhr.open("POST", form.action, true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
         xhr.upload.addEventListener("progress", (e) => {
             if (e.lengthComputable) {
@@ -150,53 +156,69 @@ Alpine.data('uploadForm', () => ({
         });
 
         xhr.onload = async () => {
-            console.log('DEBUG: xhr.onload disparado. Status:', xhr.status); // DEBUG
+            console.log('DEBUG: xhr.onload disparado. Status:', xhr.status);
             if (xhr.status === 200 || xhr.status === 201) {
-                this.closeModal(); // Cierra el modal al éxito
+                this.closeModal(); // Cierra el modal de subida inmediatamente al éxito
 
                 try {
                     const responseData = JSON.parse(xhr.responseText);
                     const boletinId = responseData.boletin_id;
-                    console.log('DEBUG: Boletín creado en backend. ID recibido:', boletinId); // DEBUG
+                    console.log('DEBUG: Boletín creado en backend. ID recibido:', boletinId);
 
                     const boletinesTableBody = document.getElementById('boletines-table-body');
-                    console.log('DEBUG: Elemento boletinesTableBody:', boletinesTableBody); // DEBUG
+                    console.log('DEBUG: Elemento boletinesTableBody:', boletinesTableBody);
 
                     if (boletinId && boletinesTableBody) {
-                        console.log(`DEBUG: Intentando obtener HTML de fila para boletín ID: ${boletinId}`); // DEBUG
-                        const rowResponse = await fetch(`/boletines/${boletinId}/row-html`);
-                        console.log('DEBUG: Respuesta de fetch row-html. Status:', rowResponse.status, 'OK:', rowResponse.ok); // DEBUG
+                        console.log(`DEBUG: Intentando obtener HTML de fila para boletín ID: ${boletinId}`);
+
+                        const rowResponse = await fetch(`/boletines/${boletinId}/row-html`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'text/html'
+                            },
+                            credentials: 'include'
+                        });
+
+                        console.log('DEBUG: Respuesta de fetch row-html. Status:', rowResponse.status, 'OK:', rowResponse.ok);
 
                         if (!rowResponse.ok) {
-                            throw new Error(`HTTP error al obtener fila: ${rowResponse.status} - ${rowResponse.statusText}`); // Más detalle en el error
+                            const errorText = await rowResponse.text();
+                            console.error('DEBUG: Raw response text for row-html failure:', errorText);
+                            throw new Error(`HTTP error al obtener fila: ${rowResponse.status} - ${rowResponse.statusText || 'Error desconocido'}. Mensaje del servidor: ${errorText.substring(0, 200)}...`);
                         }
-                        const newRowHtml = await rowResponse.text();
-                        console.log('DEBUG: HTML de nueva fila recibido:', newRowHtml); // DEBUG
+                        let newRowHtml = await rowResponse.text();
+                        console.log('DEBUG: HTML de nueva fila recibido (crudo):', newRowHtml);
 
-                        const noBoletinesRow = document.getElementById('no-boletines-row');
-                        if (noBoletinesRow) {
-                            console.log('DEBUG: Removiendo fila "no-boletines-row".'); // DEBUG
-                            noBoletinesRow.remove();
+                        // Limpiamos el HTML de cualquier espacio en blanco o caracter invisible
+                        newRowHtml = newRowHtml.trim();
+                        console.log('DEBUG: HTML de nueva fila recibido (trim):', newRowHtml);
+
+                        // Añadimos una depuración extra para ver si el HTML es realmente un <tr>
+                        if (!newRowHtml.startsWith('<tr')) {
+                            console.error('ERROR: El HTML recibido no comienza con <tr>:', newRowHtml);
+                            this.showGlobalMessage('Boletín creado, pero el HTML de la fila es inesperado. Recargue la página.', true);
+                            setTimeout(() => window.location.reload(), 2000);
+                            return; // Salir si el HTML no es un <tr>
                         }
 
                         boletinesTableBody.insertAdjacentHTML('afterbegin', newRowHtml);
                         this.showGlobalMessage('Boletín creado y tabla actualizada.', false);
-                        console.log('DEBUG: Nueva fila de boletín añadida a la tabla. Todo ok.'); // DEBUG
-                        // Ya no recargamos la página aquí
+                        console.log('DEBUG: Nueva fila de boletín añadida a la tabla. Todo ok.');
+
                     } else {
-                        console.warn('ADVERTENCIA: ID de boletín no recibido o tbody de la tabla no encontrado. La tabla NO se actualizó dinámicamente.'); // DEBUG
-                        this.showGlobalMessage('Boletín creado, pero la tabla no se pudo actualizar. Por favor, recargue la página.', false);
+                        const msg = boletinId ? 'El cuerpo de la tabla no se encontró.' : 'ID de boletín no recibido.';
+                        console.warn(`ADVERTENCIA: La tabla NO se actualizó dinámicamente. ${msg}`);
+                        this.showGlobalMessage(`Boletín creado, pero la tabla no se pudo actualizar. ${msg} Por favor, recargue la página.`, false);
                         setTimeout(() => window.location.reload(), 2000);
                     }
 
                 } catch (e) {
-                    console.error('ERROR EN LA FASE DE ACTUALIZACIÓN DE TABLA DINÁMICA:', e); // DEBUG
-                    this.showGlobalMessage('Boletín creado, pero hubo un problema al actualizar la tabla en vivo. Por favor, recargue la página.', true);
+                    console.error('ERROR EN LA FASE DE ACTUALIZACIÓN DE TABLA DINÁMICA:', e);
+                    this.showGlobalMessage(`Boletín creado, pero hubo un problema al actualizar la tabla en vivo. Detalle: ${e.message}. Por favor, recargue la página.`, true);
                     setTimeout(() => window.location.reload(), 2000);
                 }
 
             } else {
-                // Manejo de errores de la subida del formulario (HTTP status no 200/201)
                 let errorMessage = 'Error al subir el archivo.';
                 try {
                     const response = JSON.parse(xhr.responseText);
@@ -206,7 +228,7 @@ Alpine.data('uploadForm', () => ({
                         errorMessage = Object.values(response.errors).flat().join('\n');
                     }
                 } catch (e) {
-                    console.error("ERROR: parsing XHR error response:", e); // DEBUG
+                    console.error("ERROR: parsing XHR error response:", e);
                 }
                 this.closeModal();
                 this.showGlobalMessage(errorMessage, true);
@@ -214,7 +236,7 @@ Alpine.data('uploadForm', () => ({
         };
 
         xhr.onerror = () => {
-            console.error('ERROR: xhr.onerror disparado (error de red).'); // DEBUG
+            console.error('ERROR: xhr.onerror disparado (error de red).');
             this.closeModal();
             this.showGlobalMessage('Error de red o conexión al servidor. Inténtalo de nuevo.', true);
         };
@@ -229,7 +251,7 @@ window.openCreateBoletinModal = function() {
     if (modalElement && modalElement.__x) {
         modalElement.__x.$data._openModalInternal();
     } else {
-        console.warn("ADVERTENCIA: No se pudo encontrar el modal con ID 'createBoletinModal' o su instancia Alpine.js."); // DEBUG
+        console.warn("ADVERTENCIA: No se pudo encontrar el modal con ID 'createBoletinModal' o su instancia Alpine.js.");
         if (modalElement) {
             modalElement.style.display = 'flex';
         }
