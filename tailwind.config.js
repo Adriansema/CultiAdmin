@@ -15,7 +15,8 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
-            },
+                'darkblue':'#00304D'
+         },
         },
     },
 

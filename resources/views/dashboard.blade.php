@@ -11,43 +11,55 @@
             </div>
 
             <div class="flex flex-wrap items-center mt-4 space-x-2 md:mt-0" id="filter-buttons-container">
-                <!-- Botón "Últimos 3 días" - Sin borde inicial. El JS aplicará el borde y color al activarse. -->
+                <!-- Botones de Filtro -->
                 <button onclick="window.setFilter('ultimos3dias')" data-filtro="ultimos3dias"
-                    class="px-4 py-2 text-green-600 transition-all duration-300 ease-in-out rounded-full filter-btn focus:outline-none hover:border hover:border-green-600">
+                    class="px-6 py-3 text-green-600 transition-all duration-300 ease-in-out rounded-full filter-btn hover:border hover:border-green-600 focus:outline-none">
                     Últimos 3 días
                 </button>
-
-                <!-- Botón "Semana" - Sin borde inicial. El JS aplicará las clases de activo (incluyendo el borde). -->
                 <button onclick="window.setFilter('semana')" data-filtro="semana"
-                    class="px-4 py-2 text-green-600 transition-all duration-300 ease-in-out rounded-full filter-btn focus:outline-none hover:border hover:border-green-600">
+                    class="px-6 py-3 text-green-600 transition-all duration-300 ease-in-out rounded-full filter-btn hover:border hover:border-green-600 focus:outline-none">
                     Semana
                 </button>
-
-                <!-- Botón "Mes" - Sin borde inicial. El JS aplicará el borde y color al activarse. -->
                 <button onclick="window.setFilter('mes')" data-filtro="mes"
-                    class="px-4 py-2 text-green-600 transition-all duration-300 ease-in-out rounded-full filter-btn focus:outline-none hover:border hover:border-green-600">
+                    class="px-6 py-3 text-green-600 transition-all duration-300 ease-in-out rounded-full filter-btn hover:border hover:border-green-600 focus:outline-none">
                     Mes
                 </button>
 
-                
-                {{-- Botón "Año" --}}
-                <button onclick="window.setFilter('año')" data-filtro="año"
-                    class="flex items-center px-4 py-2 transition-all duration-300 ease-in-out rounded-full filter-btn focus:outline-none">
-                    Año
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                <!-- Contenedor del botón "Año" y el NUEVO selector de año personalizado -->
+                <div id="yearFilterGroup" data-filtro="año" onclick="window.setFilter('año')"
+                     class="filter-btn-group flex items-center rounded-full px-6 py-2.5 space-x-2 cursor-pointer
+                            transition-all duration-300 ease-in-out group relative
+                            text-darkblue border border-transparent hover:border-darkblue hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400">
+
+                    {{-- Icono de calendario (AHORA AL PRINCIPIO, a la izquierda) --}}
+                    <svg id="calendarIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-darkblue" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
                             d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
                             clip-rule="evenodd" />
                     </svg>
-                </button>
 
-                {{-- Contenedor de la "Casilla de Año" y su Flatpickr (inicialmente oculto) --}}
-                <div id="yearFlatpickrContainer" class="ml-2" style="display: none;">
-                    {{-- Flatpickr inyectará aquí su input visible (altInput) y el calendario --}}
-                    <input type="text" id="yearFlatpickrTargetInput" class="hidden">
+                    <span id="yearLabel" class="text-darkblue">Año</span> {{-- Texto 'Año' --}}
+
+                    {{-- Selector de Año Personalizado (2025 con flechas) - Oculto por defecto --}}
+                    {{-- Se mostrará al activar el filtro 'Año', quedando entre el texto 'Año' y el icono --}}
+                    <div id="customYearSelector" class="flex items-center space-x-1" style="display: none;">
+                        <button id="prevYearBtn" class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <span id="currentYearDisplay" class="px-2 py-1 text-base font-semibold text-gray-800 cursor-pointer">
+                            2025
+                        </span>
+                        <button id="nextYearBtn" class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
+            </div>
     </section>
 
     {{-- Sección de Gráfica de Usuarios Conectados y Métricas --}}
