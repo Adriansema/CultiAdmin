@@ -17,15 +17,15 @@ class Boletin extends Model
         'user_id',
         'estado',
         'nombre',
-        'contenido',
+        'descripcion',
         'archivo',
         'validado_por_user_id', // <-- Nueva columna
         'rechazado_por_user_id', // <-- Nueva columna
         'observaciones',
-        'precio_mas_alto',       
-        'lugar_precio_mas_alto', 
-        'precio_mas_bajo',      
-        'lugar_precio_mas_bajo', 
+        'precio_mas_alto',
+        'lugar_precio_mas_alto',
+        'precio_mas_bajo',
+        'lugar_precio_mas_bajo',
     ];
 
     public function user()

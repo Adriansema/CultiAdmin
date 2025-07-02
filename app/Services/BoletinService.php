@@ -68,12 +68,12 @@ class BoletinService
                 };
 
                 // Búsqueda robusta únicamente en la columna 'contenido'
-                $q->whereRaw($sqlNormalize('contenido') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+                $q->whereRaw($sqlNormalize('descripcion') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
             });
         }
 
         // Ordena los boletines
-        $boletines->orderBy('contenido', 'asc'); // Mantiene tu ordenamiento original
+        $boletines->orderBy('descripcion', 'asc'); // Mantiene tu ordenamiento original
 
         return $boletines->paginate($perPage)->withQueryString();
     }

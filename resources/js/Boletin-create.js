@@ -5,18 +5,17 @@ Alpine.data('uploadForm', () => ({
     file: null,
     progress: 0,
     producto: 'cafe', // valor por defecto
-    nombreBoletin: '', // Para el nombre del boletín
-    descripcionBoletin: '', // Para la descripción
+    nombreBoletin: '', // Para el nombre del boletín (x-model en el input)
+    descripcionBoletin: '', // Para la descripción (x-model en el input)
     open: false, // Controla la visibilidad general del modal (x-show)
     currentStep: 1, // 1 para selección de archivo, 2 para formulario de detalles
     isDragging: false, // Para el estilo de arrastrar y soltar
 
-    // *** PROPIEDADES PARA LOS INDICADORES ***
+    // PROPIEDADES PARA LOS INDICADORES
     precioMasAlto: '',
     lugarPrecioMasAlto: '',
     precioMasBajo: '',
     lugarPrecioMasBajo: '',
-    // ***************************************
 
     // Inicialización del componente
     init() {
@@ -60,8 +59,10 @@ Alpine.data('uploadForm', () => ({
 
     // Manejo del cambio de archivo (selección o arrastre)
     handleFileChange(event) {
+        console.log('DEBUG: handleFileChange disparado.');
         this.file = event.target.files[0];
         if (this.file) {
+            console.log('DEBUG: Archivo seleccionado:', this.file.name);
             this.progress = 0;
             let simulatedProgress = 0;
             const interval = setInterval(() => {
@@ -70,47 +71,47 @@ Alpine.data('uploadForm', () => ({
                     this.progress = simulatedProgress;
                 } else {
                     clearInterval(interval);
-                    this.currentStep = 2;
+                    this.currentStep = 2; // Avanza al paso 2
                 }
             }, 100);
         } else {
-            this.resetForm();
+            console.log('DEBUG: No se seleccionó ningún archivo.');
+            this.resetForm(); // Resetea si no hay archivo
         }
     },
 
     // Resetea el formulario a su estado inicial
     resetForm() {
+        console.log('DEBUG: resetForm llamado.');
         this.file = null;
         this.progress = 0;
         this.producto = 'cafe';
         this.nombreBoletin = '';
         this.descripcionBoletin = '';
-        this.currentStep = 1;
+        this.currentStep = 1; // Asegura que siempre vuelve al paso 1
         this.isDragging = false;
         const pdfFileInput = document.getElementById('pdfFileInput');
         if (pdfFileInput) {
-            pdfFileInput.value = '';
+            pdfFileInput.value = ''; // Limpia el input de archivo
         }
-        // *** RESETEAR PROPIEDADES DE INDICADORES ***
         this.precioMasAlto = '';
         this.lugarPrecioMasAlto = '';
         this.precioMasBajo = '';
         this.lugarPrecioMasBajo = '';
-        // *******************************************
     },
 
     // Método interno para abrir el modal
     _openModalInternal() {
         console.log('DEBUG: _openModalInternal llamado. Estableciendo open = true.');
         this.open = true;
-        this.resetForm();
+        this.resetForm(); // Asegura que el formulario se resetee al abrir
     },
 
     // Método para cerrar el modal
     closeModal() {
         console.log('DEBUG: closeModal llamado. Estableciendo open = false.');
         this.open = false;
-        this.resetForm();
+        this.resetForm(); // Asegura que el formulario se resetee al cerrar
     },
 
     // Función para manejar el envío del archivo y datos del boletín
@@ -133,10 +134,19 @@ Alpine.data('uploadForm', () => ({
             return;
         }
 
-        // *** VALIDACIÓN DE INDICADORES: Asegurar que si uno se llena, el otro también ***
-        const hasPrecioAlto = this.precioMasAlto !== null && this.precioMasAlto !== '';
+        // *** PRE-PROCESAMIENTO DE PRECIOS: Limpiar y convertir a punto decimal ***
+        // Elimina cualquier caracter que no sea dígito o punto/coma, luego convierte coma a punto.
+        let cleanedPrecioMasAlto = this.precioMasAlto ? String(this.precioMasAlto).replace(/[^\d.,]/g, '').replace(/,/g, '.') : '';
+        let cleanedPrecioMasBajo = this.precioMasBajo ? String(this.precioMasBajo).replace(/[^\d.,]/g, '').replace(/,/g, '.') : '';
+
+        // Asegura que el valor sea un número flotante si es posible, si no, null
+        let processedPrecioMasAlto = parseFloat(cleanedPrecioMasAlto) || null;
+        let processedPrecioMasBajo = parseFloat(cleanedPrecioMasBajo) || null;
+        // *************************************************************************
+
+        const hasPrecioAlto = processedPrecioMasAlto !== null;
         const hasLugarAlto = this.lugarPrecioMasAlto.trim() !== '';
-        const hasPrecioBajo = this.precioMasBajo !== null && this.precioMasBajo !== '';
+        const hasPrecioBajo = processedPrecioMasBajo !== null;
         const hasLugarBajo = this.lugarPrecioMasBajo.trim() !== '';
 
         if ((hasPrecioAlto && !hasLugarAlto) || (!hasPrecioAlto && hasLugarAlto)) {
@@ -147,7 +157,6 @@ Alpine.data('uploadForm', () => ({
             this.showGlobalMessage('Para el precio más bajo, por favor ingresa tanto el precio como el lugar, o déjalos ambos vacíos.', true);
             return;
         }
-        // ********************************************************************************
 
         const form = document.getElementById('createBoletinForm');
         if (!form) {
@@ -159,23 +168,20 @@ Alpine.data('uploadForm', () => ({
 
         const formData = new FormData();
         formData.append('archivo', this.file);
-        formData.append('nombre_boletin', this.nombreBoletin);
+        formData.append('nombre', this.nombreBoletin); // ¡CAMBIADO! Envía como 'nombre'
         formData.append('producto', this.producto);
-        formData.append('contenido', this.descripcionBoletin); // 'contenido' es la descripción
+        formData.append('descripcion', this.descripcionBoletin); // ¡CAMBIADO! Envía como 'descripcion'
 
-        // *** AÑADIR NUEVOS CAMPOS DE INDICADORES AL FORM DATA ***
-        // Solo añadir si tienen valor para evitar enviar cadenas vacías o null
-        if (hasPrecioAlto) formData.append('precio_mas_alto', this.precioMasAlto);
+        // AÑADIR PRECIOS PROCESADOS AL FORM DATA
+        if (hasPrecioAlto) formData.append('precio_mas_alto', processedPrecioMasAlto);
         if (hasLugarAlto) formData.append('lugar_precio_mas_alto', this.lugarPrecioMasAlto);
-        if (hasPrecioBajo) formData.append('precio_mas_bajo', this.precioMasBajo);
+        if (hasPrecioBajo) formData.append('precio_mas_bajo', processedPrecioMasBajo);
         if (hasLugarBajo) formData.append('lugar_precio_mas_bajo', this.lugarPrecioMasBajo);
 
-        // *** LOG DE LOS DATOS ENVIADOS ***
         console.log('DEBUG: Datos de formData a enviar:');
         for (let [key, value] of formData.entries()) {
             console.log(`${key}: ${value}`);
         }
-        // **********************************
 
         const csrfToken = document.querySelector('meta[name="csrf-token"]');
         if (csrfToken) {
@@ -199,7 +205,7 @@ Alpine.data('uploadForm', () => ({
         xhr.onload = async () => {
             console.log('DEBUG: xhr.onload disparado. Status:', xhr.status);
             if (xhr.status === 200 || xhr.status === 201) {
-                this.closeModal(); // Cierra el modal de subida inmediatamente al éxito
+                this.closeModal();
 
                 try {
                     const responseData = JSON.parse(xhr.responseText);
@@ -265,6 +271,7 @@ Alpine.data('uploadForm', () => ({
                         errorMessage = response.message;
                     } else if (response.errors) {
                         errorMessage = Object.values(response.errors).flat().join('\n');
+                        console.error('ERROR DE VALIDACIÓN (422):', response.errors);
                     }
                 } catch (e) {
                     console.error("ERROR: parsing XHR error response:", e);
