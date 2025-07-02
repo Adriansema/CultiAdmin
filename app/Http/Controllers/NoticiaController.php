@@ -25,7 +25,7 @@ class NoticiaController extends Controller
         return view('noticias.index', compact('noticias'));
     }
 
-    public function getFilteredNoticy(Request $request, NoticiaService $noticiaService) 
+    public function getFilteredNoticy(Request $request, NoticiaService $noticiaService)
     {
         $noticias = $noticiaService->obtenerNoticiaFiltradas($request);
         return response()->json($noticias);
@@ -49,25 +49,28 @@ class NoticiaController extends Controller
         // 1. Validar los datos del formulario.
         $request->validate([
             'tipo' => 'required|string|max:255',
-            'titulo' => 'nullable|string|max:100',
-            'clase' => 'nullable|string|max:100',
+            'titulo' => 'nullable|string|max:255',
+            'clase' => 'nullable|string|max:255',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validación para imagen
             'informacion' => 'nullable|string',
             'numero_pagina' => 'required|integer',
             'autor' => 'nullable|string|max:255',
-            // 'estado' no se valida aquí, ya que tiene un valor por defecto en la migración ('pendiente')
-            // y su cambio podría ser manejado por un rol de administrador.
         ]);
 
         // 2. Lógica para guardar la imagen (si se ha subido).
         $imagenPath = null;
         if ($request->hasFile('imagen')) {
-            $imagenPath = $request->file('imagen')->store('noticias', 'public'); // Guarda la imagen en storage/app/public/noticias
-        }
+            $file = $request->file('imagen');
 
+            // Genera un nombre de archivo único con la extensión original del cliente
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+            // Guarda la imagen en storage/app/public/noticias con el nombre generado
+            $imagenPath = $file->storeAs('noticias', $filename, 'public');
+        }
         // 3. Crear la nueva noticia.
         Noticia::create([
-            'user_id' => Auth::id(), // Asigna el ID del usuario autenticado
+            'user_id' => Auth::id(),
             'tipo' => $request->tipo,
             'titulo' => $request->titulo,
             'clase' => $request->clase,
@@ -75,7 +78,7 @@ class NoticiaController extends Controller
             'informacion' => $request->informacion,
             'numero_pagina' => $request->numero_pagina,
             'autor' => $request->autor,
-            // 'estado' se establecerá por defecto en la base de datos
+            'leida' => false, // ¡Nueva columna, por defecto false!
         ]);
 
         // 4. Redirigir al índice de noticias con un mensaje de éxito.
@@ -113,8 +116,8 @@ class NoticiaController extends Controller
         // 1. Validar los datos del formulario.
         $request->validate([
             'tipo' => 'required|string|max:255',
-            'titulo' => 'nullable|string|max:100',
-            'clase' => 'nullable|string|max:100',
+            'titulo' => 'nullable|string|max:255',
+            'clase' => 'nullable|string|max:255',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'informacion' => 'nullable|string',
             'numero_pagina' => 'required|integer',
@@ -129,10 +132,13 @@ class NoticiaController extends Controller
             if ($noticia->imagen && Storage::disk('public')->exists($noticia->imagen)) {
                 Storage::disk('public')->delete($noticia->imagen);
             }
-            $imagenPath = $request->file('imagen')->store('noticias', 'public');
-            $noticia->imagen = $imagenPath;
-        }
 
+            $file = $request->file('imagen');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $imagenPath = $file->storeAs('noticias', $filename, 'public');
+
+            $noticia->imagen = $imagenPath; // Asigna la nueva ruta
+        }
         // 3. Actualizar la noticia.
         $noticia->update([
             'tipo' => $request->tipo,
@@ -141,8 +147,6 @@ class NoticiaController extends Controller
             'informacion' => $request->informacion,
             'numero_pagina' => $request->numero_pagina,
             'autor' => $request->autor,
-            // Mantener el estado actual o cambiarlo si se desea
-            // 'estado' => $request->estado, // Descomentar si el estado es editable por el usuario
         ]);
 
         // 4. Redirigir al índice de noticias con un mensaje de éxito.
@@ -166,5 +170,37 @@ class NoticiaController extends Controller
 
         // 3. Redirigir al índice de noticias con un mensaje de éxito.
         return redirect()->route('noticias.index')->with('success', 'Noticia eliminada con éxito.');
+    }
+
+    /**
+     * Obtiene las noticias más recientes para mostrar en el dashboard.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function getDashboardNoticias()
+    {
+        // Obtener las últimas 5 noticias, ordenadas por fecha de creación descendente.
+        // Asegúrate de cargar la relación 'user' si quieres mostrar el autor.
+        $noticias = Noticia::with('user')
+            ->latest() // Ordena por created_at de forma descendente
+            ->limit(5) // Limita a las últimas 5 noticias
+            ->get();
+
+        // Retorna la vista parcial con las noticias.
+        return view('partials.notificacion-noticia', compact('noticias'));
+    }
+
+    /**
+     * Marca una noticia como leída.
+     *
+     * @param  \App\Models\Noticia  $noticia
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function markAsRead(Noticia $noticia)
+    {
+        $noticia->leida = true;
+        $noticia->save();
+
+        return response()->json(['message' => 'Noticia marcada como leída.']);
     }
 }

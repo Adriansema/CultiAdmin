@@ -27,6 +27,10 @@ return new class extends Migration
             $table->string('archivo', 255)->nullable(); // archivo (varchar(255), puede ser nulo)
             $table->text('observaciones')->nullable(); // Observaciones (text, puede ser nulo)
             $table->string('estado', 255)->default('pendiente'); // Estado (varchar(255), Por defecto 'pendiente')
+            $table->decimal('precio_mas_alto', 10, 2)->nullable()->after('ruta_pdf');
+            $table->string('lugar_precio_mas_alto', 255)->nullable()->after('precio_mas_alto');
+            $table->decimal('precio_mas_bajo', 10, 2)->nullable()->after('lugar_precio_mas_alto');
+            $table->string('lugar_precio_mas_bajo', 255)->nullable()->after('precio_mas_bajo');
             $table->foreignId('validado_por_user_id')
                   ->nullable()
                   ->constrained('users')

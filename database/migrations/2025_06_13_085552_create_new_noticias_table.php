@@ -16,11 +16,12 @@ return new class extends Migration
             $table->increments('id_noticias');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('tipo', 255)->default(''); // Tipo (ej. 'cafe', 'mora')
-            $table->string('titulo', 100)->nullable()->default(null);
-            $table->string('clase', 100)->nullable()->default(null);
+            $table->string('titulo', 255)->nullable()->default(null);
+            $table->string('clase', 255)->nullable()->default(null);
             $table->string('imagen', 255)->nullable(); // Ruta de la imagen
             $table->text('informacion')->nullable()->default(null);
             $table->integer('numero_pagina'); // int4 y NOT NULL
+            $table->boolean('leida')->default(false); // funcion para obtener los mensajes en el dashboard como leido
             $table->string('estado', 255)->default('pendiente'); // Estado (ej. 'pendiente', 'aprobada', 'rechazada')
             $table->string('autor', 255)->nullable()->default(null);
             $table->timestamps(); // Columnas created_at y updated_at

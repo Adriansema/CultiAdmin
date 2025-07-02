@@ -141,6 +141,7 @@ Route::middleware([
           Route::get('/{noticia}', [NoticiaController::class, 'show'])->name('show');
           Route::get('/{noticia}/edit', [NoticiaController::class, 'edit'])->name('edit')->middleware('can:editar noticia');
           Route::put('/{noticia}', [NoticiaController::class, 'update'])->name('update')->middleware('can:editar noticia');
+          Route::post('/{noticia}/mark-as-read', [NoticiaController::class, 'markAsRead'])->name('noticias.markAsRead');
           Route::delete('/{noticia}', [NoticiaController::class, 'destroy'])->name('destroy')->middleware('can:eliminar noticia');
      });
 

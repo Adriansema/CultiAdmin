@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Boletin;
+use App\Models\Noticia;
 
 use Illuminate\Support\Facades\Storage; // Importa Storage
 class DashboardController extends Controller
@@ -13,16 +14,25 @@ class DashboardController extends Controller
     public function index()
     {
         $boletines = Boletin::orderBy('created_at', 'desc')->take(5)->get();
-        
-         return view('dashboard', compact('boletines'));
+
+        // Obtener las últimas 10 noticias para el dashboard
+        // Usamos 'with' para cargar la relación 'user' y 'latest' para ordenar por fecha de creación descendente.
+        $noticias = Noticia::with('user')
+            ->where('leida', false) // ¡Filtra por noticias no leídas!
+            ->latest() // Ordena por created_at de forma descendente
+            ->limit(10) // Limita a las últimas 10 noticias
+            ->get();
+
+        // Pasa tanto los boletines como las noticias a la vista
+        return view('dashboard', compact('boletines', 'noticias'));
     }
 
-     public function download($id)
+    public function download($id)
     {
         $boletin = Boletin::findOrFail($id);
 
         // Suponiendo que tienes un campo 'archivo' con la ruta del archivo
-        $filePath = $boletin->archivo; 
+        $filePath = $boletin->archivo;
 
         if (Storage::exists($filePath)) {
             return Storage::download($filePath);
@@ -30,7 +40,6 @@ class DashboardController extends Controller
             abort(404, 'Archivo no encontrado');
         }
     }
-
 
     public function getData($range)
     {
@@ -75,5 +84,4 @@ class DashboardController extends Controller
             'connected' => $connectedUsers,
         ]);
     }
- 
-    }
+}

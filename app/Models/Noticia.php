@@ -31,6 +31,7 @@ class Noticia extends Model
         'numero_pagina',
         'estado',
         'autor',
+        'leida',
     ];
 
     /**

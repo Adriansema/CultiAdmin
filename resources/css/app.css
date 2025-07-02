@@ -50,7 +50,7 @@
 @layer base {
   :root {
     --color-iconos: #00304D;
-    --color-iconos2: #287800 ;
+    --color-iconos2: #287800;
     --color-iconos3: #5C1759;
     --color-iconos4: #39A900;
     --color-iconos5: #009400;
@@ -59,159 +59,202 @@
 }
 
 /* Estilo para Contraste Alto  en Accesibilida/index.blade.php*/
-.contrast-high, .dark-mode {
-    font-size: 1.2em;
-    line-height: 1.5;
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px black;
+.contrast-high,
+.dark-mode {
+  font-size: 1.2em;
+  line-height: 1.5;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px black;
 }
 
 .contrast-high {
-    background-color: black;
-    color: grey;
+  background-color: black;
+  color: grey;
 }
 
 .dark-mode {
-    background-color: #121212;
-    color: white;
-    border-radius: 5px;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s, color 0.3s;
+  background-color: #121212;
+  color: white;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s;
 }
 
-.contrast-high a { color: purple; text-decoration: underline; }
+.contrast-high a {
+  color: purple;
+  text-decoration: underline;
+}
 
-html { font-size: 16px; }
+html {
+  font-size: 16px;
+}
 
 /*resources/views/components/sidebar-admin/operador.blade.php*/
 @layer base {
-    :root {
-        --color-profile: #F6F6F6;
-        --color-text: #F6F6F6;
-        --color-ajustes: #D1D1D1;
-        --color-sidebarhoverbtn: #547488;
-        --color-regresar:#335971;
-        --color-hoveregresar: #547488;
-        --color-hoversgt: #61BA33;
-        --color-sgt: #39A900;
-        --color-generador: #1870a7;
-        --color-hovergener: #1870a7e1;
-    }
+  :root {
+    --color-profile: #F6F6F6;
+    --color-text: #F6F6F6;
+    --color-ajustes: #D1D1D1;
+    --color-sidebarhoverbtn: #547488;
+    --color-regresar: #335971;
+    --color-hoveregresar: #547488;
+    --color-hoversgt: #61BA33;
+    --color-sgt: #39A900;
+    --color-generador: #1870a7;
+    --color-hovergener: #1870a7e1;
+    --color-hovertextver: #479222;
+    --color-textver: #39A900;
+    --color-textmarca: #00304D;
+    --color-texthovermarca: #295672;
+    --color-hovermarca: #00568A;
+    --color-hover: #009400;
+    --color-hovercaja: #E9F3E4;
+  }
 }
 
 /*resources/views/usuarios/index.blade.php u otras vistas de esa carpeta*/
 @layer base {
   :root {
-        --color-Gestion: #E6EAED;
-        --color-formulario: #A5BFCC;
-        --color-pag: #00304D;
-        --color-hover: #39A900;
-        --color-tabla: #F6F6F6;
+    --color-Gestion: #E6EAED;
+    --color-formulario: #A5BFCC;
+    --color-pag: #00304D;
+    --color-hover: #39A900;
+    --color-tabla: #F6F6F6;
 
-        --color-activo: #C2E4B0;
-        --color-textAct: #1F5D00;
+    --color-activo: #C2E4B0;
+    --color-textAct: #1F5D00;
 
-        --color-desactivar: #FFE4D5;
-        --color-textDesact: #B80000;
+    --color-desactivar: #FFE4D5;
+    --color-textDesact: #B80000;
 
-        --color-inactivo: #E7E7E7;
-        --color-textInact: #454545;
+    --color-inactivo: #E7E7E7;
+    --color-textInact: #454545;
 
-        --color-activar: #FEECB0;
-        --color-textActivar: #8B6B00;
+    --color-activar: #FEECB0;
+    --color-textActivar: #8B6B00;
   }
 }
 
 /*color del Boton de Contactanos, resources/views/centroAyuda/index.blade.php*/
 @layer base {
-    :root {
-        --color-sombra: #FBFBFB;
-    }
+  :root {
+    --color-sombra: #FBFBFB;
+  }
 }
+
 /*sombra del color del Boton de Contactanos, resources/views/centroAyuda/index.blade.php*/
 
-@layer components{
-    .shadow-sombra {
-        box-shadow: 0 15px 20px -1px var(--color-sombra), 0 4px 6px -4px var(--color-sombra);
-    }
+@layer components {
+  .shadow-sombra {
+    box-shadow: 0 15px 20px -1px var(--color-sombra), 0 4px 6px -4px var(--color-sombra);
+  }
 }
 
 /* Sombra de texto en verde */
 .text-shadow {
-    text-shadow: 1px 1px 2px rgba(0, 128, 0, 0.3);
+  text-shadow: 1px 1px 2px rgba(0, 128, 0, 0.3);
 }
 
 .text-shadow-hover:hover {
-    text-shadow: 2px 2px 6px rgba(0, 255, 0, 0.6); /* Verde brillante al hover */
+  text-shadow: 2px 2px 6px rgba(0, 255, 0, 0.6);
+  /* Verde brillante al hover */
 }
 
 /* Estilos para el select personalizado para esta ruta resources/views/vendor/paginate/tailwind.blade.php */
 .custom-select {
-    -webkit-appearance: none; /* Para Chrome, Safari, Edge */
-    -moz-appearance: none;    /* Para Firefox */
-    appearance: none;         /* Estándar */
-    background-image: none;   /* Asegura que no haya imagen de fondo por defecto */
-    padding-right: 2.2rem;    /* Deja espacio para tu icono */
-    cursor: pointer;
+  -webkit-appearance: none;
+  /* Para Chrome, Safari, Edge */
+  -moz-appearance: none;
+  /* Para Firefox */
+  appearance: none;
+  /* Estándar */
+  background-image: none;
+  /* Asegura que no haya imagen de fondo por defecto */
+  padding-right: 2.2rem;
+  /* Deja espacio para tu icono */
+  cursor: pointer;
 }
 
 /* Hack para IE10/11 para ocultar la flecha */
 .custom-select::-ms-expand {
-    display: none;
+  display: none;
 }
 
 .custom-select-wrapper {
-    position: relative; /* Necesario para posicionar la flecha */
-    display: inline-block; /* Para que el div no ocupe todo el ancho */
+  position: relative;
+  /* Necesario para posicionar la flecha */
+  display: inline-block;
+  /* Para que el div no ocupe todo el ancho */
 }
 
 .custom-select-arrow {
-    position: absolute;
-    top: 50%;
-    right: 0.75rem; /* Ajusta la posición de la flecha */
-    transform: translateY(-50%); /* Centra verticalmente */
-    pointer-events: none; /* Asegura que la flecha no intercepte clics */
-    width: 1.10rem; /* Ajusta el tamaño de la flecha (w-5 de Tailwind) */
-    height: 1.25rem; /* Ajusta el tamaño de la flecha (h-5 de Tailwind) */
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  /* Ajusta la posición de la flecha */
+  transform: translateY(-50%);
+  /* Centra verticalmente */
+  pointer-events: none;
+  /* Asegura que la flecha no intercepte clics */
+  width: 1.10rem;
+  /* Ajusta el tamaño de la flecha (w-5 de Tailwind) */
+  height: 1.25rem;
+  /* Ajusta el tamaño de la flecha (h-5 de Tailwind) */
 }
 
 /* En tu archivo CSS principal, o en tu input.css si usas PostCSS/Tailwind */
 .highlight {
-    font-weight: bold;
-    background-color: rgb(221, 221, 221); /* Un amarillo suave para resaltar */
-    padding: 0 2px; /* Un poco de padding */
-    border-radius: 2px;
-    color: black;
+  font-weight: bold;
+  background-color: rgb(221, 221, 221);
+  /* Un amarillo suave para resaltar */
+  padding: 0 2px;
+  /* Un poco de padding */
+  border-radius: 2px;
+  color: black;
 }
 
 /* Define una clase personalizada para el contenedor de la imagen de fondo de inicio sesion */
 .fullscreen-image-overlay-purple {
-  position: fixed; /* Hace que el elemento sea fijo en la ventana de visualización */
+  position: fixed;
+  /* Hace que el elemento sea fijo en la ventana de visualización */
   top: 0;
   left: 0;
-  width: 100vw; /* Ocupa el 100% del ancho del viewport */
-  height: 100vh; /* Ocupa el 100% de la altura del viewport */
-  overflow: hidden; /* Oculta cualquier contenido que se desborde, previniendo el scroll */
-  z-index: -1; /* Coloca la imagen de fondo detrás de otros elementos de la página */
-  display: flex; /* Usa flexbox para centrar la imagen */
-  justify-content: center; /* Centra horizontalmente la imagen */
-  align-items: center; /* Centra verticalmente la imagen */
+  width: 100vw;
+  /* Ocupa el 100% del ancho del viewport */
+  height: 100vh;
+  /* Ocupa el 100% de la altura del viewport */
+  overflow: hidden;
+  /* Oculta cualquier contenido que se desborde, previniendo el scroll */
+  z-index: -1;
+  /* Coloca la imagen de fondo detrás de otros elementos de la página */
+  display: flex;
+  /* Usa flexbox para centrar la imagen */
+  justify-content: center;
+  /* Centra horizontalmente la imagen */
+  align-items: center;
+  /* Centra verticalmente la imagen */
 }
 
 /* Estilos para la imagen dentro del contenedor */
 .fullscreen-image-overlay-purple img {
-  width: 100%; /* La imagen ocupa el 100% del ancho de su contenedor */
-  height: 100%; /* La imagen ocupa el 100% de la altura de su contenedor */
-  object-fit: cover; /* Ajusta la imagen para cubrir el área sin distorsión, recortando si es necesario */
-  object-position: center; /* Centra la imagen dentro de su contenedor */
+  width: 100%;
+  /* La imagen ocupa el 100% del ancho de su contenedor */
+  height: 100%;
+  /* La imagen ocupa el 100% de la altura de su contenedor */
+  object-fit: cover;
+  /* Ajusta la imagen para cubrir el área sin distorsión, recortando si es necesario */
+  object-position: center;
+  /* Centra la imagen dentro de su contenedor */
 }
 
 /* Pseudo-elemento para la superposición morada */
 .fullscreen-image-overlay-purple::before {
-  content: ''; /* Contenido vacío para el pseudo-elemento */
-  position: absolute; /* Posicionamiento absoluto sobre la imagen */
+  content: '';
+  /* Contenido vacío para el pseudo-elemento */
+  position: absolute;
+  /* Posicionamiento absoluto sobre la imagen */
   top: 0;
   left: 0;
   width: 100%;
@@ -222,33 +265,44 @@ html { font-size: 16px; }
      - Termina en negro opaco (rgba(0, 0, 0, 0.7)) al 100% del radio
   */
   background: radial-gradient(circle at center,
-                              /* rgb(0, 0, 0, 0.6) 0%,  */  /* Morado opaco en el centro */
-                              /* rgba(0, 0, 0, 0.6) 50%, */     /* Negro opaco a partir de la mitad del radio */
-                              /* rgba(0, 0, 0, 0.1) 100%  */   /* Negro opaco hasta los bordes */
-                             );
-  pointer-events: none; /* Permite que los eventos de clic pasen a la imagen subyacente */
-  z-index: 1; /* Asegura que la superposición esté sobre la imagen */
+      /* rgb(0, 0, 0, 0.6) 0%,  */
+      /* Morado opaco en el centro */
+      /* rgba(0, 0, 0, 0.6) 50%, */
+      /* Negro opaco a partir de la mitad del radio */
+      /* rgba(0, 0, 0, 0.1) 100%  */
+      /* Negro opaco hasta los bordes */
+    );
+  pointer-events: none;
+  /* Permite que los eventos de clic pasen a la imagen subyacente */
+  z-index: 1;
+  /* Asegura que la superposición esté sobre la imagen */
 }
 
 /* Estilos para tu formulario de inicio de sesión */
- .login-form {
-   /* ... otros estilos que ya tengas para tu formulario ... */
-  background-color: white; /* Por ejemplo, si tu formulario tiene fondo blanco */
-  padding: 30px; /* Si tiene padding interno */
+.login-form {
+  /* ... otros estilos que ya tengas para tu formulario ... */
+  background-color: white;
+  /* Por ejemplo, si tu formulario tiene fondo blanco */
+  padding: 30px;
+  /* Si tiene padding interno */
   margin: 20px;
 
   /* Para rounded-xl (borde redondeado más grande) */
-  border-radius: 24px; /* Un valor común para rounded-xl. Puedes ajustar a 16px si lo ves necesario */
+  border-radius: 24px;
+  /* Un valor común para rounded-xl. Puedes ajustar a 16px si lo ves necesario */
 
   /* Para max-w-lg (ancho máximo) */
-  max-width: 36rem; /* El valor equivalente a max-w-lg en Tailwind (512px) */
-  width: 100%; /* Asegura que ocupe todo el ancho disponible hasta el max-width */
+  max-width: 36rem;
+  /* El valor equivalente a max-w-lg en Tailwind (512px) */
+  width: 100%;
+  /* Asegura que ocupe todo el ancho disponible hasta el max-width */
 
   /* Estilo para el shadow brillante blanco */
-  /* box-shadow: 0 0 10px 1px rgba(255, 255, 255, 0.50); */ /* Ajusta los valores según necesites */
- }
+  /* box-shadow: 0 0 10px 1px rgba(255, 255, 255, 0.50); */
+  /* Ajusta los valores según necesites */
+}
 
- .recuperar-form {
+.recuperar-form {
 
   background-color: white;
   padding: 30px;
@@ -258,14 +312,69 @@ html { font-size: 16px; }
 
   /* max-width: 48rem; */
   width: 100%;
- }
+}
 
- /* En tu archivo CSS principal (por ejemplo, resources/css/app.css) */
+/* En tu archivo CSS principal (por ejemplo, resources/css/app.css) */
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
+
 .animate-spin {
   animation: spin 1s linear infinite;
+}
+
+/* Estilos para el contenedor con scroll */
+.noticias-scroll-container {
+  max-height: 450px;
+  /* Ajusta esta altura para mostrar aproximadamente 3 noticias (considerando padding/margin) */
+  overflow-y: auto;
+  /* Habilita el scroll vertical */
+  padding-right: 1rem;
+  /* Espacio para que no se pegue al scrollbar */
+}
+
+/* Estilos para ocultar el scrollbar en navegadores basados en WebKit (Chrome, Safari) */
+.noticias-scroll-container::-webkit-scrollbar {
+  width: 8px;
+  /* Ancho del scrollbar */
+}
+
+.noticias-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  /* Color del fondo del track */
+  border-radius: 10px;
+}
+
+.noticias-scroll-container::-webkit-scrollbar-thumb {
+  background: #888;
+  /* Color del thumb */
+  border-radius: 10px;
+}
+
+.noticias-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Color del thumb al pasar el ratón */
+}
+
+/* Estilos para Firefox */
+.noticias-scroll-container {
+  scrollbar-width: thin;
+  /* "auto" o "thin" */
+  scrollbar-color: #888 #f1f1f1;
+  /* thumb color track color */
+}
+
+/* Clase para la animación de desvanecimiento */
+.fade-out {
+  opacity: 0;
+  transform: translateY(-20px);
+  /* Opcional: para un efecto de "deslizamiento hacia arriba" */
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }

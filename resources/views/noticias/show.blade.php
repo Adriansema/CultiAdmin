@@ -25,7 +25,7 @@
 
             @if ($noticia->imagen)
                 <div class="mb-4">
-                    <strong class="font-semibold">Imagen:</strong>
+                    <p class="mb-2"><strong class="font-semibold">Imagen:</strong></p>
                     <img src="{{ asset('storage/' . $noticia->imagen) }}" alt="Imagen de la noticia"
                         class="mt-2 w-64 h-auto object-cover rounded-lg">
                 </div>
