@@ -182,6 +182,7 @@ class NoticiaController extends Controller
         // Obtener las últimas 5 noticias, ordenadas por fecha de creación descendente.
         // Asegúrate de cargar la relación 'user' si quieres mostrar el autor.
         $noticias = Noticia::with('user')
+            ->where('leida', false)
             ->latest() // Ordena por created_at de forma descendente
             ->limit(5) // Limita a las últimas 5 noticias
             ->get();

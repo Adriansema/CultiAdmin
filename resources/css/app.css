@@ -111,6 +111,10 @@ html {
     --color-hovermarca: #00568A;
     --color-hover: #009400;
     --color-hovercaja: #E9F3E4;
+    --color-highlight-subtle: #f0fdf4;
+    /* Un verde muy claro */
+    --color-highlight-subtle-darker: #dcfce7;
+    /* Un verde un poco más oscuro para el pulso */
   }
 }
 
@@ -330,6 +334,7 @@ html {
   animation: spin 1s linear infinite;
 }
 
+/*Noticias vista en el dashboard*/
 /* Estilos para el contenedor con scroll */
 .noticias-scroll-container {
   max-height: 450px;
@@ -376,5 +381,79 @@ html {
   opacity: 0;
   transform: translateY(-20px);
   /* Opcional: para un efecto de "deslizamiento hacia arriba" */
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+
+/* NUEVO: Estilos para el highlight sutil al actualizar */
+.highlight-updated {
+  animation: pulse-bg 2s ease-out forwards;
+  /* Duración y tipo de animación */
+}
+
+@keyframes pulse-bg {
+  0% {
+    background-color: var(--color-highlight-subtle);
+  }
+
+  /* Color inicial del pulso */
+  50% {
+    background-color: var(--color-highlight-subtle-darker);
+  }
+
+  /* Color a mitad del pulso */
+  100% {
+    background-color: transparent;
+  }
+
+  /* Vuelve al color original (bg-white) */
+}
+
+/* Boletin vista en el dashboard*/
+/* Estilos para el contenedor con scroll (similar al de noticias) */
+.boletines-scroll-container {
+  max-height: 450px;
+  /* Ajusta esta altura para mostrar aproximadamente 3 boletines */
+  overflow-y: auto;
+  /* Habilita el scroll vertical */
+  padding-right: 1rem;
+  /* Espacio para que no se pegue al scrollbar */
+}
+
+/* Estilos para ocultar el scrollbar en navegadores basados en WebKit (Chrome, Safari) */
+.boletines-scroll-container::-webkit-scrollbar {
+  width: 8px;
+  /* Ancho del scrollbar */
+}
+
+.boletines-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  /* Color del fondo del track */
+  border-radius: 10px;
+}
+
+.boletines-scroll-container::-webkit-scrollbar-thumb {
+  background: #888;
+  /* Color del thumb */
+  border-radius: 10px;
+}
+
+.boletines-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Color del thumb al pasar el ratón */
+}
+
+/* Estilos para Firefox */
+.boletines-scroll-container {
+  scrollbar-width: thin;
+  /* "auto" o "thin" */
+  scrollbar-color: #888 #f1f1f1;
+  /* thumb color track color */
+}
+
+/* Clase para la animación de desvanecimiento (si se decide usar, por ejemplo, para ocultar un boletín descargado) */
+.fade-out-boletin {
+  opacity: 0;
+  transform: translateY(-20px);
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }

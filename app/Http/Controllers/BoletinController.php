@@ -60,7 +60,7 @@ class BoletinController extends Controller
     public function store(Request $request)
     {
         Log::info('DEBUG: Método store llamado.');
-        Log::info('DEBUG: Request all data: '.json_encode($request->all()));
+        Log::info('DEBUG: Request all data: ' . json_encode($request->all()));
 
         $validated = $request->validate([
             'archivo' => 'required|file|mimes:pdf|max:50000',
@@ -73,13 +73,10 @@ class BoletinController extends Controller
             'lugar_precio_mas_bajo' => 'nullable|string|max:255',
         ]);
 
-        Log::info('DEBUG: Datos validados: '.json_encode($validated));
+        Log::info('DEBUG: Datos validados: ' . json_encode($validated));
 
-        // Guarda el archivo y obtiene la ruta relativa al disco (ej. 'public/boletines/archivo.pdf')
-        $filePath = $request->file('archivo')->store('public/boletines');
-
-        // Convierte la ruta relativa a una URL pública para guardar en la DB
-       $filePath = $request->file('archivo')->store('boletines', 'public'); // Guarda 'boletines/nombre.pdf');
+       // Guarda el archivo y obtiene la ruta relativa al disco (ej. 'boletines/archivo.pdf')
+        $filePath = $request->file('archivo')->store('boletines', 'public');
 
         $boletin = Boletin::create([
             'user_id' => Auth::id(),
@@ -94,7 +91,7 @@ class BoletinController extends Controller
             'lugar_precio_mas_bajo' => $validated['lugar_precio_mas_bajo'] ?? null,
         ]);
 
-        Log::info('DEBUG: Boletín creado en DB con ID: '.$boletin->id.' y datos: '.json_encode($boletin->toArray()));
+        Log::info('DEBUG: Boletín creado en DB con ID: ' . $boletin->id . ' y datos: ' . json_encode($boletin->toArray()));
 
         $operadores = User::role('Operario')->get();
         foreach ($operadores as $operador) {
@@ -199,7 +196,7 @@ class BoletinController extends Controller
 
         $renderedRow = view('boletines.partials.boletin_row', ['boletin' => $boletin])->render();
 
-        if($request->expectsJson()) {
+        if ($request->expectsJson()) {
             return response()->json([
                 'message' => 'Boletín actualizado con éxito',
                 'boletin' => $boletin,
@@ -234,26 +231,61 @@ class BoletinController extends Controller
 
         try {
             $boletin = Boletin::findOrFail($id);
-            Log::info('DEBUG: Boletín encontrado: '.$boletin->nombre);
+            Log::info('DEBUG: Boletín encontrado: ' . $boletin->nombre);
 
             $renderedHtml = view('boletines.partials.boletin_row', compact('boletin'))->render();
 
-            Log::info("DEBUG: HTML renderizado para boletín ID {$id}: ".Str::limit($renderedHtml, 500));
+            Log::info("DEBUG: HTML renderizado para boletín ID {$id}: " . Str::limit($renderedHtml, 500));
 
             return response($renderedHtml, 200)
                 ->header('Content-Type', 'text/html')
                 ->header('X-DEBUG-RENDERED', 'true');
-
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error("ERROR: Boletín con ID {$id} no encontrado en getBoletinRowHtml. Mensaje: ".$e->getMessage());
+            Log::error("ERROR: Boletín con ID {$id} no encontrado en getBoletinRowHtml. Mensaje: " . $e->getMessage());
 
             return response('Boletín no encontrado.', 404)
                 ->header('Content-Type', 'text/plain');
         } catch (\Throwable $e) {
-            Log::error("ERROR: Error inesperado al renderizar fila de boletín ID {$id}: ".$e->getMessage()."\n".$e->getTraceAsString());
+            Log::error("ERROR: Error inesperado al renderizar fila de boletín ID {$id}: " . $e->getMessage() . "\n" . $e->getTraceAsString());
 
             return response('Error interno al generar la fila del boletín.', 500)
                 ->header('Content-Type', 'text/plain');
+        }
+    }
+
+    /**
+     * Obtiene los boletines más recientes para mostrar en el dashboard.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function getDashboardBoletines()
+    {
+        // Obtener los últimos 10 boletines, ordenados por fecha de creación descendente.
+        // Asumimos que solo queremos boletines 'aprobados' para el dashboard.
+        $boletines = Boletin::latest() // Ordena por created_at de forma descendente
+                            ->limit(10) // Limita a los últimos 10 boletines
+                            ->get();
+
+        // Retorna la vista parcial con los boletines.
+        return view('partials.notification-boletin', compact('boletines'));
+    }
+
+    /**
+     * Descarga un archivo de boletín.
+     *
+     * @param  \App\Models\Boletin  $boletin
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadBoletin(Boletin $boletin)
+    {
+        // Asegúrate de que el archivo existe en el disco 'public'
+        if ($boletin->archivo && Storage::disk('public')->exists($boletin->archivo)) {
+            // Usa el nombre original del archivo para la descarga, si es posible,
+            // o un nombre generado a partir del nombre del boletín.
+            $fileName = Str::slug($boletin->nombre) . '.pdf';
+            return Storage::disk('public')->download($boletin->archivo, $fileName);
+        } else {
+            abort(404, 'Archivo de boletín no encontrado.');
         }
     }
 
@@ -266,8 +298,8 @@ class BoletinController extends Controller
 
         if ($query) {
             $boletines->where(function ($q2) use ($query) {
-                $q2->whereRaw('LOWER(descripcion) LIKE ?', ['%'.strtolower($query).'%']) // Ajustado para 'descripcion'
-                    ->orWhereRaw('LOWER(observaciones) LIKE ?', ['%'.strtolower($query).'%']);
+                $q2->whereRaw('LOWER(descripcion) LIKE ?', ['%' . strtolower($query) . '%'])
+                    ->orWhereRaw('LOWER(observaciones) LIKE ?', ['%' . strtolower($query) . '%']);
             });
         }
 
@@ -277,14 +309,14 @@ class BoletinController extends Controller
 
         $boletinesResultados = $boletines->get();
 
-        $nombreArchivo = 'boletines_'.now()->format('Y-m-d_H-i-s').'.csv';
+        $nombreArchivo = 'boletines_' . now()->format('Y-m-d_H-i-s') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"$nombreArchivo\"",
         ];
 
-        $columnas = ['ID', 'Usuario', 'Estado', 'Nombre', 'Descripción', 'Observaciones', 'Archivo', 'Creado']; // Ajustado para 'Nombre' y 'Descripción'
+        $columnas = ['ID', 'Usuario', 'Estado', 'Nombre', 'Descripción', 'Observaciones', 'Archivo', 'Creado'];
 
         $callback = function () use ($boletinesResultados, $columnas) {
             $file = fopen('php://output', 'w');
@@ -295,10 +327,10 @@ class BoletinController extends Controller
                     $boletin->id,
                     optional($boletin->user)->name ?? 'Sin usuario',
                     $boletin->estado,
-                    $boletin->nombre, // Usar $boletin->nombre
-                    $boletin->descripcion, // Usar $boletin->descripcion
+                    $boletin->nombre,
+                    $boletin->descripcion,
                     $boletin->observaciones,
-                    $boletin->ruta_pdf,
+                    $boletin->archivo,
                     $boletin->created_at->format('Y-m-d H:i:s'),
                 ]);
             }

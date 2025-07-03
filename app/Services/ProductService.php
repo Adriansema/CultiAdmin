@@ -65,11 +65,21 @@ class ProductService
                 // Función SQL para normalizar texto.
                 // Asumimos que 'tipo' es TEXT/VARCHAR.
                 $sqlNormalize = function($column) {
+                    $fechaCampos = ['created_at', 'updated_at'];
+                    // Si es fecha, conviértelo a texto
+                    if (in_array($column, $fechaCampos)) {
+                        $column = "TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')";
+                    }
+
                     return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER({$column}), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                 };
 
                 // Búsqueda robusta únicamente en la columna 'tipo'
-                $q->whereRaw($sqlNormalize('tipo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+                $q->orWhereRaw($sqlNormalize('tipo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                ->orWhereRaw($sqlNormalize('observaciones') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                ->orWhereRaw($sqlNormalize('estado') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                ->orWhereRaw($sqlNormalize('RutaVideo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                ->orWhereRaw($sqlNormalize('created_at') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
             });
             /* dd($productos->toSql(), $productos->getBindings()); */
         }

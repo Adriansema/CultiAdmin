@@ -19,7 +19,7 @@ return new class extends Migration
 
             $table->string('tipo', 255)->default(''); // Tipo (varchar(255), Por defecto '')
             $table->string('imagen', 255)->nullable(); // Imagen (varchar(255), no nulo)
-            $table->string('RutaVideo', 255)->nullable();
+            $table->string('rutavideo', 255)->nullable();
             $table->text('observaciones')->nullable(); // Observaciones (text, puede ser nulo)
             $table->string('estado', 255)->default('pendiente'); // Estado (varchar(255), Por defecto 'pendiente')
 

@@ -13,7 +13,13 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $boletines = Boletin::orderBy('created_at', 'desc')->take(5)->get();
+        // Obtener los últimos 10 boletines para el dashboard display
+        $boletines = Boletin::latest()
+            ->limit(10)
+            ->get();
+
+        // Obtener el total de noticias NO LEÍDAS
+        $totalUnreadNoticiasCount = Noticia::where('leida', false)->count();
 
         // Obtener las últimas 10 noticias para el dashboard
         // Usamos 'with' para cargar la relación 'user' y 'latest' para ordenar por fecha de creación descendente.
@@ -23,22 +29,8 @@ class DashboardController extends Controller
             ->limit(10) // Limita a las últimas 10 noticias
             ->get();
 
-        // Pasa tanto los boletines como las noticias a la vista
-        return view('dashboard', compact('boletines', 'noticias'));
-    }
-
-    public function download($id)
-    {
-        $boletin = Boletin::findOrFail($id);
-
-        // Suponiendo que tienes un campo 'archivo' con la ruta del archivo
-        $filePath = $boletin->archivo;
-
-        if (Storage::exists($filePath)) {
-            return Storage::download($filePath);
-        } else {
-            abort(404, 'Archivo no encontrado');
-        }
+        // Pasa los boletines, las noticias limitadas y el total de noticias no leídas a la vista
+        return view('dashboard', compact('boletines', 'noticias', 'totalUnreadNoticiasCount'));
     }
 
     public function getData($range)

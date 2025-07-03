@@ -89,6 +89,7 @@ Route::middleware([
           Route::get('/', [BoletinController::class, 'index'])->name('index')->middleware('can:crear boletin');
           Route::get('/create', [BoletinController::class, 'create'])->name('create');
           Route::post('/', [BoletinController::class, 'store'])->name('store');
+          Route::get('/{boletin}/download', [BoletinController::class, 'downloadBoletin'])->name('download');
           Route::post('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf');
           Route::get('/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('exportarCSV');
           Route::get('/{boletin}/edit', [BoletinController::class, 'edit'])->name('edit')->middleware('can:editar boletin');

@@ -130,94 +130,67 @@
             </div>
         </section>
 
-        {{-- Sección de Novedades y Boletines --}}
-        {{-- Asegúrate de que esta sección tiene margen superior para no pegarse a la anterior --}}
-        <section id="novedades-boletines" class="relative grid items-stretch mt-1 gap-7 md:grid-cols-2 rounded-xl">
+        {{-- Sección de Noticias y boletines --}}
+        <section id="novedades-boletines" class="relative grid items-start mt-1 gap-7 md:grid-cols-2 rounded-xl">
 
-            <section id="mensajes" class="bg-[var(--color-gris1)] shadow p-4 flex flex-col rounded-3xl ">
-                <div class="flex items-center justify-between mb-2">
+            {{-- sesion de noticias --}}
+            <section id="mensajes" class="p-4 flex flex-col bg-[var(--color-gris1)] rounded-3xl h-full">
+                {{-- Añadido h-full --}}
+                <div class="flex items-center justify-between mb-1"> {{-- Ajustado mb-1 para reducir espacio --}}
+
                     <div class="flex items-center space-x-2">
-                        <div
-                            class="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--color-iconos)] text-white">
-                            <img src="{{ asset('images/campanita.svg') }}" alt="boletines" class="w-5 h-5">
-                        </div>
+                        <img src="{{ asset('images/noticias-n.svg') }}" alt="noticias-notificacion"
+                            class="w-10 h-8 ml-2">
                         <h2 class="text-lg font-semibold text-[var(--color-iconos)]">Noticias</h2>
+                        {{-- ¡Aquí está el nuevo contador! --}}
+                        <span id="unread-news-count" class="ml-2 text-lg font-bold text-blue-600">
+                            @if ($totalUnreadNoticiasCount >= 10)
+                                +9
+                            @else
+                                {{ $totalUnreadNoticiasCount }}
+                            @endif
+                        </span>
                     </div>
-                    <x-responsive-nav-link href="{{ route('noticias.index') }}" :active="request()->routeIs('accesibilidad')"
+
+                    <x-responsive-nav-link href="{{ route('noticias.index') }}" :active="request()->routeIs('boletines.index')"
                         class="hover:text-[var(--color-hovertextver)] group py-2 px-2 rounded-full text-md font-bold text-gray-700 focus:outline-none focus:shadow-outline inline-flex items-center transition duration-150 ease-in-out">
                         <span class="whitespace-nowrap text-inherit">{{ __('Ver Todo') }}</span>
                         <img src="{{ asset('images/verTodo.svg') }}"
                             class="w-10 h-8 relative inset-0 block group-hover:hidden" alt="Icono de Importar">
                         <img src="{{ asset('images/hoverTodo.svg') }}"
-                            class="w-10 h-8 relative inset-0 hidden group-hover:block"
-                            alt="Icono de importar hover">
+                            class="w-10 h-8 relative inset-0 hidden group-hover:block" alt="Icono de importar hover">
                     </x-responsive-nav-link>
                 </div>
-                <div id="mensajes-novedades" class="p-4 bg-white hover:bg-[var(--color-hovercaja)] shadow rounded-2xl">
+                <div id="mensajes-noticias" class="p-2 rounded-2xl flex-grow"> {{-- Añadido flex-grow --}}
                     @include('partials.notification-noticia')
                 </div>
             </section>
 
-            <section id="boletines" class="bg-[var(--color-gris1)] shadow rounded-3xl p-6">
+            {{-- sesion de boletines --}}
+            <section id="boletines" class="p-4 flex flex-col bg-[var(--color-gris1)] rounded-3xl h-full">
+                {{-- Añadido h-full --}}
+                <div class="flex items-center justify-between mb-1"> {{-- Ajustado mb-1 para reducir espacio --}}
 
-                <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center space-x-2">
-                        <div
-                            class="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--color-iconos)] text-white">
-                            <img src="{{ asset('images/boletin.svg') }}" alt="boletines" class="w-5 h-5">
-                        </div>
-
+                        <img src="{{ asset('images/boletin-n.svg') }}" alt="boletines-notificacion"
+                            class="w-10 h-8 ml-2">
                         <h2 class="text-lg font-semibold text-[var(--color-iconos)]">Boletines</h2>
                     </div>
 
-
-                    <x-responsive-nav-link href="{{ route('boletines.index') }}" :active="request()->routeIs('accesibilidad')"
-                        class="block px-3 py-2 text-sm text-gray-800 rounded-xl hover:bg-gray-300">
-                        <div class="relative flex w-full justify-evenly">
-                            <span class="text-ms">{{ __(' ver todo ↗') }}</span>
-                        </div>
+                    <x-responsive-nav-link href="{{ route('boletines.index') }}" :active="request()->routeIs('boletines.index')"
+                        class="hover:text-[var(--color-hovertextver)] group py-2 px-2 rounded-full text-md font-bold text-gray-700 focus:outline-none focus:shadow-outline inline-flex items-center transition duration-150 ease-in-out">
+                        <span class="whitespace-nowrap text-inherit">{{ __('Ver Todos') }}</span>
+                        <img src="{{ asset('images/verTodo.svg') }}"
+                            class="w-10 h-8 relative inset-0 block group-hover:hidden" alt="Icono de Ver Todo">
+                        <img src="{{ asset('images/hoverTodo.svg') }}"
+                            class="w-10 h-8 relative inset-0 hidden group-hover:block" alt="Icono de Ver Todo hover">
                     </x-responsive-nav-link>
                 </div>
 
-                <div id="mensajes-novedades" class="p-4 bg-white shadow rounded-2xl">
-                    <p class="text-gray-500">No hay novedades por ahora.</p>
+                <div id="mensajes-boletines" class="p-2 rounded-2xl flex-grow"> {{-- Añadido flex-grow --}}
+                    @include('partials.notification-boletin')
                 </div>
-
-                <style>
-                    .boletin-content {
-                        max-height: 0;
-                        overflow: hidden;
-                        transition: max-height 0.3s ease-in-out;
-                    }
-                </style>
-
-                {{-- Comentado: Contenido de boletines --}}
-
-                @push('scripts')
-                    <script>
-                        document.addEventListener('DOMContentLoaded', () => {
-                            document.querySelectorAll('.boletin-header').forEach(header => {
-                                header.addEventListener('click', e => {
-                                    if (e.target.closest('a')) return;
-
-                                    const li = header.parentElement;
-                                    const content = li.querySelector('.boletin-content');
-                                    const icon = header.querySelector('svg');
-
-                                    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
-                                        content.style.maxHeight = '0px';
-                                        icon.style.transform = 'rotate(0deg)';
-                                    } else {
-                                        content.style.maxHeight = content.scrollHeight + 'px';
-                                        icon.style.transform = 'rotate(180deg)';
-                                    }
-                                });
-                            });
-                        });
-                    </script>
-                @endpush
             </section>
-        </section> {{-- ¡ATENCIÓN! ESTA SECCIÓN CIERRA EL PADRE DE LAS NOVEDADES Y BOLETINES, NO EL CONTENEDOR PRINCIPAL
-    --}}
+        </section>
     </main>
 @endsection
