@@ -26,6 +26,7 @@ class BoletinController extends Controller
         $boletines = $boletinService->obtenerBoletinFiltrados($request);
 
         return view('boletines.index', compact('boletines'));
+        
     }
 
     public function getFilteredBoletin(Request $request, BoletinService $boletinService)

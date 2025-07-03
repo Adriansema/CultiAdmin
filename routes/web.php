@@ -86,10 +86,16 @@ Route::middleware([
      });
 
      // --- Módulo de BOLETINES ---
-     Route::prefix('boletin')->name('boletines.')->group(function () {
-          Route::get('/', [BoletinController::class, 'index'])->name('index')->middleware('can:crear boletin');
+
+     Route::prefix('boletines')->name('boletines.')->group(function () {
+          // Rutas más específicas primero
+          Route::get('/filtrados', [BoletinController::class, 'getFilteredBoletin'])->name('filtrados');
           Route::get('/create', [BoletinController::class, 'create'])->name('create');
           Route::post('/', [BoletinController::class, 'store'])->name('store');
+          Route::get('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf');
+          Route::get('/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('exportarCSV');
+
+          // Rutas con parámetros de modelo (asegúrate de que {boletin} se resuelva a un modelo Boletin)
           Route::get('/{boletin}/download', [BoletinController::class, 'downloadBoletin'])->name('download');
           Route::get('/{boletin}/row-html', [BoletinController::class, 'getBoletinRowHtml'])->name('row-html');
           Route::post('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf');
@@ -97,6 +103,10 @@ Route::middleware([
           Route::get('/{boletin}/edit', [BoletinController::class, 'edit'])->name('edit')->middleware('can:editar boletin');
           Route::put('/{boletin}', [BoletinController::class, 'update'])->name('update')->middleware('can:editar boletin');
           Route::delete('/{boletin}', [BoletinController::class, 'destroy'])->name('destroy')->middleware('can:eliminar boletin');
+          Route::get('/{boletin}', [BoletinController::class, 'show'])->name('show'); // Esta es para el fetch del modal "Ver"
+
+          // Ruta general al final
+          Route::get('/', [BoletinController::class, 'index'])->name('index')->middleware('can:crear boletin');
      });
 
      // --- Módulo de PENDIENTES ( PRODUCTOS Y BOLETINES y NOTICIAS ) ---
@@ -127,6 +137,7 @@ Route::middleware([
 
      // --- Módulo de USUARIOS ---
      Route::prefix('usuario')->name('usuarios.')->group(function () {
+          Route::get('/filtered-users', [UsuarioController::class, 'getFilteredUsers'])->name('filtered.ajax');
           Route::get('/', [UsuarioController::class, 'index'])->name('index')->middleware('can:crear usuario');
           Route::get('/create', [UsuarioController::class, 'create'])->name('create');
           Route::post('/', [UsuarioController::class, 'store'])->name('store');

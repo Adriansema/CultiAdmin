@@ -15,12 +15,19 @@
             @forelse ($boletines as $boletin)
                 @include('boletines.partials.boletin_row', ['boletin' => $boletin])
             @empty
-                <tr id="no-boletines-row">
-                    <td colspan="9" class="px-6 py-4 text-center text-gray-500">
-                        No hay boletines para mostrar.
-                    </td>
+                {{-- Esta fila es para cuando NO hay boletines (ni cargando ni nada) --}}
+                <tr id="no-boletines-message-row" style="display: none;"> {{-- Inicialmente oculto --}}
+                    <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No hay boletines para mostrar.</td>
                 </tr>
             @endforelse
+            {{-- Fila para el spinner de carga (inicialmente oculta) --}}
+            <tr id="loading-spinner-row" style="display: none;">
+                <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Cargando...</span>
+                    </div>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>
