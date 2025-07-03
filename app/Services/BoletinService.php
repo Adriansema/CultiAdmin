@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Boletin;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // Necesitamos importar DB para usar DB::raw()
+// use Illuminate\Support\Facades\DB; // No necesitas esto si no usas DB::raw() explícitamente fuera de tu sqlNormalize
 
 class BoletinService
 {
@@ -22,7 +22,7 @@ class BoletinService
 
         // Reemplazar caracteres con tildes por sus equivalentes sin tilde
         $text = str_replace(
-            ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ', 'Á', 'É', 'Í', 'Ó', 'Ú', 'Ü', 'Ñ'],
+            ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ', 'Á', 'É', 'Í', 'Ó', 'Ú', 'Ü', 'N'],
             ['a', 'e', 'i', 'o', 'u', 'u', 'n', 'A', 'E', 'I', 'O', 'U', 'U', 'N'],
             $text
         );
@@ -52,28 +52,46 @@ class BoletinService
 
         // Usamos 'q' para la búsqueda general.
         $searchQuery = $request->input('q');
+        $estadoFilter = $request->input('estado');
 
-        $boletines = Boletin::query();
+        $boletines = Boletin::query(); // Inicia la consulta del modelo Boletin
 
-        // Búsqueda robusta solo en la columna 'contenido'
+        // Lógica de búsqueda robusta general en múltiples columnas
         if ($searchQuery) {
-            // Limpiamos el texto de búsqueda ingresado por el usuario una vez
+            // Limpiamos y normalizamos el texto de búsqueda ingresado por el usuario
             $cleanedSearchQuery = $this->cleanSearchQuery($searchQuery);
 
             $boletines->where(function ($q) use ($cleanedSearchQuery) {
-                // Función SQL para normalizar texto.
-                // Asumimos que 'contenido' es TEXT/VARCHAR.
-                $sqlNormalize = function($column) {
+                // Función SQL para normalizar texto en la base de datos.
+                // Esta función asegura que la búsqueda sea insensible a mayúsculas/minúsculas y acentos.
+                $sqlNormalize = function($column, $isDate = false) {
+                    // Si es una columna de fecha, la convierte a texto primero usando TO_CHAR (PostgreSQL)
+                    if ($isDate) {
+                        $column = "TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')";
+                    }
+                    // Cadena de REPLACE anidados para eliminar acentos, puntos, guiones y convertir a minúsculas.
                     return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER({$column}), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                 };
 
-                // Búsqueda robusta únicamente en la columna 'contenido'
-                $q->whereRaw($sqlNormalize('descripcion') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+                // APLICAMOS orWhereRaw para buscar en los campos reales de tu DB
+                // 'NOMBRE' en la UI (ej. "mora", "cafe") -> Corresponde a 'descripcion' en tu DB
+                $q->orWhereRaw($sqlNormalize('descripcion') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                  // 'DESCRIPCION' en la UI (ej. "kcnjdndnxnxsjsx", "cafe es un cafetero") -> Corresponde a 'observaciones' en tu DB
+                  ->orWhereRaw($sqlNormalize('observaciones') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                  ->orWhereRaw($sqlNormalize('nombre') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                  // 'FECHA' en la UI (ej. "03 de julio del 2025") -> Corresponde a 'created_at' en tu DB
+                  ->orWhereRaw($sqlNormalize('created_at', true) . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
             });
         }
 
+        // logica de filtro por estado
+        if($estadoFilter && $estadoFilter !== 'todos') {
+            $boletines->where('estado', $estadoFilter);
+        }
+
         // Ordena los boletines
-        $boletines->orderBy('descripcion', 'asc'); // Mantiene tu ordenamiento original
+        // Ordena por 'created_at' en descendente, que es la columna de fecha que sí existe y es la más lógica para los boletines.
+        $boletines->orderBy('created_at', 'desc');
 
         return $boletines->paginate($perPage)->withQueryString();
     }

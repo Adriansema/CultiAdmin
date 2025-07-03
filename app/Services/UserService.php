@@ -96,6 +96,31 @@ class UserService
 
         return $usuarios->paginate($perPage)->withQueryString();
     }
+     public function getUsersFilteredQueryForAjax(Request $request) // <-- ¡MÉTODO NUEVO!
+    {
+        $usersQuery = User::with('roles'); // Inicia la consulta del modelo User, carga roles
+
+        // 1. FILTRO POR ESTADO (Activo o Inactivo)
+        $estado = $request->input('estado', 'todos'); // Usamos 'status' como nombre del parámetro y columna
+        if ($estado !== 'todos' && !empty($estado)) {
+            $usersQuery->where('estado', $estado);
+        }
+
+      
+        // 3. FILTRO POR ROL (si lo necesitas en el filtro AJAX)
+        $rol = $request->input('rol');
+        if ($rol) {
+            $usersQuery->whereHas('roles', function ($q3) use ($rol) {
+                $q3->where('name', $rol);
+            });
+        }
+
+        // 4. Ordenar los resultados
+        $usersQuery->orderBy('created_at', 'desc');
+
+        return $usersQuery; // Retorna el Query Builder sin ejecutar
+    }
+
 }
 
 
