@@ -111,10 +111,6 @@ html {
     --color-hovermarca: #00568A;
     --color-hover: #009400;
     --color-hovercaja: #E9F3E4;
-    --color-highlight-subtle: #f0fdf4;
-    /* Un verde muy claro */
-    --color-highlight-subtle-darker: #dcfce7;
-    /* Un verde un poco más oscuro para el pulso */
   }
 }
 
@@ -318,8 +314,6 @@ html {
   width: 100%;
 }
 
-/* En tu archivo CSS principal (por ejemplo, resources/css/app.css) */
-
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -335,7 +329,6 @@ html {
 }
 
 /*Noticias vista en el dashboard*/
-/* Estilos para el contenedor con scroll */
 .noticias-scroll-container {
   max-height: 450px;
   /* Ajusta esta altura para mostrar aproximadamente 3 noticias (considerando padding/margin) */
@@ -345,35 +338,42 @@ html {
   /* Espacio para que no se pegue al scrollbar */
 }
 
-/* Estilos para ocultar el scrollbar en navegadores basados en WebKit (Chrome, Safari) */
+/* Estilos para el scrollbar en navegadores basados en WebKit (Chrome, Safari, Edge) */
 .noticias-scroll-container::-webkit-scrollbar {
-  width: 8px;
-  /* Ancho del scrollbar */
+  width: 6px;
+  /* Ancho del scrollbar, más delgado */
 }
 
 .noticias-scroll-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  /* Color del fondo del track */
+  background: #e0e0e0;
+  /* CAMBIO: Fondo del track más visible, un gris claro */
   border-radius: 10px;
+  /* Mantenemos el radio si el track es visible */
 }
 
 .noticias-scroll-container::-webkit-scrollbar-thumb {
-  background: #888;
-  /* Color del thumb */
-  border-radius: 10px;
+  background: #555;
+  /* Color del thumb, más oscuro */
+  border-radius: 9999px;
+  /* Completamente redondeado (píldora) */
 }
 
 .noticias-scroll-container::-webkit-scrollbar-thumb:hover {
-  background: #555;
-  /* Color del thumb al pasar el ratón */
+  background: #333;
+  /* Color del thumb al pasar el ratón, aún más oscuro */
+}
+
+.noticias-scroll-container::-webkit-scrollbar-button {
+  /* NUEVO: Oculta los botones de flecha */
+  display: none;
 }
 
 /* Estilos para Firefox */
 .noticias-scroll-container {
   scrollbar-width: thin;
   /* "auto" o "thin" */
-  scrollbar-color: #888 #f1f1f1;
-  /* thumb color track color */
+  scrollbar-color: #555 #e0e0e0;
+  /* CAMBIO: thumb color track color para Firefox */
 }
 
 /* Clase para la animación de desvanecimiento */
@@ -384,36 +384,11 @@ html {
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
-
-/* NUEVO: Estilos para el highlight sutil al actualizar */
-.highlight-updated {
-  animation: pulse-bg 2s ease-out forwards;
-  /* Duración y tipo de animación */
-}
-
-@keyframes pulse-bg {
-  0% {
-    background-color: var(--color-highlight-subtle);
-  }
-
-  /* Color inicial del pulso */
-  50% {
-    background-color: var(--color-highlight-subtle-darker);
-  }
-
-  /* Color a mitad del pulso */
-  100% {
-    background-color: transparent;
-  }
-
-  /* Vuelve al color original (bg-white) */
-}
-
 /* Boletin vista en el dashboard*/
 /* Estilos para el contenedor con scroll (similar al de noticias) */
 .boletines-scroll-container {
   max-height: 450px;
-  /* Ajusta esta altura para mostrar aproximadamente 3 boletines */
+  /* Ajusta esta altura para mostrar aproximadamente 3 noticias (considerando padding/margin) */
   overflow-y: auto;
   /* Habilita el scroll vertical */
   padding-right: 1rem;
@@ -422,38 +397,50 @@ html {
 
 /* Estilos para ocultar el scrollbar en navegadores basados en WebKit (Chrome, Safari) */
 .boletines-scroll-container::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
   /* Ancho del scrollbar */
 }
 
 .boletines-scroll-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  /* Color del fondo del track */
+  background: #e0e0e0;
+  /* CAMBIO: Fondo del track más visible, un gris claro */
   border-radius: 10px;
+  /* Mantenemos el radio si el track es visible */
 }
 
 .boletines-scroll-container::-webkit-scrollbar-thumb {
-  background: #888;
-  /* Color del thumb */
-  border-radius: 10px;
+  background: #555;
+  /* Color del thumb, más oscuro */
+  border-radius: 9999px;
+  /* Completamente redondeado (píldora) */
 }
 
 .boletines-scroll-container::-webkit-scrollbar-thumb:hover {
-  background: #555;
-  /* Color del thumb al pasar el ratón */
+  background: #333;
+  /* Color del thumb al pasar el ratón, aún más oscuro */
+}
+
+.boletines-scroll-container::-webkit-scrollbar-button {
+  /* NUEVO: Oculta los botones de flecha */
+  display: none;
 }
 
 /* Estilos para Firefox */
 .boletines-scroll-container {
   scrollbar-width: thin;
   /* "auto" o "thin" */
-  scrollbar-color: #888 #f1f1f1;
-  /* thumb color track color */
+  scrollbar-color: #555 #e0e0e0;
+  /* CAMBIO: thumb color track color para Firefox */
 }
 
 /* Clase para la animación de desvanecimiento (si se decide usar, por ejemplo, para ocultar un boletín descargado) */
 .fade-out-boletin {
   opacity: 0;
   transform: translateY(-20px);
+  /* Opcional: para un efecto de "deslizamiento hacia arriba" */
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+body.modal-open {
+  overflow: hidden;
 }

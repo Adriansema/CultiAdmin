@@ -1,0 +1,17 @@
+name,lastname,email,phone,type_document,document,role
+Oriol,Espinal,rosamaria48@example.com,"987 14 1382",CE,2164006703,Operario
+Andrés,Ruvalcaba,ramirez.ignacio@example.org,"973 30 5270",CC,2539006685,Administrador
+Inmaculada,Alaniz,ruben.carrero@example.org,"+34 930-98-1295",TI,8586575478,Funcionario
+Jesús,Amador,daniela77@example.org,"+34 907-134428",NIT,4114425943,Administrador
+Rosario,Guardado,alba.ordonez@example.org,"968 71 7249",NIT,8802653250,Funcionario
+Daniela,Rodríquez,blanca.granado@example.com,"+34 997-46-2770",NIT,8917605816,Operario
+Andrea,Saavedra,tejeda.guillem@example.com,"+34 927-349954",TI,1938221988,Administrador
+Rosa,Palomino,mateo.alvarez@example.org,953-802894,NIT,0238720249,Funcionario
+Yeray,Cavazos,tamez.miriam@example.org,"+34 928644852",PAS,4749608687,Operario
+Ignacio,Rubio,jorge.torres@example.org,"+34 982-11-4093",NIT,1545500161,Funcionario
+Isabel,Tovar,alba.rey@example.org,"932 287155",NIT,3987769208,Operario
+Arnau,Gámez,pcarrasquillo@example.com,"952 35 5162",CC,8910228076,Administrador
+Daniela,Barrios,omar26@example.org,"+34 979295252",NIT,8199561803,Operario
+Mario,Villareal,paola86@example.com,979-639785,CE,1481838209,Administrador
+Leo,Carbonell,schavarria@example.net,"+34 909-51-7215",TI,7241971224,Funcionario
+Blanca,Delao,sonia68@example.net,"914 846151",PAS,8924341178,Administrador

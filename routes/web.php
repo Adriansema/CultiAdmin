@@ -14,6 +14,7 @@ use App\Http\Controllers\CentroAyudaController;
 use App\Http\Controllers\ExportarCsvController;
 use App\Http\Controllers\PendienteBolController;
 use App\Http\Controllers\PendienteProController;
+use App\Http\Controllers\PendienteNotiController;
 use App\Http\Controllers\AccesibilidadController;
 use App\Http\Controllers\Auth\NewPasswordController;       // Para establecer la nueva contraseña
 use App\Http\Controllers\Auth\PasswordResetLinkController; // Para la solicitud de restablecimiento
@@ -96,6 +97,9 @@ Route::middleware([
 
           // Rutas con parámetros de modelo (asegúrate de que {boletin} se resuelva a un modelo Boletin)
           Route::get('/{boletin}/download', [BoletinController::class, 'downloadBoletin'])->name('download');
+          Route::get('/{boletin}/row-html', [BoletinController::class, 'getBoletinRowHtml'])->name('row-html');
+          Route::post('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf');
+          Route::get('/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('exportarCSV');
           Route::get('/{boletin}/edit', [BoletinController::class, 'edit'])->name('edit')->middleware('can:editar boletin');
           Route::put('/{boletin}', [BoletinController::class, 'update'])->name('update')->middleware('can:editar boletin');
           Route::delete('/{boletin}', [BoletinController::class, 'destroy'])->name('destroy')->middleware('can:eliminar boletin');
@@ -104,24 +108,32 @@ Route::middleware([
           // Ruta general al final
           Route::get('/', [BoletinController::class, 'index'])->name('index')->middleware('can:crear boletin');
      });
-     // --- Módulo de PENDIENTES ( PRODUCTOS Y BOLETINES ) ---
+
+     // --- Módulo de PENDIENTES ( PRODUCTOS Y BOLETINES y NOTICIAS ) ---
      Route::prefix('pendiente')->name('pendientes.')->group(function () {
-          Route::get('/productos', [PendienteProController::class, 'index'])->name('productos.index')->middleware('can:ver productos pendiente');
 
-          // Ruta para la página de Boletines Pendientes
-          Route::get('/boletines', [PendienteBolController::class, 'index'])->name('boletines.index')->middleware('can:ver boletines pendiente');
-
-
-          // Rutas para la validación/revisión de productos (si las manejas aquí)
-          Route::get('/productos/{producto}', [PendienteProController::class, 'show'])->name('prouctos.show');
+          // Rutas para Productos Pendientes
+          Route::get('/productos', [PendienteProController::class, 'index'])->name('productos.index')->middleware('can:validar producto');
+          Route::get('/productos/filtrados', [PendienteProController::class, 'getFilteredProducts'])->name('productos.filtrados'); // Añadida o confirmada
+          Route::get('/productos/{producto}', [PendienteProController::class, 'show'])->name('productos.show');
           Route::post('/productos/{producto}/validar', [PendienteProController::class, 'validar'])->name('productos.validar');
           Route::post('/productos/{producto}/rechazar', [PendienteProController::class, 'rechazar'])->name('productos.rechazar');
 
-          // Rutas para la validación/revisión de boletines (si las manejas aquí)
+          // Rutas para Boletines Pendientes (ACTUALIZADAS AQUÍ)
+          Route::get('/boletines', [PendienteBolController::class, 'index'])->name('boletines.index')->middleware('can:validar boletin');
+          Route::get('/boletines/filtrados', [PendienteBolController::class, 'getFilteredBoletins'])->name('boletines.filtrados'); // ¡Nueva ruta añadida!
           Route::get('/boletines/{boletin}', [PendienteBolController::class, 'show'])->name('boletines.show');
-          Route::post('/boletines/{boletin}/validar', [PendienteBolController::class, 'validarBoletin'])->name('boletines.validar');
-          Route::post('/boletines/{boletin}/rechazar', [PendienteBolController::class, 'rechazarBoletin'])->name('boletines.rechazar');
+          Route::post('/boletines/{boletin}/validar', [PendienteBolController::class, 'validar'])->name('boletines.validar');
+          Route::post('/boletines/{boletin}/rechazar', [PendienteBolController::class, 'rechazar'])->name('boletines.rechazar');
+
+          // Rutas para Noticias Pendientes
+          Route::get('/noticias', [PendienteNotiController::class, 'index'])->name('noticias.index')->middleware('can:validar noticia'); // Corregido: 'validar noticias' a 'ver noticias pendiente'
+          Route::get('/noticias/filtradas', [PendienteNotiController::class, 'getFilteredNews'])->name('noticias.filtradas');
+          Route::get('/noticias/{noticia}', [PendienteNotiController::class, 'show'])->name('noticias.show');
+          Route::post('/noticias/{noticia}/validar', [PendienteNotiController::class, 'validar'])->name('noticias.validar');
+          Route::post('/noticias/{noticia}/rechazar', [PendienteNotiController::class, 'rechazar'])->name('noticias.rechazar');
      });
+
 
      // --- Módulo de USUARIOS ---
      Route::prefix('usuario')->name('usuarios.')->group(function () {
@@ -147,6 +159,7 @@ Route::middleware([
           Route::get('/', [NoticiaController::class, 'index'])->name('index')->middleware('can:crear noticia');
           Route::get('/create', [NoticiaController::class, 'create'])->name('create');
           Route::post('/', [NoticiaController::class, 'store'])->name('store');
+          Route::get('/exportar-csv', [NoticiaController::class, 'exportarCsv'])->name('exportarCsv');
           Route::get('/{noticia}', [NoticiaController::class, 'show'])->name('show');
           Route::get('/{noticia}/edit', [NoticiaController::class, 'edit'])->name('edit')->middleware('can:editar noticia');
           Route::put('/{noticia}', [NoticiaController::class, 'update'])->name('update')->middleware('can:editar noticia');

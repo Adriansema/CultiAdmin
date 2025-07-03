@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth; // Para obtener el ID del usuario autenticado
 use Illuminate\Support\Facades\Storage; // Para manejar la carga de imágenes
 use Illuminate\Support\Facades\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse; // Necesario para la descarga de archivos grandes
 use App\Services\NoticiaService;
 
 class NoticiaController extends Controller
@@ -82,7 +83,7 @@ class NoticiaController extends Controller
         ]);
 
         // 4. Redirigir al índice de noticias con un mensaje de éxito.
-        return redirect()->route('noticias.index')->with('success', 'Noticia creada con éxito.');
+        return redirect()->route('noticias.index')->with('modal_success_message', '¡Noticia creada con éxito!');
     }
 
     /**
@@ -113,7 +114,11 @@ class NoticiaController extends Controller
     public function update(Request $request, Noticia $noticia)
     {
         Gate::authorize('editar noticia');
-        // 1. Validar los datos del formulario.
+
+        //  Guarda el estado original de la noticia antes de cualquier actualización
+        $originalEstado = $noticia->estado;
+
+        //  Valida los datos de la solicitud
         $request->validate([
             'tipo' => 'required|string|max:255',
             'titulo' => 'nullable|string|max:255',
@@ -122,11 +127,9 @@ class NoticiaController extends Controller
             'informacion' => 'nullable|string',
             'numero_pagina' => 'required|integer',
             'autor' => 'nullable|string|max:255',
-            // 'estado' puede ser actualizado por un administrador, pero no lo incluimos aquí por simplicidad.
-            // Si necesitas que los usuarios normales puedan cambiarlo, añádelo a la validación.
         ]);
 
-        // 2. Lógica para actualizar la imagen.
+        // Lógica para actualizar la imagen.
         if ($request->hasFile('imagen')) {
             // Eliminar imagen anterior si existe
             if ($noticia->imagen && Storage::disk('public')->exists($noticia->imagen)) {
@@ -139,7 +142,21 @@ class NoticiaController extends Controller
 
             $noticia->imagen = $imagenPath; // Asigna la nueva ruta
         }
-        // 3. Actualizar la noticia.
+
+        // Lógica para cambiar el estado a 'pendiente' si la noticia fue editada
+        // y su estado anterior era 'aprobado' o 'rechazado'.
+        // Esto asegura que una noticia editada vuelva al flujo de revisión.
+        if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
+            $noticia->estado = 'pendiente';
+            $noticia->observaciones = null; // Limpia las observaciones anteriores si las hubiera
+            // Si tienes un campo específico para observaciones del operador, también límpialo:
+            // $noticia->observaciones_operador = null;
+        }
+
+        // Guarda los cambios en la base de datos
+        $noticia->save();
+
+        // Actualizar la noticia
         $noticia->update([
             'tipo' => $request->tipo,
             'titulo' => $request->titulo,
@@ -149,7 +166,7 @@ class NoticiaController extends Controller
             'autor' => $request->autor,
         ]);
 
-        // 4. Redirigir al índice de noticias con un mensaje de éxito.
+        // Redirigir al índice de noticias con un mensaje de éxito
         return redirect()->route('noticias.index')->with('success', 'Noticia actualizada con éxito.');
     }
 
@@ -170,6 +187,81 @@ class NoticiaController extends Controller
 
         // 3. Redirigir al índice de noticias con un mensaje de éxito.
         return redirect()->route('noticias.index')->with('success', 'Noticia eliminada con éxito.');
+    }
+
+    /**
+     * Exporta todas las noticias a un archivo CSV.
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function exportarCsv()
+    {
+        // Define los encabezados del CSV
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="noticias_exportadas_' . now()->format('Ymd_His') . '.csv"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        // Columnas que se incluirán en el CSV.
+        // Asegúrate de que estos nombres coincidan con los nombres de las columnas en tu tabla 'noticias'.
+        $columns = [
+            'id',
+            'user_id',
+            'tipo',
+            'titulo',
+            'clase',
+            'imagen', // Ruta de la imagen
+            'informacion',
+            'numero_pagina',
+            'autor',
+            'leida',
+            'created_at',
+            'updated_at',
+        ];
+
+        // Crea una respuesta de tipo StreamedResponse para manejar archivos grandes de manera eficiente
+        $callback = function() use ($columns) {
+            $file = fopen('php://output', 'w'); // Abre el flujo de salida para escribir el CSV
+
+            // Escribe los encabezados del CSV
+            fputcsv($file, $columns);
+
+            // Obtiene todas las noticias. Para conjuntos de datos muy grandes, considera paginación
+            // o chunking para evitar problemas de memoria.
+            // Ejemplo con chunking (recomendado para muchos registros):
+            Noticia::chunk(2000, function ($noticias) use ($file, $columns) {
+                foreach ($noticias as $noticia) {
+                    $row = [];
+                    foreach ($columns as $column) {
+                        // Accede al atributo del modelo.
+                        // Para 'imagen', podrías querer la URL completa en lugar de solo la ruta de almacenamiento.
+                        // Si 'informacion' puede contener saltos de línea, fputcsv los manejará correctamente.
+                        $value = $noticia->$column;
+
+                        // Si la columna es 'imagen' y quieres la URL pública, puedes hacer esto:
+                        if ($column === 'imagen' && $value) {
+                            $value = asset('storage/' . $value); // Asume que 'noticias' está en el disco 'public'
+                        }
+
+                        // Si la columna es 'informacion' y necesitas limpiar caracteres especiales o HTML:
+                        if ($column === 'informacion' && $value) {
+                            $value = strip_tags($value); // Elimina etiquetas HTML
+                            $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'); // Decodifica entidades HTML
+                            $value = str_replace(["\r", "\n"], " ", $value); // Reemplaza saltos de línea por espacios
+                        }
+
+                        $row[] = $value;
+                    }
+                    fputcsv($file, $row); // Escribe la fila de datos
+                }
+            });
+
+            fclose($file); // Cierra el flujo de salida
+        };
+
+        return new StreamedResponse($callback, 200, $headers);
     }
 
     /**

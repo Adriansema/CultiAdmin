@@ -18,7 +18,7 @@
 
                 @if ($boletin->archivo)
                     <a href="{{ route('boletines.download', $boletin->id) }}" class="ml-auto flex-shrink-0 group"> 
-                         <img src="{{ asset('images/descargar.svg') }}"
+                        <img src="{{ asset('images/descargar.svg') }}"
                             class="w-10 h-10 relative inset-0 block group-hover:hidden" alt="Icono de Ver Todo">
                         <img src="{{ asset('images/hoverDes.svg') }}"
                             class="w-10 h-10 relative inset-0 hidden group-hover:block" alt="Icono de Ver Todo hover">

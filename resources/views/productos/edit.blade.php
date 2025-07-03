@@ -3,9 +3,17 @@
 @section('content')
 
     @can('editar producto')
+    <div class="inline-block px-20 py-6">
+            <div class="flex items-center space-x-4">
+                <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
+                <h1 class="text-3xl whitespace-nowrap font-bold">Editar Producto</h1>
+            </div>
+            <div class="py-2">
+            {!! Breadcrumbs::render('productos.edit', $producto) !!}
+            </div>
+        </div>
+        
         <div class="container mx-auto p-4">
-            <h1 class="text-2xl font-bold mb-4">Editar Producto: {{ $producto->tipo }} - ID: {{ $producto->id }}</h1>
-
             @if ($errors->any())
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                     <strong class="font-bold">¡Oops!</strong>

@@ -76,7 +76,7 @@ class BoletinController extends Controller
 
         Log::info('DEBUG: Datos validados: ' . json_encode($validated));
 
-       // Guarda el archivo y obtiene la ruta relativa al disco (ej. 'boletines/archivo.pdf')
+        // Guarda el archivo y obtiene la ruta relativa al disco (ej. 'boletines/archivo.pdf')
         $filePath = $request->file('archivo')->store('boletines', 'public');
 
         $boletin = Boletin::create([
@@ -117,7 +117,6 @@ class BoletinController extends Controller
     {
         Gate::authorize('editar boletin');
 
-        // *** ACTUALIZACIÓN DE LAS REGLAS DE VALIDACIÓN para incluir nombre y precios ***
         $rules = ([
             'nombre' => 'required|string|max:100', // Agregado para el nombre
             'descripcion' => 'required|string|max:255',
@@ -264,8 +263,8 @@ class BoletinController extends Controller
         // Obtener los últimos 10 boletines, ordenados por fecha de creación descendente.
         // Asumimos que solo queremos boletines 'aprobados' para el dashboard.
         $boletines = Boletin::latest() // Ordena por created_at de forma descendente
-                            ->limit(10) // Limita a los últimos 10 boletines
-                            ->get();
+            ->limit(10) // Limita a los últimos 10 boletines
+            ->get();
 
         // Retorna la vista parcial con los boletines.
         return view('partials.notification-boletin', compact('boletines'));

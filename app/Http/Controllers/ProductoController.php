@@ -60,14 +60,14 @@ class ProductoController extends Controller
             $rules['cafe_data.clase'] = 'nullable|string|max:100';
             $rules['cafe_data.informacion'] = 'required|string';
             // RutaVideo para café/mora:
-            $rules['RutaVideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es café
+            $rules['rutavideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es café
 
         } elseif ($tipoProductoPrincipal === 'mora') {
             $rules['mora_data.numero_pagina'] = 'required|integer';
             $rules['mora_data.clase'] = 'nullable|string|max:100';
             $rules['mora_data.informacion'] = 'required|string';
             // RutaVideo para café/mora:
-            $rules['RutaVideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es mora
+            $rules['rutavideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es mora
 
         } elseif ($tipoProductoPrincipal === 'videos') {
             // Regla para el subtipo de video (primarios, secundarios, categorias)
@@ -84,11 +84,6 @@ class ProductoController extends Controller
                 $rules["videos_data.{$subtipoSeleccionado}.titulo"] = 'required|string|max:255';
                 $rules["videos_data.{$subtipoSeleccionado}.descripcion"] = 'nullable|string';
                 $rules["videos_data.{$subtipoSeleccionado}.rutaVideo"] = 'required|url|max:255';
-
-                // Si tienes campos adicionales específicos para cada subtipo (ej. campo1),
-                // asegúrate de incluirlos aquí con su respectiva anidación.
-                // Por ejemplo:
-                // $rules["videos_data.{$subtipoSeleccionado}.campo1"] = 'required|string';
             }
         }
 
@@ -102,9 +97,9 @@ class ProductoController extends Controller
         }
 
         // Determinar la RutaVideo para la tabla 'productos'
-        $productoRutaVideo = null;
+        $productorutavideo = null;
         if ($tipoProductoPrincipal === 'café' || $tipoProductoPrincipal === 'mora') {
-            $productoRutaVideo = $request->RutaVideo;
+            $productorutavideo = $request->rutavideo;
         }
 
         // 5. Crear el registro principal en la tabla 'productos'.
@@ -114,7 +109,7 @@ class ProductoController extends Controller
             'observaciones' => $request->observaciones,
             'imagen' => $imagen,
             'tipo' => $tipoProductoPrincipal, // Este 'tipo' es 'café', 'mora' o 'videos'
-            'RutaVideo' => $productoRutaVideo, // Se guarda solo si es café o mora
+            'rutavideo' => $productorutavideo, // Se guarda solo si es café o mora
         ]);
 
         // 6. Guardar los datos específicos del producto en sus tablas correspondientes.
@@ -208,14 +203,14 @@ class ProductoController extends Controller
             $rules['cafe_data.clase'] = 'nullable|string|max:100';
             $rules['cafe_data.informacion'] = 'required|string';
             // RutaVideo para café/mora:
-            $rules['RutaVideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es café
+            $rules['rutavideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es café
 
         } elseif ($requestType === 'mora') {
             $rules['mora_data.numero_pagina'] = 'required|integer';
             $rules['mora_data.clase'] = 'nullable|string|max:100';
             $rules['mora_data.informacion'] = 'required|string';
             // RutaVideo para café/mora:
-            $rules['RutaVideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es mora
+            $rules['rutavideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es mora
 
         } elseif ($requestType === 'videos') {
             // Regla para el subtipo de video (primarios, secundarios, categorias)
@@ -264,11 +259,11 @@ class ProductoController extends Controller
 
         // Actualizar RutaVideo solo si el tipo es café o mora
         if ($requestType === 'café' || $requestType === 'mora') {
-            $producto->RutaVideo = $request->RutaVideo;
+            $producto->rutavideo = $request->rutavideo;
         } else {
             // Si el tipo es 'videos' o cualquier otro, asegúrate de que RutaVideo en Producto sea null
             // Esto es importante si el tipo de producto cambia de café/mora a videos
-            $producto->RutaVideo = null;
+            $producto->rutavideo = null;
         }
 
 
@@ -277,7 +272,7 @@ class ProductoController extends Controller
         $estadoCambiadoAPendiente = false;
         if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
             $producto->estado = 'pendiente';
-            $producto->observaciones_operador = null; // Asumiendo que tienes un campo para esto
+            $producto->observaciones = null; // Asumiendo que tienes un campo para esto
             $estadoCambiadoAPendiente = true;
         }
 

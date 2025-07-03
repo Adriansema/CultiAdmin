@@ -1,9 +1,17 @@
 @extends('layouts.app') {{-- Asume que tienes un layout base --}}
 
 @section('content')
-    <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold mb-4">Editar Noticia: {{ $noticia->titulo ?? 'Sin Título' }}</h1>
+    <div class="inline-block px-20 py-6">
+        <div class="flex items-center space-x-4">
+            <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
+            <h1 class="text-3xl whitespace-nowrap font-bold"> Editar Noticias</h1>
+        </div>
+        <div class="py-2">
+            {!! Breadcrumbs::render('noticias.edit', $noticia) !!}
+        </div>
+    </div>
 
+    <div class="container mx-auto p-4">
         @if ($errors->any())
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                 <strong class="font-bold">¡Oops!</strong>
@@ -26,8 +34,8 @@
                 <select name="tipo" id="tipo"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                     <option value="">Seleccione un tipo</option>
-                    <option value="café" {{ old('tipo') == 'café' ? 'selected' : '' }}>Café</option>
-                    <option value="mora" {{ old('tipo') == 'mora' ? 'selected' : '' }}>Mora</option>
+                    <option value="café" {{ old('tipo', $noticia->tipo) == 'café' ? 'selected' : '' }}>Café</option>
+                    <option value="mora" {{ old('tipo', $noticia->tipo) == 'mora' ? 'selected' : '' }}>Mora</option>
                 </select>
                 @error('tipo')
                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
