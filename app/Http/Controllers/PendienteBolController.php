@@ -6,8 +6,9 @@ use App\Models\User;
 use App\Models\Boletin;
 use Illuminate\Http\Request;
 use App\Mail\BoletinEstadoMail;
-use App\Services\OperadorService;
+
 use App\Http\Controllers\Controller;
+use App\Services\OperarioAndFuncionarioService; // Asegúrate de que el nombre del servicio sea correcto
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
@@ -17,25 +18,30 @@ class PendienteBolController extends Controller
     /**
      * Muestra la lista de boletines pendientes de revisión para el operador.
      */
-    public function index(Request $request, OperadorService $operadorService)
+    public function index(Request $request, OperarioAndFuncionarioService $operarioAndFuncionarioService)
     {
-        Gate::authorize('ver boletines pendiente');
-        $data = $operadorService->obtenerProductosYBoletinesFiltrados($request);
-        $boletines = $data['boletines'];
-        // No necesitas productos aquí si solo vas a mostrar boletines
+        // Autorizar la acción: 'ver boletines pendiente'
+        Gate::authorize('validar boletin');
+
+        // Obtener solo los boletines filtrados utilizando el método específico del servicio
+        $boletines = $operarioAndFuncionarioService->obtenerBoletinesFiltrados($request);
+
+        // Retorna la vista con los boletines pendientes
         return view('pendientes.boletines_pendientes', compact('boletines'));
     }
 
     /**
-     * Retorna productos y boletines pendientes de revisión filtrados en formato JSON.
+     * Retorna boletines pendientes de revisión filtrados en formato JSON.
+     * Este método se enfoca exclusivamente en los boletines.
      */
-    public function getFilteredProductsAndBoletins(Request $request, OperadorService $operadorService)
+    public function getFilteredBoletins(Request $request, OperarioAndFuncionarioService $operarioAndFuncionarioService)
     {
+        // Obtener solo los boletines utilizando el método específico del servicio
+        $boletines = $operarioAndFuncionarioService->obtenerBoletinesFiltrados($request);
 
-        $data = $operadorService->obtenerProductosYBoletinesFiltrados($request);
+        // Retornar solo los boletines en formato JSON
         return response()->json([
-            'productos' => $data['productos'],
-            'boletines' => $data['boletines'],
+            'boletines' => $boletines,
         ]);
     }
 
@@ -44,8 +50,10 @@ class PendienteBolController extends Controller
      */
     public function show($id)
     {
+        // Encuentra el boletín por ID o falla
         $boletin = Boletin::findOrFail($id);
 
+        // Retorna la vista de detalle del boletín
         return view('boletines.show', compact('boletin'));
     }
 

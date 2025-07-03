@@ -1,123 +1,117 @@
-<div id="modal-editar-{{ $boletin->id }}" class="hidden">
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <form id="form-boletin-{{ $boletin->id }}" action="{{ route('boletines.update', $boletin) }}" method="POST"
-            enctype="multipart/form-data" class="px-4 py-6 space-y-4 bg-gray-200 rounded-xl">
+<div id="modal-editar-{{ $boletin->id }}"
+    class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl mx-auto my-8">
+        {{-- Encabezado del modal --}}
+        <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-900">Editar Boletín: {{ $boletin->nombre }}</h3>
+            {{-- Botón para cerrar el modal --}}
+            <button type="button" class="text-gray-400 hover:text-gray-600"
+                onclick="cerrarModal('editar', '{{ $boletin->id }}')">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Cuerpo del modal: Formulario de edición --}}
+        <form id="editBoletinForm-{{ $boletin->id }}" action="{{ route('boletines.update', $boletin->id) }}"
+            method="POST" enctype="multipart/form-data" class="py-4">
             @csrf
-            @method('PUT')
+            @method('PUT') {{-- Importante para que Laravel reconozca la solicitud como PUT/PATCH --}}
 
-            <h1 class="mb-4 text-xl font-semibold">Editar Boletín</h1> {{-- Título añadido para claridad --}}
-
-            {{-- Campo para el Nombre --}}
+            {{-- Campo Nombre del Boletín --}}
             <div class="mb-4">
-                <label for="nombre" class="block font-semibold">Nombre del Boletín:</label>
-                <input type="text" name="nombre" id="nombre" class="w-full p-2 mt-1 border rounded-lg"
-                    value="{{ old('nombre', $boletin->nombre) }}" required>
-                @error('nombre')
-                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                @enderror
+                <label for="edit_nombre_{{ $boletin->id }}" class="block text-sm font-medium text-gray-700">Nombre del
+                    Boletín</label>
+                <input type="text" name="nombre" id="edit_nombre_{{ $boletin->id }}"
+                    value="{{ old('nombre', $boletin->nombre) }}"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                {{-- Div para mostrar errores de validación del nombre --}}
+                <div id="edit_nombre_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1"></div>
             </div>
 
-            {{-- Campo para la Descripción (anteriormente "Contenido") --}}
+            {{-- Campo Descripción --}}
             <div class="mb-4">
-                <label for="descripcion" class="block font-semibold">Descripción:</label>
-                <textarea name="descripcion" id="descripcion" rows="4" class="w-full p-2 mt-1 border rounded-lg"
-                    required>{{ old('descripcion', $boletin->descripcion) }}</textarea>
-                @error('descripcion')
-                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                @enderror
+                <label for="edit_descripcion_{{ $boletin->id }}"
+                    class="block text-sm font-medium text-gray-700">Descripción</label>
+                <textarea name="descripcion" id="edit_descripcion_{{ $boletin->id }}" rows="3"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">{{ old('descripcion', $boletin->descripcion) }}</textarea>
+                {{-- Div para mostrar errores de validación de la descripción --}}
+                <div id="edit_descripcion_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1"></div>
             </div>
 
-            {{-- Sección de Indicadores de Precio --}}
-            <div class="p-3 mt-4 bg-gray-100 rounded-md"> {{-- Cambiado a bg-gray-100 para diferenciar --}}
-                <h3 class="mb-2 font-semibold text-black text-md">Indicadores de Precio:</h3>
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    {{-- Precio Más Alto --}}
-                    <div>
-                        <label for="precio_mas_alto" class="block text-sm font-medium text-gray-700">Precio Más
-                            Alto:</label>
-                        <input type="number" step="0.01" name="precio_mas_alto" id="precio_mas_alto"
-                            class="w-full p-2 mt-1 border rounded-lg"
-                            value="{{ old('precio_mas_alto', $boletin->precio_mas_alto) }}">
-                        @error('precio_mas_alto')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
-                        <label for="lugar_precio_mas_alto" class="block mt-2 text-sm font-medium text-gray-700">Lugar
-                            (Precio Más Alto):</label>
-                        <input type="text" name="lugar_precio_mas_alto" id="lugar_precio_mas_alto"
-                            class="w-full p-2 mt-1 border rounded-lg"
-                            value="{{ old('lugar_precio_mas_alto', $boletin->lugar_precio_mas_alto) }}">
-                        @error('lugar_precio_mas_alto')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    {{-- Precio Más Bajo --}}
-                    <div>
-                        <label for="precio_mas_bajo" class="block text-sm font-medium text-gray-700">Precio Más
-                            Bajo:</label>
-                        <input type="number" step="0.01" name="precio_mas_bajo" id="precio_mas_bajo"
-                            class="w-full p-2 mt-1 border rounded-lg"
-                            value="{{ old('precio_mas_bajo', $boletin->precio_mas_bajo) }}">
-                        @error('precio_mas_bajo')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
-                        <label for="lugar_precio_mas_bajo" class="block mt-2 text-sm font-medium text-gray-700">Lugar
-                            (Precio Más Bajo):</label>
-                        <input type="text" name="lugar_precio_mas_bajo" id="lugar_precio_mas_bajo"
-                            class="w-full p-2 mt-1 border rounded-lg"
-                            value="{{ old('lugar_precio_mas_bajo', $boletin->lugar_precio_mas_bajo) }}">
-                        @error('lugar_precio_mas_bajo')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-
-            {{-- Sección de Archivo Adjunto --}}
+            {{-- Campo Archivo PDF --}}
             <div class="mb-4">
-                <label for="archivo_upload" class="block font-semibold">Archivo Adjunto:</label>
-
-                @if ($boletin->archivo) {{-- ¡REVERTIDO! Usa $boletin->archivo --}}
-                <div class="mt-2 flex items-center space-x-3 p-3 bg-gray-50 rounded-md **archivo-actual-info**">
-                    @php
-                    // Obtener la extensión del nombre de archivo de la ruta relativa
-                    $extension = pathinfo($boletin->archivo, PATHINFO_EXTENSION);
-                    $iconSrc = asset('images/form.svg');
-
-                    if (in_array(strtolower($extension), ['pdf'])) {
-                    $iconSrc = asset('images/PDF.svg');
-                    }
-                    @endphp
-                    <a href="{{ asset('storage/' . $boletin->archivo) }}" target="_blank" {{-- ¡REVERTIDO! Usa asset()
-                        --}}
-                        class="flex flex-col items-center text-blue-600 transition-transform duration-300 ease-in-out transform hover:underline hover:scale-105">
-                        <img src="{{ $iconSrc }}" alt="Icono de Archivo Actual" class="w-16 h-16 cursor-pointer">
-                        <span class="**archivo-extension-text**">Ver Archivo Actual
-                            ({{ strtoupper($extension) ?: 'Sin Ext.' }})</span>
-                    </a>
-                </div>
-                <p class="mt-2 text-sm text-gray-600 **info-archivo-subido**">Deja este campo vacío para mantener el
-                    archivo actual, o sube uno
-                    nuevo para reemplazarlo.</p>
-                @else
-                <p class="mt-2 text-sm text-gray-600 **no-archivo-mensaje**">No hay archivo adjunto actualmente.
-                    Puedes subir uno a
-                    continuación.</p>
+                <label for="edit_archivo_upload_{{ $boletin->id }}" class="block text-sm font-medium text-gray-700">Archivo
+                    PDF (opcional)</label>
+                <input type="file" name="archivo_upload" id="edit_archivo_upload_{{ $boletin->id }}" accept=".pdf"
+                    class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
+                <p class="mt-1 text-sm text-gray-500">Tamaño máximo: 5MB. Formato: PDF.</p>
+                {{-- Div para mostrar errores de validación del archivo --}}
+                <div id="edit_archivo_upload_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1"></div>
+                @if ($boletin->archivo)
+                    <p class="mt-2 text-sm text-gray-600">Archivo actual: <a href="{{ Storage::url($boletin->archivo) }}"
+                            target="_blank" class="text-blue-600 hover:underline">Ver PDF</a></p>
                 @endif
-
-                {{-- Input para subir un nuevo archivo --}}
-                <input type="file" name="archivo_upload" id="archivo_upload" class="w-full p-2 mt-2 border rounded-lg">
-                @error('archivo_upload')
-                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                @enderror
             </div>
 
-            <div class="flex items-center justify-between mb-6">
-                <a href="{{ route('boletines.index') }}" onclick="ocultarModal('editar', '{{ $boletin->id }}')"
-                    class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">
-                    Cerrar
-                </a>
-                <button type="submit" class="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700">
-                    Actualizar
+            {{-- Campos Precio Más Alto y Lugar Precio Más Alto --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="edit_precio_mas_alto_{{ $boletin->id }}"
+                        class="block text-sm font-medium text-gray-700">Precio Más Alto</label>
+                    <input type="number" step="0.01" name="precio_mas_alto" id="edit_precio_mas_alto_{{ $boletin->id }}"
+                        value="{{ old('precio_mas_alto', $boletin->precio_mas_alto) }}"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    {{-- Div para mostrar errores de validación del precio más alto --}}
+                    <div id="edit_precio_mas_alto_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1"></div>
+                </div>
+                <div>
+                    <label for="edit_lugar_precio_mas_alto_{{ $boletin->id }}"
+                        class="block text-sm font-medium text-gray-700">Lugar Precio Más Alto</label>
+                    <input type="text" name="lugar_precio_mas_alto" id="edit_lugar_precio_mas_alto_{{ $boletin->id }}"
+                        value="{{ old('lugar_precio_mas_alto', $boletin->lugar_precio_mas_alto) }}"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    {{-- Div para mostrar errores de validación del lugar del precio más alto --}}
+                    <div id="edit_lugar_precio_mas_alto_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1">
+                    </div>
+                </div>
+            </div>
+
+            {{-- Campos Precio Más Bajo y Lugar Precio Más Bajo --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="edit_precio_mas_bajo_{{ $boletin->id }}"
+                        class="block text-sm font-medium text-gray-700">Precio Más Bajo</label>
+                    <input type="number" step="0.01" name="precio_mas_bajo" id="edit_precio_mas_bajo_{{ $boletin->id }}"
+                        value="{{ old('precio_mas_bajo', $boletin->precio_mas_bajo) }}"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    {{-- Div para mostrar errores de validación del precio más bajo --}}
+                    <div id="edit_precio_mas_bajo_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1"></div>
+                </div>
+                <div>
+                    <label for="edit_lugar_precio_mas_bajo_{{ $boletin->id }}"
+                        class="block text-sm font-medium text-gray-700">Lugar Precio Más Bajo</label>
+                    <input type="text" name="lugar_precio_mas_bajo" id="edit_lugar_precio_mas_bajo_{{ $boletin->id }}"
+                        value="{{ old('lugar_precio_mas_bajo', $boletin->lugar_precio_mas_bajo) }}"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    {{-- Div para mostrar errores de validación del lugar del precio más bajo --}}
+                    <div id="edit_lugar_precio_mas_bajo_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1">
+                    </div>
+                </div>
+            </div>
+
+            {{-- Pie de página del modal: Botones de acción --}}
+            <div class="flex justify-end pt-4 border-t border-gray-200">
+                <button type="button" onclick="cerrarModal('editar', '{{ $boletin->id }}')"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 mr-2">
+                    Cancelar
+                </button>
+                <button type="submit"
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Guardar Cambios
                 </button>
             </div>
         </form>

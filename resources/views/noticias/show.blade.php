@@ -1,9 +1,17 @@
 @extends('layouts.app') {{-- Asume que tienes un layout base --}}
 
 @section('content')
-    <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold mb-4">Detalles de la Noticia</h1>
+     <div class="inline-block px-20 py-6">
+            <div class="flex items-center space-x-4">
+                <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
+                <h1 class="text-3xl whitespace-nowrap font-bold"> Ver Noticias</h1>
+            </div>
+            <div class="py-2">
+            {!! Breadcrumbs::render('noticias.show', $noticia) !!}
+            </div>
+        </div>
 
+    <div class="container mx-auto p-4">
         <div class="bg-white shadow-md rounded-lg p-6">
             <p class="mb-2"><strong class="font-semibold">ID Noticia:</strong> {{ $noticia->id_noticias }}</p>
             <p class="mb-2">

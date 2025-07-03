@@ -76,11 +76,6 @@ Breadcrumbs::for('boletines.edit', function ($trail, $boletin) {
         ->push('Editar Boletín', route('boletines.edit', $boletin));
 });
 
-Breadcrumbs::for('historial.index', function ($trail) {
-    $trail->parent('dashboard')
-        ->push('Historial', route('historial.index'));
-});
-
 Breadcrumbs::for('centroAyuda.index', function ($trail) {
     $trail->parent('dashboard')
         ->push('Centro de Ayuda', route('centroAyuda.index'));
@@ -124,6 +119,26 @@ Breadcrumbs::for('view-user.historial', function ($trail, $id) {
 Breadcrumbs::for('statistics.index', function ($trail) {
     $trail->parent('dashboard')
         ->push('Estadísticas', route('statistics.index'));
+});
+
+Breadcrumbs::for('noticias.index', function ($trail) {
+    $trail->parent('dashboard')
+        ->push('Gestion de Noticias', route('noticias.index'));
+});
+
+Breadcrumbs::for('noticias.create', function ($trail) {
+    $trail->parent('noticias.index')
+        ->push('Crear Noticia', route('noticias.create'));
+});
+
+Breadcrumbs::for('noticias.show', function ($trail, $noticia) {
+    $trail->parent('noticias.index')
+        ->push('Detalle de la Noticia', route('noticias.show', $noticia));
+});
+
+Breadcrumbs::for('noticias.edit', function ($trail, $noticia) {
+    $trail->parent('noticias.index')
+        ->push('Editar Noticia', route('noticias.edit', $noticia));
 });
 
 /*

@@ -1,59 +1,166 @@
+window.mostrarModal = function (type, id) {
+    console.log(`--- Función mostrarModal llamada: tipo=${type}, id=${id} ---`);
+
+    // Cierra todos los modales del mismo tipo antes de abrir el nuevo
+    document.querySelectorAll(`[id^="modal-${type}-"]`).forEach(m => {
+        if (m.id !== `modal-${type}-${id}`) {
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+            console.log(`Ocultando modal anterior: ${m.id}`);
+        }
+    });
+
+    const modal = document.getElementById(`modal-${type}-${id}`);
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        console.log(`Mostrando modal: modal-${type}-${id}`);
+    } else {
+        console.warn(`Advertencia: Modal con ID modal-${type}-${id} no encontrado.`);
+    }
+};
+
+window.cerrarModal = function (type, id) {
+    console.log(`--- Función cerrarModal llamada: tipo=${type}, id=${id} ---`);
+    const modal = document.getElementById(`modal-${type}-${id}`);
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        console.log(`Ocultando modal: modal-${type}-${id}`);
+        if (type === 'editar') {
+            window.clearValidationErrors(id);
+        }
+        // NO MANIPULAMOS document.body.style.overflow aquí
+    } else {
+        console.warn(`Advertencia: Modal con ID modal-${type}-${id} no encontrado para cerrar.`);
+    }
+};
+
+/**
+ * Limpia los mensajes de error de validación y los bordes rojos de los campos de un formulario.
+ * @param {string|number} boletinId - El ID del boletín cuyo formulario se va a limpiar.
+ */
+window.clearValidationErrors = function (boletinId) {
+    console.log(`--- Función clearValidationErrors llamada para boletín ID: ${boletinId} ---`);
+    const form = document.getElementById(`editBoletinForm-${boletinId}`);
+    if (form) {
+        const errorDivs = form.querySelectorAll(`[id$="_error_${boletinId}"]`);
+        errorDivs.forEach(div => {
+            div.textContent = '';
+        });
+        const inputFields = form.querySelectorAll('input, textarea, select');
+        inputFields.forEach(input => {
+            input.classList.remove('border-red-500');
+        });
+    }
+};
+
+/**
+ * Muestra los mensajes de error de validación en el formulario del modal.
+ * @param {string|number} boletinId - El ID del boletín cuyo formulario mostrará los errores.
+ * @param {object} errors - Un objeto con los errores de validación, donde la clave es el nombre del campo.
+ */
+window.displayValidationErrors = function (boletinId, errors) {
+    console.log(`--- Función displayValidationErrors llamada para boletín ID: ${boletinId} ---`);
+    window.clearValidationErrors(boletinId);
+    const form = document.getElementById(`editBoletinForm-${boletinId}`);
+    if (form) {
+        for (const field in errors) {
+            const errorDiv = document.getElementById(`edit_${field}_error_${boletinId}`);
+            if (errorDiv) {
+                errorDiv.textContent = errors[field][0];
+                const inputField = form.querySelector(`[name="${field}"]`);
+                if (inputField) {
+                    inputField.classList.add('border-red-500');
+                }
+            }
+        }
+    }
+};
+
+/**
+ * Muestra un mensaje global de éxito o error utilizando un modal vanilla JS.
+ * @param {string} type - El tipo de mensaje ('success' o 'error').
+ * @param {string} message - El mensaje a mostrar.
+ */
+window.showGlobalMessage = function (type, message) {
+    console.log(`--- Función showGlobalMessage llamada (Vanilla JS): Tipo=${type}, Mensaje="${message}" ---`);
+
+    const modal = document.getElementById('globalMessageModalVanilla');
+    const messageText = document.getElementById('globalMessageText');
+    const successIcon = document.getElementById('globalMessageSuccessIcon');
+    const errorIcon = document.getElementById('globalMessageErrorIcon');
+    const closeButton = document.getElementById('globalMessageCloseButton');
+
+    if (!modal || !messageText || !successIcon || !errorIcon || !closeButton) {
+        console.error('ERROR: Elementos del modal de mensaje global vanilla no encontrados. Mostrando alert de fallback.');
+        alert(type === 'error' ? `Error: ${message}` : `Éxito: ${message}`);
+        return;
+    }
+
+    messageText.textContent = message;
+
+    if (type === 'success') {
+        successIcon.classList.remove('hidden');
+        errorIcon.classList.add('hidden');
+    } else { // type === 'error'
+        successIcon.classList.add('hidden');
+        errorIcon.classList.remove('hidden');
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden'; // Bloquea el scroll del body
+
+    // Cierra el modal al hacer clic en el botón OK
+    const closeHandler = () => {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+        document.body.style.overflow = ''; // Restaura el scroll del body
+        closeButton.removeEventListener('click', closeHandler); // Limpia el listener
+        clearTimeout(autoHideTimer); // Limpia el temporizador si se cierra manualmente
+        console.log('DEBUG: Modal de mensaje global cerrado manualmente.');
+    };
+    closeButton.addEventListener('click', closeHandler);
+
+    // Cierra el modal automáticamente después de 3 segundos
+    const autoHideTimer = setTimeout(() => {
+        if (!modal.classList.contains('hidden')) { // Solo cierra si aún está visible
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            document.body.style.overflow = ''; // Restaura el scroll del body
+            closeButton.removeEventListener('click', closeHandler); // Limpia el listener
+            console.log('DEBUG: Modal de mensaje global cerrado automáticamente.');
+        }
+    }, 3000);
+};
+
+
 document.addEventListener('DOMContentLoaded', function () {
     console.log('--- DOMContentLoaded event fired: Script loaded and ready ---');
 
-    window.mostrarModal = function (tipo, id) {
-        console.log(`--- Función mostrarModal llamada: tipo=${tipo}, id=${id} ---`);
-
-        // Cierra todos los modales del mismo tipo antes de abrir el nuevo
-        document.querySelectorAll(`[id^="modal-${tipo}-"]`).forEach(m => {
-            if (m.id !== `modal-${tipo}-${id}`) {
-                m.classList.add('hidden');
-                console.log(`Ocultando modal anterior: ${m.id}`);
-            }
-        });
-
-        const modal = document.getElementById(`modal-${tipo}-${id}`);
-        if (modal) {
-            modal.classList.remove('hidden');
-            console.log(`Mostrando modal: modal-${tipo}-${id}`);
-            // Opcional: Asegúrate de que el body no tenga overflow cuando un modal está abierto
-            // document.body.style.overflow = 'hidden';
-        } else {
-            console.warn(`Advertencia: Modal con ID modal-${tipo}-${id} no encontrado.`);
-        }
-    }
-
-    window.ocultarModal = function (tipo, id) {
-        console.log(`--- Función ocultarModal llamada: tipo=${tipo}, id=${id} ---`);
-        const modal = document.getElementById(`modal-${tipo}-${id}`);
-        if (modal) {
-            modal.classList.add('hidden');
-            console.log(`Ocultando modal: modal-${tipo}-${id}`);
-            // Opcional: Restaura el overflow del body cuando el modal se cierra
-            // document.body.style.overflow = '';
-        } else {
-            console.warn(`Advertencia: Modal con ID modal-${tipo}-${id} no encontrado para ocultar.`);
-        }
-    }
-
-    // Delegación de eventos para los botones de acción en la tabla (Asegúrate que tu tbody tenga este ID)
+    // Delegación de eventos para los botones de acción en la tabla
     const tableBody = document.querySelector('#boletines-table-body');
     if (tableBody) {
         console.log('Event listener añadido a #boletines-table-body para delegación de eventos.');
         tableBody.addEventListener('click', function (event) {
             console.log('Click detectado en la tabla.');
-            const targetButton = event.target.closest('button[data-type]');
+            const targetButton = event.target.closest('button[onclick^="mostrarModal"]');
             if (targetButton) {
-                const type = targetButton.dataset.type;
-                const id = targetButton.dataset.id;
-                console.log(`Botón de acción clicado: Tipo=${type}, ID=${id}`);
-
-                if (type === 'ver' || type === 'editar' || type === 'eliminar') {
-                    if (type === 'eliminar') {
-                        mostrarModal('boletin', id); // Asumo que tu modal de eliminar es 'modal-boletin-ID'
+                const onclickAttr = targetButton.getAttribute('onclick');
+                const match = onclickAttr.match(/mostrarModal\('([^']+)', '([^']+)'\)/);
+                if (match && match.length === 3) {
+                    const type = match[1];
+                    const id = match[2];
+                    console.log(`Botón de acción clicado: Tipo=${type}, ID=${id}`);
+                    if (type === 'boletin') {
+                        console.warn(`ADVERTENCIA: La acción 'boletin' (Eliminar) no está manejada en este script.`);
+                        return;
                     } else {
-                        mostrarModal(type, id);
+                        window.mostrarModal(type, id);
                     }
+                } else {
+                    console.warn('No se pudieron extraer los argumentos de mostrarModal del atributo onclick.');
                 }
             } else {
                 console.log('Click no fue en un botón de acción de tabla.');
@@ -63,15 +170,15 @@ document.addEventListener('DOMContentLoaded', function () {
         console.warn('Advertencia: #boletines-table-body no encontrado. La delegación de eventos de la tabla no funcionará.');
     }
 
-
-    document.querySelectorAll('[id^="form-boletin-"]').forEach(form => {
+    // Listener para los formularios de edición
+    document.querySelectorAll('[id^="editBoletinForm-"]').forEach(form => {
         console.log(`Añadiendo event listener de submit al formulario: ${form.id}`);
-        form.addEventListener('submit', function (event) {
+        form.addEventListener('submit', async function (event) {
             console.log('--- Submit de formulario detectado ---');
             event.preventDefault();
 
             const formId = this.id;
-            const boletinId = formId.split('-')[2];
+            const boletinId = formId.split('-')[1];
             const formData = new FormData(this);
 
             console.log(`Boletín ID para actualización: ${boletinId}`);
@@ -83,122 +190,71 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('Botón de actualización deshabilitado.');
             }
 
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            formData.append('_token', csrfToken);
-            console.log('CSRF token añadido a FormData.');
-
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                }
-            })
-                .then(response => {
-                    console.log('--- Fetch Response recibido ---');
-                    console.log('Response Status:', response.status);
-                    if (!response.ok) {
-                        return response.json().then(err => {
-                            err.status = response.status;
-                            console.error('Error en la respuesta del servidor (HTTP not OK):', err);
-                            throw err;
-                        });
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('--- Fetch Data Procesado (Éxito) ---');
-                    console.log('Boletín actualizado con éxito:', data);
-                    console.log('HTML recibido para depuración:', data.html_row); // Mantén este log para verificar
+                });
 
-                    if (data.html_row) {
+                console.log('--- Fetch Response recibido ---');
+                console.log('Response Status:', response.status);
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    console.log('--- Fetch Data Procesado (Éxito) ---');
+                    console.log('Boletín actualizado con éxito:', result);
+                    console.log('HTML recibido para depuración:', result.html_row);
+
+                    if (result.html_row) {
                         const oldRow = document.getElementById(`boletin-row-${boletinId}`);
                         console.log('Buscando oldRow con ID:', `boletin-row-${boletinId}`);
                         console.log('oldRow encontrado:', oldRow);
 
                         if (oldRow) {
-                            const tempDiv = document.createElement('div');
-                            // Usamos trim() para eliminar cualquier espacio exterior (líneas vacías, etc.)
-                            tempDiv.innerHTML = data.html_row.trim();
-                            console.log('tempDiv.innerHTML establecido.');
-
-                            // ***** NUEVO INTENTO: Verificar la estructura interna de tempDiv *****
-                            console.log('Contenido de tempDiv (para inspección):', tempDiv.innerHTML);
-                            // Opcional: debugger; aquí para inspeccionar tempDiv en el navegador
-
-                            // Intentamos encontrar el TR directamente. Si el HTML está anidado incorrectamente,
-                            // esto nos dará el TR más alto que sea descendiente.
-                            const newRow = tempDiv.querySelector('tr');
-
-                            console.log('Valor de newRow después de querySelector("tr"):', newRow);
-                            console.log('tagName de newRow:', newRow ? newRow.tagName : 'null/undefined');
-
-                            if (newRow && newRow.tagName === 'TR') {
-                                oldRow.parentNode.replaceChild(newRow, oldRow);
-                                console.log('Fila reemplazada en el DOM.');
-                                reindexTableRows();
-                                console.log('reindexTableRows llamado.');
-                            } else {
-                                console.error('El HTML de la fila devuelto no es un <tr> válido o no se encontró. HTML recibido (data.html_row):', data.html_row);
-                                console.error('HTML parseado en tempDiv (tempDiv.innerHTML):', tempDiv.innerHTML); // Esto puede mostrar la diferencia
-                                console.error('Primer hijo de tempDiv (tempDiv.children[0]):', tempDiv.children[0]); // Esto mostrará el SPAN
-                            }
+                            oldRow.outerHTML = result.html_row;
+                            console.log('Fila reemplazada en el DOM.');
+                            reindexTableRows();
+                            console.log('reindexTableRows llamado.');
                         } else {
                             console.error(`Error: oldRow con ID boletin-row-${boletinId} no encontrado para reemplazar.`);
+                            window.showGlobalMessage('error', 'Boletín actualizado, pero la tabla no se pudo refrescar. Recargue la página.');
                         }
                     } else {
-                        console.warn('Advertencia: data.html_row no presente en la respuesta del servidor.');
+                        console.warn('Advertencia: result.html_row no presente en la respuesta del servidor.');
+                        window.showGlobalMessage('success', 'Boletín actualizado, pero no se recibió HTML para refrescar la tabla. Recargue la página.');
                     }
 
-                    ocultarModal('editar', boletinId);
-                    mostrarToast('success', data.message || 'Boletín actualizado.');
+                    window.cerrarModal('editar', boletinId); // Cierra el modal de edición
 
-                    if (updateButton) {
-                        updateButton.disabled = false;
-                        updateButton.textContent = 'Actualizar';
-                        console.log('Botón de actualización re-habilitado.');
-                    }
+                    // Después de la actualización exitosa, mostramos directamente el mensaje global de éxito
+                    window.showGlobalMessage('success', result.message || 'Boletín actualizado con éxito.');
 
-                    form.querySelectorAll('.error-message').forEach(el => el.remove());
-                    form.querySelectorAll('.text-red-500').forEach(el => el.remove());
-                    console.log('Errores de validación anteriores limpiados.');
-                })
-                .catch(error => {
-                    console.error('--- Fetch Catch (Error) ---');
-                    console.error('Error al actualizar el boletín:', error);
-
-                    mostrarModal('editar', boletinId);
-                    console.log('Modal de edición reabierto por error.');
-
-                    form.querySelectorAll('.error-message').forEach(el => el.remove());
-                    form.querySelectorAll('.text-red-500').forEach(el => el.remove());
-                    console.log('Errores de validación anteriores limpiados en Catch.');
-
-                    if (error.errors) {
-                        console.log('Manejando errores de validación del servidor...');
-                        for (const field in error.errors) {
-                            const inputElement = form.querySelector(`[name="${field}"]`);
-                            if (inputElement) {
-                                const errorMessage = document.createElement('p');
-                                errorMessage.classList.add('mt-1', 'text-sm', 'text-red-500', 'error-message');
-                                errorMessage.textContent = error.errors[field][0];
-                                inputElement.parentNode.insertBefore(errorMessage, inputElement.nextSibling);
-                                console.log(`Error para el campo ${field}: ${error.errors[field][0]}`);
-                            } else {
-                                console.warn(`Input para el campo ${field} no encontrado.`);
-                            }
-                        }
-                    } else {
-                        alert('Error: ' + (error.message || 'Ocurrió un error inesperado.'));
-                        console.log('Alerta mostrada para error inesperado.');
-                    }
-
-                    if (updateButton) {
-                        updateButton.disabled = false;
-                        updateButton.textContent = 'Actualizar';
-                        console.log('Botón de actualización re-habilitado en Catch.');
-                    }
-                });
+                } else if (response.status === 422) {
+                    console.error('--- Errores de validación (422) ---');
+                    console.error('Errores:', result.errors);
+                    window.displayValidationErrors(boletinId, result.errors);
+                    window.showGlobalMessage('error', result.message || 'Por favor, corrige los errores en el formulario.');
+                } else {
+                    console.error('--- Error HTTP (no 2xx ni 422) ---');
+                    console.error('Error en la respuesta del servidor:', result);
+                    window.showGlobalMessage('error', result.message || 'Ocurrió un error inesperado al actualizar el boletín.');
+                }
+            } catch (error) {
+                console.error('--- Fetch Catch (Error de red/parsing) ---');
+                console.error('Error al actualizar el boletín:', error);
+                window.showGlobalMessage('error', 'Error de red o conexión al servidor. Inténtalo de nuevo.');
+            } finally {
+                if (updateButton) {
+                    updateButton.disabled = false;
+                    updateButton.textContent = 'Guardar Cambios';
+                    console.log('Botón de actualización re-habilitado.');
+                }
+            }
         });
     });
 
@@ -209,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const rows = tableBody.querySelectorAll('tr[id^="boletin-row-"]');
             console.log(`Encontradas ${rows.length} filas para re-indexar.`);
             rows.forEach((row, index) => {
-                const orderNumberCell = row.querySelector('.boletin-order-number'); // Asegúrate que este selector sea correcto
+                const orderNumberCell = row.querySelector('.boletin-order-number');
                 if (orderNumberCell) {
                     orderNumberCell.textContent = index + 1;
                     console.log(`Fila ${row.id} re-indexada a ${index + 1}.`);
@@ -222,28 +278,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Llama a reindexTableRows al cargar la página para asegurarte de que los números estén bien desde el inicio
     reindexTableRows();
 
-    function mostrarToast(type, message) {
-        console.log(`--- Función mostrarToast llamada: Tipo=${type}, Mensaje="${message}" ---`);
-        // Implementa tu propia lógica de toast aquí (ej. con SweetAlert2, Toastr, etc.)
-        // Para pruebas, puedes usar un alert o console.log
-        // alert(message);
-    }
-
-    // Opcional: Listener global para cerrar modales al hacer clic fuera del contenido del modal
     document.addEventListener('click', function (event) {
-        // console.log('Click global detectado.'); // Demasiado ruidoso, descomentar solo si depuras clics
-        if (event.target.classList.contains('bg-black/50') || event.target.closest('[data-modal-close]')) { // Si el clic fue en el fondo oscuro o en un botón con data-modal-close
+        if (event.target.classList.contains('bg-opacity-50') && event.target.closest('[id^="modal-"]')) {
             const modalWrapper = event.target.closest('[id^="modal-"]');
-            if (modalWrapper) {
+            if (modalWrapper && modalWrapper.id !== 'custom-confirm-modal' && modalWrapper.id !== 'createBoletinModal') {
                 const idParts = modalWrapper.id.split('-');
                 const tipo = idParts[1];
                 const id = idParts[2];
-                ocultarModal(tipo, id);
+                window.cerrarModal(tipo, id);
                 console.log(`Cerrando modal por click externo/botón de cierre: ${modalWrapper.id}`);
             }
         }
     });
 });
+
+window.openCreateBoletinModal = window.openCreateBoletinModalVanilla;

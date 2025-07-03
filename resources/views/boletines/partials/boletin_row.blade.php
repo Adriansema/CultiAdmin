@@ -1,11 +1,11 @@
 <tr id="boletin-row-{{ $boletin->id }}" class="bg-white hover:bg-gray-200">
-    <td class="max-w-xs px-4 py-2 text-gray-800 break-words whitespace-normal align-top">
+    <td class=" px-4 py-2 text-gray-800 break-words whitespace-normal align-top">
         {{ Str::limit($boletin->nombre, 40) }}
     </td>
-    <td class="max-w-xs px-4 py-2 text-gray-600 break-words whitespace-normal align-top boletin-contenido-cell">
+    <td class=" px-4 py-2 text-gray-600 break-words whitespace-normal align-top boletin-contenido-cell">
         {{ Str::limit($boletin->descripcion, 60) }}
     </td>
-    <td class="max-w-xs px-4 py-2 text-gray-600 break-words whitespace-normal align-top boletin-fecha-cell">
+    <td class=" px-4 py-2 text-gray-600 break-words whitespace-normal align-top boletin-fecha-cell">
         {{ $boletin->created_at->locale('es')->translatedFormat('d \d\e F \d\e\l Y h:i a') }}
         <span class="block text-xs text-gray-500">
             ({{ $boletin->created_at->diffForHumans() }})
@@ -14,8 +14,10 @@
     <td class="px-4 py-2 text-gray-700 align-top whitespace-nowrap">
         @if ($boletin->precio_mas_alto)
             <p class="flex items-center text-green-600">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18">
+                    </path>
                 </svg>
                 ${{ number_format($boletin->precio_mas_alto, 2) }}
             </p>
@@ -29,8 +31,10 @@
     <td class="px-4 py-2 text-gray-700 align-top whitespace-nowrap">
         @if ($boletin->precio_mas_bajo)
             <p class="flex items-center text-red-600">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
                 </svg>
                 ${{ number_format($boletin->precio_mas_bajo, 2) }}
             </p>
@@ -49,17 +53,47 @@
         </span>
     </td>
     <td class="flex flex-col px-4 py-2 space-y-1 align-top md:space-y-0 md:space-x-2 md:flex-row boletin-acciones-cell">
-        <button type="button" onclick="mostrarModal('ver', '{{ $boletin->id }}')"
-            class="px-3 py-1 text-sm text-center text-white bg-green-600 rounded hover:bg-green-700">
-            Ver
-        </button>
-        <button type="button" onclick="mostrarModal('editar', '{{ $boletin->id }}')"
-            class="px-3 py-1 text-sm text-center text-white bg-yellow-600 rounded hover:bg-yellow-700">
-            Editar
-        </button>
-        <button type="button" onclick="mostrarModal('boletin', '{{ $boletin->id }}')"
-            class="w-20 px-1 py-1 text-sm text-center text-white bg-red-600 rounded hover:bg-red-700">
-            Eliminar
-        </button>
+        {{-- Botón 'Ver' --}}
+        @can('crear boletin')
+            <button type="button" onclick="mostrarModal('ver', '{{ $boletin->id }}')"
+                class="px-3 py-1 text-sm text-center text-white bg-green-600 rounded hover:bg-green-700">
+                Ver
+            </button>
+        @endcan
+
+        {{-- Botón 'Editar' --}}
+        @can('editar boletin')
+            <button type="button" onclick="mostrarModal('editar', '{{ $boletin->id }}')"
+                class="px-3 py-1 text-sm text-center text-white bg-yellow-600 rounded hover:bg-yellow-700">
+                Editar
+            </button>
+        @endcan
+
+        {{-- Botón 'Eliminar' --}}
+        @can('eliminar boletin')
+            <button type="button" onclick="mostrarModal('boletin', '{{ $boletin->id }}')"
+                class="w-20 px-1 py-1 text-sm text-center text-white bg-red-600 rounded hover:bg-red-700">
+                Eliminar
+            </button>
+        @endcan
+
+        {{-- Botones de Validar y Rechazar, visibles solo si el estado es 'pendiente' --}}
+        @if ($boletin->estado === 'pendiente')
+            @can('validar boletin')
+                <button type="button" onclick="mostrarModal('validar-boletin', '{{ $boletin->id }}')"
+                    class="px-3 py-1 text-sm text-center text-white bg-blue-600 rounded hover:bg-blue-700">
+                    Validar
+                </button>
+                @include('pendientes.partials.modal-boletin-validar')
+            @endcan
+
+            @can('validar boletin')
+                <button type="button" onclick="mostrarModal('rechazar-boletin', '{{ $boletin->id }}')"
+                    class="px-3 py-1 text-sm text-center text-white bg-orange-600 rounded hover:bg-orange-700">
+                    Rechazar
+                </button>
+                @include('pendientes.partials.modal-boletin-rechazar')
+            @endcan
+        @endif
     </td>
 </tr>

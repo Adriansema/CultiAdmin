@@ -48,7 +48,7 @@ class NoticiaService
         // Define la cantidad de elementos por página, con un valor por defecto y opciones válidas
         $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100])
             ? $request->input('per_page')
-            : 5; // Por defecto 5
+            : 10; // Por defecto 5
 
         $query = $request->input('q');        // Búsqueda general
 

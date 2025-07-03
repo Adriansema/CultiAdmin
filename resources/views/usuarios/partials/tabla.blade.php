@@ -59,18 +59,21 @@
                                  // El SuperAdmin no entra en los 'if'/'elseif' de restricciones de rol.
                              @endphp
 
-                             @if ($canEditTargetUser && $loggedInUser)
-                                 <button type="button" class="ml-2 edit-user-button"
-                                     data-user-id="{{ $usuario->id }}">
-                                     <img src="{{ asset('images/lapiz.svg') }}" class="w-4 h-4" alt="editar">
-                                 </button>
-                             @else
-                                 {{-- Muestra el icono pero lo hace no interactivo y un poco opaco --}}
-                                 <span class="ml-2 cursor-not-allowed">
-                                     <img src="{{ asset('images/lapiz.svg') }}" class="w-4 h-4 opacity-50"
-                                         alt="editar">
-                                 </span>
-                             @endif
+                             @can('editar usuario')
+                                 @if ($canEditTargetUser && $loggedInUser)
+                                     {{-- Muestra el botón interactivo si el usuario tiene permiso y se cumplen las condiciones --}}
+                                     <button type="button" class="ml-2 edit-user-button"
+                                         data-user-id="{{ $usuario->id }}">
+                                         <img src="{{ asset('images/lapiz.svg') }}" class="w-4 h-4" alt="editar">
+                                     </button>
+                                 @else
+                                     {{-- Muestra el icono no interactivo y opaco si el usuario tiene permiso, pero las condiciones internas no se cumplen --}}
+                                     <span class="ml-2 cursor-not-allowed">
+                                         <img src="{{ asset('images/lapiz.svg') }}" class="w-4 h-4 opacity-50"
+                                             alt="editar">
+                                     </span>
+                                 @endif
+                             @endcan
                          </td>
 
                          <td class="px-6 py-4">

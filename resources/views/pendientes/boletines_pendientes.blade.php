@@ -65,17 +65,4 @@
             @endif
         </div>
     </div>
-
-    {{-- Scripts para modales (solo si son necesarios para los boletines) --}}
-    <script>
-        function mostrarModal(tipo, id) {
-            const modal = document.getElementById(`modal-${tipo}-${id}`);
-            modal.classList.remove('hidden');
-        }
-
-        function ocultarModal(tipo, id) {
-            const modal = document.getElementById(`modal-${tipo}-${id}`);
-            modal.classList.add('hidden');
-        }
-    </script>
 @endsection

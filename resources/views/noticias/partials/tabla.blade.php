@@ -57,18 +57,48 @@
                         </td>
                         <td class="px-6 py-4 text-sm">
                             <div class="flex items-center space-x-2">
-                                <a href="{{ route('noticias.show', $noticia->id_noticias) }}"
-                                    class="text-blue-600 hover:text-blue-900">Ver</a>
+                                @can('crear noticia')
+                                    <a href="{{ route('noticias.show', $noticia->id_noticias) }}"
+                                    class="px-3 py-1 text-sm text-center text-white bg-blue-600 rounded hover:bg-blue-700">
+                                    Ver
+                                </a>
 
-                                <a href="{{ route('noticias.edit', $noticia->id_noticias) }}"
-                                    class="text-yellow-600 hover:text-yellow-900">Editar</a>
+                                @endcan
+                                
+                                @can('editar noticia')
+                                    <a href="{{ route('noticias.edit', $noticia->id_noticias) }}"
+                                    class="px-3 py-1 text-sm text-center text-white bg-yellow-600 rounded hover:bg-yellow-700">
+                                    Editar
+                                </a>
+                                @endcan
+                                
+                                @can('eliminar noticia')
+                                    <button type="button" onclick="mostrarModal('noticia', '{{ $noticia->id_noticias }}')"
+                                    class="px-3 py-1 text-sm text-center text-white bg-red-600 rounded hover:bg-red-700">
+                                    Eliminar
+                                </button>
+                                @endcan
+                                
+                                {{-- Botones de Validar y Rechazar, visibles solo si el estado es 'pendiente' --}}
+                                @if ($noticia->estado === 'pendiente')
+                                    @can('validar noticia')
+                                        <button type="button"
+                                            onclick="mostrarModal('validar-noticia', '{{ $noticia->id_noticias }}')"
+                                            class="px-3 py-1 text-sm text-center text-white bg-blue-600 rounded hover:bg-blue-700">
+                                            Validar
+                                        </button>
+                                        @include('pendientes.partials.modal-noticia-validar')
+                                    @endcan
 
-                                <form action="{{ route('noticias.destroy', $noticia->id_noticias) }}" method="POST"
-                                    onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta noticia?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900">Eliminar</button>
-                                </form>
+                                    @can('validar noticia')
+                                        <button type="button"
+                                            onclick="mostrarModal('rechazar-noticia', '{{ $noticia->id_noticias }}')"
+                                            class="px-3 py-1 text-sm text-center text-white bg-orange-600 rounded hover:bg-orange-700">
+                                            Rechazar
+                                        </button>
+                                        @include('pendientes.partials.modal-noticia-rechazar')
+                                    @endcan
+                                @endif
                             </div>
                         </td>
                     </tr>

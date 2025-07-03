@@ -48,7 +48,7 @@ class UserService
     {
         $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100])
             ? $request->input('per_page')
-            : 5;
+            : 10;
 
         $query      = $request->input('q');        // Búsqueda general
         $estado     = $request->input('estado');   // 'activo' o 'inactivo'

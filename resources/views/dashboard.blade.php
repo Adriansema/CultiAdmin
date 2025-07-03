@@ -134,9 +134,9 @@
         <section id="novedades-boletines" class="relative grid items-start mt-1 gap-7 md:grid-cols-2 rounded-xl">
 
             {{-- sesion de noticias --}}
-            <section id="mensajes" class="p-4 flex flex-col bg-[var(--color-gris1)] rounded-3xl h-full">
+            <section id="mensajes" class="p-4 flex flex-col bg-[var(--color-gris1)] rounded-3xl">
                 {{-- Añadido h-full --}}
-                <div class="flex items-center justify-between mb-1"> {{-- Ajustado mb-1 para reducir espacio --}}
+                <div class="flex items-center justify-between mb-1">
 
                     <div class="flex items-center space-x-2">
                         <img src="{{ asset('images/noticias-n.svg') }}" alt="noticias-notificacion"
@@ -167,7 +167,7 @@
             </section>
 
             {{-- sesion de boletines --}}
-            <section id="boletines" class="p-4 flex flex-col bg-[var(--color-gris1)] rounded-3xl h-full">
+            <section id="boletines" class="p-4 flex flex-col bg-[var(--color-gris1)] rounded-3xl">
                 {{-- Añadido h-full --}}
                 <div class="flex items-center justify-between mb-1"> {{-- Ajustado mb-1 para reducir espacio --}}
 

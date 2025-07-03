@@ -1,4 +1,4 @@
-<div class="relative flex items-center w-full max-w-xl">
+<div class="relative flex items-center w-full">
     {{-- ! Un campo de texto (<input>) para escribir la búsqueda, con estilos que cambian al pasar el ratón o al enfocarlo. --}}
     <input type="text" id="SearchLive" name="q" placeholder="Buscar Producto"
         class="form-control border border-[var(--color-ajustes)] hover:border-[var(--color-hover)] rounded-2xl pr-10 py-2 w-full

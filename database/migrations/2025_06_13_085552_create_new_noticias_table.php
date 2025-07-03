@@ -24,6 +24,7 @@ return new class extends Migration
             $table->boolean('leida')->default(false); // funcion para obtener los mensajes en el dashboard como leido
             $table->string('estado', 255)->default('pendiente'); // Estado (ej. 'pendiente', 'aprobada', 'rechazada')
             $table->string('autor', 255)->nullable()->default(null);
+            $table->text('observaciones')->nullable();
             $table->timestamps(); // Columnas created_at y updated_at
         });
     }

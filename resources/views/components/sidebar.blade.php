@@ -72,7 +72,7 @@
                     <x-responsive-nav-link href="{{ route('noticias.index') }}"
                         class="flex items-center transition-all duration-300 ease-in-out" :active="request()->routeIs('boletines')">
 
-                        <img src="{{ asset('images/form.svg') }}" class="w-4 h-4" alt="cultivos">
+                        <img src="{{ asset('images/noticias.svg') }}" class="w-4 h-4" alt="cultivos">
 
                         <span x-show="sidebarOpen" x-transition
                             class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
@@ -93,7 +93,7 @@
                     <x-responsive-nav-link href="{{ route('boletines.index') }}"
                         class="flex items-center transition-all duration-300 ease-in-out" :active="request()->routeIs('boletines')">
 
-                        <img src="{{ asset('images/dolar.svg') }}" class="w-4 h-4" alt="Boletines">
+                        <img src="{{ asset('images/form.svg') }}" class="w-4 h-4" alt="Boletines">
 
                         <span x-show="sidebarOpen" x-transition
                             class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">

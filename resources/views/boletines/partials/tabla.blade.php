@@ -1,4 +1,4 @@
-<div class="mb-6 overflow-x-auto bg-white shadow-sm rounded-xl">
+<div class="mb-6 overflow-x-auto w-full bg-white shadow-sm rounded-xl">
     <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
             <tr>
