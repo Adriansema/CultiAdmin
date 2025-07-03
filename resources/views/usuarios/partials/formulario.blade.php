@@ -409,9 +409,6 @@
     </div>
 </div>
 
-<!-- INICIO: MODALES DE FLUJO DE IMPORTACIÓN CSV -->
-
-<!-- Modal de Carga de Archivo CSV (Corresponde a la parte superior de tu Imagen 1 inicial) -->
 <div id="importCsvUploadModal"
     class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center 
     transition-opacity duration-300 ease-out opacity-0 pointer-events-none">

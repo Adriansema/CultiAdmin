@@ -25,11 +25,11 @@
             @else
                 @forelse($productos as $producto)
                     <tr class="bg-white hover:bg-gray-300">
-                        <td class="px-4 py-2 flex items-center">
+                        <td class="px-4 py-2">
                             <span>{{ $producto->tipo }}</span>
                         </td>
 
-                        <td class="px-4 py-2 text-gray-600 break-words whitespace-normal align-top">
+                        <td class="px-4 py-2 text-gray-600">
                             {{ $producto->created_at->locale('es')->translatedFormat('d \d\e F \d\e\l Y h:i a') }}
                             <span class="block text-xs text-gray-500">
                                 ({{ $producto->created_at->diffForHumans() }})
@@ -38,7 +38,7 @@
 
                         <td class="px-4 py-2">
                             <span
-                                class="inline-block px-3 py-1 text-sm font-semibold text-white rounded
+                                class="inline-block px-3 py-2 text-md font-semibold text-white rounded-xl
                                 {{ $producto->estado === 'aprobado' ? 'bg-green-600' : ($producto->estado === 'pendiente' ? 'bg-yellow-500' : 'bg-red-600') }}">
                                 {{ ucfirst($producto->estado) }}
                             </span>
@@ -47,21 +47,21 @@
                         <td class="px-4 py-2 space-x-2">
                             @can('crear producto')
                                 <a href="{{ route('productos.show', $producto) }}"
-                                    class="px-3 py-2 text-sm text-center text-white bg-green-600 rounded hover:bg-green-700">
+                                    class="px-3 py-2 text-sm text-center text-white bg-green-600 rounded-xl hover:bg-green-700">
                                     Ver
                                 </a>
                             @endcan
 
                             @can('editar producto')
                                 <a href="{{ route('productos.edit', $producto) }}"
-                                    class="px-3 py-2 text-sm text-center text-white bg-yellow-600 rounded hover:bg-yellow-700">
+                                    class="px-3 py-2 text-sm text-center text-white bg-yellow-600 rounded-xl hover:bg-yellow-700">
                                     Editar
                                 </a>
                             @endcan
 
                             @can('eliminar producto')
                                 <button type="button" onclick="mostrarModal('producto', '{{ $producto->id }}')"
-                                    class="px-3 py-2 text-sm text-center text-white bg-red-600 rounded hover:bg-red-700">
+                                    class=" px-3 py-2 text-sm text-center text-white bg-red-600 rounded-xl hover:bg-red-700">
                                     Eliminar
                                 </button>
                             @endcan
@@ -70,7 +70,7 @@
                             @if ($producto->estado === 'pendiente')
                                 @can('validar producto')
                                     <button type="button" onclick="mostrarModal('validar-producto', '{{ $producto->id }}')"
-                                        class="px-3 py-2 text-sm text-center text-white bg-blue-600 rounded hover:bg-blue-700">
+                                        class="px-3 py-2 text-sm text-center text-white bg-blue-600 rounded-xl hover:bg-blue-700">
                                         Validar
                                     </button>
                                     @include('pendientes.partials.modal-producto-validar')
@@ -79,7 +79,7 @@
                                 @can('validar producto')
                                     <button type="button"
                                         onclick="mostrarModal('rechazar-producto', '{{ $producto->id }}')"
-                                        class="px-3 py-2 text-sm text-center text-white bg-orange-600 rounded hover:bg-orange-700">
+                                        class="px-3 py-2 text-sm text-center text-white bg-orange-600 rounded-xl hover:bg-orange-700">
                                         Rechazar
                                     </button>
                                     @include('pendientes.partials.modal-producto-rechazar')

@@ -9,7 +9,7 @@
                 <h1 class="text-3xl whitespace-nowrap font-bold">Noticias</h1>
             </div>
             <div class="py-2">
-            {!! Breadcrumbs::render('noticias.index') !!}
+                {!! Breadcrumbs::render('noticias.index') !!}
             </div>
         </div>
 
@@ -56,10 +56,6 @@
                 </div>
             </div>
 
-            @if (session('success'))
-                <div class="p-4 mb-4 text-green-800 bg-green-100 rounded shadow">{{ session('success') }}</div>
-            @endif
-
             @if (session('error'))
                 <div class="p-4 mb-4 text-red-800 bg-red-100 rounded shadow">{{ session('error') }}</div>
             @endif
@@ -79,10 +75,9 @@
             @endif
         </div>
     @endcan
-
+    
     @include('partials.success-modal')
 
-    {{-- Div oculto para pasar el mensaje de éxito a JavaScript --}}
     @if (session('modal_success_message'))
         <div id="success-message-data" data-message="{{ session('modal_success_message') }}" class="hidden"></div>
     @endif
