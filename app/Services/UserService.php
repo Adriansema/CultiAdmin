@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\User;
+use Doctrine\DBAL\Query;
 use Illuminate\Http\Request;
+use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\DB; // Necesitamos importar DB para usar DB::raw()
 
 class UserService
@@ -45,7 +47,18 @@ class UserService
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function obtenerUsuariosFiltrados(Request $request)
-    {
+    { 
+        $estado = $request->input('estado');
+        
+
+        $query = user::query();
+
+        if(in_array($estado, ['activo','inativo'])){
+            $query->where('estado',$estado);
+        }
+        return $query->paginate(10);
+    
+
         $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100])
             ? $request->input('per_page')
             : 10;
