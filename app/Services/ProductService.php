@@ -4,90 +4,71 @@ namespace App\Services;
 
 use App\Models\Producto;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // Necesitamos importar DB para usar DB::raw()
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class ProductService
 {
-    /**
-     * Limpia el texto de búsqueda para una comparación robusta.
-     * Convierte a minúsculas, elimina tildes y caracteres especiales.
-     *
-     * @param string $text El texto a limpiar.
-     * @return string El texto limpio.
-     */
     private function cleanSearchQuery(string $text): string
     {
-        // Convertir a minúsculas
         $text = mb_strtolower($text, 'UTF-8');
-
-        // Reemplazar caracteres con tildes por sus equivalentes sin tilde
         $text = str_replace(
             ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ', 'Á', 'É', 'Í', 'Ó', 'Ú', 'Ü', 'Ñ'],
             ['a', 'e', 'i', 'o', 'u', 'u', 'n', 'A', 'E', 'I', 'O', 'U', 'U', 'N'],
             $text
         );
-
-        // Remover caracteres no alfanuméricos (excepto espacios)
-        // Esto elimina puntos, comas, guiones, etc., dejando solo letras, números y espacios
         $text = preg_replace('/[^a-z0-9\s]/', '', $text);
-
-        // Remover espacios múltiples y eliminar espacios al inicio/final
         $text = trim(preg_replace('/\s+/', ' ', $text));
-
         return $text;
     }
 
-    /**
-     * Obtiene productos filtrados con búsqueda robusta por la columna 'tipo'.
-     *
-     * @param Request $request La solicitud HTTP con los parámetros de filtro.
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
     public function obtenerProductosFiltrados(Request $request)
     {
-        // Define la cantidad de elementos por página, con un valor por defecto y opciones válidas
         $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100])
             ? $request->input('per_page')
-            : 10; // Por defecto 5
+            : 10;
 
-        // Usamos 'q' para la búsqueda general.
-        $searchQuery = $request->input('q');
+        // --- CAMBIO CLAVE AQUÍ: Inicializar las variables al principio ---
+        $searchQuery = $request->input('q', ''); // Inicializar con cadena vacía si no está presente
+        $estado = $request->input('estado', ''); // Inicializar con cadena vacía si no está presente
+        // --- FIN DEL CAMBIO CLAVE ---
 
         $productos = Producto::query();
 
-        // Búsqueda robusta solo en la columna 'tipo'
-        if ($searchQuery) {
-            // Limpiamos el texto de búsqueda ingresado por el usuario una vez
+        // La lógica de la búsqueda robusta solo se aplica si hay una consulta
+        if (!empty($searchQuery)) { // Usar !empty() es más robusto que solo if($searchQuery)
             $cleanedSearchQuery = $this->cleanSearchQuery($searchQuery);
-            /* dd($searchQuery, $cleanedSearchQuery); */
-
-            $productos->where(function ($q) use ($cleanedSearchQuery) {
-                // Función SQL para normalizar texto.
-                // Asumimos que 'tipo' es TEXT/VARCHAR.
+            
+            $productos->where(function ($q) use ($cleanedSearchQuery, $searchQuery) { // Asegúrate de pasar $searchQuery si lo usas para Carbon
                 $sqlNormalize = function($column) {
-                    $fechaCampos = ['created_at', 'updated_at'];
-                    // Si es fecha, conviértelo a texto
-                    if (in_array($column, $fechaCampos)) {
-                        $column = "TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')";
+                    if (in_array($column, ['created_at', 'updated_at'])) {
+                        return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                     }
-
                     return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER({$column}), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                 };
 
-                // Búsqueda robusta únicamente en la columna 'tipo'
                 $q->orWhereRaw($sqlNormalize('tipo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                ->orWhereRaw($sqlNormalize('observaciones') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                ->orWhereRaw($sqlNormalize('estado') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                ->orWhereRaw($sqlNormalize('RutaVideo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                ->orWhereRaw($sqlNormalize('created_at') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+                  ->orWhereRaw($sqlNormalize('observaciones') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                  ->orWhereRaw($sqlNormalize('estado') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                  ->orWhereRaw($sqlNormalize('RutaVideo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+                
+                // Intenta buscar por fecha limpia si la cadena de búsqueda parece una fecha
+                try {
+                    $date = Carbon::parse($searchQuery); // Usa $searchQuery original para parsear la fecha
+                    $q->orWhereDate('created_at', $date->toDateString());
+                } catch (\Exception $e) {
+                    // No hace nada si la fecha no es válida
+                }
             });
-            /* dd($productos->toSql(), $productos->getBindings()); */
         }
 
-        // Ordena los productos
-        $productos->orderBy('tipo', 'asc'); // Mantiene tu ordenamiento original
+        // Aplicar filtro por estado (ahora 'estado' siempre estará definido)
+        if (!empty($estado) && in_array($estado, ['aprobado', 'pendiente', 'rechazado'])) {
+            $productos->where('estado', $estado);
+        }
 
-        // Retorna los productos paginados
+        $productos->orderBy('tipo', 'asc');
+
         return $productos->paginate($perPage)->withQueryString();
     }
 }
