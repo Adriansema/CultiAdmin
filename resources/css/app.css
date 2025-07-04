@@ -312,11 +312,13 @@ html {
 
   background-color: white;
   padding: 30px;
-  margin: 30px;
+  margin: 20px;
 
-  border-radius: 32px;
+  border-radius: 24px;
 
-  /* max-width: 48rem; */
+  /* Para max-w-lg (ancho máximo) */
+  max-width: 36rem;
+  /* El valor equivalente a max-w-lg en Tailwind (512px) */
   width: 100%;
 }
 

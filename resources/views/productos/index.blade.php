@@ -5,7 +5,7 @@
 @section('content')
 
     @can('crear producto')
-        <div class="inline-block px-20 py-6">
+        <div class="inline-block px-10 py-6">
             <div class="flex items-center space-x-4">
                 <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
                 <h1 class="text-3xl whitespace-nowrap font-bold">Gestion de Productos</h1>
@@ -16,7 +16,7 @@
         </div>
 
         <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-2xl p-4">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between"> 
 
                 <form id="searchForm" action="{{ route('productos.index') }}" method="GET"
                     class="flex items-center w-full max-w-xl">
@@ -76,7 +76,7 @@
             @endforelse
 
             @if ($productos->total() > 0 && $productos->hasPages())
-                <div class="p-4 mt-4 rounded-b-xl">
+                <div class="mt-4 rounded-b-xl">
                     {{ $productos->links('vendor.pagination.tailwind') }}
                 </div>
             @endif

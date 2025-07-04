@@ -1,11 +1,5 @@
 @extends('layouts.app')
 
-@section('header')
-    <h2 class="text-xl font-semibold leading-tight text-gray-800">
-        {{ __('Profile') }}
-    </h2>
-@endsection
-
 @section('content')
 <div>
     <div class="py-10 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -21,23 +15,16 @@
             <x-section-border />
         @endif
 
-        @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
+       {{--  @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
             <div class="mt-10 sm:mt-0">
                 @livewire('profile.two-factor-authentication-form')
             </div>
             <x-section-border />
-        @endif
+        @endif --}}
 
-        <div class="mt-10 sm:mt-0">
+        {{-- <div class="mt-10 sm:mt-0">
             @livewire('profile.logout-other-browser-sessions-form')
-        </div>
-
-        {{-- @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
-            <x-section-border />
-            <div class="mt-10 sm:mt-0">
-                @livewire('profile.delete-user-form')
-            </div>
-        @endif --}} {{-- SE DESACTIVO LA OPCION/FUNCION DE ELIMINAR --}}
+        </div> --}}
     </div>
 </div>
 @endsection

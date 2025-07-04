@@ -75,10 +75,4 @@
             @endif
         </div>
     @endcan
-    
-    @include('partials.success-modal')
-
-    @if (session('modal_success_message'))
-        <div id="success-message-data" data-message="{{ session('modal_success_message') }}" class="hidden"></div>
-    @endif
 @endsection

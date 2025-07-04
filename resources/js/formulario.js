@@ -48,12 +48,20 @@ document.addEventListener('DOMContentLoaded', async function () {
     const confirmCancelButton = document.getElementById('confirmCancelButton');
     const confirmActionButton = document.getElementById('confirmActionButton');
 
+    // REFERENCIAS A LOS ELEMENTOS DEL MODAL DE NOTIFICACIÓN GLOBAL
+    const appNotificationModal = document.getElementById('appNotificationModal');
+    const appNotificationIconContainer = document.getElementById('appNotificationIconContainer');
+    const appNotificationSuccessIcon = document.getElementById('appNotificationSuccessIcon');
+    const appNotificationErrorIcon = document.getElementById('appNotificationErrorIcon');
+    const appNotificationText = document.getElementById('appNotificationText');
+    const appNotificationCloseButton = document.getElementById('appNotificationCloseButton');
+
     // Verificaciones iniciales de elementos (importante para depuración)
     if (!userFormModal) { console.error('ERROR: userFormModal no encontrado.'); return; }
     if (!nextButton) console.error('ERROR: nextStepButton no encontrado. ¡Este es crucial!');
     if (!prevButton) console.error('ERROR: prevButton no encontrado.');
     if (!generatePasswordButton) console.error('ERROR: generatePasswordButton no encontrado.');
-    if (!importCsvButton) console.error('ERROR: importCsvButton no encontrado.'); 
+    if (!importCsvButton) console.error('ERROR: importCsvButton no encontrado.');
     if (!step3Content) console.error('ERROR: step3Content no encontrado.');
     if (!step3Indicator) console.error('ERROR: step3Indicator no encontrado.');
     if (!passwordInput) console.error('ERROR: passwordInput no encontrado.');
@@ -64,6 +72,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (!confirmActionButton) console.error('ERROR: confirmActionButton no encontrado.');
     if (!lastnameInput) console.error('ERROR: lastnameInput no encontrado.');
     if (!phoneInput) console.error('ERROR: phoneInput no encontrado.');
+
+    // Verificaciones para el nuevo modal de notificación
+    if (!appNotificationModal) console.error('ERROR: appNotificationModal no encontrado.');
+    if (!appNotificationIconContainer) console.error('ERROR: appNotificationIconContainer no encontrado.');
+    if (!appNotificationSuccessIcon) console.error('ERROR: appNotificationSuccessIcon no encontrado.');
+    if (!appNotificationErrorIcon) console.error('ERROR: appNotificationErrorIcon no encontrado.');
+    if (!appNotificationText) console.error('ERROR: appNotificationText no encontrado.');
+    if (!appNotificationCloseButton) console.error('ERROR: appNotificationCloseButton no encontrado.');
 
 
     // Estado global del modal
@@ -102,7 +118,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         rolePermissionsMapping: {},
         errors: {},
         successMessage: '',
-        csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+
+        // ESTADOS PARA EL MODAL DE NOTIFICACIÓN GLOBAL
+        isAppNotificationModalOpen: false,
+        appNotificationMessage: '',
+        appNotificationIsSuccess: true, // true para éxito (verde), false para error (rojo)
     };
 
     // ! Funciones Auxiliares
@@ -198,6 +219,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         resetPermissions();
         modalData.errors = {};
         modalData.successMessage = '';
+        // Resetear también el estado del modal de notificación global
+        modalData.isAppNotificationModalOpen = false;
+        modalData.appNotificationMessage = '';
+        modalData.appNotificationIsSuccess = true;
 
         if (nameInput) nameInput.value = '';
         if (lastnameInput) lastnameInput.value = '';
@@ -227,19 +252,80 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
     // ! Fin de Funciones Auxiliares
 
-    function updateModalUI() {
-        console.log('JS: updateModalUI llamado. Paso actual:', modalData.currentStep, 'Modo:', modalData.isEditMode ? 'Editar' : 'Crear');
-
-        // Control de visibilidad del modal principal
+    /**
+     * Actualiza la visibilidad del modal principal de usuario.
+     */
+    function updateModalVisibility() {
         if (modalData.isOpen) {
             userFormModal.classList.remove('opacity-0', 'pointer-events-none');
             userFormModal.classList.add('opacity-100');
             document.body.classList.add('overflow-hidden');
         } else {
             userFormModal.classList.remove('opacity-100');
-            userFormModal.classList.add('opacity-0', 'pointer-events-none');
-            document.body.classList.remove('overflow-hidden');
+            userFormModal.classList.add('opacity-0');
+            // Usa transitionend para asegurarse de que pointer-events-none se aplique después de la animación de cierre
+            const onTransitionEnd = (event) => {
+                if (event.propertyName === 'opacity') {
+                    userFormModal.classList.add('pointer-events-none');
+                    // Solo remover overflow-hidden si NO hay otro modal abierto (ej. el de notificación global)
+                    if (!modalData.isAppNotificationModalOpen) {
+                        document.body.classList.remove('overflow-hidden');
+                    }
+                    userFormModal.removeEventListener('transitionend', onTransitionEnd);
+                }
+            };
+            userFormModal.addEventListener('transitionend', onTransitionEnd);
         }
+    }
+
+    /**
+     * Gestiona la visibilidad y el contenido del modal de notificación global.
+     */
+    function updateAppNotificationModalVisibility() {
+        if (appNotificationModal) {
+            if (modalData.isAppNotificationModalOpen) {
+                appNotificationModal.classList.remove('hidden');
+                appNotificationModal.classList.add('flex'); // Añadir flex para centrar contenido
+                document.body.classList.add('overflow-hidden'); // Asegurar que el scroll del body esté desactivado
+
+                appNotificationText.textContent = modalData.appNotificationMessage;
+                if (appNotificationSuccessIcon && appNotificationErrorIcon) { // Asegurarse de que los iconos existan
+                    if (modalData.appNotificationIsSuccess) {
+                        appNotificationSuccessIcon.classList.remove('hidden');
+                        appNotificationErrorIcon.classList.add('hidden');
+                    } else {
+                        appNotificationSuccessIcon.classList.add('hidden');
+                        appNotificationErrorIcon.classList.remove('hidden');
+                    }
+                }
+            } else {
+                appNotificationModal.classList.add('hidden');
+                appNotificationModal.classList.remove('flex');
+                // Solo remover overflow-hidden si NO hay otro modal abierto (ej. userFormModal)
+                if (!modalData.isOpen) { // Verificar si el modal principal del formulario también está cerrado
+                    document.body.classList.remove('overflow-hidden');
+                }
+            }
+        }
+    }
+
+    /**
+     * Muestra el modal de notificación global.
+     * @param {string} message - El mensaje de texto a mostrar.
+     * @param {boolean} isSuccess - True para éxito (icono verde), false para error (icono rojo).
+     */
+    function showAppNotification(message, isSuccess) {
+        modalData.appNotificationMessage = message;
+        modalData.appNotificationIsSuccess = isSuccess;
+        modalData.isAppNotificationModalOpen = true;
+        updateAppNotificationModalVisibility();
+    }
+
+    function updateModalUI() {
+        console.log('JS: updateModalUI llamado. Paso actual:', modalData.currentStep, 'Modo:', modalData.isEditMode ? 'Editar' : 'Crear');
+
+        // Control de visibilidad del modal principal
+        updateModalVisibility(); // Ahora se llama a la función dedicada
 
         if (modalTitle) {
             modalTitle.textContent = modalData.isEditMode ? 'Editar Usuario' : 'Registrar Nuevo Usuario';
@@ -602,6 +688,17 @@ document.addEventListener('DOMContentLoaded', async function () {
         openImportCsvModal();
     }
 
+    // ************* FUNCIÓN PARA ALTERNAR VISIBILIDAD DE CONTRASEÑA EN EL MODAL DE CONFIRMACIÓN *************
+    window.toggleConfirmPasswordVisibilityInModal = function (buttonElement) {
+        const passwordInputInModal = buttonElement.previousElementSibling; // El input es el hermano anterior del botón
+        if (passwordInputInModal) {
+            const type = passwordInputInModal.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInputInModal.setAttribute('type', type);
+            buttonElement.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+            buttonElement.setAttribute('title', type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
+        }
+    };
+
     // ************* FUNCIONES PARA EL MODAL DE CONFIRMACIÓN *************
     function openConfirmModal() {
         console.log('JS: openConfirmModal llamado.');
@@ -648,10 +745,12 @@ document.addEventListener('DOMContentLoaded', async function () {
             passwordDisplayHtml = `
                 <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contraseña generada:</h4>
                 <div class="relative flex items-center mb-4 bg-gray-100 p-3 rounded-lg border border-gray-200">
-                    <input type="text" value="${modalData.password}" readonly
-                        class="w-full bg-transparent text-gray-800 text-base font-mono focus:outline-none cursor-not-allowed" />
-                    <button type="button" class="absolute right-3 text-gray-500 hover:text-gray-700" title="Copiar contraseña" onclick="copyPasswordToClipboard('${modalData.password}')">
-                        <img src="/images/copy.svg" alt="copiar" class="w-5 h-5" />
+                    <!-- AÑADIDO ID AL INPUT Y TIPO INICIAL PASSWORD -->
+                    <input type="password" id="confirmPasswordDisplayInput" value="${modalData.password}" readonly
+                        class="w-full bg-transparent text-gray-800 text-base font-mono focus:outline-none cursor-not-allowed pr-12" /> <!-- pr-12 para espacio -->
+                    <!-- CAMBIADO ONCLICK Y ICONO INICIAL -->
+                    <button type="button" class="absolute right-4 text-gray-500 hover:text-gray-700" title="Mostrar contraseña" onclick="toggleConfirmPasswordVisibilityInModal(this)">
+                        <img src="/images/ojo-close.svg" alt="Mostrar/Ocultar" class="w-5 h-5" />
                     </button>
                 </div>
                 <p class="text-gray-600 text-sm mb-4">Esta contraseña se enviará al correo del usuario.</p>
@@ -723,34 +822,22 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // Función para copiar la contraseña al portapapeles
-    window.copyPasswordToClipboard = function (password) {
-        const tempInput = document.createElement('textarea');
-        tempInput.value = password;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        try {
-            document.execCommand('copy');
-            console.log('¡Contraseña copiada al portapapeles!');
-        } catch (err) {
-            console.error('Error al copiar la contraseña: ', err);
-            console.log('No se pudo copiar la contraseña automáticamente. Por favor, cópiala manualmente.');
-        }
-        document.body.removeChild(tempInput);
-    };
-
-
     async function submitFormConfirmed() {
         console.log('JS: submitFormConfirmed llamado. Iniciando envío.');
-        closeConfirmModal(); // Cierra el modal de confirmación, esto también re-muestra el modal principal
-        modalData.errors = {};
-        modalData.successMessage = '';
-        updateModalUI(); // Actualiza la UI del modal principal para mostrar errores/carga
 
+        // Deshabilitar botón y mostrar spinner en el botón del modal de confirmación
         const actionButton = confirmActionButton;
         const originalBtnText = actionButton.innerHTML;
         actionButton.disabled = true;
-        actionButton.innerHTML = `Confirmando <img src="/images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">`;
+        actionButton.innerHTML = `
+            <span class="flex items-center justify-between w-full">
+                <span>Confirmando</span>
+                <img src="/images/cargando_.svg" alt="Cargando..." class="w-5 h-5 animate-spin">
+            </span>
+        `;
+
+        // NO cerramos el modal de confirmación aquí todavía.
+        // Se mantendrá abierto con el spinner visible mientras se envía la solicitud.
 
         const formData = new FormData();
         formData.append('_token', modalData.csrfToken);
@@ -811,45 +898,49 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             const data = await response.json();
 
-            if (!response.ok) {
-                if (response.status === 422 && data.errors) {
-                    modalData.errors = data.errors;
-                    console.error('Errores de validación del backend:', data.errors);
-                } else {
-                    modalData.errors.general = data.message || `Error ${response.status}: ${response.statusText || 'Desconocido'}.`;
-                    console.error('Error del servidor no 422:', data);
-                }
-                modalData.isOpen = true;
-                const firstErrorField = Object.keys(modalData.errors)[0];
-                if (firstErrorField === 'name' || firstErrorField === 'lastname' || firstErrorField === 'email' || firstErrorField === 'phone' || firstErrorField === 'type_document' || firstErrorField === 'document') {
-                    modalData.currentStep = 1;
-                } else if (firstErrorField === 'roles' || firstErrorField === 'selectedRole' || firstErrorField === 'permissions') {
-                    modalData.currentStep = 2;
-                } else if (firstErrorField === 'password' || firstErrorField === 'password_confirmation') {
-                    modalData.currentStep = 3;
-                }
-                updateModalUI();
-                return;
-            }
-
-            // Éxito
-            modalData.successMessage = data.message;
-            updateModalUI();
-
-            // Tras el éxito, cerrar el modal y recargar la página.
-            setTimeout(() => {
-                closeModal();
-                window.location.reload();
-            }, 1500);
-
-        } catch (error) {
-            console.error('Error de red o parsing JSON:', error);
-            modalData.errors.general = 'Ocurrió un error de red o inesperado. Por favor, inténtalo de nuevo.';
-            modalData.isOpen = true;
-            updateModalUI();
-        } finally {
+            // Volver a habilitar el botón del modal de confirmación
             actionButton.disabled = false;
             actionButton.innerHTML = originalBtnText;
+
+            // AHORA SÍ: Cerrar el modal de confirmación
+            closeConfirmModal();
+
+            // Asegurarse de que el modal principal del formulario esté completamente oculto
+            modalData.isOpen = false;
+            updateModalVisibility(); // Esto activará la lógica para ocultar userFormModal
+
+            if (response.ok) {
+                // Éxito: Mostrar el nuevo modal de notificación global
+                const successMessage = modalData.isEditMode ? '¡Tu usuario se ha actualizado correctamente!' : '¡Tu usuario se ha creado correctamente!';
+                showAppNotification(successMessage, true); // True para éxito
+            } else {
+                // Errores: Mostrar mensaje de error en el nuevo modal de notificación global
+                console.error('Error en la respuesta del envío:', data);
+                let errorMessage = 'Hubo un error al ' + (modalData.isEditMode ? 'actualizar' : 'crear') + ' el usuario.';
+
+                if (data.errors) {
+                    const validationErrors = Object.values(data.errors).flat();
+                    errorMessage = validationErrors.join('<br>');
+                } else if (data.message) {
+                    errorMessage = data.message;
+                }
+                showAppNotification(errorMessage, false); // False para error
+            }
+
+        } catch (error) {
+            console.error('Error de red o inesperado:', error);
+            // Volver a habilitar el botón
+            actionButton.disabled = false;
+            actionButton.innerHTML = originalBtnText;
+
+            // AHORA SÍ: Cerrar el modal de confirmación
+            closeConfirmModal();
+
+            // Asegurarse de que el modal principal del formulario esté completamente oculto
+            modalData.isOpen = false;
+            updateModalVisibility(); // Esto activará la lógica para ocultar userFormModal
+
+            showAppNotification('Error de conexión o inesperado. Por favor, inténtalo de nuevo.', false); // False para error
         }
     }
 
@@ -947,6 +1038,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
             this.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+            this.setAttribute('title', type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
         });
     }
 
@@ -955,6 +1047,16 @@ document.addEventListener('DOMContentLoaded', async function () {
             const type = passwordConfirmationInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordConfirmationInput.setAttribute('type', type);
             this.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+            this.setAttribute('title', type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
+        });
+    }
+
+    // LISTENER PARA EL BOTÓN CERRAR DEL MODAL GLOBAL DE NOTIFICACIONES
+    if (appNotificationCloseButton) {
+        appNotificationCloseButton.addEventListener('click', function () {
+            modalData.isAppNotificationModalOpen = false; // Oculta el modal global
+            updateAppNotificationModalVisibility(); // Actualiza la visibilidad
+            window.location.reload(); // Recarga la página para refrescar la tabla de usuarios
         });
     }
 });

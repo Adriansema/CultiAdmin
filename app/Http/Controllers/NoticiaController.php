@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth; // Para obtener el ID del usuario autenticado
 use Illuminate\Support\Facades\Storage; // Para manejar la carga de imágenes
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Log; // Importar la clase Log para registrar errores
+use Illuminate\Database\QueryException; //
 use Symfony\Component\HttpFoundation\StreamedResponse; // Necesario para la descarga de archivos grandes
 use App\Services\NoticiaService;
 
@@ -58,32 +60,45 @@ class NoticiaController extends Controller
             'autor' => 'nullable|string|max:255',
         ]);
 
-        // 2. Lógica para guardar la imagen (si se ha subido).
-        $imagenPath = null;
-        if ($request->hasFile('imagen')) {
-            $file = $request->file('imagen');
+        try {
+            // 2. Lógica para guardar la imagen (si se ha subido).
+            $imagenPath = null;
+            if ($request->hasFile('imagen')) {
+                $file = $request->file('imagen');
 
-            // Genera un nombre de archivo único con la extensión original del cliente
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                // Genera un nombre de archivo único con la extensión original del cliente
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-            // Guarda la imagen en storage/app/public/noticias con el nombre generado
-            $imagenPath = $file->storeAs('noticias', $filename, 'public');
+                // Guarda la imagen en storage/app/public/noticias con el nombre generado
+                $imagenPath = $file->storeAs('noticias', $filename, 'public');
+            }
+
+            // 3. Crear la nueva noticia.
+            // Si Noticia::create() falla, lanzará una excepción que será capturada por el bloque catch.
+            Noticia::create([
+                'user_id' => Auth::id(),
+                'tipo' => $request->tipo,
+                'titulo' => $request->titulo,
+                'clase' => $request->clase,
+                'imagen' => $imagenPath, // Guarda la ruta de la imagen
+                'informacion' => $request->informacion,
+                'numero_pagina' => $request->numero_pagina,
+                'autor' => $request->autor,
+                'leida' => false, // ¡Nueva columna, por defecto false!
+            ]);
+
+            // Si la creación es exitosa, el código continúa aquí.
+            return redirect()->route('noticias.index')->with('success_message', '¡Noticia creada con éxito!');
+
+        } catch (QueryException $e) {
+            // Captura errores específicos de la base de datos
+            Log::error('Error de base de datos al crear noticia: ' . $e->getMessage());
+            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al crear la noticia. Por favor, inténtalo de nuevo.');
+        } catch (\Exception $e) {
+            // Captura cualquier otra excepción inesperada
+            Log::error('Error inesperado al crear noticia: ' . $e->getMessage());
+            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al crear la noticia. Por favor, inténtalo de nuevo.');
         }
-        // 3. Crear la nueva noticia.
-        Noticia::create([
-            'user_id' => Auth::id(),
-            'tipo' => $request->tipo,
-            'titulo' => $request->titulo,
-            'clase' => $request->clase,
-            'imagen' => $imagenPath, // Guarda la ruta de la imagen
-            'informacion' => $request->informacion,
-            'numero_pagina' => $request->numero_pagina,
-            'autor' => $request->autor,
-            'leida' => false, // ¡Nueva columna, por defecto false!
-        ]);
-
-        // 4. Redirigir al índice de noticias con un mensaje de éxito.
-        return redirect()->route('noticias.index')->with('modal_success_message', '¡Noticia creada con éxito!');
     }
 
     /**
@@ -115,59 +130,70 @@ class NoticiaController extends Controller
     {
         Gate::authorize('editar noticia');
 
-        //  Guarda el estado original de la noticia antes de cualquier actualización
-        $originalEstado = $noticia->estado;
+        try {
+            // Guarda el estado original de la noticia antes de cualquier actualización
+            $originalEstado = $noticia->estado;
 
-        //  Valida los datos de la solicitud
-        $request->validate([
-            'tipo' => 'required|string|max:255',
-            'titulo' => 'nullable|string|max:255',
-            'clase' => 'nullable|string|max:255',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'informacion' => 'nullable|string',
-            'numero_pagina' => 'required|integer',
-            'autor' => 'nullable|string|max:255',
-        ]);
+            // Valida los datos de la solicitud
+            $request->validate([
+                'tipo' => 'required|string|max:255',
+                'titulo' => 'nullable|string|max:255',
+                'clase' => 'nullable|string|max:255',
+                'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'informacion' => 'nullable|string',
+                'numero_pagina' => 'required|integer',
+                'autor' => 'nullable|string|max:255',
+            ]);
 
-        // Lógica para actualizar la imagen.
-        if ($request->hasFile('imagen')) {
-            // Eliminar imagen anterior si existe
-            if ($noticia->imagen && Storage::disk('public')->exists($noticia->imagen)) {
-                Storage::disk('public')->delete($noticia->imagen);
+            // 1. Lógica para actualizar la imagen.
+            if ($request->hasFile('imagen')) {
+                // Eliminar imagen anterior si existe
+                if ($noticia->imagen && Storage::disk('public')->exists($noticia->imagen)) {
+                    Storage::disk('public')->delete($noticia->imagen);
+                }
+
+                $file = $request->file('imagen');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $imagenPath = $file->storeAs('noticias', $filename, 'public');
+
+                $noticia->imagen = $imagenPath; // Asigna la nueva ruta
             }
 
-            $file = $request->file('imagen');
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $imagenPath = $file->storeAs('noticias', $filename, 'public');
+            // 2. Lógica para cambiar el estado a 'pendiente' si la noticia fue editada
+            //    y su estado anterior era 'aprobado' o 'rechazado'.
+            //    Esto asegura que una noticia editada vuelva al flujo de revisión.
+            if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
+                $noticia->estado = 'pendiente';
+                $noticia->observaciones = null; // Limpia las observaciones anteriores si las hubiera
+                // Si tienes un campo específico para observaciones del operador, también límpialo:
+                // $noticia->observaciones_operador = null;
+            }
 
-            $noticia->imagen = $imagenPath; // Asigna la nueva ruta
+            // 3. Actualizar las propiedades de la noticia con los datos del request.
+            //    No necesitas llamar a $noticia->save() y luego $noticia->update().
+            //    Puedes asignar las propiedades y luego llamar a save() una vez.
+            $noticia->tipo = $request->tipo;
+            $noticia->titulo = $request->titulo;
+            $noticia->clase = $request->clase;
+            $noticia->informacion = $request->informacion;
+            $noticia->numero_pagina = $request->numero_pagina;
+            $noticia->autor = $request->autor;
+
+            // Guarda todos los cambios en la base de datos en una sola operación
+            $noticia->save();
+
+            // Si la actualización es exitosa, el código continúa aquí.
+            return redirect()->route('noticias.index')->with('success_message', '¡Noticia actualizada con éxito!');
+
+        } catch (QueryException $e) {
+            // Captura errores específicos de la base de datos
+            Log::error('Error de base de datos al actualizar noticia (ID: ' . $noticia->id . '): ' . $e->getMessage());
+            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al actualizar la noticia. Por favor, inténtalo de nuevo.');
+        } catch (\Exception $e) {
+            // Captura cualquier otra excepción inesperada
+            Log::error('Error inesperado al actualizar noticia (ID: ' . $noticia->id . '): ' . $e->getMessage());
+            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al actualizar la noticia. Por favor, inténtalo de nuevo.');
         }
-
-        // Lógica para cambiar el estado a 'pendiente' si la noticia fue editada
-        // y su estado anterior era 'aprobado' o 'rechazado'.
-        // Esto asegura que una noticia editada vuelva al flujo de revisión.
-        if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
-            $noticia->estado = 'pendiente';
-            $noticia->observaciones = null; // Limpia las observaciones anteriores si las hubiera
-            // Si tienes un campo específico para observaciones del operador, también límpialo:
-            // $noticia->observaciones_operador = null;
-        }
-
-        // Guarda los cambios en la base de datos
-        $noticia->save();
-
-        // Actualizar la noticia
-        $noticia->update([
-            'tipo' => $request->tipo,
-            'titulo' => $request->titulo,
-            'clase' => $request->clase,
-            'informacion' => $request->informacion,
-            'numero_pagina' => $request->numero_pagina,
-            'autor' => $request->autor,
-        ]);
-
-        // Redirigir al índice de noticias con un mensaje de éxito
-        return redirect()->route('noticias.index')->with('success', 'Noticia actualizada con éxito.');
     }
 
     /**
@@ -222,7 +248,7 @@ class NoticiaController extends Controller
         ];
 
         // Crea una respuesta de tipo StreamedResponse para manejar archivos grandes de manera eficiente
-        $callback = function() use ($columns) {
+        $callback = function () use ($columns) {
             $file = fopen('php://output', 'w'); // Abre el flujo de salida para escribir el CSV
 
             // Escribe los encabezados del CSV

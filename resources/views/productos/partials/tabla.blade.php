@@ -2,10 +2,10 @@
     <table class="min-w-full text-sm text-left">
         <thead class="bg-[var(--color-tabla)]">
             <tr>
-                <th class="px-4 py-2">Tipo</th>
-                <th class="px-4 py-2">Fecha</th>
-                <th class="px-4 py-2">Estado</th>
-                <th class="px-4 py-2">Acciones</th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">Tipo</th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">Fecha</th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">Estado</th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">Acciones</th>
             </tr>
         </thead>
 
@@ -66,25 +66,21 @@
                                 </button>
                             @endcan
 
-                            {{-- Botones de Validar y Rechazar, visibles solo si el estado es 'pendiente' --}}
-                            @if ($producto->estado === 'pendiente')
-                                @can('validar producto')
-                                    <button type="button" onclick="mostrarModal('validar-producto', '{{ $producto->id }}')"
-                                        class="px-3 py-2 text-sm text-center text-white bg-blue-600 rounded-xl hover:bg-blue-700">
-                                        Validar
-                                    </button>
-                                    @include('pendientes.partials.modal-producto-validar')
-                                @endcan
+                            @can('validar producto')
+                                <button type="button" onclick="mostrarModal('validar-producto', '{{ $producto->id }}')"
+                                    class="px-3 py-2 text-sm text-center text-white bg-blue-600 rounded-xl hover:bg-blue-700">
+                                    Validar
+                                </button>
+                                @include('pendientes.partials.modal-producto-validar')
+                            @endcan
 
-                                @can('validar producto')
-                                    <button type="button"
-                                        onclick="mostrarModal('rechazar-producto', '{{ $producto->id }}')"
-                                        class="px-3 py-2 text-sm text-center text-white bg-orange-600 rounded-xl hover:bg-orange-700">
-                                        Rechazar
-                                    </button>
-                                    @include('pendientes.partials.modal-producto-rechazar')
-                                @endcan
-                            @endif
+                            @can('validar producto')
+                                <button type="button" onclick="mostrarModal('rechazar-producto', '{{ $producto->id }}')"
+                                    class="px-3 py-2 text-sm text-center text-white bg-orange-600 rounded-xl hover:bg-orange-700">
+                                    Rechazar
+                                </button>
+                                @include('pendientes.partials.modal-producto-rechazar')
+                            @endcan
                         </td>
                     </tr>
                 @empty

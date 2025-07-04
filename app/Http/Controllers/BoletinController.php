@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View; // Para la función view()
 use Illuminate\Support\Facades\Response; // Para la función response()
 use Illuminate\Support\Facades\Redirect; // Para la función redirect()
+use Illuminate\Database\QueryException; // Importar para manejar errores de base de datos
 use Carbon\Carbon; // Para la función now() (si la usas para obtener la fecha y hora actual)
 use Illuminate\Support\Str;
 
@@ -26,7 +27,6 @@ class BoletinController extends Controller
         $boletines = $boletinService->obtenerBoletinFiltrados($request);
 
         return view('boletines.index', compact('boletines'));
-        
     }
 
     public function getFilteredBoletin(Request $request, BoletinService $boletinService)
@@ -49,8 +49,9 @@ class BoletinController extends Controller
     public function edit(Boletin $boletin)
     {
         Gate::authorize('editar boletin');
-
-        return view('boletines.edit', compact('boletin'));
+        // $boletin ya contendrá los datos más recientes de la base de datos
+        // Si hay lógica de carga de relaciones, asegúrate de que se ejecute aquí.
+        return view('boletines.partials.modal-edit', compact('boletin'));
     }
 
     /**
@@ -63,6 +64,7 @@ class BoletinController extends Controller
         Log::info('DEBUG: Método store llamado.');
         Log::info('DEBUG: Request all data: ' . json_encode($request->all()));
 
+        // 1. Validar los datos del formulario.
         $validated = $request->validate([
             'archivo' => 'required|file|mimes:pdf|max:50000',
             'nombre' => 'required|string|max:100',
@@ -76,135 +78,177 @@ class BoletinController extends Controller
 
         Log::info('DEBUG: Datos validados: ' . json_encode($validated));
 
-        // Guarda el archivo y obtiene la ruta relativa al disco (ej. 'boletines/archivo.pdf')
-        $filePath = $request->file('archivo')->store('boletines', 'public');
+        try {
+            // Guarda el archivo y obtiene la ruta relativa al disco (ej. 'boletines/archivo.pdf')
+            $filePath = $request->file('archivo')->store('boletines', 'public');
 
-        $boletin = Boletin::create([
-            'user_id' => Auth::id(),
-            'estado' => 'pendiente',
-            'descripcion' => $validated['descripcion'],
-            'nombre' => $validated['nombre'],
-            'producto' => $validated['producto'],
-            'archivo' => $filePath,
-            'precio_mas_alto' => $validated['precio_mas_alto'] ?? null,
-            'lugar_precio_mas_alto' => $validated['lugar_precio_mas_alto'] ?? null,
-            'precio_mas_bajo' => $validated['precio_mas_bajo'] ?? null,
-            'lugar_precio_mas_bajo' => $validated['lugar_precio_mas_bajo'] ?? null,
-        ]);
+            $boletin = Boletin::create([
+                'user_id' => Auth::id(),
+                'estado' => 'pendiente',
+                'descripcion' => $validated['descripcion'],
+                'nombre' => $validated['nombre'],
+                'producto' => $validated['producto'],
+                'archivo' => $filePath,
+                'precio_mas_alto' => $validated['precio_mas_alto'] ?? null,
+                'lugar_precio_mas_alto' => $validated['lugar_precio_mas_alto'] ?? null,
+                'precio_mas_bajo' => $validated['precio_mas_bajo'] ?? null,
+                'lugar_precio_mas_bajo' => $validated['lugar_precio_mas_bajo'] ?? null,
+            ]);
 
-        Log::info('DEBUG: Boletín creado en DB con ID: ' . $boletin->id . ' y datos: ' . json_encode($boletin->toArray()));
+            Log::info('DEBUG: Boletín creado en DB con ID: ' . $boletin->id . ' y datos: ' . json_encode($boletin->toArray()));
 
-        $operadores = User::role('Operario')->get();
-        foreach ($operadores as $operador) {
-            Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
-        }
-
-        if ($request->expectsJson()) {
-            Log::info('DEBUG: Petición AJAX, devolviendo JSON para store.');
-
-            return response()->json([
-                'message' => 'Boletín creado exitosamente.',
-                'boletin_id' => $boletin->id,
-            ], 201);
-        }
-
-        Log::info('DEBUG: Petición tradicional, redirigiendo para store.');
-
-        return redirect()->route('boletines.index')->with('success', 'Boletín creado con éxito y enviado a revisión del operador.');
-    }
-
-    public function update(Request $request, Boletin $boletin)
-    {
-        Gate::authorize('editar boletin');
-
-        $rules = ([
-            'nombre' => 'required|string|max:100', // Agregado para el nombre
-            'descripcion' => 'required|string|max:255',
-            'archivo_upload' => 'nullable|file|mimes:pdf|max:5000',
-            'precio_mas_alto' => 'nullable|numeric', // Agregado
-            'lugar_precio_mas_alto' => 'nullable|string|max:255', // Agregado
-            'precio_mas_bajo' => 'nullable|numeric', // Agregado
-            'lugar_precio_mas_bajo' => 'nullable|string|max:255', // Agregado
-        ]);
-
-        $messages = [
-            'nombre.required' => 'El nombre del boletín es obligatorio.', // Mensaje para nombre
-            'nombre.string' => 'El nombre debe ser texto.',
-            'nombre.max' => 'El nombre no debe exceder los 100 caracteres.',
-
-            'descripcion.required' => 'La descripción del boletín es obligatoria.',
-            'descripcion.string' => 'La descripción debe ser texto.',
-            'descripcion.max' => 'La descripción no debe exceder los 255 caracteres.',
-
-            'archivo_upload.file' => 'El archivo debe ser un archivo válido.',
-            'archivo_upload.mimes' => 'El archivo debe ser de tipo PDF.',
-            'archivo_upload.max' => 'El archivo no debe pesar más de 5MB.',
-
-            // Mensajes para precios
-            'precio_mas_alto.numeric' => 'El precio más alto debe ser un número.',
-            'lugar_precio_mas_alto.string' => 'El lugar del precio más alto debe ser texto.',
-            'precio_mas_bajo.numeric' => 'El precio más bajo debe ser un número.',
-            'lugar_precio_mas_bajo.string' => 'El lugar del precio más bajo debe ser texto.',
-        ];
-
-        $validatedData = $request->validate($rules, $messages);
-
-        $originalEstado = $boletin->estado;
-
-        if ($request->hasFile('archivo_upload')) {
-            // Elimina el archivo anterior si existe.
-            // $boletin->archivo aquí contendrá 'boletines/viejo.pdf'
-            if ($boletin->archivo && Storage::disk('public')->exists($boletin->archivo)) {
-                Storage::disk('public')->delete($boletin->archivo);
-                Log::info('DEBUG: Archivo anterior eliminado: ' . $boletin->archivo);
-            }
-
-            // Guarda el nuevo archivo. $path contendrá 'boletines/nuevo.pdf'
-            $path = $request->file('archivo_upload')->store('boletines', 'public');
-            $boletin->archivo = $path; // ¡CAMBIADO! Asigna a 'archivo' la ruta interna
-            Log::info('DEBUG: Nuevo archivo subido y archivo actualizada a: ' . $boletin->archivo);
-        }
-
-
-        // Actualiza los demás campos
-        $boletin->nombre = $validatedData['nombre']; // Actualiza el nombre
-        $boletin->descripcion = $validatedData['descripcion'];
-        $boletin->precio_mas_alto = $validatedData['precio_mas_alto'] ?? null;
-        $boletin->lugar_precio_mas_alto = $validatedData['lugar_precio_mas_alto'] ?? null;
-        $boletin->precio_mas_bajo = $validatedData['precio_mas_bajo'] ?? null;
-        $boletin->lugar_precio_mas_bajo = $validatedData['lugar_precio_mas_bajo'] ?? null;
-
-        $estadoCambiadoAPendiente = false;
-        if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
-            $boletin->estado = 'pendiente';
-            $boletin->observaciones = null;
-            $estadoCambiadoAPendiente = true;
-        }
-
-        $boletin->save();
-        Log::info('DEBUG: Boletín actualizado en DB con ID: ' . $boletin->id . ' y datos: ' . json_encode($boletin->toArray()));
-
-
-        if ($estadoCambiadoAPendiente) {
+            // Envío de correo a operadores
             $operadores = User::role('Operario')->get();
             foreach ($operadores as $operador) {
                 Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
             }
+
+            if ($request->expectsJson()) {
+                Log::info('DEBUG: Petición AJAX, devolviendo JSON para store.');
+                return response()->json([
+                    'message' => 'Boletín creado exitosamente.',
+                    'boletin_id' => $boletin->id,
+                ], 201);
+            }
+
+            Log::info('DEBUG: Petición tradicional, redirigiendo para store.');
+            return redirect()->route('boletines.index')->with('success_message', 'Boletín creado con éxito y enviado a revisión del operador.');
+        } catch (QueryException $e) {
+            Log::error('Error de base de datos al crear boletín: ' . $e->getMessage());
+            // Si el archivo se subió antes de la falla de la DB, intentar eliminarlo
+            if (isset($filePath) && Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error de base de datos al crear el boletín. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al crear el boletín. Por favor, inténtalo de nuevo.');
+        } catch (\Exception $e) {
+            Log::error('Error inesperado al crear boletín: ' . $e->getMessage());
+            // Si el archivo se subió antes de la falla, intentar eliminarlo
+            if (isset($filePath) && Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error inesperado al crear el boletín. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al crear el boletín. Por favor, inténtalo de nuevo.');
         }
+    }
 
-        $boletin = $boletin->fresh(); // Recarga el modelo para tener los últimos datos
+    /**
+     * Update the specified resource in storage.
+     * Actualiza un boletín existente en la base de datos.
+     */
+    public function update(Request $request, Boletin $boletin)
+    {
+        Gate::authorize('editar boletin'); // La autorización se realiza antes del try-catch
 
-        $renderedRow = view('boletines.partials.boletin_row', ['boletin' => $boletin])->render();
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'Boletín actualizado con éxito',
-                'boletin' => $boletin,
-                'html_row' => $renderedRow,
+        try {
+            $rules = ([
+                'nombre' => 'required|string|max:100',
+                'descripcion' => 'required|string|max:255',
+                'archivo_upload' => 'nullable|file|mimes:pdf|max:5000',
+                'precio_mas_alto' => 'nullable|numeric',
+                'lugar_precio_mas_alto' => 'nullable|string|max:255',
+                'precio_mas_bajo' => 'nullable|numeric',
+                'lugar_precio_mas_bajo' => 'nullable|string|max:255',
             ]);
-        }
 
-        return redirect()->route('boletines.index')->with('success', 'Boletín actualizado y enviado a revisión del operador.');
+            $messages = [
+                'nombre.required' => 'El nombre del boletín es obligatorio.',
+                'nombre.string' => 'El nombre debe ser texto.',
+                'nombre.max' => 'El nombre no debe exceder los 100 caracteres.',
+                'descripcion.required' => 'La descripción del boletín es obligatoria.',
+                'descripcion.string' => 'La descripción debe ser texto.',
+                'descripcion.max' => 'La descripción no debe exceder los 255 caracteres.',
+                'archivo_upload.file' => 'El archivo debe ser un archivo válido.',
+                'archivo_upload.mimes' => 'El archivo debe ser de tipo PDF.',
+                'archivo_upload.max' => 'El archivo no debe pesar más de 5MB.',
+                'precio_mas_alto.numeric' => 'El precio más alto debe ser un número.',
+                'lugar_precio_mas_alto.string' => 'El lugar del precio más alto debe ser texto.',
+                'precio_mas_bajo.numeric' => 'El precio más bajo debe ser un número.',
+                'lugar_precio_mas_bajo.string' => 'El lugar del precio más bajo debe ser texto.',
+            ];
+
+            $validatedData = $request->validate($rules, $messages);
+
+            $originalEstado = $boletin->estado;
+            $oldFilePath = $boletin->archivo; // Guarda la ruta del archivo anterior
+
+            if ($request->hasFile('archivo_upload')) {
+                // Guarda el nuevo archivo.
+                $newFilePath = $request->file('archivo_upload')->store('boletines', 'public');
+                $boletin->archivo = $newFilePath; // Asigna la nueva ruta
+                Log::info('DEBUG: Nuevo archivo subido y archivo actualizada a: ' . $boletin->archivo);
+            }
+
+            // Actualiza los demás campos
+            $boletin->nombre = $validatedData['nombre'];
+            $boletin->descripcion = $validatedData['descripcion'];
+            $boletin->precio_mas_alto = $validatedData['precio_mas_alto'] ?? null;
+            $boletin->lugar_precio_mas_alto = $validatedData['lugar_precio_mas_alto'] ?? null;
+            $boletin->precio_mas_bajo = $validatedData['precio_mas_bajo'] ?? null;
+            $boletin->lugar_precio_mas_bajo = $validatedData['lugar_precio_mas_bajo'] ?? null;
+
+            $estadoCambiadoAPendiente = false;
+            if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
+                $boletin->estado = 'pendiente';
+                $boletin->observaciones = null;
+                $estadoCambiadoAPendiente = true;
+            }
+
+            // Guarda todos los cambios en la base de datos en una sola operación
+            $boletin->save();
+            Log::info('DEBUG: Boletín actualizado en DB con ID: ' . $boletin->id . ' y datos: ' . json_encode($boletin->toArray()));
+
+            // Elimina el archivo anterior SOLO si el nuevo archivo se guardó con éxito
+            if ($request->hasFile('archivo_upload') && $oldFilePath && Storage::disk('public')->exists($oldFilePath)) {
+                Storage::disk('public')->delete($oldFilePath);
+                Log::info('DEBUG: Archivo anterior eliminado: ' . $oldFilePath);
+            }
+
+            if ($estadoCambiadoAPendiente) {
+                $operadores = User::role('Operario')->get();
+                foreach ($operadores as $operador) {
+                    Mail::to($operador->email)->send(new NuevaRevisionPendienteMail($boletin, 'Boletín'));
+                }
+            }
+
+            $boletin = $boletin->fresh(); // Recarga el modelo para tener los últimos datos
+
+            $renderedRow = view('boletines.partials.boletin_row', ['boletin' => $boletin])->render();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Boletín actualizado con éxito',
+                    'boletin' => $boletin,
+                    'html_row' => $renderedRow,
+                ]);
+            }
+
+            return redirect()->route('boletines.index')->with('success_message', 'Boletín actualizado y enviado a revisión del operador.');
+        } catch (QueryException $e) {
+            Log::error('Error de base de datos al actualizar boletín (ID: ' . $boletin->id . '): ' . $e->getMessage());
+            // Si se subió un nuevo archivo y la DB falló, intentar eliminar el nuevo archivo
+            if (isset($newFilePath) && Storage::disk('public')->exists($newFilePath)) {
+                Storage::disk('public')->delete($newFilePath);
+            }
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error de base de datos al actualizar el boletín. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al actualizar el boletín. Por favor, inténtalo de nuevo.');
+        } catch (\Exception $e) {
+            Log::error('Error inesperado al actualizar boletín (ID: ' . $boletin->id . '): ' . $e->getMessage());
+            // Si se subió un nuevo archivo y la operación falló, intentar eliminar el nuevo archivo
+            if (isset($newFilePath) && Storage::disk('public')->exists($newFilePath)) {
+                Storage::disk('public')->delete($newFilePath);
+            }
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error inesperado al actualizar el boletín. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al actualizar el boletín. Por favor, inténtalo de nuevo.');
+        }
     }
 
     public function destroy(Boletin $boletin)

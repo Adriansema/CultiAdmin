@@ -11,7 +11,7 @@
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
                 <div class="flex justify-end mt-4 space-x-2">
-                    <button type="button" onclick="ocultarModal('rechazar-noticia', '{{ $noticia->id_noticias }}')"
+                    <button type="button" onclick="cerrarModal('rechazar-noticia', '{{ $noticia->id_noticias }}')"
                         class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">Cancelar</button>
                     <x-button class="bg-red-600 hover:bg-red-700">Rechazar</x-button>
                 </div>
