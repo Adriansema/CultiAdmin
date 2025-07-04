@@ -56,7 +56,7 @@
         {{-- Botón 'Ver' --}}
         @can('crear boletin')
             <button type="button" onclick="mostrarModal('ver', '{{ $boletin->id }}')"
-                class="px-3 py-2 text-sm text-center text-white bg-green-600 rounded-xl hover:bg-green-700">
+                class="px-2 py-2 text-sm text-center text-white bg-green-600 rounded-xl hover:bg-green-700">
                 Ver
             </button>
         @endcan
@@ -64,7 +64,7 @@
         {{-- Botón 'Editar' --}}
         @can('editar boletin')
             <button type="button" onclick="mostrarModal('editar', '{{ $boletin->id }}')"
-                class="px-3 py-2 text-sm text-center text-white bg-yellow-600 rounded-xl hover:bg-yellow-700">
+                class="px-2 py-2 text-sm text-center text-white bg-yellow-600 rounded-xl hover:bg-yellow-700">
                 Editar
             </button>
         @endcan
@@ -72,28 +72,26 @@
         {{-- Botón 'Eliminar' --}}
         @can('eliminar boletin')
             <button type="button" onclick="mostrarModal('boletin', '{{ $boletin->id }}')"
-                class="w-20 px-3 py-2 text-sm text-center text-white bg-red-600 rounded-xl hover:bg-red-700">
+                class="px-2 py-2 text-sm text-center text-white bg-red-600 rounded-xl hover:bg-red-700">
                 Eliminar
             </button>
         @endcan
 
         {{-- Botones de Validar y Rechazar, visibles solo si el estado es 'pendiente' --}}
-        @if ($boletin->estado === 'pendiente')
-            @can('validar boletin')
-                <button type="button" onclick="mostrarModal('validar-boletin', '{{ $boletin->id }}')"
-                    class="px-3 py-2 text-sm text-center text-white bg-blue-600 rounded-xl hover:bg-blue-700">
-                    Validar
-                </button>
-                @include('pendientes.partials.modal-boletin-validar')
-            @endcan
+        @can('validar boletin')
+            <button type="button" onclick="mostrarModal('validar-boletin', '{{ $boletin->id }}')"
+                class="px-2 py-2 text-sm text-center text-white bg-blue-600 rounded-xl hover:bg-blue-700">
+                Validar
+            </button>
+            @include('pendientes.partials.modal-boletin-validar')
+        @endcan
 
-            @can('validar boletin')
-                <button type="button" onclick="mostrarModal('rechazar-boletin', '{{ $boletin->id }}')"
-                    class="px-3 py-2 text-sm text-center text-white bg-orange-600 rounded-xl hover:bg-orange-700">
-                    Rechazar
-                </button>
-                @include('pendientes.partials.modal-boletin-rechazar')
-            @endcan
-        @endif
+        @can('validar boletin')
+            <button type="button" onclick="mostrarModal('rechazar-boletin', '{{ $boletin->id }}')"
+                class="px-2 py-2 text-sm text-center text-white bg-orange-600 rounded-xl hover:bg-orange-700">
+                Rechazar
+            </button>
+            @include('pendientes.partials.modal-boletin-rechazar')
+        @endcan
     </td>
 </tr>

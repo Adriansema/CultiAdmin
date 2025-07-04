@@ -9,12 +9,12 @@
                 <h1 class="text-3xl whitespace-nowrap font-bold">Boletines</h1>
             </div>
             <div class="py-2">
-            {!! Breadcrumbs::render('boletines.index') !!}
+                {!! Breadcrumbs::render('boletines.index') !!}
             </div>
         </div>
 
         {{-- Contenedor principal de la sección de gestión (fondo verde claro) --}}
-        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-3xl p-5">
+        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-3xl p-5 mb-10">
 
             {{-- Contenedor de búsqueda y grupo de botones de acción --}}
             <div class="flex flex-col sm:flex-row items-center justify-between mb-4 flex-wrap">
@@ -29,16 +29,14 @@
                 <div class="flex items-center justify-center sm:justify-end flex-nowrap gap-2 py-4 sm:py-0">
 
                     {{-- Botón Filtrar --}}
-                    <button type="button" id="filterBtn"
-                        class="inline-flex group items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] rounded-full whitespace-nowrap">
-                        <span class="text-md font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
-                            {{ __('Filtrar') }}
-                        </span>
-                        <img src="{{ asset('images/filtro.svg') }}" class="relative inset-0 block w-4 h-3 group-hover:hidden"
-                            alt="Icono de filtro">
-                        <img src="{{ asset('images/filtro-hover.svg') }}"
-                            class="relative inset-0 hidden w-4 h-3 group-hover:block" alt="Icono de filtro hover">
-                    </button>
+                    <select name="estado" id="filtro-estado"
+                        class="border border-gray-300 rounded-md px-6
+                        onchange = "filtrarPorEstado(this.value)">
+                        <option value="" {{ request('estado') == '' ? 'selected': '' }}> Filtrar</option>
+                        <option value= "aprobado">Aprobado</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="rechazado">Rechazado</option>
+                    </select>
 
                     {{-- Botón Exportar Csv (dentro de un form) --}}
                     <form method="GET" action="{{ route('boletines.exportarCSV') }}">
@@ -64,6 +62,15 @@
                 </div>
             </div>
 
+            <script>
+                function filtrarPorEstados(estados){
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('estado', 'estado');
+                    window.location.href = url.toString();
+
+                }
+            </script>
+
             {{-- Mensajes de sesión de éxito o error --}}
             @if (session('success'))
                 <div class="p-4 mb-4 text-green-800 bg-green-100 rounded shadow">{{ session('success') }}</div>
@@ -85,7 +92,7 @@
                 {{-- Si no hay boletines, no se renderiza ningún modal --}}
             @endforelse
 
-            @include('boletines.partials.global-message')
+            @include('partials.global-message-modal')
         </div>
     @endcan
 @endsection

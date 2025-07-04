@@ -4,14 +4,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const SearchUser = document.getElementById('SearchUser');
     const searchIcon = document.getElementById('searchIcon');
     const clearIconContainer = document.getElementById('clearIconContainer');
+    const estadoSelect = document.getElementById('filtro-estado-usuario');
 
     // 1. Lógica para el botón "Filtrar" (que envía el formulario)
-    if (filtrarBoton && BuscarUser) {
-        filtrarBoton.addEventListener('click', function () {
-            console.log('Botón Filtrar clicado. Enviando formulario...');
-            BuscarUser.submit(); // Envía el formulario
+    document.getElementById('filtro-estado-usuario').addEventListener('change',function(){
+    if (estadoSelect){
+        estadoSelect.addEventListener('change',function(){
+            const estadoSeleccionado = document.getElementById('filtro-estado-usuario');
+
+            //agrega el estado del parametro 
+            const url = new URL (window.location.href);
+            if(estadoSeleccionado){
+                url.searchParam.set('estado',estadoSeleccionado);
+            } else {
+                url,searchParam.delete('estado');
+
+            }
+
+            window.Location.href = url.toString();
+            });
+        }
         });
-    }
+    
+    
 
     // 2. Lógica para la tecla Enter en el input de búsqueda
     // AHORA USA 'SearchUser' (la variable correcta)

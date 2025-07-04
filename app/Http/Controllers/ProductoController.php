@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Database\QueryException; 
 use App\Mail\NuevaRevisionPendienteMail;
 
 class ProductoController extends Controller
@@ -39,7 +40,7 @@ class ProductoController extends Controller
         return view('productos.create');
     }
 
-   /**
+    /**
      * Guarda un nuevo producto (café o mora o video) en la base de datos.
      * Incluye validación de datos y manejo de carga de imágenes.
      */
@@ -59,27 +60,19 @@ class ProductoController extends Controller
             $rules['cafe_data.numero_pagina'] = 'required|integer';
             $rules['cafe_data.clase'] = 'nullable|string|max:100';
             $rules['cafe_data.informacion'] = 'required|string';
-            // RutaVideo para café/mora:
             $rules['rutavideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es café
 
         } elseif ($tipoProductoPrincipal === 'mora') {
             $rules['mora_data.numero_pagina'] = 'required|integer';
             $rules['mora_data.clase'] = 'nullable|string|max:100';
             $rules['mora_data.informacion'] = 'required|string';
-            // RutaVideo para café/mora:
             $rules['rutavideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es mora
 
         } elseif ($tipoProductoPrincipal === 'videos') {
-            // Regla para el subtipo de video (primarios, secundarios, categorias)
             $rules['videos_data.tipo'] = 'required|string|in:primarios,secundarios,categorias';
-
-            // Agrega reglas de validación para los campos generales de video,
-            // pero ahora ANIDADOS bajo el subtipo seleccionado.
-            // Usamos $request->input('videos_data.tipo') para determinar el prefijo.
             $subtipoSeleccionado = $request->input('videos_data.tipo');
 
-            // Validar los campos comunes de video que ahora están anidados por subtipo
-            if ($subtipoSeleccionado) { // Solo si se ha seleccionado un subtipo
+            if ($subtipoSeleccionado) {
                 $rules["videos_data.{$subtipoSeleccionado}.autor"] = 'required|string|max:255';
                 $rules["videos_data.{$subtipoSeleccionado}.titulo"] = 'required|string|max:255';
                 $rules["videos_data.{$subtipoSeleccionado}.descripcion"] = 'nullable|string';
@@ -90,75 +83,98 @@ class ProductoController extends Controller
         // 3. Aplicar las reglas de validación.
         $request->validate($rules);
 
-        // 4. Lógica para guardar la imagen (si se ha subido).
+        // Inicializar variables para posible limpieza en caso de error
         $imagen = null;
-        if ($request->hasFile('imagen')) {
-            $imagen = $request->file('imagen')->store('productos', 'public');
-        }
+        $producto = null; // Se inicializa para asegurar que exista en el catch
 
-        // Determinar la RutaVideo para la tabla 'productos'
-        $productorutavideo = null;
-        if ($tipoProductoPrincipal === 'café' || $tipoProductoPrincipal === 'mora') {
-            $productorutavideo = $request->rutavideo;
-        }
+        try {
+            // 4. Lógica para guardar la imagen (si se ha subido).
+            if ($request->hasFile('imagen')) {
+                $imagen = $request->file('imagen')->store('productos', 'public');
+            }
 
-        // 5. Crear el registro principal en la tabla 'productos'.
-        $producto = Producto::create([
-            'user_id' => Auth::id(),
-            'estado' => 'pendiente',
-            'observaciones' => $request->observaciones,
-            'imagen' => $imagen,
-            'tipo' => $tipoProductoPrincipal, // Este 'tipo' es 'café', 'mora' o 'videos'
-            'rutavideo' => $productorutavideo, // Se guarda solo si es café o mora
-        ]);
+            // Determinar la RutaVideo para la tabla 'productos'
+            $productorutavideo = null;
+            if ($tipoProductoPrincipal === 'café' || $tipoProductoPrincipal === 'mora') {
+                $productorutavideo = $request->rutavideo;
+            }
 
-        // 6. Guardar los datos específicos del producto en sus tablas correspondientes.
-        if ($tipoProductoPrincipal === 'café') {
-            $cafeData = $request->input('cafe_data', []);
-            Cafe::create([
-                'producto_id' => $producto->id,
-                'numero_pagina' => $cafeData['numero_pagina'],
-                'clase' => $cafeData['clase'] ?? null,
-                'informacion' => $cafeData['informacion'],
-            ]);
-        } elseif ($tipoProductoPrincipal === 'mora') {
-            $moraData = $request->input('mora_data', []);
-            Mora::create([
-                'producto_id' => $producto->id,
-                'numero_pagina' => $moraData['numero_pagina'],
-                'clase' => $moraData['clase'] ?? null,
-                'informacion' => $moraData['informacion'],
-            ]);
-        } elseif ($tipoProductoPrincipal === 'videos') {
-            $subtipoSeleccionado = $request->input('videos_data.tipo');
-            // Acceder a los datos de video a través del subtipo seleccionado
-            $videoData = $request->input("videos_data.{$subtipoSeleccionado}", []);
-
-            // Si tienes campos adicionales específicos para cada subtipo,
-            // asegúrate de recuperarlos aquí.
-            // Ejemplo: $campo1Especifico = $videoData['campo1'] ?? null;
-
-            Video::create([
-                'producto_id' => $producto->id,
+            // 5. Crear el registro principal en la tabla 'productos'.
+            $producto = Producto::create([
                 'user_id' => Auth::id(),
-                'autor' => $videoData['autor'],
-                'titulo' => $videoData['titulo'],
-                'descripcion' => $videoData['descripcion'] ?? null,
-                'rutaVideo' => $videoData['rutaVideo'],
-                'tipo' => $subtipoSeleccionado, // Este campo 'tipo' de Video guardará el subtipo (primarios, secundarios, categorias)
-                // Si tienes campos específicos por subtipo y los guardas en una columna JSON/TEXT:
-                // 'datos_extras' => json_encode(['campo1' => $campo1Especifico]),
+                'estado' => 'pendiente',
+                'observaciones' => $request->observaciones,
+                'imagen' => $imagen,
+                'tipo' => $tipoProductoPrincipal,
+                'rutavideo' => $productorutavideo,
             ]);
-        }
 
-        // 7. Lógica para enviar email a los operarios.
-        $operarios = User::role('Operario')->get();
-        foreach ($operarios as $operario) {
-            Mail::to($operario->email)->send(new NuevaRevisionPendienteMail($producto, $tipoProductoPrincipal));
-        }
+            // 6. Guardar los datos específicos del producto en sus tablas correspondientes.
+            if ($tipoProductoPrincipal === 'café') {
+                $cafeData = $request->input('cafe_data', []);
+                Cafe::create([
+                    'producto_id' => $producto->id,
+                    'numero_pagina' => $cafeData['numero_pagina'],
+                    'clase' => $cafeData['clase'] ?? null,
+                    'informacion' => $cafeData['informacion'],
+                ]);
+            } elseif ($tipoProductoPrincipal === 'mora') {
+                $moraData = $request->input('mora_data', []);
+                Mora::create([
+                    'producto_id' => $producto->id,
+                    'numero_pagina' => $moraData['numero_pagina'],
+                    'clase' => $moraData['clase'] ?? null,
+                    'informacion' => $moraData['informacion'],
+                ]);
+            } elseif ($tipoProductoPrincipal === 'videos') {
+                $subtipoSeleccionado = $request->input('videos_data.tipo');
+                $videoData = $request->input("videos_data.{$subtipoSeleccionado}", []);
 
-        // 8. Redirigir con un mensaje de éxito.
-        return redirect()->route('productos.index')->with('success', 'Información guardada con éxito y enviada a revisión.');
+                Video::create([
+                    'producto_id' => $producto->id,
+                    'user_id' => Auth::id(),
+                    'autor' => $videoData['autor'],
+                    'titulo' => $videoData['titulo'],
+                    'descripcion' => $videoData['descripcion'] ?? null,
+                    'rutaVideo' => $videoData['rutaVideo'],
+                    'tipo' => $subtipoSeleccionado,
+                ]);
+            }
+
+            // 7. Lógica para enviar email a los operarios.
+            $operarios = User::role('Operario')->get();
+            foreach ($operarios as $operario) {
+                Mail::to($operario->email)->send(new NuevaRevisionPendienteMail($producto, $tipoProductoPrincipal));
+            }
+
+            // 8. Redirigir con un mensaje de éxito.
+            return redirect()->route('productos.index')->with('success_message', 'Información guardada con éxito y enviada a revisión.');
+
+        } catch (QueryException $e) {
+            // Captura errores específicos de la base de datos
+            Log::error('Error de base de datos al crear producto: ' . $e->getMessage());
+            // Si el producto principal se creó pero la relación falló, eliminarlo
+            if ($producto && $producto->exists) {
+                $producto->delete();
+            }
+            // Si la imagen se subió antes de la falla de la DB, intentar eliminarla
+            if ($imagen && Storage::disk('public')->exists($imagen)) {
+                Storage::disk('public')->delete($imagen);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al crear el producto. Por favor, inténtalo de nuevo.');
+        } catch (\Exception $e) {
+            // Captura cualquier otra excepción inesperada
+            Log::error('Error inesperado al crear producto: ' . $e->getMessage());
+            // Si el producto principal se creó pero la relación falló, eliminarlo
+            if ($producto && $producto->exists) {
+                $producto->delete();
+            }
+            // Si la imagen se subió antes de la falla, intentar eliminarla
+            if ($imagen && Storage::disk('public')->exists($imagen)) {
+                Storage::disk('public')->delete($imagen);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al crear el producto. Por favor, inténtalo de nuevo.');
+        }
     }
 
     /**
@@ -176,7 +192,7 @@ class ProductoController extends Controller
         return view('productos.edit', compact('producto'));
     }
 
-     /**
+    /**
      * Actualiza el producto especificado en el almacenamiento.
      */
     public function update(Request $request, Producto $producto)
@@ -184,178 +200,154 @@ class ProductoController extends Controller
         // Autorizar la acción de edición (usando Laravel Gates)
         Gate::authorize('editar producto');
 
-        // 1. Definir las reglas de validación base para la actualización del producto.
-        $rules = [
-            // El tipo de producto principal debe incluir 'videos'
-            'tipo' => 'required|string|in:café,mora,videos',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validación para la imagen
-            'observaciones' => 'nullable|string', // Campo opcional de observaciones
-        ];
+        // Inicializar variables para posible limpieza en caso de error
+        $newImagenPath = null;
+        $oldImagenPath = $producto->imagen; // Guarda la ruta de la imagen original
 
-        // 2. Añadir reglas de validación condicionalmente según el tipo del producto que se está actualizando.
-        // Usamos $request->input('tipo') para la validación, ya que el usuario podría cambiar el tipo
-        // en el formulario de edición (aunque el input sea readonly en la vista, la lógica del controlador
-        // debe ser robusta por si se manipula la petición o se permite el cambio de tipo en el futuro).
-        $requestType = $request->input('tipo');
+        try {
+            // 1. Definir las reglas de validación base para la actualización del producto.
+            $rules = [
+                'tipo' => 'required|string|in:café,mora,videos',
+                'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'observaciones' => 'nullable|string',
+            ];
 
-        if ($requestType === 'café') {
-            $rules['cafe_data.numero_pagina'] = 'required|integer';
-            $rules['cafe_data.clase'] = 'nullable|string|max:100';
-            $rules['cafe_data.informacion'] = 'required|string';
-            // RutaVideo para café/mora:
-            $rules['rutavideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es café
+            // 2. Añadir reglas de validación condicionalmente según el tipo del producto que se está actualizando.
+            $requestType = $request->input('tipo');
 
-        } elseif ($requestType === 'mora') {
-            $rules['mora_data.numero_pagina'] = 'required|integer';
-            $rules['mora_data.clase'] = 'nullable|string|max:100';
-            $rules['mora_data.informacion'] = 'required|string';
-            // RutaVideo para café/mora:
-            $rules['rutavideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es mora
+            if ($requestType === 'café') {
+                $rules['cafe_data.numero_pagina'] = 'required|integer';
+                $rules['cafe_data.clase'] = 'nullable|string|max:100';
+                $rules['cafe_data.informacion'] = 'required|string';
+                $rules['rutavideo'] = 'nullable|url|max:255';
 
-        } elseif ($requestType === 'videos') {
-            // Regla para el subtipo de video (primarios, secundarios, categorias)
-            $rules['videos_data.tipo'] = 'required|string|in:primarios,secundarios,categorias';
+            } elseif ($requestType === 'mora') {
+                $rules['mora_data.numero_pagina'] = 'required|integer';
+                $rules['mora_data.clase'] = 'nullable|string|max:100';
+                $rules['mora_data.informacion'] = 'required|string';
+                $rules['rutavideo'] = 'nullable|url|max:255';
 
-            // Agrega reglas de validación para los campos generales de video,
-            // pero ahora ANIDADOS bajo el subtipo seleccionado.
-            // Usamos $request->input('videos_data.tipo') para determinar el prefijo.
-            $subtipoSeleccionado = $request->input('videos_data.tipo');
+            } elseif ($requestType === 'videos') {
+                $rules['videos_data.tipo'] = 'required|string|in:primarios,secundarios,categorias';
+                $subtipoSeleccionado = $request->input('videos_data.tipo');
 
-            // Validar los campos comunes de video que ahora están anidados por subtipo
-            if ($subtipoSeleccionado) { // Solo si se ha seleccionado un subtipo
-                $rules["videos_data.{$subtipoSeleccionado}.autor"] = 'required|string|max:255';
-                $rules["videos_data.{$subtipoSeleccionado}.titulo"] = 'required|string|max:255';
-                $rules["videos_data.{$subtipoSeleccionado}.descripcion"] = 'nullable|string';
-                $rules["videos_data.{$subtipoSeleccionado}.rutaVideo"] = 'required|url|max:255';
-
-                // Si tienes campos adicionales específicos para cada subtipo (ej. campo1),
-                // asegúrate de incluirlos aquí con su respectiva anidación.
-                // Por ejemplo:
-                // $rules["videos_data.{$subtipoSeleccionado}.campo1"] = 'nullable|string'; // O 'required' si es el caso
+                if ($subtipoSeleccionado) {
+                    $rules["videos_data.{$subtipoSeleccionado}.autor"] = 'required|string|max:255';
+                    $rules["videos_data.{$subtipoSeleccionado}.titulo"] = 'required|string|max:255';
+                    $rules["videos_data.{$subtipoSeleccionado}.descripcion"] = 'nullable|string';
+                    $rules["videos_data.{$subtipoSeleccionado}.rutaVideo"] = 'required|url|max:255';
+                }
             }
-        }
 
-        // 3. Aplicar las reglas de validación.
-        $request->validate($rules);
+            // 3. Aplicar las reglas de validación.
+            $request->validate($rules);
 
-        // 4. Almacenar el estado original del producto ANTES de cualquier cambio.
-        $originalEstado = $producto->estado;
-        // Guardar el tipo original del producto para la lógica de eliminación de relaciones
-        $originalTipoProducto = $producto->tipo;
+            // 4. Almacenar el estado original del producto ANTES de cualquier cambio.
+            $originalEstado = $producto->estado;
+            $originalTipoProducto = $producto->tipo;
 
-        // 5. Actualizar la imagen si viene una nueva.
-        if ($request->hasFile('imagen')) {
-            // Eliminar imagen anterior si existe.
-            if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
-                Storage::disk('public')->delete($producto->imagen);
+            // 5. Actualizar la imagen si viene una nueva.
+            if ($request->hasFile('imagen')) {
+                $newImagenPath = $request->file('imagen')->store('productos', 'public');
+                $producto->imagen = $newImagenPath; // Asigna la nueva ruta
             }
-            $imagen = $request->file('imagen')->store('productos', 'public');
-            $producto->imagen = $imagen;
-        }
 
-        // 6. Actualizar los demás campos del producto principal.
-        $producto->observaciones = $request->observaciones;
-        $producto->tipo = $requestType; // Asegura que el tipo del producto se actualice si cambia en el formulario
+            // 6. Actualizar los demás campos del producto principal.
+            $producto->observaciones = $request->observaciones;
+            $producto->tipo = $requestType;
 
-        // Actualizar RutaVideo solo si el tipo es café o mora
-        if ($requestType === 'café' || $requestType === 'mora') {
-            $producto->rutavideo = $request->rutavideo;
-        } else {
-            // Si el tipo es 'videos' o cualquier otro, asegúrate de que RutaVideo en Producto sea null
-            // Esto es importante si el tipo de producto cambia de café/mora a videos
-            $producto->rutavideo = null;
-        }
-
-
-        // 7. Lógica para cambiar el estado a 'pendiente' si el producto fue editado
-        // y su estado anterior era 'aprobado' o 'rechazado'.
-        $estadoCambiadoAPendiente = false;
-        if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
-            $producto->estado = 'pendiente';
-            $producto->observaciones = null; // Asumiendo que tienes un campo para esto
-            $estadoCambiadoAPendiente = true;
-        }
-
-        $producto->save(); // Guarda los cambios en el producto principal
-
-        // 8. Actualizar registros en las tablas de detalle según el tipo del producto.
-        // Es crucial manejar la posibilidad de que el tipo de producto haya cambiado.
-        // Si el tipo de producto cambia, debemos eliminar el registro antiguo y crear uno nuevo.
-
-        // Eliminar relaciones antiguas si el tipo de producto ha cambiado
-        if ($requestType !== $originalTipoProducto) { // Comparar el tipo actual del request con el tipo ORIGINAL del producto
-            if ($originalTipoProducto === 'café' && $producto->cafe) {
-                $producto->cafe->delete();
-            } elseif ($originalTipoProducto === 'mora' && $producto->mora) {
-                $producto->mora->delete();
-            } elseif ($originalTipoProducto === 'videos' && $producto->videos) {
-                $producto->videos->delete();
+            if ($requestType === 'café' || $requestType === 'mora') {
+                $producto->rutavideo = $request->rutavideo;
+            } else {
+                $producto->rutavideo = null;
             }
-        }
 
-        // Crear/Actualizar el registro de detalle según el tipo actual del producto
-        if ($requestType === 'café') {
-            // Obtener o crear el registro de Cafe asociado al producto
-            $cafe = Cafe::firstOrNew(['producto_id' => $producto->id]);
-            $cafeData = $request->input('cafe_data', []);
-
-            // Actualizar los campos del modelo Cafe
-            $cafe->numero_pagina = $cafeData['numero_pagina']; // Ya validado como required
-            $cafe->clase = $cafeData['clase'] ?? null;
-            $cafe->informacion = $cafeData['informacion']; // Ya validado como required
-            $cafe->save(); // Guarda los cambios en el registro de Cafe
-
-        } elseif ($requestType === 'mora') {
-            // Obtener o crear el registro de Mora asociado al producto
-            $mora = Mora::firstOrNew(['producto_id' => $producto->id]);
-            $moraData = $request->input('mora_data', []);
-
-            // Actualizar los campos del modelo Mora
-            $mora->numero_pagina = $moraData['numero_pagina'];
-            $mora->clase = $moraData['clase'] ?? null;
-            $mora->informacion = $moraData['informacion'];
-            $mora->save(); // Guarda los cambios en el registro de Mora
-
-        } elseif ($requestType === 'videos') {
-            // Obtener o crear el registro de Video asociado al producto
-            $video = Video::firstOrNew(['producto_id' => $producto->id]);
-
-            $subtipoSeleccionado = $request->input('videos_data.tipo');
-            // Acceder a los datos de video a través del subtipo seleccionado
-            $videoData = $request->input("videos_data.{$subtipoSeleccionado}", []);
-
-            // Si tienes campos adicionales específicos para cada subtipo,
-            // asegúrate de recuperarlos aquí.
-            // Ejemplo: $campo1Especifico = $videoData['campo1'] ?? null;
-
-            // Actualizar los campos del modelo Video
-            $video->user_id = Auth::id(); // Asegúrate de vincularlo al usuario también
-            $video->autor = $videoData['autor'];
-            $video->titulo = $videoData['titulo'];
-            $video->descripcion = $videoData['descripcion'] ?? null;
-            $video->rutaVideo = $videoData['rutaVideo']; // Esta es la ruta para la tabla 'videos'
-            $video->tipo = $subtipoSeleccionado; // Este campo 'tipo' de Video guardará el subtipo
-            // Opcional: Si tienes una columna 'datos_extras' para JSON
-            // $video->datos_extras = json_encode(['campo1' => $campo1Especifico]);
-            $video->save(); // Guarda los cambios en el registro de Video
-        }
-
-        // 9. Lógica para enviar email al operario si el estado cambió a pendiente.
-        // O si simplemente se actualizó el contenido, aunque el estado sea ya pendiente
-        // podrías querer notificar una edición. Adaptar según tu flujo.
-        if ($estadoCambiadoAPendiente || $request->hasAny(['observaciones', 'imagen', 'cafe_data', 'mora_data', 'videos_data'])) {
-            // Obtener los operarios
-            $operarios = User::role('Operario')->get();
-            $itemTipo = $producto->tipo; // Obtenemos el tipo de producto ('café' o 'mora' o 'videos')
-
-            foreach ($operarios as $operario) {
-                // Envía el correo con el producto principal, los detalles específicos y el tipo
-                Mail::to($operario->email)->send(new NuevaRevisionPendienteMail($producto, $itemTipo));
+            // 7. Lógica para cambiar el estado a 'pendiente' si el producto fue editado
+            $estadoCambiadoAPendiente = false;
+            if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
+                $producto->estado = 'pendiente';
+                $producto->observaciones = null;
+                $estadoCambiadoAPendiente = true;
             }
-        }
 
-        // 10. Redirigir con un mensaje de éxito.
-        return redirect()->route('productos.index')->with('success', 'Producto actualizado y enviado a revisión del operario.');
+            // Guarda los cambios en el producto principal
+            $producto->save();
+
+            // Si la imagen nueva se guardó y la operación de DB fue exitosa, eliminar la antigua
+            if ($request->hasFile('imagen') && $oldImagenPath && Storage::disk('public')->exists($oldImagenPath)) {
+                Storage::disk('public')->delete($oldImagenPath);
+            }
+
+            // 8. Actualizar registros en las tablas de detalle según el tipo del producto.
+            // Eliminar relaciones antiguas si el tipo de producto ha cambiado
+            if ($requestType !== $originalTipoProducto) {
+                if ($originalTipoProducto === 'café' && $producto->cafe) {
+                    $producto->cafe->delete();
+                } elseif ($originalTipoProducto === 'mora' && $producto->mora) {
+                    $producto->mora->delete();
+                } elseif ($originalTipoProducto === 'videos' && $producto->videos) {
+                    $producto->videos->delete();
+                }
+            }
+
+            // Crear/Actualizar el registro de detalle según el tipo actual del producto
+            if ($requestType === 'café') {
+                $cafe = Cafe::firstOrNew(['producto_id' => $producto->id]);
+                $cafeData = $request->input('cafe_data', []);
+                $cafe->numero_pagina = $cafeData['numero_pagina'];
+                $cafe->clase = $cafeData['clase'] ?? null;
+                $cafe->informacion = $cafeData['informacion'];
+                $cafe->save();
+
+            } elseif ($requestType === 'mora') {
+                $mora = Mora::firstOrNew(['producto_id' => $producto->id]);
+                $moraData = $request->input('mora_data', []);
+                $mora->numero_pagina = $moraData['numero_pagina'];
+                $mora->clase = $moraData['clase'] ?? null;
+                $mora->informacion = $moraData['informacion'];
+                $mora->save();
+
+            } elseif ($requestType === 'videos') {
+                $video = Video::firstOrNew(['producto_id' => $producto->id]);
+                $subtipoSeleccionado = $request->input('videos_data.tipo');
+                $videoData = $request->input("videos_data.{$subtipoSeleccionado}", []);
+                $video->user_id = Auth::id();
+                $video->autor = $videoData['autor'];
+                $video->titulo = $videoData['titulo'];
+                $video->descripcion = $videoData['descripcion'] ?? null;
+                $video->rutaVideo = $videoData['rutaVideo'];
+                $video->tipo = $subtipoSeleccionado;
+                $video->save();
+            }
+
+            // 9. Lógica para enviar email al operario si el estado cambió a pendiente.
+            if ($estadoCambiadoAPendiente || $request->hasAny(['observaciones', 'imagen', 'cafe_data', 'mora_data', 'videos_data'])) {
+                $operarios = User::role('Operario')->get();
+                $itemTipo = $producto->tipo;
+
+                foreach ($operarios as $operario) {
+                    Mail::to($operario->email)->send(new NuevaRevisionPendienteMail($producto, $itemTipo));
+                }
+            }
+
+            // 10. Redirigir con un mensaje de éxito.
+            return redirect()->route('productos.index')->with('success_message', 'Producto actualizado y enviado a revisión del operario.');
+
+        } catch (QueryException $e) {
+            Log::error('Error de base de datos al actualizar producto (ID: ' . $producto->id . '): ' . $e->getMessage());
+            // Si se subió una nueva imagen y la DB falló, intentar eliminarla
+            if ($newImagenPath && Storage::disk('public')->exists($newImagenPath)) {
+                Storage::disk('public')->delete($newImagenPath);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al actualizar el producto. Por favor, inténtalo de nuevo.');
+        } catch (\Exception $e) {
+            Log::error('Error inesperado al actualizar producto (ID: ' . $producto->id . '): ' . $e->getMessage());
+            // Si se subió una nueva imagen y la operación falló, intentar eliminarla
+            if ($newImagenPath && Storage::disk('public')->exists($newImagenPath)) {
+                Storage::disk('public')->delete($newImagenPath);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al actualizar el producto. Por favor, inténtalo de nuevo.');
+        }
     }
 
     /**

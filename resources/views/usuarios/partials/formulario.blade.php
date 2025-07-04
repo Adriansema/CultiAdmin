@@ -608,7 +608,8 @@
             class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none focus:outline-none">&times;
         </button>
         <h2 id="missingDataModalTitle" class="text-2xl font-bold text-gray-800 text-center mb-6">Datos faltantes</h2>
-        <p class="text-gray-700 text-center mb-6">
+        
+        <p id="missingDataDescription" class="text-gray-700 text-center mb-6">
             Se han detectado filas con campos faltantes o formatos inválidos. Por favor, corrija el CSV o excluya esas
             filas antes de continuar. Estos son los campos a corregir:
         </p>
@@ -629,3 +630,5 @@
         </div>
     </div>
 </div>
+
+@include('usuarios.partials.modal-success')

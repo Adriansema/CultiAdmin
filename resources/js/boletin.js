@@ -14,6 +14,7 @@ window.mostrarModal = function (type, id) {
     if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+        document.body.classList.add('modal-open'); // Añadir para bloquear scroll
         console.log(`Mostrando modal: modal-${type}-${id}`);
     } else {
         console.warn(`Advertencia: Modal con ID modal-${type}-${id} no encontrado.`);
@@ -26,15 +27,18 @@ window.cerrarModal = function (type, id) {
     if (modal) {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
+        document.body.classList.remove('modal-open'); // Remover para restaurar scroll
         console.log(`Ocultando modal: modal-${type}-${id}`);
         if (type === 'editar') {
             window.clearValidationErrors(id);
         }
-        // NO MANIPULAMOS document.body.style.overflow aquí
+        // NO MANIPULAMOS document.body.style.overflow aquí, usamos la clase 'modal-open'
     } else {
         console.warn(`Advertencia: Modal con ID modal-${type}-${id} no encontrado para cerrar.`);
     }
 };
+
+// --- Funciones de Validación (Se mantienen, ya que no están relacionadas con el modal de éxito) ---
 
 /**
  * Limpia los mensajes de error de validación y los bordes rojos de los campos de un formulario.
@@ -78,6 +82,8 @@ window.displayValidationErrors = function (boletinId, errors) {
     }
 };
 
+// --- Función de Mensaje Global (Se mantiene, es tu nuevo enfoque para mensajes de éxito/error) ---
+
 /**
  * Muestra un mensaje global de éxito o error utilizando un modal vanilla JS.
  * @param {string} type - El tipo de mensaje ('success' o 'error').
@@ -110,26 +116,26 @@ window.showGlobalMessage = function (type, message) {
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
-    document.body.style.overflow = 'hidden'; // Bloquea el scroll del body
+    document.body.classList.add('modal-open'); // Usa la clase para bloquear el scroll
 
     // Cierra el modal al hacer clic en el botón OK
     const closeHandler = () => {
         modal.classList.remove('flex');
         modal.classList.add('hidden');
-        document.body.style.overflow = ''; // Restaura el scroll del body
-        closeButton.removeEventListener('click', closeHandler); // Limpia el listener
-        clearTimeout(autoHideTimer); // Limpia el temporizador si se cierra manualmente
+        document.body.classList.remove('modal-open'); // Restaura el scroll
+        closeButton.removeEventListener('click', closeHandler);
+        clearTimeout(autoHideTimer);
         console.log('DEBUG: Modal de mensaje global cerrado manualmente.');
     };
     closeButton.addEventListener('click', closeHandler);
 
     // Cierra el modal automáticamente después de 3 segundos
     const autoHideTimer = setTimeout(() => {
-        if (!modal.classList.contains('hidden')) { // Solo cierra si aún está visible
+        if (!modal.classList.contains('hidden')) {
             modal.classList.remove('flex');
             modal.classList.add('hidden');
-            document.body.style.overflow = ''; // Restaura el scroll del body
-            closeButton.removeEventListener('click', closeHandler); // Limpia el listener
+            document.body.classList.remove('modal-open');
+            closeButton.removeEventListener('click', closeHandler);
             console.log('DEBUG: Modal de mensaje global cerrado automáticamente.');
         }
     }, 3000);
@@ -139,7 +145,7 @@ window.showGlobalMessage = function (type, message) {
 document.addEventListener('DOMContentLoaded', function () {
     console.log('--- DOMContentLoaded event fired: Script loaded and ready ---');
 
-    // Delegación de eventos para los botones de acción en la tabla
+    // Delegación de eventos para los botones de acción en la tabla (se mantiene)
     const tableBody = document.querySelector('#boletines-table-body');
     if (tableBody) {
         console.log('Event listener añadido a #boletines-table-body para delegación de eventos.');
@@ -157,6 +163,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         console.warn(`ADVERTENCIA: La acción 'boletin' (Eliminar) no está manejada en este script.`);
                         return;
                     } else {
+                        // Aquí se llama a mostrarModal. Asegúrate de que los modales que usa (ej. 'editar')
+                        // no son el modal de éxito de noticias si quieres que lo maneje el global.
                         window.mostrarModal(type, id);
                     }
                 } else {
@@ -170,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.warn('Advertencia: #boletines-table-body no encontrado. La delegación de eventos de la tabla no funcionará.');
     }
 
-    // Listener para los formularios de edición
+    // Listener para los formularios de edición (se mantiene)
     document.querySelectorAll('[id^="editBoletinForm-"]').forEach(form => {
         console.log(`Añadiendo event listener de submit al formulario: ${form.id}`);
         form.addEventListener('submit', async function (event) {
@@ -229,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         window.showGlobalMessage('success', 'Boletín actualizado, pero no se recibió HTML para refrescar la tabla. Recargue la página.');
                     }
 
-                    window.cerrarModal('editar', boletinId); // Cierra el modal de edición
+                    window.cerrarModal('editar', boletinId); // Cierra el modal de edición (esto se mantiene)
 
                     // Después de la actualización exitosa, mostramos directamente el mensaje global de éxito
                     window.showGlobalMessage('success', result.message || 'Boletín actualizado con éxito.');
@@ -280,10 +288,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     reindexTableRows();
 
+    // Listener para cerrar modales por click externo/botón de cierre
+    // SE MODIFICA PARA EXCLUIR EL MODAL DE ÉXITO DE NOTICIAS,
+    // YA QUE AHORA SE ESPERA QUE showGlobalMessage LO MANEJE
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('bg-opacity-50') && event.target.closest('[id^="modal-"]')) {
             const modalWrapper = event.target.closest('[id^="modal-"]');
-            if (modalWrapper && modalWrapper.id !== 'custom-confirm-modal' && modalWrapper.id !== 'createBoletinModal') {
+            // Excluir el modal de éxito de noticias y el modal global de showGlobalMessage
+            // Asumiendo que el modal de éxito de noticias ya no usa "modal-success-"
+            // o que showGlobalMessage() ya maneja su cierre.
+            if (modalWrapper &&
+                modalWrapper.id !== 'custom-confirm-modal' &&
+                modalWrapper.id !== 'createBoletinModal' &&
+                modalWrapper.id !== 'modal-success-' && // Excluimos explícitamente si aún existe
+                modalWrapper.id !== 'globalMessageModalVanilla') { // Excluimos el modal global
                 const idParts = modalWrapper.id.split('-');
                 const tipo = idParts[1];
                 const id = idParts[2];

@@ -85,7 +85,7 @@ class BoletinService
         }
 
         // logica de filtro por estado
-        if($estadoFilter && $estadoFilter !== 'todos') {
+        if(!empty($estadoFilter)) {
             $boletines->where('estado', $estadoFilter);
         }
 

@@ -1,11 +1,11 @@
  <div class="overflow-x-auto rounded-2xl">
-     <table class="min-w-full divide-y divide-gray-100">
+     <table class="min-w-full text-md text-left">
          <thead class="bg-[var(--color-tabla)]">
              <tr>
-                 <th class="px-6 py-3 font-medium text-left text-gray-600">Rol</th>
-                 <th class="px-6 py-3 font-medium text-left text-gray-600">Nombre</th>
-                 <th class="px-6 py-3 font-medium text-left text-gray-600">Email</th>
-                 <th class="px-6 py-3 font-medium text-left text-gray-600">Estado</th>
+                 <th class="px-6 py-3 font-bold text-left text-gray-600">Rol</th>
+                 <th class="px-6 py-3 font-bold text-left text-gray-600">Nombre</th>
+                 <th class="px-6 py-3 font-bold text-left text-gray-600">Email</th>
+                 <th class="px-6 py-3 font-bold text-left text-gray-600">Estado</th>
              </tr>
          </thead>
 

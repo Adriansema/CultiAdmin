@@ -29,7 +29,8 @@
 </head>
 
 <body class="flex items-center justify-center min-h-screen">
-    <div>
+    {{-- AÑADIR CLASES DE ANCHO Y CENTRADO A ESTE DIV --}}
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
         @yield('content')
     </div>
 
