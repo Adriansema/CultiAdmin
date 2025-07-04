@@ -48,12 +48,20 @@ document.addEventListener('DOMContentLoaded', async function () {
     const confirmCancelButton = document.getElementById('confirmCancelButton');
     const confirmActionButton = document.getElementById('confirmActionButton');
 
+    // REFERENCIAS A LOS ELEMENTOS DEL MODAL DE NOTIFICACIÓN GLOBAL
+    const appNotificationModal = document.getElementById('appNotificationModal');
+    const appNotificationIconContainer = document.getElementById('appNotificationIconContainer');
+    const appNotificationSuccessIcon = document.getElementById('appNotificationSuccessIcon');
+    const appNotificationErrorIcon = document.getElementById('appNotificationErrorIcon');
+    const appNotificationText = document.getElementById('appNotificationText');
+    const appNotificationCloseButton = document.getElementById('appNotificationCloseButton');
+
     // Verificaciones iniciales de elementos (importante para depuración)
     if (!userFormModal) { console.error('ERROR: userFormModal no encontrado.'); return; }
     if (!nextButton) console.error('ERROR: nextStepButton no encontrado. ¡Este es crucial!');
     if (!prevButton) console.error('ERROR: prevButton no encontrado.');
     if (!generatePasswordButton) console.error('ERROR: generatePasswordButton no encontrado.');
-    if (!importCsvButton) console.error('ERROR: importCsvButton no encontrado.'); 
+    if (!importCsvButton) console.error('ERROR: importCsvButton no encontrado.');
     if (!step3Content) console.error('ERROR: step3Content no encontrado.');
     if (!step3Indicator) console.error('ERROR: step3Indicator no encontrado.');
     if (!passwordInput) console.error('ERROR: passwordInput no encontrado.');
@@ -64,6 +72,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (!confirmActionButton) console.error('ERROR: confirmActionButton no encontrado.');
     if (!lastnameInput) console.error('ERROR: lastnameInput no encontrado.');
     if (!phoneInput) console.error('ERROR: phoneInput no encontrado.');
+
+    // Verificaciones para el nuevo modal de notificación
+    if (!appNotificationModal) console.error('ERROR: appNotificationModal no encontrado.');
+    if (!appNotificationIconContainer) console.error('ERROR: appNotificationIconContainer no encontrado.');
+    if (!appNotificationSuccessIcon) console.error('ERROR: appNotificationSuccessIcon no encontrado.');
+    if (!appNotificationErrorIcon) console.error('ERROR: appNotificationErrorIcon no encontrado.');
+    if (!appNotificationText) console.error('ERROR: appNotificationText no encontrado.');
+    if (!appNotificationCloseButton) console.error('ERROR: appNotificationCloseButton no encontrado.');
 
 
     // Estado global del modal
@@ -102,7 +118,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         rolePermissionsMapping: {},
         errors: {},
         successMessage: '',
-        csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+
+        // ESTADOS PARA EL MODAL DE NOTIFICACIÓN GLOBAL
+        isAppNotificationModalOpen: false,
+        appNotificationMessage: '',
+        appNotificationIsSuccess: true, // true para éxito (verde), false para error (rojo)
     };
 
     // ! Funciones Auxiliares
@@ -227,19 +248,80 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
     // ! Fin de Funciones Auxiliares
 
-    function updateModalUI() {
-        console.log('JS: updateModalUI llamado. Paso actual:', modalData.currentStep, 'Modo:', modalData.isEditMode ? 'Editar' : 'Crear');
-
-        // Control de visibilidad del modal principal
+    /**
+     * Actualiza la visibilidad del modal principal de usuario.
+     */
+    function updateModalVisibility() {
         if (modalData.isOpen) {
             userFormModal.classList.remove('opacity-0', 'pointer-events-none');
             userFormModal.classList.add('opacity-100');
             document.body.classList.add('overflow-hidden');
         } else {
             userFormModal.classList.remove('opacity-100');
-            userFormModal.classList.add('opacity-0', 'pointer-events-none');
-            document.body.classList.remove('overflow-hidden');
+            userFormModal.classList.add('opacity-0');
+            // Usa transitionend para asegurarse de que pointer-events-none se aplique después de la animación de cierre
+            const onTransitionEnd = (event) => {
+                if (event.propertyName === 'opacity') {
+                    userFormModal.classList.add('pointer-events-none');
+                    // Solo remover overflow-hidden si NO hay otro modal abierto (ej. el de notificación global)
+                    if (!modalData.isAppNotificationModalOpen) {
+                        document.body.classList.remove('overflow-hidden');
+                    }
+                    userFormModal.removeEventListener('transitionend', onTransitionEnd);
+                }
+            };
+            userFormModal.addEventListener('transitionend', onTransitionEnd);
         }
+    }
+
+    /**
+     * Gestiona la visibilidad y el contenido del modal de notificación global.
+     */
+    function updateAppNotificationModalVisibility() {
+        if (appNotificationModal) {
+            if (modalData.isAppNotificationModalOpen) {
+                appNotificationModal.classList.remove('hidden');
+                appNotificationModal.classList.add('flex'); // Añadir flex para centrar contenido
+                document.body.classList.add('overflow-hidden'); // Asegurar que el scroll del body esté desactivado
+
+                appNotificationText.textContent = modalData.appNotificationMessage;
+                if (appNotificationSuccessIcon && appNotificationErrorIcon) { // Asegurarse de que los iconos existan
+                    if (modalData.appNotificationIsSuccess) {
+                        appNotificationSuccessIcon.classList.remove('hidden');
+                        appNotificationErrorIcon.classList.add('hidden');
+                    } else {
+                        appNotificationSuccessIcon.classList.add('hidden');
+                        appNotificationErrorIcon.classList.remove('hidden');
+                    }
+                }
+            } else {
+                appNotificationModal.classList.add('hidden');
+                appNotificationModal.classList.remove('flex');
+                // Solo remover overflow-hidden si NO hay otro modal abierto (ej. userFormModal)
+                if (!modalData.isOpen) { // Verificar si el modal principal del formulario también está cerrado
+                    document.body.classList.remove('overflow-hidden');
+                }
+            }
+        }
+    }
+
+    /**
+     * Muestra el modal de notificación global.
+     * @param {string} message - El mensaje de texto a mostrar.
+     * @param {boolean} isSuccess - True para éxito (icono verde), false para error (icono rojo).
+     */
+    function showAppNotification(message, isSuccess) {
+        modalData.appNotificationMessage = message;
+        modalData.appNotificationIsSuccess = isSuccess;
+        modalData.isAppNotificationModalOpen = true;
+        updateAppNotificationModalVisibility();
+    }
+
+    function updateModalUI() {
+        console.log('JS: updateModalUI llamado. Paso actual:', modalData.currentStep, 'Modo:', modalData.isEditMode ? 'Editar' : 'Crear');
+
+        // Control de visibilidad del modal principal
+        updateModalVisibility(); // Ahora se llama a la función dedicada
 
         if (modalTitle) {
             modalTitle.textContent = modalData.isEditMode ? 'Editar Usuario' : 'Registrar Nuevo Usuario';
@@ -723,12 +805,13 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // Función para copiar la contraseña al portapapeles
-    window.copyPasswordToClipboard = function (password) {
-        const tempInput = document.createElement('textarea');
-        tempInput.value = password;
-        document.body.appendChild(tempInput);
-        tempInput.select();
+    // Función para copiar la contraseña al portapapeles con tooltip
+    window.copyPasswordToClipboard = function (buttonElement, password) {
+        // 1. Copiar el texto al portapapeles
+        const textarea = document.createElement('textarea');
+        textarea.value = password;
+        document.body.appendChild(textarea);
+        textarea.select();
         try {
             document.execCommand('copy');
             console.log('¡Contraseña copiada al portapapeles!');
@@ -736,28 +819,63 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.error('Error al copiar la contraseña: ', err);
             console.log('No se pudo copiar la contraseña automáticamente. Por favor, cópiala manualmente.');
         }
-        document.body.removeChild(tempInput);
-    };
+        document.body.removeChild(textarea);
 
+        // 2. Crear el elemento del tooltip
+        const tooltip = document.createElement('div');
+        tooltip.textContent = 'Copiado!';
+        // Clases de Tailwind para el estilo y la transición del tooltip
+        tooltip.className = 'absolute bg-gray-800 text-white text-xs px-2 py-1 rounded-md shadow-lg opacity-0 transition-opacity duration-300 ease-in-out z-50 whitespace-nowrap';
+
+        // 3. Posicionar el tooltip relativo al botón que fue clicado
+        const buttonRect = buttonElement.getBoundingClientRect();
+
+        // Posicionar el tooltip ligeramente por encima del botón, centrado horizontalmente sobre él
+        tooltip.style.top = `${buttonRect.top - 35}px`; // 35px por encima del botón
+        tooltip.style.left = `${buttonRect.left + buttonRect.width / 2}px`;
+        tooltip.style.transform = 'translateX(-50%)'; // Centrar horizontalmente
+
+        document.body.appendChild(tooltip);
+
+        // 4. Animar la aparición del tooltip
+        // Pequeño retraso para asegurar que la transición de opacidad se aplique correctamente
+        setTimeout(() => {
+            tooltip.classList.remove('opacity-0');
+            tooltip.classList.add('opacity-100');
+        }, 10);
+
+        // 5. Animar la desaparición y remover el tooltip después de un tiempo
+        setTimeout(() => {
+            tooltip.classList.remove('opacity-100');
+            tooltip.classList.add('opacity-0');
+            // Remover el tooltip del DOM una vez que la transición de salida haya terminado
+            tooltip.addEventListener('transitionend', () => tooltip.remove(), { once: true });
+        }, 1500); // Mostrar por 1.5 segundos
+    };
 
     async function submitFormConfirmed() {
         console.log('JS: submitFormConfirmed llamado. Iniciando envío.');
-        closeConfirmModal(); // Cierra el modal de confirmación, esto también re-muestra el modal principal
-        modalData.errors = {};
-        modalData.successMessage = '';
-        updateModalUI(); // Actualiza la UI del modal principal para mostrar errores/carga
-
+        
+        // Deshabilitar botón y mostrar spinner en el botón del modal de confirmación
         const actionButton = confirmActionButton;
         const originalBtnText = actionButton.innerHTML;
         actionButton.disabled = true;
-        actionButton.innerHTML = `Confirmando <img src="/images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">`;
+        actionButton.innerHTML = `
+            <span class="flex items-center justify-between w-full">
+                <span>Confirmando</span>
+                <img src="/images/cargando_.svg" alt="Cargando..." class="w-5 h-5 animate-spin">
+            </span>
+        `;
+
+        // NO cerramos el modal de confirmación aquí todavía.
+        // Se mantendrá abierto con el spinner visible mientras se envía la solicitud.
 
         const formData = new FormData();
         formData.append('_token', modalData.csrfToken);
-
+        
         let url = '';
         let method = 'POST';
-
+        
         if (modalData.isEditMode) {
             url = `/usuario/${modalData.userId}`;
             formData.append('_method', 'PUT');
@@ -766,16 +884,16 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         // AÑADIR TODOS LOS DATOS RECOPILADOS DE TODOS LOS PASOS
-        formData.append('name', modalData.name);
+        formData.append('name', modalData.name); 
         formData.append('lastname', modalData.lastname);
-        formData.append('email', modalData.email);
+        formData.append('email', modalData.email); 
         formData.append('phone', modalData.phone);
-        formData.append('type_document', modalData.type_document);
-        formData.append('document', modalData.document);
-
+        formData.append('type_document', modalData.type_document); 
+        formData.append('document', modalData.document); 
+        
         formData.append('password', modalData.password);
         formData.append('password_confirmation', modalData.passwordConfirmation);
-
+        
         // Rol
         if (modalData.selectedRole) {
             formData.append('roles[]', modalData.selectedRole);
@@ -811,47 +929,53 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             const data = await response.json();
 
-            if (!response.ok) {
-                if (response.status === 422 && data.errors) {
-                    modalData.errors = data.errors;
-                    console.error('Errores de validación del backend:', data.errors);
-                } else {
-                    modalData.errors.general = data.message || `Error ${response.status}: ${response.statusText || 'Desconocido'}.`;
-                    console.error('Error del servidor no 422:', data);
-                }
-                modalData.isOpen = true;
-                const firstErrorField = Object.keys(modalData.errors)[0];
-                if (firstErrorField === 'name' || firstErrorField === 'lastname' || firstErrorField === 'email' || firstErrorField === 'phone' || firstErrorField === 'type_document' || firstErrorField === 'document') {
-                    modalData.currentStep = 1;
-                } else if (firstErrorField === 'roles' || firstErrorField === 'selectedRole' || firstErrorField === 'permissions') {
-                    modalData.currentStep = 2;
-                } else if (firstErrorField === 'password' || firstErrorField === 'password_confirmation') {
-                    modalData.currentStep = 3;
-                }
-                updateModalUI();
-                return;
-            }
-
-            // Éxito
-            modalData.successMessage = data.message;
-            updateModalUI();
-
-            // Tras el éxito, cerrar el modal y recargar la página.
-            setTimeout(() => {
-                closeModal();
-                window.location.reload();
-            }, 1500);
-
-        } catch (error) {
-            console.error('Error de red o parsing JSON:', error);
-            modalData.errors.general = 'Ocurrió un error de red o inesperado. Por favor, inténtalo de nuevo.';
-            modalData.isOpen = true;
-            updateModalUI();
-        } finally {
+            // Volver a habilitar el botón del modal de confirmación
             actionButton.disabled = false;
             actionButton.innerHTML = originalBtnText;
+
+            // AHORA SÍ: Cerrar el modal de confirmación
+            closeConfirmModal(); 
+
+            // Asegurarse de que el modal principal del formulario esté completamente oculto
+            modalData.isOpen = false; 
+            updateModalVisibility(); // Esto activará la lógica para ocultar userFormModal
+
+            if (response.ok) {
+                // Éxito: Mostrar el nuevo modal de notificación global
+                const successMessage = modalData.isEditMode ? '¡Tu usuario se ha actualizado correctamente!' : '¡Tu usuario se ha creado correctamente!';
+                showAppNotification(successMessage, true); // True para éxito
+            } else {
+                // Errores: Mostrar mensaje de error en el nuevo modal de notificación global
+                console.error('Error en la respuesta del envío:', data);
+                let errorMessage = 'Hubo un error al ' + (modalData.isEditMode ? 'actualizar' : 'crear') + ' el usuario.';
+
+                if (data.errors) {
+                    const validationErrors = Object.values(data.errors).flat();
+                    errorMessage = validationErrors.join('<br>');
+                } else if (data.message) {
+                    errorMessage = data.message;
+                }
+                showAppNotification(errorMessage, false); // False para error
+            }
+
+        } catch (error) {
+            console.error('Error de red o inesperado:', error);
+            // Volver a habilitar el botón
+            actionButton.disabled = false;
+            actionButton.innerHTML = originalBtnText;
+
+            // AHORA SÍ: Cerrar el modal de confirmación
+            closeConfirmModal(); 
+
+            // Asegurarse de que el modal principal del formulario esté completamente oculto
+            modalData.isOpen = false; 
+            updateModalVisibility(); // Esto activará la lógica para ocultar userFormModal
+
+            showAppNotification('Error de conexión o inesperado. Por favor, inténtalo de nuevo.', false); // False para error
         }
     }
+
+
 
     // --- Event Listeners ---
     document.body.addEventListener('click', function (event) {
@@ -955,6 +1079,15 @@ document.addEventListener('DOMContentLoaded', async function () {
             const type = passwordConfirmationInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordConfirmationInput.setAttribute('type', type);
             this.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+        });
+    }
+
+    // LISTENER PARA EL BOTÓN CERRAR DEL MODAL GLOBAL DE NOTIFICACIONES
+    if (appNotificationCloseButton) {
+        appNotificationCloseButton.addEventListener('click', function () {
+            modalData.isAppNotificationModalOpen = false; // Oculta el modal global
+            updateAppNotificationModalVisibility(); // Actualiza la visibilidad
+            window.location.reload(); // Recarga la página para refrescar la tabla de usuarios
         });
     }
 });

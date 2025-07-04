@@ -14,7 +14,7 @@
         </div>
 
         {{-- Contenedor principal de la sección de gestión (fondo verde claro) --}}
-        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-3xl p-5">
+        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-3xl p-5 mb-6">
 
             {{-- Contenedor de búsqueda y grupo de botones de acción --}}
             <div class="flex flex-col sm:flex-row items-center justify-between mb-4 flex-wrap">
@@ -85,7 +85,7 @@
                 {{-- Si no hay boletines, no se renderiza ningún modal --}}
             @endforelse
 
-            @include('boletines.partials.global-message')
+            @include('partials.global-message-modal')
         </div>
     @endcan
 @endsection

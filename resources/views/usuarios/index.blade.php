@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-3xl p-4">
+        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-3xl p-4 mb-8">
             <div class="flex items-center justify-between">
 
                 <form id="BuscarUser" action="{{ route('usuarios.index') }}" method="GET"

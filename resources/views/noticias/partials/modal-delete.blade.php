@@ -12,7 +12,7 @@
                 @csrf
                 @method('DELETE')
                 <div class="flex justify-end mt-4 space-x-2">
-                    <button type="button" onclick="ocultarModal('noticia', '{{ $noticia->id_noticias }}')"
+                    <button type="button" onclick="cerrarModal('noticia', '{{ $noticia->id_noticias }}')"
                         class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
                         Cancelar
                     </button>

@@ -6,7 +6,7 @@
         </x-slot>
 
         <x-slot name="description">
-            {{ __('API tokens allow third-party services to authenticate with our application on your behalf.') }}
+            {{ __('Los tokens API permiten que los servicios de terceros se autentiquen con nuestra aplicación en su nombre.') }}
         </x-slot>
 
         <x-slot name="form">

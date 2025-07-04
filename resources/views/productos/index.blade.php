@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-2xl p-4">
+        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-2xl p-4 mb-6">
             <div class="flex items-center justify-between">
 
                 <form id="searchForm" action="{{ route('productos.index') }}" method="GET"
@@ -76,7 +76,7 @@
             @endforelse
 
             @if ($productos->total() > 0 && $productos->hasPages())
-                <div class="p-4 mt-4 rounded-b-xl">
+                <div class="mt-4 rounded-b-xl">
                     {{ $productos->links('vendor.pagination.tailwind') }}
                 </div>
             @endif

@@ -54,7 +54,8 @@ const importCsvMissingDataModal = document.getElementById('importCsvMissingDataM
 const closeMissingDataModalButton = document.getElementById('closeMissingDataModalButton');
 const returnFromMissingDataModalButton = document.getElementById('returnFromMissingDataModalButton');
 const missingDataList = document.getElementById('missingDataList');
-
+const missingDataModalTitle = document.getElementById('missingDataModalTitle'); 
+const missingDataDescription = document.getElementById('missingDataDescription');
 
 // Columnas requeridas y sus nombres amigables para los mensajes de error (frontend validation)
 const REQUIRED_COLUMNS = {
@@ -97,12 +98,15 @@ function resetImportCsvFlow() {
 
     updateModalVisibility();
     document.body.classList.remove('overflow-hidden'); // Asegurarse de liberar el scroll del body
-    // Re-mostrar el modal de formulario si estaba abierto
-    const userFormModal = document.getElementById('userFormModal');
+    
+    // === IMPORTANTE: SE ELIMINÓ LA LÓGICA QUE RE-ABRÍA userFormModal AQUÍ ===
+    // La decisión de qué modal abrir después de un reset se maneja en los listeners
+    // o en la función que inicia el flujo (ej. openImportCsvModal).
+    /* const userFormModal = document.getElementById('userFormModal');
     if (userFormModal) {
         userFormModal.classList.remove('opacity-0', 'pointer-events-none');
         userFormModal.classList.add('opacity-100');
-    }
+    } */
 }
 
 /**
@@ -386,7 +390,28 @@ async function handleFileProcessing(file) {
                 lineNumber: item.lineNumber,
                 errors: item.errors
             }));
-            renderMissingDataErrors(importCsvState.backendValidationErrors);
+
+            // Lógica para determinar el tipo de error predominante
+            let missingCount = 0;
+            let invalidCount = 0;
+            importCsvState.invalidUsers.forEach(userError => {
+                userError.errors.forEach(errorMsg => {
+                    if (errorMsg.includes('Falta valor')) {
+                        missingCount++;
+                    } else {
+                        invalidCount++;
+                    }
+                });
+            });
+
+            let errorCategory = 'mixtos'; // Por defecto, si hay ambos o no se puede clasificar
+            if (missingCount > 0 && invalidCount === 0) {
+                errorCategory = 'faltantes';
+            } else if (invalidCount > 0 && missingCount === 0) {
+                errorCategory = 'invalidos';
+            }
+
+            renderMissingDataErrors(importCsvState.backendValidationErrors, errorCategory); // pasar la categoria
             importCsvState.missingDataModalOpen = true;
             updateModalVisibility();
             return;
@@ -426,7 +451,7 @@ async function handleFileProcessing(file) {
         renderCsvPreview([]);
 
         importCsvState.backendValidationErrors = [{ lineNumber: 'Procesamiento', errors: [`Error al procesar el archivo: ${error.message}`] }];
-        renderMissingDataErrors(importCsvState.backendValidationErrors);
+        renderMissingDataErrors(importCsvState.backendValidationErrors , 'general'); // Usar 'general' para errores de procesamiento
         importCsvState.missingDataModalOpen = true;
         updateModalVisibility();
     }
@@ -437,8 +462,35 @@ async function handleFileProcessing(file) {
  * Renderiza la lista de errores de datos faltantes/inválidos en el modal correspondiente.
  * @param {Array<{lineNumber: string|number, errors: Array<string>}>} errorsList
  */
-function renderMissingDataErrors(errorsList) {
+function renderMissingDataErrors(errorsList, errorCategory) {
     let listHtml = '';
+
+    // Actualiza el titulo del modal segun la categoria de error
+    if (missingDataModalTitle) {
+        if (errorCategory === 'faltantes') {
+            missingDataModalTitle.textContent = 'Campos Faltantes';
+        } else if (errorCategory === 'invalidos') {
+            missingDataModalTitle.textContent = 'Datos Inválidos';
+        } else if (errorCategory === 'mixtos') {
+            missingDataModalTitle.textContent = 'Datos Faltantes o Inválidos';
+        } else {
+            missingDataModalTitle.textContent = 'Error en Datos'; // Para errores generales de procesamiento
+        }
+    }
+
+    // Actualizar el texto descriptivo del modal según la categoría de error
+    if (missingDataDescription) {
+        if (errorCategory === 'faltantes') {
+            missingDataDescription.textContent = 'Se han detectado filas con campos faltantes. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
+        } else if (errorCategory === 'invalidos') {
+            missingDataDescription.textContent = 'Se han detectado filas con datos inválidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
+        } else if (errorCategory === 'mixtos') {
+            missingDataDescription.textContent = 'Se han detectado filas con campos faltantes o formatos inválidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
+        } else { // 'general' o cualquier otro caso
+            missingDataDescription.textContent = 'Se han detectado errores al procesar el archivo. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los detalles:';
+        }
+    }
+
     if (errorsList.length > 0) {
         listHtml = '<ul class="list-disc pl-5 text-gray-800">'; // Clases para estilo de lista
         errorsList.forEach(item => {
@@ -584,6 +636,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const lineErrors = data.detailed_errors[lineNumberKey];
                             lineErrors.forEach(errorMsg => {
                                 const displayLineNumber = lineNumberKey.replace('Línea ', '');
+                                 // La expresión regular ahora incluye el espacio después del número de fila y el ":"
                                 const cleanErrorMsg = errorMsg.replace(/La fila \d+:\s*/, '');
 
                                 if (cleanErrorMsg.includes('ya existe en el sistema')) {
@@ -613,18 +666,18 @@ document.addEventListener('DOMContentLoaded', function () {
                             importCsvState.duplicatesModalOpen = true;
                         } else if (newBackendValidationErrors.length > 0) {
                             importCsvState.backendValidationErrors = newBackendValidationErrors;
-                            renderMissingDataErrors(importCsvState.backendValidationErrors);
+                            renderMissingDataErrors(importCsvState.backendValidationErrors, 'mixtos');
                             importCsvState.missingDataModalOpen = true;
                         } else {
                             // Fallback para errores no clasificados pero con detailed_errors
                             importCsvState.backendValidationErrors = [{ lineNumber: 'General', errors: [data.message || 'Error desconocido del servidor con datos detallados.'] }];
-                            renderMissingDataErrors(importCsvState.backendValidationErrors);
+                            renderMissingDataErrors(importCsvState.backendValidationErrors, 'general');
                             importCsvState.missingDataModalOpen = true;
                         }
                     } else {
                         // Error general del servidor sin detailed_errors
                         importCsvState.backendValidationErrors = [{ lineNumber: 'General', errors: [data.message || 'Error desconocido del servidor.'] }];
-                        renderMissingDataErrors(importCsvState.backendValidationErrors);
+                        renderMissingDataErrors(importCsvState.backendValidationErrors, 'general');
                         importCsvState.missingDataModalOpen = true;
                     }
                     updateModalVisibility(); // Asegurar que el modal de error se muestre

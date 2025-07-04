@@ -28,7 +28,7 @@
     <div class="relative flex flex-1 overflow-hidden">
         <x-sidebar />
 
-        <div class="flex flex-col flex-1 w-full overflow-hidden mr-8" :class="sidebarOpen ? 'ml-8' : 'ml-8'">
+        <div class="flex flex-col flex-1 w-full overflow-hidden" :class="sidebarOpen ? 'ml-8' : 'ml-8'">
             @if (isset($header))
                 <header class="px-4 py-6 bg-white shadow">
                     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -45,16 +45,21 @@
     @stack('modals')
     @yield('scripts')
     @livewireScripts
+    
+    @include('partials.global-message-modal')
 
-    <script>
-        const sessionStatusProducto = @json(session('status_producto', null));
-        const sessionProductoIdForRedirect = @json(session('producto_id_for_redirect', null));
-        const sessionStatusBoletin = @json(session('status_boletin', null));
-        const sessionBoletinIdForRedirect = @json(session('boletin_id_for_redirect', null));
-        const sessionSuccess = @json(session('success', null));
-        const sessionError = @json(session('error', null));
-    </script>
+    {{-- Divs ocultos para pasar mensajes flash desde el servidor a JavaScript --}}
+    @if (session('success_message'))
+        <div id="flash-success-message-data" data-message="{{ session('success_message') }}" class="hidden"></div>
+    @endif
+
+    @if (session('error_message'))
+        <div id="flash-error-message-data" data-message="{{ session('error_message') }}" class="hidden"></div>
+    @endif
+
+    <script src="{{ asset('js/ModalesGeneral.js') }}"></script>
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
+    <script src="{{ asset('js/boletin.js') }}"></script>
 </body>
 
 </html>
