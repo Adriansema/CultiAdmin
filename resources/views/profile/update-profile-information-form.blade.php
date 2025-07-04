@@ -20,7 +20,7 @@
                                 reader.readAsDataURL($refs.photo.files[0]);
                         " />
 
-                <x-label for="photo" value="{{ __('Photo') }}" />
+                <x-label for="photo" value="{{ __('Foto') }}" />
 
                 <div class="mt-2">
                     <div class="relative w-32 h-32 overflow-hidden rounded-full shadow-md cursor-pointer group hover:shadow-lg transition-all duration-300 border-2 border-gray-300"
@@ -69,8 +69,8 @@
 
             @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) &&
                     !$this->user->hasVerifiedEmail())
-                <p class="mt-2 text-sm">
-                    {{ __('Your email address is unverified.') }}
+                <p class="mt-4 text-sm">
+                    {{ __('Su dirección de correo electrónico no está verificada.') }}
 
                     <button type="button"
                         class="text-sm text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

@@ -219,6 +219,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         resetPermissions();
         modalData.errors = {};
         modalData.successMessage = '';
+        // Resetear también el estado del modal de notificación global
+        modalData.isAppNotificationModalOpen = false;
+        modalData.appNotificationMessage = '';
+        modalData.appNotificationIsSuccess = true;
 
         if (nameInput) nameInput.value = '';
         if (lastnameInput) lastnameInput.value = '';
@@ -684,6 +688,17 @@ document.addEventListener('DOMContentLoaded', async function () {
         openImportCsvModal();
     }
 
+    // ************* FUNCIÓN PARA ALTERNAR VISIBILIDAD DE CONTRASEÑA EN EL MODAL DE CONFIRMACIÓN *************
+    window.toggleConfirmPasswordVisibilityInModal = function (buttonElement) {
+        const passwordInputInModal = buttonElement.previousElementSibling; // El input es el hermano anterior del botón
+        if (passwordInputInModal) {
+            const type = passwordInputInModal.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInputInModal.setAttribute('type', type);
+            buttonElement.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+            buttonElement.setAttribute('title', type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
+        }
+    };
+
     // ************* FUNCIONES PARA EL MODAL DE CONFIRMACIÓN *************
     function openConfirmModal() {
         console.log('JS: openConfirmModal llamado.');
@@ -730,10 +745,12 @@ document.addEventListener('DOMContentLoaded', async function () {
             passwordDisplayHtml = `
                 <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contraseña generada:</h4>
                 <div class="relative flex items-center mb-4 bg-gray-100 p-3 rounded-lg border border-gray-200">
-                    <input type="text" value="${modalData.password}" readonly
-                        class="w-full bg-transparent text-gray-800 text-base font-mono focus:outline-none cursor-not-allowed" />
-                    <button type="button" class="absolute right-3 text-gray-500 hover:text-gray-700" title="Copiar contraseña" onclick="copyPasswordToClipboard('${modalData.password}')">
-                        <img src="/images/copy.svg" alt="copiar" class="w-5 h-5" />
+                    <!-- AÑADIDO ID AL INPUT Y TIPO INICIAL PASSWORD -->
+                    <input type="password" id="confirmPasswordDisplayInput" value="${modalData.password}" readonly
+                        class="w-full bg-transparent text-gray-800 text-base font-mono focus:outline-none cursor-not-allowed pr-12" /> <!-- pr-12 para espacio -->
+                    <!-- CAMBIADO ONCLICK Y ICONO INICIAL -->
+                    <button type="button" class="absolute right-4 text-gray-500 hover:text-gray-700" title="Mostrar contraseña" onclick="toggleConfirmPasswordVisibilityInModal(this)">
+                        <img src="/images/ojo-close.svg" alt="Mostrar/Ocultar" class="w-5 h-5" />
                     </button>
                 </div>
                 <p class="text-gray-600 text-sm mb-4">Esta contraseña se enviará al correo del usuario.</p>
@@ -805,57 +822,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // Función para copiar la contraseña al portapapeles con tooltip
-    window.copyPasswordToClipboard = function (buttonElement, password) {
-        // 1. Copiar el texto al portapapeles
-        const textarea = document.createElement('textarea');
-        textarea.value = password;
-        document.body.appendChild(textarea);
-        textarea.select();
-        try {
-            document.execCommand('copy');
-            console.log('¡Contraseña copiada al portapapeles!');
-        } catch (err) {
-            console.error('Error al copiar la contraseña: ', err);
-            console.log('No se pudo copiar la contraseña automáticamente. Por favor, cópiala manualmente.');
-        }
-        document.body.removeChild(textarea);
-
-        // 2. Crear el elemento del tooltip
-        const tooltip = document.createElement('div');
-        tooltip.textContent = 'Copiado!';
-        // Clases de Tailwind para el estilo y la transición del tooltip
-        tooltip.className = 'absolute bg-gray-800 text-white text-xs px-2 py-1 rounded-md shadow-lg opacity-0 transition-opacity duration-300 ease-in-out z-50 whitespace-nowrap';
-
-        // 3. Posicionar el tooltip relativo al botón que fue clicado
-        const buttonRect = buttonElement.getBoundingClientRect();
-
-        // Posicionar el tooltip ligeramente por encima del botón, centrado horizontalmente sobre él
-        tooltip.style.top = `${buttonRect.top - 35}px`; // 35px por encima del botón
-        tooltip.style.left = `${buttonRect.left + buttonRect.width / 2}px`;
-        tooltip.style.transform = 'translateX(-50%)'; // Centrar horizontalmente
-
-        document.body.appendChild(tooltip);
-
-        // 4. Animar la aparición del tooltip
-        // Pequeño retraso para asegurar que la transición de opacidad se aplique correctamente
-        setTimeout(() => {
-            tooltip.classList.remove('opacity-0');
-            tooltip.classList.add('opacity-100');
-        }, 10);
-
-        // 5. Animar la desaparición y remover el tooltip después de un tiempo
-        setTimeout(() => {
-            tooltip.classList.remove('opacity-100');
-            tooltip.classList.add('opacity-0');
-            // Remover el tooltip del DOM una vez que la transición de salida haya terminado
-            tooltip.addEventListener('transitionend', () => tooltip.remove(), { once: true });
-        }, 1500); // Mostrar por 1.5 segundos
-    };
-
     async function submitFormConfirmed() {
         console.log('JS: submitFormConfirmed llamado. Iniciando envío.');
-        
+
         // Deshabilitar botón y mostrar spinner en el botón del modal de confirmación
         const actionButton = confirmActionButton;
         const originalBtnText = actionButton.innerHTML;
@@ -872,10 +841,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         const formData = new FormData();
         formData.append('_token', modalData.csrfToken);
-        
+
         let url = '';
         let method = 'POST';
-        
+
         if (modalData.isEditMode) {
             url = `/usuario/${modalData.userId}`;
             formData.append('_method', 'PUT');
@@ -884,16 +853,16 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         // AÑADIR TODOS LOS DATOS RECOPILADOS DE TODOS LOS PASOS
-        formData.append('name', modalData.name); 
+        formData.append('name', modalData.name);
         formData.append('lastname', modalData.lastname);
-        formData.append('email', modalData.email); 
+        formData.append('email', modalData.email);
         formData.append('phone', modalData.phone);
-        formData.append('type_document', modalData.type_document); 
-        formData.append('document', modalData.document); 
-        
+        formData.append('type_document', modalData.type_document);
+        formData.append('document', modalData.document);
+
         formData.append('password', modalData.password);
         formData.append('password_confirmation', modalData.passwordConfirmation);
-        
+
         // Rol
         if (modalData.selectedRole) {
             formData.append('roles[]', modalData.selectedRole);
@@ -934,10 +903,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             actionButton.innerHTML = originalBtnText;
 
             // AHORA SÍ: Cerrar el modal de confirmación
-            closeConfirmModal(); 
+            closeConfirmModal();
 
             // Asegurarse de que el modal principal del formulario esté completamente oculto
-            modalData.isOpen = false; 
+            modalData.isOpen = false;
             updateModalVisibility(); // Esto activará la lógica para ocultar userFormModal
 
             if (response.ok) {
@@ -965,17 +934,15 @@ document.addEventListener('DOMContentLoaded', async function () {
             actionButton.innerHTML = originalBtnText;
 
             // AHORA SÍ: Cerrar el modal de confirmación
-            closeConfirmModal(); 
+            closeConfirmModal();
 
             // Asegurarse de que el modal principal del formulario esté completamente oculto
-            modalData.isOpen = false; 
+            modalData.isOpen = false;
             updateModalVisibility(); // Esto activará la lógica para ocultar userFormModal
 
             showAppNotification('Error de conexión o inesperado. Por favor, inténtalo de nuevo.', false); // False para error
         }
     }
-
-
 
     // --- Event Listeners ---
     document.body.addEventListener('click', function (event) {
@@ -1071,6 +1038,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
             this.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+            this.setAttribute('title', type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
         });
     }
 
@@ -1079,6 +1047,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             const type = passwordConfirmationInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordConfirmationInput.setAttribute('type', type);
             this.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+            this.setAttribute('title', type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
         });
     }
 

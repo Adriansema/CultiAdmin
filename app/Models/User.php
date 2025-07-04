@@ -10,16 +10,18 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use App\Notifications\CustomResetPassword; // <-- Esta importación está CORRECTA y es necesaria.
 
-class User extends Authenticatable 
+class User extends Authenticatable
 {
-    use HasApiTokens;              // Para tokens de API (Sanctum).
-    use HasRoles;                  // Para roles y permisos (Spatie).
+    use HasApiTokens;
+    use HasRoles;
     use HasRelationships;
     use HasFactory;
-    use HasProfilePhoto;           // Para fotos de perfil (Jetstream).
-    use Notifiable;                // Para notificaciones (ej. emails).
-    use TwoFactorAuthenticatable;  // Para autenticación de dos factores (Fortify).
+    use HasProfilePhoto;
+    use Notifiable;
+    use TwoFactorAuthenticatable;
+    // use CustomResetPassword; // <-- ¡ELIMINA ESTA LÍNEA! Es el problema.
 
     protected $table = 'users';
 
@@ -29,13 +31,13 @@ class User extends Authenticatable
         'password',
         'estado',
         'type_document',
-        'document',    
+        'document',
         'lastname',
         'phone',
     ];
 
     protected $hidden = [
-        'password',       // Oculta el hash de la contraseña en respuestas JSON/arrays por seguridad.
+        'password',
         'remember_token',
         'two_factor_recovery_codes',
         'two_factor_secret',
@@ -47,31 +49,37 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed', // Laravel 10+: Asegura que la contraseña siempre se guarde hasheada y se verifique automáticamente.
+        'password' => 'hashed',
         'estado' => 'string',
     ];
 
-    protected $guard_name = 'web'; // <-- IMPORTANTE para Spatie Permissions: Define qué 'guard' usa este modelo para roles/permisos. // Conecta roles/permisos asignados a este usuario con el guard 'web'.
+    protected $guard_name = 'web';
 
-    // Opcional: Método de ayuda para verificar rol (si aún lo necesitas)
     public function isAdmin(): bool
     {
         return $this->hasRole('administrador');
     }
 
-    // Relación para los productos que el usuario ha creado
     public function productos()
     {
-        return $this->hasMany(Producto::class, 'user_id', 'id'); // 'user_id' es la FK en 'productos'
+        return $this->hasMany(Producto::class, 'user_id', 'id');
     }
 
-     /**
-     * Define la relación hasMany con el modelo Noticia.
-     * Un Usuario puede tener muchas Noticias.
-     */
     public function noticias()
     {
-        // 'user_id' es la clave foránea en la tabla 'noticias'
         return $this->hasMany(Noticia::class, 'user_id', 'id');
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        // Esta línea está bien porque la importación de arriba (`use App\Notifications\CustomResetPassword;`)
+        // le dice a PHP dónde encontrar la clase `CustomResetPassword` cuando la instanciamos aquí.
+        $this->notify(new CustomResetPassword($token));
     }
 }
