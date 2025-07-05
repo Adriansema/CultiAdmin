@@ -58,6 +58,11 @@
   }
 }
 
+[x-cloak] {
+    display: none !important;
+}
+
+
 /* Estilo para Contraste Alto  en Accesibilida/index.blade.php*/
 .contrast-high,
 .dark-mode {
@@ -111,6 +116,7 @@ html {
     --color-hovermarca: #00568A;
     --color-hover: #009400;
     --color-hovercaja: #E9F3E4;
+    --color-focus: #ffffff;
   }
 }
 
