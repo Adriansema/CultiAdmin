@@ -4,81 +4,72 @@ namespace App\Services;
 
 use App\Models\Noticia;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // Necesitamos importar DB para usar DB::raw()
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class NoticiaService
 {
-    /**
-     * Limpia el texto de búsqueda para una comparación robusta.
-     * Convierte a minúsculas, elimina tildes y caracteres especiales.
-     *
-     * @param string $text El texto a limpiar.
-     * @return string El texto limpio.
-     */
     private function cleanSearchQuery(string $text): string
     {
-        // Convertir a minúsculas
         $text = mb_strtolower($text, 'UTF-8');
-
-        // Reemplazar caracteres con tildes por sus equivalentes sin tilde
         $text = str_replace(
             ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ', 'Á', 'É', 'Í', 'Ó', 'Ú', 'Ü', 'Ñ'],
             ['a', 'e', 'i', 'o', 'u', 'u', 'n', 'A', 'E', 'I', 'O', 'U', 'U', 'N'],
             $text
         );
-
-        // Remover caracteres no alfanuméricos (excepto espacios)
-        // Esto elimina puntos, comas, guiones, etc., dejando solo letras, números y espacios
         $text = preg_replace('/[^a-z0-9\s]/', '', $text);
-
-        // Remover espacios múltiples y eliminar espacios al inicio/final
         $text = trim(preg_replace('/\s+/', ' ', $text));
-
         return $text;
     }
 
-    /**
-     * Obtiene noticias filtradas con búsqueda robusta general.
-     *
-     * @param Request $request La solicitud HTTP con los parámetros de filtro.
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
     public function obtenerNoticiaFiltradas(Request $request)
     {
-        // Define la cantidad de elementos por página, con un valor por defecto y opciones válidas
         $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100])
             ? $request->input('per_page')
-            : 10; // Por defecto 5
+            : 10;
 
-        $query = $request->input('q');        // Búsqueda general
+        // Inicializar variables al principio de la función para asegurar su definición
+        $searchQuery = $request->input('q', '');
+        $estadoFilter = $request->input('estado', '');
 
-        $noticias = Noticia::query(); // Mejor usar query() en vez de with('') si no hay relaciones
+        $noticias = Noticia::query();
 
         // Búsqueda robusta general en múltiples columnas
-        if ($query) {
-            // Limpiamos el texto de búsqueda ingresado por el usuario una vez
-            $cleanedQuery = $this->cleanSearchQuery($query);
+        if (!empty($searchQuery)) {
+            // Asegúrate de que $cleanedSearchQuery se define aquí, dentro del if donde se usa
+            $cleanedSearchQuery = $this->cleanSearchQuery($searchQuery);
 
-            $noticias->where(function ($q2) use ($cleanedQuery) {
-                // Función SQL para normalizar texto, para usar en múltiples columnas
+            $noticias->where(function ($q2) use ($cleanedSearchQuery, $searchQuery) { // Pasar $cleanedSearchQuery a la clausura
                 $sqlNormalize = function($column) {
+                    if (in_array($column, ['created_at', 'updated_at'])) {
+                        return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
+                    }
                     return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER({$column}), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                 };
 
-                // Búsqueda robusta en la columna 'tipo'
-                $q2->whereRaw($sqlNormalize('tipo') . ' LIKE ?', ['%' . $cleanedQuery . '%'])
-                   // Búsqueda robusta en la columna 'titulo'
-                   ->orWhereRaw($sqlNormalize('titulo') . ' LIKE ?', ['%' . $cleanedQuery . '%'])
-                   // Búsqueda robusta en la columna 'autor'
-                   ->orWhereRaw($sqlNormalize('autor') . ' LIKE ?', ['%' . $cleanedQuery . '%'])
-                   // Búsqueda robusta en la columna 'clase'
-                   ->orWhereRaw($sqlNormalize('clase') . ' LIKE ?', ['%' . $cleanedQuery . '%'])
-                   // Búsqueda robusta en la columna 'numero_pagina' (CAST a TEXT)
-                   ->orWhereRaw($sqlNormalize('CAST(numero_pagina AS TEXT)') . ' LIKE ?', ['%' . $cleanedQuery . '%']);
+                // Búsqueda robusta en las columnas de Noticia
+                $q2->orWhereRaw($sqlNormalize('tipo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                   ->orWhereRaw($sqlNormalize('titulo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                   ->orWhereRaw($sqlNormalize('autor') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                   ->orWhereRaw($sqlNormalize('clase') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                   ->orWhereRaw($sqlNormalize('CAST(numero_pagina AS TEXT)') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+                
+                try {
+                    $date = Carbon::parse($searchQuery);
+                    $q2->orWhereDate('created_at', $date->toDateString());
+                } catch (\Exception $e) {
+                    // No hace nada si la fecha no es válida
+                }
             });
         }
 
-        // Retorna las noticias paginadas
-        return $noticias->paginate($perPage)->withQueryString(); // Agrega withQueryString()
+        // Aplicar filtro por estado
+        if (!empty($estadoFilter) && in_array($estadoFilter, ['aprobado', 'pendiente', 'rechazado'])) {
+            $noticias->where('estado', $estadoFilter);
+        }
+
+        $noticias->orderBy('tipo', 'asc');
+
+        return $noticias->paginate($perPage)->withQueryString();
     }
 }

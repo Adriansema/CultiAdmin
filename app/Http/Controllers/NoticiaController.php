@@ -15,25 +15,17 @@ use App\Services\NoticiaService;
 
 class NoticiaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * Muestra una lista de todas las noticias.
-     */
     public function index(Request $request, NoticiaService $noticiaService)
     {
-        Gate::authorize('crear noticia');
+        // Autorización para ver la lista de noticias
+        Gate::authorize('crear noticia'); // Asegúrate de que este permiso es el adecuado
+
+        // Llama al servicio para obtener las noticias filtradas/paginadas
         $noticias = $noticiaService->obtenerNoticiaFiltradas($request);
-        // Carga todas las noticias, incluyendo la relación con User para mostrar quién la creó.
-        /* $noticias = Noticia::with('user')->get(); */
+
+        // Retorna la vista con los datos de las noticias
         return view('noticias.index', compact('noticias'));
     }
-
-    public function getFilteredNoticy(Request $request, NoticiaService $noticiaService)
-    {
-        $noticias = $noticiaService->obtenerNoticiaFiltradas($request);
-        return response()->json($noticias);
-    }
-
     /**
      * Show the form for creating a new resource.
      * Muestra el formulario para crear una nueva noticia.

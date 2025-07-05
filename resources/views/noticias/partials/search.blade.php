@@ -1,10 +1,10 @@
-{{-- resources/views/boletines/partials/search.blade.php --}}
+{{-- resources/views/noticias/partials/search.blade.php --}}
 
 <div class="relative flex items-center w-full max-w-xl">
     <input type="text"
            id="buscar-noticia-input" {{-- ¡Este ID es CRUCIAL! --}}
            name="q"
-           placeholder="Buscar Boletín"
+           placeholder="Buscar Noticia" {{-- Nota: el placeholder aquí dice "Buscar Boletín", cámbialo a "Buscar Noticia" si es necesario --}}
            class="form-control border border-[var(--color-ajustes)] hover:border-[var(--color-hover)] rounded-2xl pr-10 py-2 w-full
                   focus:border-[var(--color-hover)] focus:outline-none focus:ring-0"
            value="{{ request('q') }}">

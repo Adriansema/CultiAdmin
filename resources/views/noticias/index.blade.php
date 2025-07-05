@@ -22,16 +22,14 @@
                 </form>
 
                 <div class="flex items-center justify-end py-4 space-x-2">
-                    <button type="button" id="filtrosBotones"
-                        class="inline-flex group items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] rounded-full w-auto">
-                        <span class="text-md font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
-                            {{ __('Filtrar') }}
-                        </span>
-                        <img src="{{ asset('images/filtro.svg') }}" class="w-4 h-3 relative inset-0 block group-hover:hidden"
-                            alt="Icono de filtro">
-                        <img src="{{ asset('images/filtro-hover.svg') }}"
-                            class="w-4 h-3 relative inset-0 hidden group-hover:block" alt="Icono de filtro hover">
-                    </button>
+                     {{-- SELECT para filtrar por ESTADO --}}
+                    <select id="filtro-estado" name="estado"
+                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium text-black mr-2 mb-2 md:mb-0">
+                        <option value="">{{ __('Todos los estados') }}</option>
+                        <option value="aprobado" {{ request('estado') == 'aprobado' ? 'selected' : '' }}>{{ __('Aprobado') }}</option>
+                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>{{ __('Pendiente') }}</option>
+                        <option value="rechazado" {{ request('estado') == 'rechazado' ? 'selected' : '' }}>{{ __('Rechazado') }}</option>
+                    </select>
 
                     <form method="GET" action="{{ route('noticias.exportarCsv') }}">
                         <x-responsive-nav-link href="#" onclick="this.closest('form').submit(); return false;"

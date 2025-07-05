@@ -3,6 +3,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('buscar-boletin-input');
     const estadoFilterSelect = document.getElementById('filtro-estado');
+    const precioFilterSelect = document.getElementById('filtro-precio'); // Nuevo: el select de precio
     const tableBody = document.getElementById('boletines-table-body');
     const noBoletinesMessageRow = document.getElementById('no-boletines-message-row');
     const loadingSpinnerRow = document.getElementById('loading-spinner-row');
@@ -199,14 +200,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function fetchBoletines() {
         const query = searchInput ? searchInput.value : '';
-        const estado = estadoFilterSelect ? estadoFilterSelect.value : 'todos';
+        const estado = estadoFilterSelect ? estadoFilterSelect.value : ''; // Valor por defecto vacío
+        const precio = precioFilterSelect ? precioFilterSelect.value : ''; // Nuevo: obtener valor del select de precio
 
         const url = new URL('/boletines/filtrados', window.location.origin);
         if (query) {
             url.searchParams.append('q', query);
         }
-        if (estado && estado !== 'todos') {
+        if (estado) { // Solo añadir si hay un estado seleccionado (no vacío)
             url.searchParams.append('estado', estado);
+        }
+        if (precio) { // Nuevo: Solo añadir si hay un precio seleccionado
+            url.searchParams.append('precio', precio);
         }
         url.searchParams.append('per_page', 5);
 
@@ -296,6 +301,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Lógica para el SELECT de filtro por estado
     if (estadoFilterSelect) {
         estadoFilterSelect.addEventListener('change', function() {
+            fetchBoletines();
+        });
+    }
+
+    // NUEVO: Lógica para el SELECT de filtro por precio
+    if (precioFilterSelect) {
+        precioFilterSelect.addEventListener('change', function() {
             fetchBoletines();
         });
     }

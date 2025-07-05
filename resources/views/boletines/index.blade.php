@@ -9,12 +9,12 @@
                 <h1 class="text-3xl whitespace-nowrap font-bold">Boletines</h1>
             </div>
             <div class="py-2">
-                {!! Breadcrumbs::render('boletines.index') !!}
+            {!! Breadcrumbs::render('boletines.index') !!}
             </div>
         </div>
 
         {{-- Contenedor principal de la sección de gestión (fondo verde claro) --}}
-        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-3xl p-5 mb-10">
+        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-3xl p-5 mb-6">
 
             {{-- Contenedor de búsqueda y grupo de botones de acción --}}
             <div class="flex flex-col sm:flex-row items-center justify-between mb-4 flex-wrap">
@@ -28,14 +28,21 @@
                 {{-- Grupo de los tres botones: Filtro, Exportar y Crear/Importar --}}
                 <div class="flex items-center justify-center sm:justify-end flex-nowrap gap-2 py-4 sm:py-0">
 
-                    {{-- Botón Filtrar --}}
-                    <select name="estado" id="filtro-estado"
-                        class="border border-gray-300 rounded-md px-6
-                        onchange = "filtrarPorEstado(this.value)">
-                        <option value="" {{ request('estado') == '' ? 'selected': '' }}> Filtrar</option>
-                        <option value= "aprobado">Aprobado</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="rechazado">Rechazado</option>
+                    <select id="filtro-estado" name="estado"
+                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium text-black">
+                        <option value="">{{ __('Todos los estados') }}</option>
+                        <option value="aprobado" {{ request('estado') == 'aprobado' ? 'selected' : '' }}>{{ __('Aprobado') }}</option>
+                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>{{ __('Pendiente') }}</option>
+                        <option value="rechazado" {{ request('estado') == 'rechazado' ? 'selected' : '' }}>{{ __('Rechazado') }}</option>
+                    </select>
+
+                    <select id="filtro-precio" name="precio"
+                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium text-black">
+                        <option value="">{{ __('Todos los precios') }}</option>
+                        <option value="precio_alto_desc" {{ request('precio') == 'precio_alto_desc' ? 'selected' : '' }}>{{ __('Precio Más Alto (Desc)') }}</option>
+                        <option value="precio_alto_asc" {{ request('precio') == 'precio_alto_asc' ? 'selected' : '' }}>{{ __('Precio Más Alto (Asc)') }}</option>
+                        <option value="precio_bajo_desc" {{ request('precio') == 'precio_bajo_desc' ? 'selected' : '' }}>{{ __('Precio Más Bajo (Desc)') }}</option>
+                        <option value="precio_bajo_asc" {{ request('precio') == 'precio_bajo_asc' ? 'selected' : '' }}>{{ __('Precio Más Bajo (Asc)') }}</option>
                     </select>
 
                     {{-- Botón Exportar Csv (dentro de un form) --}}
@@ -61,15 +68,6 @@
                     @include('boletines.partials.modal-create')
                 </div>
             </div>
-
-            <script>
-                function filtrarPorEstados(estados){
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('estado', 'estado');
-                    window.location.href = url.toString();
-
-                }
-            </script>
 
             {{-- Mensajes de sesión de éxito o error --}}
             @if (session('success'))
