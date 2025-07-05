@@ -115,7 +115,7 @@
                         class="w-4 h-4" alt="Usuarios">
                     <span x-show="sidebarOpen" x-transition
                         class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('usuarios.index') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
-                        {{ __('Gestion de Usuarios') }}
+                        {{ __('Gestión de usuarios') }}
                     </span>
                 </div>
             </a>
@@ -146,7 +146,7 @@
                         class="w-4 h-4" alt="Centro de Ayuda">
                     <span x-show="sidebarOpen" x-transition
                         class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('centroAyuda.index') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
-                        {{ __('Centro de Ayuda') }}
+                        {{ __('Centro de ayuda') }}
                     </span>
                 </div>
             </a>
@@ -161,7 +161,7 @@
                     <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                         <img src="{{ asset('images/off.svg') }}" class="w-4 h-4" alt="Cerrar Sesión">
                         <span x-show="sidebarOpen" x-transition class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
-                            {{ __('Cerrar Sesión') }}
+                            {{ __('Cerrar sesión') }}
                         </span>
                     </div>
                 </a>
@@ -169,7 +169,7 @@
         </div>
     </nav>
 
-    <div class="px-6 py-12">
+    <div class="px-6 py-12>
         {{-- Perfil (Generalmente visible para todos) --}}
         <x-responsive-nav-link href="{{ route('profile.show') }}" class="rounded-3xl"
             x-bind:class="sidebarOpen ? 'px-3 py-6' : 'flex justify-center p-0'">

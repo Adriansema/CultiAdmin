@@ -6,9 +6,9 @@
     <div class="inline-block px-8 py-10">
         <div class="flex items-center space-x-2">
             <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-            <h1 class="text-3xl whitespace-nowrap font-bold">Detalles del Producto</h1>
+            <h1 class="text-3xl font-bold whitespace-nowrap">Detalles del producto</h1>
         </div>
-        {!! Breadcrumbs::render('productos.show', $producto) !!} 
+        {!! Breadcrumbs::render('productos.show', $producto) !!}
     </div>
 
     <div class="container max-w-4xl py-6 mx-auto">

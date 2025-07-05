@@ -1,10 +1,10 @@
-<div class="noticias-scroll-container space-y-4">
+<div class="space-y-4 noticias-scroll-container">
     @forelse ($noticias as $noticia)
         <div id="noticia-{{ $noticia->id_noticias }}"
             class="bg-white p-4 rounded-2xl shadow-sm mb-4 hover:bg-[var(--color-hovercaja)]">
             <div class="flex">
                 <div class="flex-shrink-0 mr-2">
-                    <img src="{{ asset('images/infor_noti.svg') }}" class="w-7 h-6" alt="informacion de la noticia">
+                    <img src="{{ asset('images/infor_noti.svg') }}" class="h-6 w-7" alt="Información de la noticia">
                 </div>
 
                 <div class="flex-grow min-w-0">
@@ -12,17 +12,17 @@
                         <h3 class="text-base font-bold text-[var(--color-textmarca)] truncate">
                             {{ Str::limit($noticia->titulo ?? 'Sin título', 60, '...') }}
                         </h3>
-                        <span class="text-base font-normal text-gray-500 ml-4 flex-shrink-0 flex items-center">
+                        <span class="flex items-center flex-shrink-0 ml-4 text-base font-normal text-gray-500">
                             <img src="{{ asset('images/hora.svg') }}" class="w-8 h-5 mr-1"
-                                alt="informacion de la noticia">
+                                alt="Información de la noticia">
                             {{ $noticia->created_at->diffForHumans() }}
                         </span>
                     </div>
 
-                    <p class="text-sm text-gray-700 mb-3 line-clamp-3">
+                    <p class="mb-3 text-sm text-gray-700 line-clamp-3">
                         {{ $noticia->informacion ?? 'No hay información disponible.' }}</p>
 
-                    <div class="flex space-x-2 text-md font-semibold">
+                    <div class="flex space-x-2 font-semibold text-md">
                         <button data-noticia-id="{{ $noticia->id_noticias }}"
                             class="mark-as-read-btn text-[var(--color-textmarca)] hover:bg-[var(--color-hovermarca)] hover:text-white rounded-lg px-2 focus:outline-none">
                             Marcar como leído

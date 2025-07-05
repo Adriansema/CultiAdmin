@@ -3,33 +3,31 @@
         <div class="w-full max-w-xl p-6 bg-[var(--color-gris1)] rounded-lg shadow-xl space-y-4 ">
             {{-- Detalles del Boletin --}}
             @if ($boletin->archivo)
-                <div class="mt-4 flex justify-between gap-4"> {{-- Contenedor principal con flexbox y gap para la separación --}}
+                <div class="flex justify-between gap-4 mt-4"> {{-- Contenedor principal con flexbox y gap para la separación --}}
 
                     {{-- Div del Contenido (Izquierda) --}}
-                    <div class="flex-grow p-3 bg-gray-50 rounded-md "> {{-- flex-grow para ocupar espacio y estilos de tarjeta --}}
-                        <h3 class="text-md font-semibold text-black ">Contenido:</h3>
+                    <div class="flex-grow p-3 rounded-md bg-gray-50 "> {{-- flex-grow para ocupar espacio y estilos de tarjeta --}}
+                        <h3 class="font-semibold text-black text-md ">Contenido:</h3>
                         <p class="text-black whitespace-pre-line">
                             {{ $boletin->contenido }}
                         </p>
                     </div>
 
                     {{-- Div del Icono (Derecha) --}}
-                    <div class="p-3 bg-gray-50 rounded-md flex-shrink-2 flex flex-col items-center justify-center">
+                    <div class="flex flex-col items-center justify-center p-3 rounded-md bg-gray-50 flex-shrink-2">
                         {{-- Estilos de tarjeta y centrado --}}
-                        <h3 class="text-xs font-semibold text-black ">Archivo Adjunto:</h3>
+                        <h3 class="text-xs font-semibold text-black ">Archivo adjunto:</h3>
                         {{-- Oculto visualmente, para accesibilidad --}}
                         <a href="{{ asset('storage/' . $boletin->archivo) }}" target="_blank"
-                            class="text-blue-600 hover:underline flex flex-col items-center
-                                    transform transition-transform duration-300 ease-in-out
-                                    hover:scale-105">
+                            class="flex flex-col items-center text-blue-600 transition-transform duration-300 ease-in-out transform hover:underline hover:scale-105">
                             <img src="{{ asset('images/PDF.svg') }}" alt="Icono PDF"
-                                class="w-14 h-14 mb-1 cursor-pointer">
+                                class="mb-1 cursor-pointer w-14 h-14">
                         </a>
                     </div>
                 </div>
             @else
                 {{-- Si no hay archivo, solo mostrar el contenido ocupando todo el ancho --}}
-                <div class="mt-4 p-3 bg-gray-50 rounded-md">
+                <div class="p-3 mt-4 rounded-md bg-gray-50">
                     <p class="text-gray-700 whitespace-pre-line">
                         {{ $boletin->contenido }}
                     </p>

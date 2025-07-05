@@ -1,7 +1,7 @@
 <div id="modal-validar-noticia-{{ $noticia->id_noticias }}" class="hidden">
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
         <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
-            <h3 class="mb-4 text-lg font-bold text-gray-800">Observaciones de la Validación</h3>
+            <h3 class="mb-4 text-lg font-bold text-gray-800">Observaciones de la validación</h3>
             <form action="{{ route('pendientes.noticias.validar', $noticia->id_noticias) }}" method="POST">
                 @csrf
                 <textarea name="observaciones" class="w-full p-2 border border-gray-300 rounded-md" rows="4" required></textarea>

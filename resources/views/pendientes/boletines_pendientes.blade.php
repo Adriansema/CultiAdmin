@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto py-6">
+    <div class="container py-6 mx-auto">
         <div class="inline-block px-8 py-10">
             <div class="flex items-center space-x-2">
                 <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-                <h1 class="text-3xl whitespace-nowrap font-bold">Gestión de Validaciones - Boletines</h1>
+                <h1 class="text-3xl font-bold whitespace-nowrap">Gestión de balidaciones - Boletines</h1>
             </div>
             {{-- {!! Breadcrumbs::render('pendientes.boletines') !!} --}} {{-- Ajusta el breadcrumb si es necesario --}}
         </div>
@@ -27,9 +27,9 @@
                             {{ __('Filtrar') }}
                         </span>
                         <img src="{{ asset('images/filtro.svg') }}"
-                            class="w-4 h-3 relative inset-0 block group-hover:hidden" alt="Icono Nuevo Usuario">
+                            class="relative inset-0 block w-4 h-3 group-hover:hidden" alt="Icono Nuevo Usuario">
                         <img src="{{ asset('images/filtro-hover.svg') }}"
-                            class="w-4 h-3 relative inset-0 hidden group-hover:block" alt="Icono Nuevo Usuario">
+                            class="relative inset-0 hidden w-4 h-3 group-hover:block" alt="Icono Nuevo Usuario">
                     </x-responsive-nav-link>
 
                     <form method="GET" action="{{ route('pendientes.boletines.index') }}"> {{-- Asume una nueva ruta para boletines --}}
@@ -39,9 +39,9 @@
                                 {{ __('Exportar Csv') }}
                             </span>
                             <img src="{{ asset('images/export.svg') }}"
-                                class="w-5 h-4 relative inset-0 block group-hover:hidden" alt="Icono Exportar CSV">
+                                class="relative inset-0 block w-5 h-4 group-hover:hidden" alt="Icono Exportar CSV">
                             <img src="{{ asset('images/export-hover.svg') }}"
-                                class="w-5 h-4 relative inset-0 hidden group-hover:block" alt="Icono Exportar CSV">
+                                class="relative inset-0 hidden w-5 h-4 group-hover:block" alt="Icono Exportar CSV">
                         </x-responsive-nav-link>
                     </form>
                 </div>
