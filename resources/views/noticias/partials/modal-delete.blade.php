@@ -2,7 +2,7 @@
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
         <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
             <h3 class="mb-4 text-lg font-bold text-gray-800">
-                ¿Estás seguro de eliminar este noticia?
+                ¿Estás seguro de eliminar esta noticia?
             </h3>
             <p class="mb-4 text-gray-600">
                 Esta acción no se puede deshacer. El noticia será eliminado permanentemente

@@ -50,7 +50,7 @@ class UserService
 
                 $q->orWhereRaw($sqlNormalize('name') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
                   ->orWhereRaw($sqlNormalize('email') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                  ->orWhereRaw($sqlNormalize('apellido') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+                  ->orWhereRaw($sqlNormalize('lastname') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
                 
                 try {
                     $date = Carbon::parse($searchQuery);
