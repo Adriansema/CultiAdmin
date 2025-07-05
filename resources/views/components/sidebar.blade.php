@@ -142,7 +142,7 @@
                 ? '{{ request()->routeIs('centroAyuda.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'
                 : '{{ request()->routeIs('centroAyuda.index') ? 'bg-white' : '' }} flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                 <div class="flex items-center w-full transition-all duration-300 ease-in-out">
-                    <img src="{{ asset(request()->routeIs('centroAyuda.index') ? 'images/pregColor.svg' : 'images/preg.svg') }}"
+                    <img src="{{ asset(request()->routeIs('centroAyuda.index') ? 'images/pregColors.svg' : 'images/preg.svg') }}"
                         class="w-4 h-4" alt="Centro de Ayuda">
                     <span x-show="sidebarOpen" x-transition
                         class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('centroAyuda.index') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
