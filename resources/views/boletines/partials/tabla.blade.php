@@ -16,7 +16,7 @@
                 @include('boletines.partials.boletin_row', ['boletin' => $boletin])
             @empty
                 <tr id="no-boletines-row">
-                    <td colspan="9" class="px-4 py-4 text-sm text-center text-gray-500 whitespace-nowrap"> {{-- Ajustado colspan a 7 --}}
+                    <td colspan="9" class="px-4 py-4 text-sm text-center text-gray-500 whitespace-nowrap"> 
                         No hay boletines para mostrar.
                     </td>
                 </tr>

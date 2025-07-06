@@ -44,13 +44,15 @@ class NoticiaController extends Controller
         // 1. Validar los datos del formulario.
         $request->validate([
             'tipo' => 'required|string|max:255',
-            'titulo' => 'nullable|string|max:255',
-            'clase' => 'nullable|string|max:255',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validación para imagen
-            'informacion' => 'nullable|string',
+            'titulo' => 'required|string|max:255',
+            'clase' => 'required|string|max:255',
+            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validación para imagen
+            'informacion' => 'required|string',
             'numero_pagina' => 'required|integer',
-            'autor' => 'nullable|string|max:255',
+            'autor' => 'required|string|max:255',
         ]);
+
+        $messages = [];
 
         try {
             // 2. Lógica para guardar la imagen (si se ha subido).
@@ -129,12 +131,12 @@ class NoticiaController extends Controller
             // Valida los datos de la solicitud
             $request->validate([
                 'tipo' => 'required|string|max:255',
-                'titulo' => 'nullable|string|max:255',
-                'clase' => 'nullable|string|max:255',
-                'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'informacion' => 'nullable|string',
+                'titulo' => 'required|string|max:255',
+                'clase' => 'required|string|max:255',
+                'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'informacion' => 'required|string',
                 'numero_pagina' => 'required|integer',
-                'autor' => 'nullable|string|max:255',
+                'autor' => 'required|string|max:255',
             ]);
 
             // 1. Lógica para actualizar la imagen.

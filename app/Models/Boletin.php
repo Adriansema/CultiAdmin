@@ -19,8 +19,8 @@ class Boletin extends Model
         'nombre',
         'descripcion',
         'archivo',
-        'validado_por_user_id', // <-- Nueva columna
-        'rechazado_por_user_id', // <-- Nueva columna
+        'validado_por_user_id',
+        'rechazado_por_user_id',
         'observaciones',
         'precio_mas_alto',
         'lugar_precio_mas_alto',
@@ -28,6 +28,7 @@ class Boletin extends Model
         'lugar_precio_mas_bajo',
     ];
 
+    // Relaciones
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -42,5 +43,33 @@ class Boletin extends Model
     {
         return $this->belongsTo(User::class, 'rechazado_por_user_id');
     }
-}
 
+    // Accessors para el formato de precios
+    /**
+     * Obtiene el precio_mas_alto formateado como moneda ($X.XXX,XX).
+     *
+     * @return string
+     */
+    public function getPrecioMasAltoFormattedAttribute(): string
+    {
+        if (is_null($this->precio_mas_alto)) {
+            return 'N/A'; // O un valor predeterminado si no hay precio
+        }
+        // Formato para español de Colombia: 2 decimales, coma para decimales, punto para miles
+        return '$' . number_format($this->precio_mas_alto, 2, ',', '.');
+    }
+
+    /**
+     * Obtiene el precio_mas_bajo formateado como moneda ($X.XXX,XX).
+     *
+     * @return string
+     */
+    public function getPrecioMasBajoFormattedAttribute(): string
+    {
+        if (is_null($this->precio_mas_bajo)) {
+            return 'N/A'; // O un valor predeterminado si no hay precio
+        }
+        // Formato para español de Colombia: 2 decimales, coma para decimales, punto para miles
+        return '$' . number_format($this->precio_mas_bajo, 2, ',', '.');
+    }
+}

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use App\Mail\UserCreatedNotification;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Response;
@@ -76,9 +77,9 @@ class UsuarioController extends Controller
             'name'          => 'required|string|max:255',
             'lastname'      => 'required|string|max:255',
             'email'         => 'required|email|unique:users,email',
-            'phone'      => 'required|string|max:20',
-            'type_document' => 'required|string|max:10',
-            'document'      => 'required|string|max:20|unique:users,document',
+            'phone'         => 'required|string|digits:10', // Corregido para validar exactamente 10 dígitos
+            'type_document' => ['required', 'string', Rule::in(['CC', 'TI', 'CE', 'PPT', 'PEP'])], // Regla más segura
+            'document'      => 'required|string|max:10|unique:users,document',
             'roles'         => 'required|array', // Rol es obligatorio para la creación
             'roles.*'       => 'string|exists:roles,name',
             'permissions'   => 'nullable|array',
@@ -87,13 +88,38 @@ class UsuarioController extends Controller
             'password_confirmation' => 'required|string|min:8',
         ];
 
+        // --- LÓGICA DINÁMICA PARA EL DOCUMENTO ---
+
+        // 1. Define las reglas base para el documento
+        $documentValidation = ['required', 'string', 'unique:users,document'];
+
+        // 2. Añade la regla de longitud correcta según el tipo
+        switch ($request->input('type_document')) {
+            case 'PPT':
+                $documentValidation[] = 'digits:7';
+                break;
+            case 'PEP':
+                $documentValidation[] = 'digits:15';
+                break;
+            case 'CC':
+                $documentValidation[] = 'digits_between:8,10';
+                break;
+            case 'TI':
+            case 'CE':
+                $documentValidation[] = 'digits:10';
+                break;
+        }
+
+        // 3. Añade la regla construida dinámicamente al array principal
+        $rules['document'] = $documentValidation;
+
         $messages = [
             'name.required'             => 'El nombre es obligatorio.',
             'lastname.required'         => 'El lastname es obligatorio.',
             'email.required'            => 'El correo es obligatorio.',
             'email.email'               => 'El correo debe ser una dirección de email válida.',
             'email.unique'              => 'Este correo ya está registrado.',
-            'phone.required'         => 'El teléfono es obligatorio.',
+            'phone.required'            => 'El teléfono es obligatorio.',
             'type_document.required'    => 'El tipo de documento es obligatorio.',
             'document.required'         => 'El número de documento es obligatorio.',
             'document.unique'           => 'Este número de documento ya está registrado.',
@@ -474,7 +500,7 @@ class UsuarioController extends Controller
         return Response::stream($callback, 200, $headers);
     }
 
-   /**
+    /**
      * Importa usuarios desde datos JSON pre-parseados del CSV.
      * Requiere el permiso 'importar usuarios csv'.
      *
@@ -511,12 +537,12 @@ class UsuarioController extends Controller
                 // Definir las reglas de validación para cada usuario
                 $rules = [
                     'name'          => 'required|string|max:255',
-                    'lastname'      => 'nullable|string|max:255', 
+                    'lastname'      => 'nullable|string|max:255',
                     'email'         => 'required|string|email|max:255|unique:users,email',
-                    'phone'         => 'nullable|string|max:20', 
+                    'phone'         => 'nullable|string|max:20',
                     'type_document' => 'required|string|max:10',
                     'document'      => 'required|string|max:50|unique:users,document',
-                    'role'          => 'required|string|exists:roles,name', 
+                    'role'          => 'required|string|exists:roles,name',
                 ];
 
                 // Crear un validador manual para cada fila de usuario
@@ -550,24 +576,24 @@ class UsuarioController extends Controller
                 $phone          = isset($userData['phone']) ? trim($userData['phone']) : null;
                 $typeDocument   = trim($userData['type_document']);
                 $document       = trim($userData['document']);
-                $rolName        = trim($userData['role']); 
+                $rolName        = trim($userData['role']);
 
                 try {
-                    $initialPassword = $document; 
+                    $initialPassword = $document;
                     $hashedPassword = Hash::make($initialPassword);
 
                     $usuario = User::create([
                         'name'          => $name,
-                        'lastname'      => $lastname, 
+                        'lastname'      => $lastname,
                         'email'         => $email,
-                        'phone'         => $phone,    
+                        'phone'         => $phone,
                         'type_document' => $typeDocument,
                         'document'      => $document,
                         'password'      => $hashedPassword,
-                        'email_verified_at' => null, 
+                        'email_verified_at' => null,
                     ]);
 
-                    $usuario->syncRoles([$rolName]); 
+                    $usuario->syncRoles([$rolName]);
 
                     Log::info('Usuario importado y creado exitosamente.', [
                         'user_id'       => $usuario->id,
@@ -595,7 +621,7 @@ class UsuarioController extends Controller
                     Log::error('Error interno al crear o procesar usuario desde CSV.', [
                         'error'     => $e->getMessage(),
                         'user_data' => $userData,
-                        'trace'     => $e->getTraceAsString(), 
+                        'trace'     => $e->getTraceAsString(),
                         'imported_by' => Auth::id() ?? 'System',
                     ]);
                 }
@@ -620,7 +646,6 @@ class UsuarioController extends Controller
                     'imported_count' => $importedCount
                 ], 200);
             }
-            
         } catch (\Exception $e) {
             Log::error('Error fatal al procesar la solicitud de importación CSV.', [
                 'error' => $e->getMessage(),
@@ -699,7 +724,6 @@ class UsuarioController extends Controller
                 // Si no hay duplicados, devolver un 200 OK
                 return response()->json(['message' => 'No se encontraron duplicados.'], 200);
             }
-
         } catch (\Exception $e) {
             Log::error('Error fatal al procesar la solicitud de verificación de duplicados CSV.', [
                 'error' => $e->getMessage(),

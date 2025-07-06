@@ -57,10 +57,9 @@
             @endif
 
             {{-- Sección de Video del Producto (para Café o Mora) --}}
-            @if (($producto->tipo === 'café' || $producto->tipo === 'mora') && $producto->RutaVideo)
-                <h2 class="text-2xl font-bold text-gray-800 mt-6 mb-4 pb-2 border-b border-gray-200">Video del Producto
-                    General</h2>
-                @include('productos.partials.video_player', ['videoUrl' => $producto->RutaVideo])
+            @if (($producto->tipo === 'café' || $producto->tipo === 'mora') && $producto->rutavideo)
+                <h2 class="text-2xl font-bold text-gray-800 mt-6 mb-4 pb-2 border-b border-gray-200">Video del Producto General</h2>
+                @include('productos.partials.video_player', ['videoUrl' => $producto->rutavideo])
             @endif
 
             {{-- Sección de Detalles Específicos (Café, Mora o Videos) --}}
@@ -107,8 +106,7 @@
                 </div>
                 {{-- Video player para el producto de tipo 'videos' --}}
                 @if ($producto->videos->rutaVideo)
-                    <h3 class="text-xl font-semibold text-gray-800 mt-4 mb-3 pb-2 border-b border-gray-200">Video Específico
-                    </h3>
+                    <h3 class="text-xl font-semibold text-gray-800 mt-4 mb-3 pb-2 border-b border-gray-200">Video Específico</h3>
                     @include('productos.partials.video_player', [
                         'videoUrl' => $producto->videos->rutaVideo,
                     ])

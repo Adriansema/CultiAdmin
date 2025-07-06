@@ -59,7 +59,7 @@
 }
 
 [x-cloak] {
-    display: none !important;
+  display: none !important;
 }
 
 
@@ -451,4 +451,69 @@ html {
 
 body.modal-open {
   overflow: hidden;
+}
+
+/* Clase para la celda de Acciones (la que más lo necesita por los botones variables) */
+.boletin-acciones-cell {
+  min-width: 380px;
+  /* **AJUSTA ESTE VALOR** según tus pruebas en el navegador. */
+  /* Debe ser lo suficientemente ancho para contener todos los 5 botones + espacios */
+  /* sin que se descuadren, incluso en pantallas más pequeñas si flex-col no está activo. */
+  justify-content: flex-start;
+  /* Alinea los elementos (botones) al inicio del contenedor flex */
+  align-items: flex-start;
+  /* Alinea los elementos al inicio del eje transversal (arriba en flex-col, izquierda en flex-row) */
+}
+
+/* Media query para pantallas medianas (md) y más grandes */
+@media (min-width: 768px) {
+
+  /* Corresponde al breakpoint 'md' de Tailwind CSS */
+  .boletin-acciones-cell {
+    min-width: 380px;
+    /* Mantén el mismo valor o ajústalo si notas diferencias */
+    /* para la disposición horizontal de los botones. */
+  }
+}
+
+
+/* Estilos opcionales para otras celdas si necesitas un control de ancho específico
+   o estilos adicionales que no sean cubiertos por las clases de Tailwind ya existentes. */
+
+.boletin-nombre-cell {
+  min-width: 150px;
+  /* Ejemplo: Si quieres asegurar un ancho mínimo para el nombre */
+  max-width: 200px;
+  /* Si quieres un máximo que no esté cubierto por Tailwind's max-w-xs, etc. */
+}
+
+.boletin-descripcion-cell {
+  min-width: 200px;
+  /* Ejemplo */
+  max-width: 300px;
+  /* Ejemplo */
+}
+
+.boletin-fecha-cell {
+  min-width: 180px;
+  text-align: center;
+}
+
+.boletin-precio-alto-cell{
+  min-width: 120px;
+  /* Ejemplo: Para asegurar espacio para los precios */
+  text-align: left;
+  /* Común para números, si no lo hace Tailwind ya */
+}
+
+.boletin-precio-bajo-cell {
+  min-width: 120px;
+  /* Ejemplo: Para asegurar espacio para los precios */
+  text-align: left;
+  /* Común para números, si no lo hace Tailwind ya */
+}
+
+.boletin-estado-cell {
+  min-width: 100px;
+  text-align: center;
 }

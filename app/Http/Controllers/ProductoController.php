@@ -49,24 +49,26 @@ class ProductoController extends Controller
         // 1. Definir las reglas de validación base para el producto.
         $rules = [
             'tipo' => 'required|string|in:café,mora,videos', // El tipo principal de producto
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validación para la imagen
-            'observaciones' => 'nullable|string', // Campo opcional de observaciones
         ];
 
         // 2. Añadir reglas de validación condicionalmente según el tipo de producto.
         $tipoProductoPrincipal = $request->input('tipo');
 
         if ($tipoProductoPrincipal === 'café') {
+            $rules['imagen'] = 'required|image|mimes:jpeg,png,jpg|max:2048';
+            $rules['observaciones'] = 'required|string'; // Asumo que es requerido para café
             $rules['cafe_data.numero_pagina'] = 'required|integer';
-            $rules['cafe_data.clase'] = 'nullable|string|max:100';
+            $rules['cafe_data.clase'] = 'required|string|max:100';
             $rules['cafe_data.informacion'] = 'required|string';
-            $rules['rutavideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es café
+            $rules['rutavideo'] = 'required|url|max:255'; // Se aplica solo si el tipo es café
 
         } elseif ($tipoProductoPrincipal === 'mora') {
+            $rules['imagen'] = 'required|image|mimes:jpeg,png,jpg|max:2048';
+            $rules['observaciones'] = 'required|string'; // Asumo que es requerido para mora
             $rules['mora_data.numero_pagina'] = 'required|integer';
-            $rules['mora_data.clase'] = 'nullable|string|max:100';
+            $rules['mora_data.clase'] = 'required|string|max:100';
             $rules['mora_data.informacion'] = 'required|string';
-            $rules['rutavideo'] = 'nullable|url|max:255'; // Se aplica solo si el tipo es mora
+            $rules['rutavideo'] = 'required|url|max:255'; // Se aplica solo si el tipo es mora
 
         } elseif ($tipoProductoPrincipal === 'videos') {
             $rules['videos_data.tipo'] = 'required|string|in:primarios,secundarios,categorias';
@@ -75,10 +77,12 @@ class ProductoController extends Controller
             if ($subtipoSeleccionado) {
                 $rules["videos_data.{$subtipoSeleccionado}.autor"] = 'required|string|max:255';
                 $rules["videos_data.{$subtipoSeleccionado}.titulo"] = 'required|string|max:255';
-                $rules["videos_data.{$subtipoSeleccionado}.descripcion"] = 'nullable|string';
+                $rules["videos_data.{$subtipoSeleccionado}.descripcion"] = 'required|string';
                 $rules["videos_data.{$subtipoSeleccionado}.rutaVideo"] = 'required|url|max:255';
             }
         }
+
+        $messages = [];
 
         // 3. Aplicar las reglas de validación.
         $request->validate($rules);

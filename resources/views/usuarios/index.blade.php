@@ -26,15 +26,25 @@
                 <div class="flex items-center justify-end py-6 space-x-2 flex-wrap ml-auto"> {{-- Añadido ml-auto y flex-wrap --}}
                     {{-- SELECT para filtrar por ESTADO --}}
                     <select id="filtrarEstado" name="estado"
-                        class="inline-flex group items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] rounded-full w-auto text-md font-medium text-black mr-2 mb-2 md:mb-0">
+                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all 
+                        duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] 
+                        hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium
+                        text-black form-control  hover:border-[var(--color-hover)]
+                  focus:border-[var(--color-hover)] focus:outline-none focus:ring-0 pr-8">
                         <option value="">{{ __('Todos los estados') }}</option>
-                        <option value="activo" {{ request('estado') == 'activo' ? 'selected' : '' }}>{{ __('Activo') }}</option>
-                        <option value="inactivo" {{ request('estado') == 'inactivo' ? 'selected' : '' }}>{{ __('Inactivo') }}</option>
+                        <option value="activo" {{ request('estado') == 'activo' ? 'selected' : '' }}>{{ __('Activo') }}
+                        </option>
+                        <option value="inactivo" {{ request('estado') == 'inactivo' ? 'selected' : '' }}>{{ __('Inactivo') }}
+                        </option>
                     </select>
 
                     {{-- SELECT para filtrar por ROL --}}
                     <select id="filtrarRol" name="rol"
-                        class="inline-flex group items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] rounded-full w-auto text-md font-medium text-black mr-2 mb-2 md:mb-0">
+                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all 
+                        duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] 
+                        hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium
+                        text-black form-control  hover:border-[var(--color-hover)]
+                  focus:border-[var(--color-hover)] focus:outline-none focus:ring-0 pr-8">
                         <option value="">{{ __('Todos los roles') }}</option>
                         @foreach ($roles as $role)
                             <option value="{{ $role->name }}" {{ request('rol') == $role->name ? 'selected' : '' }}>

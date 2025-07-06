@@ -615,9 +615,52 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (!modalData.name) { modalData.errors.name = 'El nombre es obligatorio.'; hasError = true; }
             if (!modalData.lastname) { modalData.errors.lastname = 'El apellido es obligatorio.'; hasError = true; }
             if (!modalData.email || !/\S+@\S+\.\S+/.test(modalData.email)) { modalData.errors.email = 'El correo no es válido.'; hasError = true; }
-            if (!modalData.phone) { modalData.errors.phone = 'El teléfono es obligatorio.'; hasError = true; }
+
+            // --- VALIDACIÓN DE TELÉFONO ACTUALIZADA ---
+            if (!modalData.phone) {
+                modalData.errors.phone = 'El teléfono es obligatorio.';
+                hasError = true;
+            } else if (!/^\d{10}$/.test(modalData.phone)) { // Revisa si son exactamente 10 dígitos numéricos
+                modalData.errors.phone = `El teléfono debe tener 10 dígitos (actualmente tiene ${modalData.phone.length}).`;
+                hasError = true;
+            }
+
             if (!modalData.type_document) { modalData.errors.type_document = 'Debe seleccionar un tipo de documento.'; hasError = true; }
-            if (!modalData.document) { modalData.errors.document = 'El número de documento es obligatorio.'; hasError = true; }
+
+            // --- VALIDACIÓN DE DOCUMENTO ACTUALIZADA ---
+            if (!modalData.document) {
+                modalData.errors.document = 'El número de documento es obligatorio.'; // Corregido el typo
+                hasError = true;
+            } else {
+                // Revisa el tipo de documento para aplicar la regla de validación correcta
+                switch (modalData.type_document) {
+                    case 'PPT':
+                        if (!/^\d{7}$/.test(modalData.document)) {
+                            modalData.errors.document = `Para PPT, el documento debe tener 7 dígitos (actualmente tiene ${modalData.document.length}).`;
+                            hasError = true;
+                        }
+                        break;
+                    case 'PEP':
+                        if (!/^\d{15}$/.test(modalData.document)) {
+                            modalData.errors.document = `Para PEP, el documento debe tener 15 dígitos (actualmente tiene ${modalData.document.length}).`;
+                            hasError = true;
+                        }
+                        break;
+                    case 'CC':
+                        if (!/^\d{8,10}$/.test(modalData.document)) {
+                            modalData.errors.document = `Para CC, el documento debe tener entre 8 y 10 dígitos (actualmente tiene ${modalData.document.length}).`;
+                            hasError = true;
+                        }
+                        break;
+                    case 'TI':
+                    case 'CE':
+                        if (!/^\d{10}$/.test(modalData.document)) {
+                            modalData.errors.document = `Para ${modalData.type_document}, el documento debe tener 10 dígitos (actualmente tiene ${modalData.document.length}).`;
+                            hasError = true;
+                        }
+                        break;
+                }
+            }
 
             if (!hasError) {
                 modalData.currentStep = 2;

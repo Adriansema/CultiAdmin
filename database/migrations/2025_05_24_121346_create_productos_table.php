@@ -13,26 +13,20 @@ return new class extends Migration
     {
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')
-                  ->constrained() 
-                  ->onDelete('cascade'); // Si un usuario es eliminado, también se borran sus productos
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
-            $table->string('tipo', 255)->default(''); // Tipo (varchar(255), Por defecto '')
-            $table->string('imagen', 255)->nullable(); // Imagen (varchar(255), no nulo)
-            $table->string('rutavideo', 255)->nullable();
-            $table->text('observaciones')->nullable(); // Observaciones (text, puede ser nulo)
-            $table->string('estado', 255)->default('pendiente'); // Estado (varchar(255), Por defecto 'pendiente')
+            $table->string('tipo'); // Tipo de producto (café, mora, videos)
 
-            $table->foreignId('validado_por_user_id')
-                  ->nullable() // Puede ser nulo si aún no ha sido validado
-                  ->constrained('users') // Referencia a la tabla 'users'
-                  ->onDelete('set null'); 
+            // Campos que pueden estar vacíos
+            $table->string('imagen')->nullable();
+            $table->string('rutavideo')->nullable();
+            $table->text('observaciones')->nullable();
             
-            $table->foreignId('rechazado_por_user_id')
-                  ->nullable()
-                  ->constrained('users')
-                  ->onDelete('set null')
-                  ->after('validado_por_user_id'); 
+            $table->string('estado')->default('pendiente');
+
+            $table->foreignId('validado_por_user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('rechazado_por_user_id')->nullable()->constrained('users')->onDelete('set null');
+
             $table->timestamps();
         });
     }
@@ -45,3 +39,4 @@ return new class extends Migration
         Schema::dropIfExists('productos');
     }
 };
+

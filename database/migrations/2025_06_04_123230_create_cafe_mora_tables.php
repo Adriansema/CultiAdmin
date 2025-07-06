@@ -36,8 +36,8 @@ return new class extends Migration
             $table->increments('id_cafe');
             $table->foreignId('producto_id')->constrained('productos')->onDelete('cascade');
             $table->integer('numero_pagina'); // int4 y NOT NULL
-            $table->string('clase', 100)->nullable()->default(null);
-            $table->text('informacion')->nullable()->default(null);
+            $table->string('clase', 100);
+            $table->text('informacion');
             $table->timestamps();
         });
 
@@ -46,8 +46,8 @@ return new class extends Migration
             $table->increments('id_mora'); 
             $table->foreignId('producto_id')->constrained('productos')->onDelete('cascade');
             $table->integer('numero_pagina');
-            $table->string('clase', 100)->nullable()->default(null);
-            $table->text('informacion')->nullable()->default(null);
+            $table->string('clase', 100);
+            $table->text('informacion');
             $table->timestamps();
         });
 

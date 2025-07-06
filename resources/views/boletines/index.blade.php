@@ -9,7 +9,7 @@
                 <h1 class="text-3xl whitespace-nowrap font-bold">Boletines</h1>
             </div>
             <div class="py-2">
-            {!! Breadcrumbs::render('boletines.index') !!}
+                {!! Breadcrumbs::render('boletines.index') !!}
             </div>
         </div>
 
@@ -29,20 +29,35 @@
                 <div class="flex items-center justify-center sm:justify-end flex-nowrap gap-2 py-4 sm:py-0">
 
                     <select id="filtro-estado" name="estado"
-                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium text-black">
+                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all 
+                        duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] 
+                        hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium
+                        text-black pr-10 form-control  hover:border-[var(--color-hover)] w-full
+                  focus:border-[var(--color-hover)] focus:outline-none focus:ring-0">
                         <option value="">{{ __('Todos los estados') }}</option>
-                        <option value="aprobado" {{ request('estado') == 'aprobado' ? 'selected' : '' }}>{{ __('Aprobado') }}</option>
-                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>{{ __('Pendiente') }}</option>
-                        <option value="rechazado" {{ request('estado') == 'rechazado' ? 'selected' : '' }}>{{ __('Rechazado') }}</option>
+                        <option value="aprobado" {{ request('estado') == 'aprobado' ? 'selected' : '' }}>{{ __('Aprobado') }}
+                        </option>
+                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>{{ __('Pendiente') }}
+                        </option>
+                        <option value="rechazado" {{ request('estado') == 'rechazado' ? 'selected' : '' }}>{{ __('Rechazado') }}
+                        </option>
                     </select>
 
                     <select id="filtro-precio" name="precio"
-                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium text-black">
+                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all 
+                        duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] 
+                        hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium 
+                        text-black hover:border-[var(--color-hover)]
+                  focus:border-[var(--color-hover)] focus:outline-none focus:ring-0 pr-10">
                         <option value="">{{ __('Todos los precios') }}</option>
-                        <option value="precio_alto_desc" {{ request('precio') == 'precio_alto_desc' ? 'selected' : '' }}>{{ __('Precio Más Alto (Desc)') }}</option>
-                        <option value="precio_alto_asc" {{ request('precio') == 'precio_alto_asc' ? 'selected' : '' }}>{{ __('Precio Más Alto (Asc)') }}</option>
-                        <option value="precio_bajo_desc" {{ request('precio') == 'precio_bajo_desc' ? 'selected' : '' }}>{{ __('Precio Más Bajo (Desc)') }}</option>
-                        <option value="precio_bajo_asc" {{ request('precio') == 'precio_bajo_asc' ? 'selected' : '' }}>{{ __('Precio Más Bajo (Asc)') }}</option>
+                        <option value="precio_alto_desc" {{ request('precio') == 'precio_alto_desc' ? 'selected' : '' }}>
+                            {{ __('Precio Más Alto (Desc)') }}</option>
+                        <option value="precio_alto_asc" {{ request('precio') == 'precio_alto_asc' ? 'selected' : '' }}>
+                            {{ __('Precio Más Alto (Asc)') }}</option>
+                        <option value="precio_bajo_desc" {{ request('precio') == 'precio_bajo_desc' ? 'selected' : '' }}>
+                            {{ __('Precio Más Bajo (Desc)') }}</option>
+                        <option value="precio_bajo_asc" {{ request('precio') == 'precio_bajo_asc' ? 'selected' : '' }}>
+                            {{ __('Precio Más Bajo (Asc)') }}</option>
                     </select>
 
                     {{-- Botón Exportar Csv (dentro de un form) --}}
@@ -86,6 +101,8 @@
                 @include('boletines.partials.modal-views', ['boletin' => $boletin])
                 @include('boletines.partials.modal-edit', ['boletin' => $boletin])
                 @include('boletines.partials.modal-delete', ['boletin' => $boletin])
+                @include('pendientes.partials.modal-boletin-validar')
+                @include('pendientes.partials.modal-boletin-rechazar')
             @empty
                 {{-- Si no hay boletines, no se renderiza ningún modal --}}
             @endforelse

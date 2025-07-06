@@ -44,43 +44,44 @@
                             </span>
                         </td>
 
-                        <td class="px-4 py-2 space-x-2">
-                            @can('crear producto')
-                                <a href="{{ route('productos.show', $producto) }}"
-                                    class="px-3 py-2 text-sm text-center text-white bg-green-600 rounded-xl hover:bg-green-700">
-                                    Ver
-                                </a>
-                            @endcan
+                        <td class="px-4 py-2 ">
+                            <div class="flex items-center space-x-2">
+                                @can('crear producto')
+                                    <a href="{{ route('productos.show', $producto) }}"
+                                        class="px-3 py-2 text-sm text-center text-white bg-green-600 rounded-xl hover:bg-green-700">
+                                        Ver
+                                    </a>
+                                @endcan
 
-                            @can('editar producto')
-                                <a href="{{ route('productos.edit', $producto) }}"
-                                    class="px-3 py-2 text-sm text-center text-white bg-yellow-600 rounded-xl hover:bg-yellow-700">
-                                    Editar
-                                </a>
-                            @endcan
+                                @can('editar producto')
+                                    <a href="{{ route('productos.edit', $producto) }}"
+                                        class="px-3 py-2 text-sm text-center text-white bg-yellow-600 rounded-xl hover:bg-yellow-700">
+                                        Editar
+                                    </a>
+                                @endcan
 
-                            @can('eliminar producto')
-                                <button type="button" onclick="mostrarModal('producto', '{{ $producto->id }}')"
-                                    class=" px-3 py-2 text-sm text-center text-white bg-red-600 rounded-xl hover:bg-red-700">
-                                    Eliminar
-                                </button>
-                            @endcan
+                                @can('eliminar producto')
+                                    <button type="button" onclick="mostrarModal('producto', '{{ $producto->id }}')"
+                                        class=" px-3 py-2 text-sm text-center text-white bg-red-600 rounded-xl hover:bg-red-700">
+                                        Eliminar
+                                    </button>
+                                @endcan
 
-                            @can('validar producto')
-                                <button type="button" onclick="mostrarModal('validar-producto', '{{ $producto->id }}')"
-                                    class="px-3 py-2 text-sm text-center text-white bg-blue-600 rounded-xl hover:bg-blue-700">
-                                    Validar
-                                </button>
-                                @include('pendientes.partials.modal-producto-validar')
-                            @endcan
+                                @can('validar producto')
+                                    <button type="button" onclick="mostrarModal('validar-producto', '{{ $producto->id }}')"
+                                        class="px-3 py-2 text-sm text-center text-white bg-blue-600 rounded-xl hover:bg-blue-700">
+                                        Validar
+                                    </button>
+                                @endcan
 
-                            @can('validar producto')
-                                <button type="button" onclick="mostrarModal('rechazar-producto', '{{ $producto->id }}')"
-                                    class="px-3 py-2 text-sm text-center text-white bg-orange-600 rounded-xl hover:bg-orange-700">
-                                    Rechazar
-                                </button>
-                                @include('pendientes.partials.modal-producto-rechazar')
-                            @endcan
+                                @can('validar producto')
+                                    <button type="button"
+                                        onclick="mostrarModal('rechazar-producto', '{{ $producto->id }}')"
+                                        class="px-3 py-2 text-sm text-center text-white bg-orange-600 rounded-xl hover:bg-orange-700">
+                                        Rechazar
+                                    </button>
+                                @endcan
+                            </div>
                         </td>
                     </tr>
                 @empty

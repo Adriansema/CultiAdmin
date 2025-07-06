@@ -22,13 +22,20 @@
                 </form>
 
                 <div class="flex items-center justify-end py-4 space-x-2">
-                     {{-- SELECT para filtrar por ESTADO --}}
+                    {{-- SELECT para filtrar por ESTADO --}}
                     <select id="filtro-estado" name="estado"
-                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium text-black mr-2 mb-2 md:mb-0">
+                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all 
+                        duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] 
+                        hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium
+                        text-black pr-10 form-control  hover:border-[var(--color-hover)] w-full
+                  focus:border-[var(--color-hover)] focus:outline-none focus:ring-0">
                         <option value="">{{ __('Todos los estados') }}</option>
-                        <option value="aprobado" {{ request('estado') == 'aprobado' ? 'selected' : '' }}>{{ __('Aprobado') }}</option>
-                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>{{ __('Pendiente') }}</option>
-                        <option value="rechazado" {{ request('estado') == 'rechazado' ? 'selected' : '' }}>{{ __('Rechazado') }}</option>
+                        <option value="aprobado" {{ request('estado') == 'aprobado' ? 'selected' : '' }}>{{ __('Aprobado') }}
+                        </option>
+                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>{{ __('Pendiente') }}
+                        </option>
+                        <option value="rechazado" {{ request('estado') == 'rechazado' ? 'selected' : '' }}>{{ __('Rechazado') }}
+                        </option>
                     </select>
 
                     <form method="GET" action="{{ route('noticias.exportarCsv') }}">
@@ -57,11 +64,19 @@
             @if (session('error'))
                 <div class="p-4 mb-4 text-red-800 bg-red-100 rounded shadow">{{ session('error') }}</div>
             @endif
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show p-4 mb-4 text-green-800 bg-green-100 rounded shadow" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
 
             @include('noticias.partials.tabla')
 
             @forelse ($noticias as $noticia)
                 @include('noticias.partials.modal-delete', ['noticia' => $noticia])
+                @include('pendientes.partials.modal-noticia-rechazar')
+                @include('pendientes.partials.modal-noticia-validar')
             @empty
                 {{-- Si no hay noticias, no se renderiza ningún modal aquí --}}
             @endforelse

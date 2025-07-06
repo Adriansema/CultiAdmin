@@ -19,7 +19,7 @@ class Producto extends Model
         'rechazado_por_user_id',
         'observaciones',
         'imagen',
-        'RutaVideo',
+        'rutavideo',
     ];
 
     public function user()

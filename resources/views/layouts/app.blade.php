@@ -45,7 +45,7 @@
     @stack('modals')
     @yield('scripts')
     @livewireScripts
-    
+
     @include('partials.global-message-modal')
 
     {{-- Divs ocultos para pasar mensajes flash desde el servidor a JavaScript --}}
@@ -57,9 +57,8 @@
         <div id="flash-error-message-data" data-message="{{ session('error_message') }}" class="hidden"></div>
     @endif
 
-    <script src="{{ asset('js/ModalesGeneral.js') }}"></script>
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
-    <script src="{{ asset('js/boletin.js') }}"></script>
+    @stack('scripts')
 </body>
 
 </html>

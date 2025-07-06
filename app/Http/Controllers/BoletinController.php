@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View; // Para la función view()
 use Illuminate\Support\Facades\Response; // Para la función response()
@@ -31,9 +32,29 @@ class BoletinController extends Controller
 
     public function getFilteredBoletin(Request $request, BoletinService $boletinService)
     {
-        $boletines = $boletinService->obtenerBoletinFiltrados($request);
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $boletinesPaginados */ // <-- ¡Añade esta línea aquí!
+        $boletinesPaginados = $boletinService->obtenerBoletinFiltrados($request);
 
-        return response()->json($boletines);
+        // Mapea los boletines para añadir la información de permisos
+        $boletinesData = $boletinesPaginados->getCollection()->map(function ($boletin) {
+            // Agrega los accessors para los precios (ya definidos en el modelo)
+            $boletin->precio_mas_alto_formatted = $boletin->precio_mas_alto_formatted;
+            $boletin->precio_mas_bajo_formatted = $boletin->precio_mas_bajo_formatted;
+
+            // Añade booleanos para los permisos del usuario actual
+            // Asegúrate de que Auth::user() esté disponible
+            $boletin->can_crear = Auth::user() ? Auth::user()->can('crear boletin') : false;
+            $boletin->can_editar = Auth::user() ? Auth::user()->can('editar boletin') : false;
+            $boletin->can_eliminar = Auth::user() ? Auth::user()->can('eliminar boletin') : false;
+            $boletin->can_validar = Auth::user() ? Auth::user()->can('validar boletin') : false;
+
+            return $boletin;
+        });
+
+        // Vuelve a crear un paginator con la colección modificada
+        $boletinesPaginados->setCollection($boletinesData);
+
+        return response()->json($boletinesPaginados);
     }
 
     public function create()
@@ -337,18 +358,32 @@ class BoletinController extends Controller
     {
         $query = $request->input('q');
         $estado = $request->input('estado');
+        $precio = $request->input('precio'); // <-- NUEVO: Obtener el parámetro de filtro por precio
 
         $boletines = Boletin::with('user');
 
         if ($query) {
             $boletines->where(function ($q2) use ($query) {
-                $q2->whereRaw('LOWER(descripcion) LIKE ?', ['%' . strtolower($query) . '%'])
-                    ->orWhereRaw('LOWER(observaciones) LIKE ?', ['%' . strtolower($query) . '%']);
+                $q2->whereRaw('LOWER(nombre) LIKE ?', ['%' . strtolower($query) . '%']) // Añadir nombre a la búsqueda si lo quieres
+                    ->orWhereRaw('LOWER(descripcion) LIKE ?', ['%' . strtolower($query) . '%'])
+                    ->orWhereRaw('LOWER(observaciones) LIKE ?', ['%' . strtolower($query) . '%'])
+                    ->orWhereRaw('LOWER(lugar_precio_mas_alto) LIKE ?', ['%' . strtolower($query) . '%']) // Incluir lugares de precio en la búsqueda
+                    ->orWhereRaw('LOWER(lugar_precio_mas_bajo) LIKE ?', ['%' . strtolower($query) . '%']);
             });
         }
 
         if ($estado) {
             $boletines->where('estado', $estado);
+        }
+
+        // <-- NUEVO: Lógica para el filtro por precio
+        if ($precio) {
+            if ($precio === 'precio_alto_desc') {
+                $boletines->orderByDesc('precio_mas_alto');
+            } elseif ($precio === 'precio_bajo_asc') {
+                $boletines->orderBy('precio_mas_bajo');
+            }
+            // Puedes añadir más condiciones si tienes otros valores para 'precio'
         }
 
         $boletinesResultados = $boletines->get();
@@ -360,10 +395,26 @@ class BoletinController extends Controller
             'Content-Disposition' => "attachment; filename=\"$nombreArchivo\"",
         ];
 
-        $columnas = ['ID', 'Usuario', 'Estado', 'Nombre', 'Descripción', 'Observaciones', 'Archivo', 'Creado'];
+        // <-- MODIFICADO: Añadir nuevas columnas
+        $columnas = [
+            'ID',
+            'Usuario',
+            'Estado',
+            'Nombre',
+            'Descripción',
+            'Observaciones',
+            'Archivo',
+            'Precio Más Alto',
+            'Lugar Precio Más Alto',
+            'Precio Más Bajo',
+            'Lugar Precio Más Bajo',
+            'Creado'
+        ];
 
         $callback = function () use ($boletinesResultados, $columnas) {
             $file = fopen('php://output', 'w');
+            // Añadir la marca BOM para asegurar que UTF-8 se muestre correctamente en Excel
+            fputs($file, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
             fputcsv($file, $columnas);
 
             foreach ($boletinesResultados as $boletin) {
@@ -375,6 +426,10 @@ class BoletinController extends Controller
                     $boletin->descripcion,
                     $boletin->observaciones,
                     $boletin->archivo,
+                    $boletin->precio_mas_alto_formatted,
+                    $boletin->lugar_precio_mas_alto,
+                    $boletin->precio_mas_bajo_formatted,
+                    $boletin->lugar_precio_mas_bajo,
                     $boletin->created_at->format('Y-m-d H:i:s'),
                 ]);
             }

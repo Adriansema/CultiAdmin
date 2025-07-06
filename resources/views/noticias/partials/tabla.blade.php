@@ -55,7 +55,7 @@
                                 {{ ucfirst($noticia->estado) }}
                             </span>
                         </td>
-                        <td class="px-4 py-2 text-sm">
+                        <td class="px-4 py-2">
                             <div class="flex items-center space-x-2">
                                 @can('crear noticia')
                                     <a href="{{ route('noticias.show', $noticia->id_noticias) }}"
@@ -84,7 +84,6 @@
                                         class="px-3 py-2 text-sm text-center text-white bg-blue-600 rounded-xl hover:bg-blue-700">
                                         Validar
                                     </button>
-                                    @include('pendientes.partials.modal-noticia-validar')
                                 @endcan
 
                                 @can('validar noticia')
@@ -93,7 +92,6 @@
                                         class="px-3 py-2 text-sm text-center text-white bg-orange-600 rounded-xl hover:bg-orange-700">
                                         Rechazar
                                     </button>
-                                    @include('pendientes.partials.modal-noticia-rechazar')
                                 @endcan
                             </div>
                         </td>

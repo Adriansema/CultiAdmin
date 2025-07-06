@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('producto_id')->constrained('productos')->onDelete('cascade');
             $table->string('autor');
             $table->string('titulo');
-            $table->text('descripcion')->nullable();
+            $table->text('descripcion');
             $table->string('rutaVideo'); 
             $table->string('tipo'); 
             $table->timestamps();

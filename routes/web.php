@@ -16,6 +16,7 @@ use App\Http\Controllers\PendienteBolController;
 use App\Http\Controllers\PendienteProController;
 use App\Http\Controllers\PendienteNotiController;
 use App\Http\Controllers\AccesibilidadController;
+use App\Http\Middleware\PreventBackHistory;
 use App\Http\Controllers\Auth\NewPasswordController;       // Para establecer la nueva contraseña
 use App\Http\Controllers\Auth\PasswordResetLinkController; // Para la solicitud de restablecimiento
 
@@ -30,9 +31,6 @@ Route::prefix('pqrs')->name('pqrs.')->group(function () {
      Route::post('/store', [PqrsController::class, 'store'])->name('store');
 });
 
-// Ruta para generar masivos usuarios
-Route::get('/exportar-csv', [ExportarCsvController::class, 'generarCsv']);
-
 // Ruta para verificar si el correo existe 
 Route::post('/check-email', [UsuarioController::class, 'checkEmailExists'])->name('check-email');
 
@@ -46,20 +44,6 @@ Route::get('/resend-activation', [UsuarioController::class, 'showResendActivatio
 // Procesa la solicitud de reenvío del email de activación
 Route::post('/resend-activation', [UsuarioController::class, 'resendActivationEmail'])->name('resend.activation.email');
 
-// Rutas de Centro de Ayuda
-Route::prefix('centro-ayuda')->name('centroAyuda.')->group(function () {
-     Route::get('/', [CentroAyudaController::class, 'index'])->name('index');
-     Route::get('/search-faq', [CentroAyudaController::class, 'searchFaq'])->name('search.faq');
-     Route::get('/contacto', [CentroAyudaController::class, 'showContactForm'])->name('contactForm');
-     Route::post('/contact-submit', [CentroAyudaController::class, 'submitContact'])->name('contact.submit');
-});
-
-// Ruta de Accesibilidad
-Route::get('/accesibilidad', [AccesibilidadController::class, 'index'])->name('accesibilidad.index');
-
-// Ruta de Estadística publica
-Route::get('/public-statistics', [StatisticController::class, 'index'])->name('statistics.index.public');
-
 // ------------------------------------------------------------------------------------
 // Grupo de rutas que requieren AUTENTICACIÓN y verificación de correo electrónico
 // ------------------------------------------------------------------------------------
@@ -67,10 +51,29 @@ Route::middleware([
      'auth:sanctum',
      config('jetstream.auth_session'),
      'verified',
-     CheckUserEstado::class // Verifica el estado activo/inactivo del usuario
+     CheckUserEstado::class, // Verifica el estado activo/inactivo del usuario
+     PreventBackHistory::class // 
 ])->group(function () {
 
      Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+     // Ruta para generar masivos usuarios
+     Route::get('/exportar-csv', [ExportarCsvController::class, 'generarCsv']);
+
+     // Rutas de Centro de Ayuda
+     Route::prefix('centro-ayuda')->name('centroAyuda.')->group(function () {
+          Route::get('/', [CentroAyudaController::class, 'index'])->name('index');
+          Route::get('/search-faq', [CentroAyudaController::class, 'searchFaq'])->name('search.faq');
+          Route::get('/contacto', [CentroAyudaController::class, 'showContactForm'])->name('contactForm');
+          Route::post('/contact-submit', [CentroAyudaController::class, 'submitContact'])->name('contact.submit');
+     });
+
+     // Ruta de Accesibilidad
+     Route::get('/accesibilidad', [AccesibilidadController::class, 'index'])->name('accesibilidad.index');
+
+     // Ruta de Estadística publica
+     Route::get('/public-statistics', [StatisticController::class, 'index'])->name('statistics.index.public');
+
 
      // --- Módulo de PRODUCTOS ---
      Route::prefix('producto')->name('productos.')->group(function () {
@@ -88,11 +91,14 @@ Route::middleware([
      // --- Módulo de BOLETINES ---
 
      Route::prefix('boletines')->name('boletines.')->group(function () {
+
+          // Ruta general al final
+          Route::get('/', [BoletinController::class, 'index'])->name('index')->middleware('can:crear boletin');
           // Rutas más específicas primero
           Route::get('/filtrados', [BoletinController::class, 'getFilteredBoletin'])->name('filtrados');
           Route::get('/create', [BoletinController::class, 'create'])->name('create');
           Route::post('/', [BoletinController::class, 'store'])->name('store');
-          Route::get('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf');
+          /* Route::get('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf'); */
           Route::get('/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('exportarCSV');
 
           // Rutas con parámetros de modelo (asegúrate de que {boletin} se resuelva a un modelo Boletin)
@@ -104,9 +110,6 @@ Route::middleware([
           Route::put('/{boletin}', [BoletinController::class, 'update'])->name('update')->middleware('can:editar boletin');
           Route::delete('/{boletin}', [BoletinController::class, 'destroy'])->name('destroy')->middleware('can:eliminar boletin');
           Route::get('/{boletin}', [BoletinController::class, 'show'])->name('show'); // Esta es para el fetch del modal "Ver"
-
-          // Ruta general al final
-          Route::get('/', [BoletinController::class, 'index'])->name('index')->middleware('can:crear boletin');
      });
 
      // --- Módulo de PENDIENTES ( PRODUCTOS Y BOLETINES y NOTICIAS ) ---

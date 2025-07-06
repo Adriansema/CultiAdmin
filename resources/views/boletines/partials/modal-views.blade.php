@@ -98,8 +98,8 @@
                     <div>
                         <p class="text-gray-700">
                             <strong>Precio Más Alto:</strong>
-                            @if ($boletin->precio_mas_alto)
-                                <span class="text-green-600">${{ number_format($boletin->precio_mas_alto, 2) }}</span>
+                            @if ($boletin->precio_mas_alto_formatted) {{-- Usar la propiedad formateada --}}
+                                <span class="text-green-600">{{ $boletin->precio_mas_alto_formatted }}</span>
                                 @if ($boletin->lugar_precio_mas_alto)
                                     <span class="text-gray-600">({{ $boletin->lugar_precio_mas_alto }})</span>
                                 @endif
@@ -112,8 +112,8 @@
                     <div>
                         <p class="text-gray-700">
                             <strong>Precio Más Bajo:</strong>
-                            @if ($boletin->precio_mas_bajo)
-                                <span class="text-red-600">${{ number_format($boletin->precio_mas_bajo, 2) }}</span>
+                            @if ($boletin->precio_mas_bajo_formatted) {{-- Usar la propiedad formateada --}}
+                                <span class="text-red-600">{{ $boletin->precio_mas_bajo_formatted }}</span>
                                 @if ($boletin->lugar_precio_mas_bajo)
                                     <span class="text-gray-600">({{ $boletin->lugar_precio_mas_bajo }})</span>
                                 @endif
