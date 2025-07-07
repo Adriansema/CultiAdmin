@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Database\QueryException; 
+use Illuminate\Database\QueryException;
 use App\Mail\NuevaRevisionPendienteMail;
 
 class ProductoController extends Controller
@@ -81,10 +81,53 @@ class ProductoController extends Controller
             }
         }
 
-        $messages = [];
+        $messages = [
+            // Mensajes para 'café'
+            'imagen.required' => 'La imagen es obligatoria.',
+            'imagen.image' => 'El archivo debe ser una imagen.',
+            'imagen.mimes' => 'La imagen debe ser de tipo JPEG, PNG o JPG.',
+            'imagen.max' => 'La imagen no debe exceder los 2MB.',
+            'cafe_data.numero_pagina.required' => 'El número de página es obligatorio.',
+            'cafe_data.numero_pagina.integer' => 'El número de página debe ser un número entero.',
+            'cafe_data.clase.required' => 'La clase es obligatoria.',
+            'cafe_data.clase.string' => 'La clase debe ser texto.',
+            'cafe_data.clase.max' => 'La clase no debe exceder los 100 caracteres.',
+            'cafe_data.informacion.required' => 'La información es obligatoria.',
+            'cafe_data.informacion.string' => 'La información debe ser texto.',
+            'rutavideo.required' => 'La URL del video es obligatoria.',
+            'rutavideo.url' => 'La URL del video debe ser una URL válida.',
+            'rutavideo.max' => 'La URL del video no debe exceder los 255 caracteres.',
+
+            // Mensajes para 'mora'
+            'mora_data.numero_pagina.required' => 'El número de página es obligatorio.',
+            'mora_data.numero_pagina.integer' => 'El número de página debe ser un número entero.',
+            'mora_data.clase.required' => 'La clase es obligatoria.',
+            'mora_data.clase.string' => 'La clase debe ser texto.',
+            'mora_data.clase.max' => 'La clase no debe exceder los 100 caracteres.',
+            'mora_data.informacion.required' => 'La información es obligatoria.',
+            'mora_data.informacion.string' => 'La información debe ser texto.',
+
+            // Mensajes para 'videos'
+            'videos_data.tipo.required' => 'El tipo de video (primarios, secundarios o categorías) es obligatorio.',
+            'videos_data.tipo.string' => 'El tipo de video debe ser texto.',
+            'videos_data.tipo.in' => 'El tipo de video seleccionado no es válido. Debe ser "primarios", "secundarios" o "categorias".',
+
+            // Mensajes dinámicos para 'videos' según el subtipo seleccionado
+            'videos_data.*.autor.required' => 'El autor es obligatorio.',
+            'videos_data.*.autor.string' => 'El autor debe ser texto.',
+            'videos_data.*.autor.max' => 'El autor no debe exceder los 255 caracteres.',
+            'videos_data.*.titulo.required' => 'El título es obligatorio.',
+            'videos_data.*.titulo.string' => 'El título debe ser texto.',
+            'videos_data.*.titulo.max' => 'El título no debe exceder los 255 caracteres.',
+            'videos_data.*.descripcion.required' => 'La descripción es obligatoria.',
+            'videos_data.*.descripcion.string' => 'La descripción debe ser texto.',
+            'videos_data.*.rutaVideo.required' => 'La URL del video es obligatoria.',
+            'videos_data.*.rutaVideo.url' => 'La URL del video debe ser una URL válida.',
+            'videos_data.*.rutaVideo.max' => 'La URL del video no debe exceder los 255 caracteres.',
+        ];
 
         // 3. Aplicar las reglas de validación.
-        $request->validate($rules);
+        $request->validate($rules, $messages);
 
         // Inicializar variables para posible limpieza en caso de error
         $imagen = null;
@@ -152,7 +195,6 @@ class ProductoController extends Controller
 
             // 8. Redirigir con un mensaje de éxito.
             return redirect()->route('productos.index')->with('success_message', 'Información guardada con éxito y enviada a revisión.');
-
         } catch (QueryException $e) {
             // Captura errores específicos de la base de datos
             Log::error('Error de base de datos al crear producto: ' . $e->getMessage());
@@ -223,13 +265,11 @@ class ProductoController extends Controller
                 $rules['cafe_data.clase'] = 'nullable|string|max:100';
                 $rules['cafe_data.informacion'] = 'required|string';
                 $rules['rutavideo'] = 'nullable|url|max:255';
-
             } elseif ($requestType === 'mora') {
                 $rules['mora_data.numero_pagina'] = 'required|integer';
                 $rules['mora_data.clase'] = 'nullable|string|max:100';
                 $rules['mora_data.informacion'] = 'required|string';
                 $rules['rutavideo'] = 'nullable|url|max:255';
-
             } elseif ($requestType === 'videos') {
                 $rules['videos_data.tipo'] = 'required|string|in:primarios,secundarios,categorias';
                 $subtipoSeleccionado = $request->input('videos_data.tipo');
@@ -301,7 +341,6 @@ class ProductoController extends Controller
                 $cafe->clase = $cafeData['clase'] ?? null;
                 $cafe->informacion = $cafeData['informacion'];
                 $cafe->save();
-
             } elseif ($requestType === 'mora') {
                 $mora = Mora::firstOrNew(['producto_id' => $producto->id]);
                 $moraData = $request->input('mora_data', []);
@@ -309,7 +348,6 @@ class ProductoController extends Controller
                 $mora->clase = $moraData['clase'] ?? null;
                 $mora->informacion = $moraData['informacion'];
                 $mora->save();
-
             } elseif ($requestType === 'videos') {
                 $video = Video::firstOrNew(['producto_id' => $producto->id]);
                 $subtipoSeleccionado = $request->input('videos_data.tipo');
@@ -335,7 +373,6 @@ class ProductoController extends Controller
 
             // 10. Redirigir con un mensaje de éxito.
             return redirect()->route('productos.index')->with('success_message', 'Producto actualizado y enviado a revisión del operario.');
-
         } catch (QueryException $e) {
             Log::error('Error de base de datos al actualizar producto (ID: ' . $producto->id . '): ' . $e->getMessage());
             // Si se subió una nueva imagen y la DB falló, intentar eliminarla
@@ -367,7 +404,7 @@ class ProductoController extends Controller
             'validador', // Mantengo si estos modelos/relaciones existen en tu app
             'rechazador', // Mantengo si estos modelos/relaciones existen en tu app
         ]);
-        
+
         return view('productos.show', compact('producto'));
     }
 

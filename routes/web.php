@@ -140,6 +140,7 @@ Route::middleware([
 
      // --- Módulo de USUARIOS ---
      Route::prefix('usuario')->name('usuarios.')->group(function () {
+          Route::get('role-permissions-map', [UsuarioController::class, 'getRolePermissionsMap'])->name('role-permissions-map');
           Route::get('/filtered-users', [UsuarioController::class, 'getFilteredUsers'])->name('filtered.ajax');
           Route::get('/', [UsuarioController::class, 'index'])->name('index')->middleware('can:crear usuario');
           Route::get('/create', [UsuarioController::class, 'create'])->name('create');
@@ -150,11 +151,7 @@ Route::middleware([
           Route::get('/{usuario}/edit', [UsuarioController::class, 'edit'])->name('edit')->middleware('can:editar usuario');
           Route::put('/{usuario}', [UsuarioController::class, 'update'])->name('update')->middleware('can:editar usuario');
           Route::patch('/{usuario}/toggle', [UsuarioController::class, 'toggle'])->name('toggle');
-          // Nueva ruta para obtener datos de usuario por AJAX
           Route::get('/usuarios/{usuario}/data', [UsuarioController::class, 'getUserData'])->name('users.data')->middleware('can:editar usuario');
-
-          // La ruta completa será: /usuario/role-permissions-map
-          Route::get('role-permissions-map', [UsuarioController::class, 'getRolePermissionsMap'])->name('role-permissions-map');
      });
 
      // --- Módulo de NOTICIAS ---

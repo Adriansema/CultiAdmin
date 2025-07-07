@@ -12,18 +12,6 @@
     </div>
 
     <div class="container mx-auto p-4">
-        @if ($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <strong class="font-bold">¡Oops!</strong>
-                <span class="block sm:inline">Hubo algunos problemas con tu entrada.</span>
-                <ul class="mt-3 list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data"
             class="bg-[var(--color-Gestion)] shadow-2xl rounded-2xl p-8 mb-8">
             @csrf
@@ -63,7 +51,7 @@
             <div id="campos_ruta_video_producto" class="hidden">
                 <div class="mb-4">
                     <label for="rutavideo" class="block text-gray-700 text-sm font-bold mb-2">URL del video (Producto
-                        general):</label>
+                        general):<span class="text-red-500">*</span></label>
                     <input type="url" name="rutavideo" id="rutavideo"
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('rutavideo') border-red-500 @else border-gray-300 @enderror"
                         value="{{ old('rutavideo') }}" placeholder="https://ejemplo.com/tu-video-general.mp4">
@@ -89,7 +77,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="cafe_data_clase" class="block text-gray-700 text-sm font-bold mb-2">Clase:</label>
+                    <label for="cafe_data_clase" class="block text-gray-700 text-sm font-bold mb-2">Clase: <span class="text-red-500">*</span></label>
                     <input type="text" name="cafe_data[clase]" id="cafe_data_clase"
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('cafe_data.clase') border-red-500 @else border-gray-300 @enderror"
                         value="{{ old('cafe_data.clase') }}">
@@ -100,7 +88,7 @@
 
                 <div class="mb-4">
                     <label for="cafe_data_informacion" class="block text-gray-700 text-sm font-bold mb-2">Información de
-                        café:</label>
+                        café: <span class="text-red-500">*</span></label>
                     <textarea name="cafe_data[informacion]" id="cafe_data_informacion" rows="5"
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('cafe_data.informacion') }}</textarea>
                     @error('cafe_data.informacion')
@@ -124,7 +112,7 @@
                     @enderror
                 </div>
                 <div class="mb-4">
-                    <label for="mora_data_clase" class="block text-gray-700 text-sm font-bold mb-2">Clase:</label>
+                    <label for="mora_data_clase" class="block text-gray-700 text-sm font-bold mb-2">Clase:<span class="text-red-500">*</span></label>
                     <input type="text" name="mora_data[clase]" id="mora_data_clase"
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('mora_data.clase') border-red-500 @else border-gray-300 @enderror"
                         value="{{ old('mora_data.clase') }}">
@@ -134,7 +122,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="mora_data_informacion" class="block text-gray-700 text-sm font-bold mb-2">
-                        Información de mora: <span class="text-red-500">*</span>
+                        Información de mora:<span class="text-red-500">*</span>
                     </label>
                     <textarea name="mora_data[informacion]" id="mora_data_informacion" rows="5"
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('mora_data.informacion') border-red-500 @else border-gray-300 @enderror">{{ old('mora_data.informacion') }}</textarea>
@@ -193,7 +181,7 @@
                     </div>
                     <div class="mb-4">
                         <label for="primarios_descripcion"
-                            class="block text-gray-700 text-sm font-bold mb-2">Descripción:</label>
+                            class="block text-gray-700 text-sm font-bold mb-2">Descripción:<span class="text-red-500">*</span></label>
                         <textarea name="videos_data[primarios][descripcion]" id="primarios_descripcion" rows="5"
                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.primarios.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.primarios.descripcion') }}</textarea>
                         @error('videos_data.primarios.descripcion')
