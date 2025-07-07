@@ -70,7 +70,7 @@ class ProductoController extends Controller
             $rules['rutavideo'] = 'required|url|max:255'; // Se aplica solo si el tipo es mora
 
         } elseif ($tipoProductoPrincipal === 'videos') {
-            $rules['videos_data.tipo'] = 'required|string|in:primarios,secundarios,categorias';
+             $rules['videos_data.tipo'] = 'required|string|in:Educativo,Secundarios,Insumos_y_abonos,Cuidados_generales,Preparacion_terreno_siembra,Sugerencias_generales,Metodos_recoleccion,Cuidados_cosecha,Buenas_practicas_agricolas';
             $subtipoSeleccionado = $request->input('videos_data.tipo');
 
             if ($subtipoSeleccionado) {
@@ -110,7 +110,7 @@ class ProductoController extends Controller
             // Mensajes para 'videos'
             'videos_data.tipo.required' => 'El tipo de video (primarios, secundarios o categorías) es obligatorio.',
             'videos_data.tipo.string' => 'El tipo de video debe ser texto.',
-            'videos_data.tipo.in' => 'El tipo de video seleccionado no es válido. Debe ser "primarios", "secundarios" o "categorias".',
+            'videos_data.tipo.in' => 'El tipo de video seleccionado no es válido. Debe ser "primarios", "secundarios", "Insumos y Abonos", "Cuidados Generales", "Preparacion del terreno y siembra", "Sugerencias generales", "Metodos de recoleccion", "Cuidados de la cosecha", "Buenas Practicas Agricolas".',
 
             // Mensajes dinámicos para 'videos' según el subtipo seleccionado
             'videos_data.*.autor.required' => 'El autor es obligatorio.',
@@ -271,10 +271,12 @@ class ProductoController extends Controller
                 $rules['mora_data.informacion'] = 'required|string';
                 $rules['rutavideo'] = 'nullable|url|max:255';
             } elseif ($requestType === 'videos') {
-                $rules['videos_data.tipo'] = 'required|string|in:primarios,secundarios,categorias';
+                // Asegúrate de que los valores aquí coincidan con los 'value' de tus <option> en el HTML
+                $rules['videos_data.tipo'] = 'required|string|in:Educativo,Secundarios,Insumos_y_abonos,Cuidados_generales,Preparacion_terreno_siembra,Sugerencias_generales,Metodos_recoleccion,Cuidados_cosecha,Buenas_practicas_agricolas';
                 $subtipoSeleccionado = $request->input('videos_data.tipo');
 
                 if ($subtipoSeleccionado) {
+                    // Los nombres de los campos deben coincidir con cómo se enviarán desde el formulario
                     $rules["videos_data.{$subtipoSeleccionado}.autor"] = 'required|string|max:255';
                     $rules["videos_data.{$subtipoSeleccionado}.titulo"] = 'required|string|max:255';
                     $rules["videos_data.{$subtipoSeleccionado}.descripcion"] = 'nullable|string';

@@ -89,28 +89,32 @@ Route::middleware([
      });
 
      // --- Módulo de BOLETINES ---
-
      Route::prefix('boletines')->name('boletines.')->group(function () {
 
-          // Ruta general al final
+          // Ruta principal para listar boletines y manejar los filtros via GET (recarga de página)
           Route::get('/', [BoletinController::class, 'index'])->name('index')->middleware('can:crear boletin');
-          // Rutas más específicas primero
-          Route::get('/filtrados', [BoletinController::class, 'getFilteredBoletin'])->name('filtrados');
+
+          // Rutas de creación
           Route::get('/create', [BoletinController::class, 'create'])->name('create');
           Route::post('/', [BoletinController::class, 'store'])->name('store');
-          /* Route::get('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf'); */
+
+          // Rutas de importación y exportación (mantienen su lógica)
+          Route::post('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf'); // Si existe este método en tu controlador
           Route::get('/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('exportarCSV');
+
 
           // Rutas con parámetros de modelo (asegúrate de que {boletin} se resuelva a un modelo Boletin)
           Route::get('/{boletin}/download', [BoletinController::class, 'downloadBoletin'])->name('download');
-          Route::get('/{boletin}/row-html', [BoletinController::class, 'getBoletinRowHtml'])->name('row-html');
-          Route::post('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf');
-          Route::get('/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('exportarCSV');
+
           Route::get('/{boletin}/edit', [BoletinController::class, 'edit'])->name('edit')->middleware('can:editar boletin');
           Route::put('/{boletin}', [BoletinController::class, 'update'])->name('update')->middleware('can:editar boletin');
           Route::delete('/{boletin}', [BoletinController::class, 'destroy'])->name('destroy')->middleware('can:eliminar boletin');
-          Route::get('/{boletin}', [BoletinController::class, 'show'])->name('show'); // Esta es para el fetch del modal "Ver"
+
+          // Ruta para mostrar un boletín específico (si es usada para un modal "Ver" o similar)
+          Route::get('/{boletin}', [BoletinController::class, 'show'])->name('show');
      });
+
+     // ... otras rutas que puedas tener ...
 
      // --- Módulo de PENDIENTES ( PRODUCTOS Y BOLETINES y NOTICIAS ) ---
      Route::prefix('pendiente')->name('pendientes.')->group(function () {

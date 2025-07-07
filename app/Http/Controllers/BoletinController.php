@@ -30,32 +30,9 @@ class BoletinController extends Controller
         return view('boletines.index', compact('boletines'));
     }
 
-    public function getFilteredBoletin(Request $request, BoletinService $boletinService)
-    {
-        /** @var \Illuminate\Pagination\LengthAwarePaginator $boletinesPaginados */ // <-- ¡Añade esta línea aquí!
-        $boletinesPaginados = $boletinService->obtenerBoletinFiltrados($request);
-
-        // Mapea los boletines para añadir la información de permisos
-        $boletinesData = $boletinesPaginados->getCollection()->map(function ($boletin) {
-            // Agrega los accessors para los precios (ya definidos en el modelo)
-            $boletin->precio_mas_alto_formatted = $boletin->precio_mas_alto_formatted;
-            $boletin->precio_mas_bajo_formatted = $boletin->precio_mas_bajo_formatted;
-
-            // Añade booleanos para los permisos del usuario actual
-            // Asegúrate de que Auth::user() esté disponible
-            $boletin->can_crear = Auth::user() ? Auth::user()->can('crear boletin') : false;
-            $boletin->can_editar = Auth::user() ? Auth::user()->can('editar boletin') : false;
-            $boletin->can_eliminar = Auth::user() ? Auth::user()->can('eliminar boletin') : false;
-            $boletin->can_validar = Auth::user() ? Auth::user()->can('validar boletin') : false;
-
-            return $boletin;
-        });
-
-        // Vuelve a crear un paginator con la colección modificada
-        $boletinesPaginados->setCollection($boletinesData);
-
-        return response()->json($boletinesPaginados);
-    }
+    // ELIMINADO: getFilteredBoletin ya no es necesario con el enfoque de recarga de página.
+    // ELIMINADO: getBoletinRowHtml ya no es necesario.
+    // ELIMINADO: getRowAndModalsHtml ya no es necesario.
 
     public function create()
     {
@@ -125,7 +102,7 @@ class BoletinController extends Controller
             }
 
             if ($request->expectsJson()) {
-                Log::info('DEBUG: Petición AJAX, devolviendo JSON para store.');
+                Log::info('DEBUG: Petición AJAX, devolviendo JSON para store (esperando recarga de JS).');
                 return response()->json([
                     'message' => 'Boletín creado exitosamente.',
                     'boletin_id' => $boletin->id,
@@ -236,11 +213,17 @@ class BoletinController extends Controller
                 }
             }
 
-            $boletin = $boletin->fresh(); // Recarga el modelo para tener los últimos datos
+            // Recarga el modelo para tener los últimos datos, necesario si vas a redirigir
+            $boletin = $boletin->fresh();
 
+            // Renderizar la fila HTML para la actualización, aunque con recarga no es estrictamente necesario,
+            // si la dejas, puede ser útil si decides volver al AJAX para updates específicos.
+            // Por ahora, con la recarga total de la página tras la creación, no es un problema.
             $renderedRow = view('boletines.partials.boletin_row', ['boletin' => $boletin])->render();
 
             if ($request->expectsJson()) {
+                // Para updates, aún puedes devolver la fila actualizada si lo necesitas para otras funcionalidades,
+                // pero la página se recargará completamente después de la creación/filtrado.
                 return response()->json([
                     'message' => 'Boletín actualizado con éxito',
                     'boletin' => $boletin,
@@ -282,40 +265,6 @@ class BoletinController extends Controller
         $boletin->delete();
 
         return redirect()->route('boletines.index')->with('success', 'Boletín eliminado.');
-    }
-
-    /**
-     * Obtener el HTML de una fila de boletín específica.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function getBoletinRowHtml($id)
-    {
-        Log::info("DEBUG: getBoletinRowHtml llamado para ID: {$id}");
-
-        try {
-            $boletin = Boletin::findOrFail($id);
-            Log::info('DEBUG: Boletín encontrado: ' . $boletin->nombre);
-
-            $renderedHtml = view('boletines.partials.boletin_row', compact('boletin'))->render();
-
-            Log::info("DEBUG: HTML renderizado para boletín ID {$id}: " . Str::limit($renderedHtml, 500));
-
-            return response($renderedHtml, 200)
-                ->header('Content-Type', 'text/html')
-                ->header('X-DEBUG-RENDERED', 'true');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error("ERROR: Boletín con ID {$id} no encontrado en getBoletinRowHtml. Mensaje: " . $e->getMessage());
-
-            return response('Boletín no encontrado.', 404)
-                ->header('Content-Type', 'text/plain');
-        } catch (\Throwable $e) {
-            Log::error("ERROR: Error inesperado al renderizar fila de boletín ID {$id}: " . $e->getMessage() . "\n" . $e->getTraceAsString());
-
-            return response('Error interno al generar la fila del boletín.', 500)
-                ->header('Content-Type', 'text/plain');
-        }
     }
 
     /**

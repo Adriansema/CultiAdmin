@@ -16,16 +16,8 @@
         @if ($youtubeVideoId)
             {{-- Si es un video de YouTube, usa un iframe responsivo --}}
             <div class="w-full aspect-video rounded-lg shadow-lg overflow-hidden border border-gray-200">
-                {{-- <iframe
-                    class="w-full h-full"
-                    src="https://www.youtube.com/embed/{{ $youtubeVideoId }}?rel=0" {{-- rel=0 para no mostrar videos relacionados -
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen>
-                </iframe> --}}
                 <iframe
                     class="w-full h-full"
-                    {{-- CAMBIO: Se usa youtube-nocookie.com para mejorar la compatibilidad --}}
                     src="https://www.youtube-nocookie.com/embed/{{ $youtubeVideoId }}?rel=0" 
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

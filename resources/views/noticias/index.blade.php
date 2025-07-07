@@ -55,7 +55,7 @@
                         class="inline-flex items-center px-6 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900] hover:bg-[#61BA33] text-white rounded-full w-auto">
                         <img src="{{ asset('images/signo.svg') }}" class="w-4 h-3" alt="Icono Nuevo Usuario">
                         <span class="text-md font-medium whitespace-nowrap">
-                            {{ __('Nueva Noticia') }}
+                            {{ __('Nueva noticia') }}
                         </span>
                     </x-responsive-nav-link>
                 </div>

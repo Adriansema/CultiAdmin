@@ -38,11 +38,13 @@ class BoletinService
      */
     public function obtenerBoletinFiltrados(Request $request)
     {
+        // El per_page se tomará del request si se envía, de lo contrario, se usará 10.
+        // Esto es compatible con la paginación de Laravel que se renderiza en Blade.
         $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100])
             ? $request->input('per_page')
-            : 10; // Tu JS está enviando '5', ajusta este valor si necesitas más por defecto
+            : 10;
 
-        $query  = $request->input('q'); // Esta es la variable original, no se usa dentro del cierre donde da el error
+        $query  = $request->input('q');
         $estado = $request->input('estado');
         $precio = $request->input('precio');
 
@@ -50,20 +52,17 @@ class BoletinService
 
         // Búsqueda robusta por nombre, descripción y fecha de creación
         if ($query) {
-            // Aquí se define $cleanedQuery
             $cleanedQuery = $this->cleanSearchQuery($query);
 
-            $boletines->where(function ($q2) use ($cleanedQuery, $query) { // Asegúrate de pasar $query si la vas a usar para Carbon
+            $boletines->where(function ($q2) use ($cleanedQuery, $query) {
                 // Búsqueda en 'nombre'
                 $q2->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(nombre), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '') LIKE ?", ['%' . $cleanedQuery . '%'])
                    // Búsqueda en 'descripcion'
                    ->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(descripcion), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '') LIKE ?", ['%' . $cleanedQuery . '%']);
 
                 // Búsqueda por fecha de creación (created_at)
-                // Es aquí donde podrías estar intentando usar $query sin pasarla en el 'use'
                 try {
-                    // Si usas $query aquí, DEBE estar en el 'use' del closure
-                    $date = Carbon::parse($query); // <-- Línea 65 es probablemente esta
+                    $date = Carbon::parse($query);
                     $q2->orWhereDate('created_at', $date->toDateString());
                 } catch (\Exception $e) {
                     // Si no es una fecha válida, no se aplica este filtro de fecha
@@ -91,16 +90,17 @@ class BoletinService
                 case 'precio_bajo_asc':
                     $boletines->orderBy('precio_mas_bajo', 'asc');
                     break;
-                // Puedes añadir un default si quieres un ordenamiento por defecto cuando se selecciona algo inválido
             }
         }
 
         // Ordenamiento por defecto si no hay un orden de precios específico
-        // Esto evita que los resultados salgan en un orden aleatorio si no se aplica un filtro de precio.
         if (!$precio) {
             $boletines->orderBy('created_at', 'desc');
         }
 
+        // Cargar relaciones necesarias para las vistas de la tabla
+        // Asegúrate de que estas relaciones estén definidas en tu modelo Boletin.
+        $boletines->with(['user.roles', 'validador', 'rechazador']);
 
         return $boletines->paginate($perPage)->withQueryString();
     }

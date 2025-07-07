@@ -1,0 +1,5 @@
+@include('boletines.partials.modal-views', ['boletin' => $boletin])
+@include('boletines.partials.modal-edit', ['boletin' => $boletin])
+@include('boletines.partials.modal-delete', ['boletin' => $boletin])
+@include('pendientes.partials.modal-boletin-validar', ['boletin' => $boletin])
+@include('pendientes.partials.modal-boletin-rechazar', ['boletin' => $boletin])

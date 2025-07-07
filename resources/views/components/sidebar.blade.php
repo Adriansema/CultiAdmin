@@ -9,7 +9,7 @@
                 <x-application-mark class="block w-auto h-9" />
             </a>
         </div>
-        <button @click="toggleSidebar"
+        {{-- <button @click="toggleSidebar"
             class="-ml-2 text-[var(--color-text)] rounded hover:bg-[var(--color-sidebarhoverbtn)] transition-transform duration-700 ease-in-out hover:translate-x-1"
             :class="!sidebarOpen && 'rotate-180 mx-auto'">
 
@@ -17,7 +17,7 @@
                 viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-        </button>
+        </button> --}}
     </div>
 
     <nav class="flex-1 px-6 pt-4 space-y-2">

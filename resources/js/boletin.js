@@ -27,18 +27,21 @@ window.cerrarModal = function (type, id) {
     if (modal) {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
-        document.body.classList.remove('modal-open'); // Remover para restaurar scroll
+        // Comprobar si hay otros modales abiertos antes de quitar modal-open
+        const openModals = document.querySelectorAll('.modal-overlay.flex:not(.hidden)');
+        if (openModals.length === 0) {
+            document.body.classList.remove('modal-open'); // Remover para restaurar scroll
+        }
         console.log(`Ocultando modal: modal-${type}-${id}`);
         if (type === 'editar') {
-            window.clearValidationErrors(id);
+            window.clearValidationErrors(id); // Limpia errores de validación al cerrar modal de edición
         }
-        // NO MANIPULAMOS document.body.style.overflow aquí, usamos la clase 'modal-open'
     } else {
         console.warn(`Advertencia: Modal con ID modal-${type}-${id} no encontrado para cerrar.`);
     }
 };
 
-// --- Funciones de Validación (Se mantienen, ya que no están relacionadas con el modal de éxito) ---
+// --- Funciones de Validación (Se mantienen) ---
 
 /**
  * Limpia los mensajes de error de validación y los bordes rojos de los campos de un formulario.
@@ -65,7 +68,7 @@ window.clearValidationErrors = function (boletinId) {
  * @param {object} errors - Un objeto con los errores de validación, donde la clave es el nombre del campo.
  */
 window.displayValidationErrors = function (boletinId, errors) {
-    window.clearValidationErrors(boletinId);
+    window.clearValidationErrors(boletinId); // Limpia errores antes de mostrar los nuevos
     const form = document.getElementById(`editBoletinForm-${boletinId}`);
     if (form) {
         for (const field in errors) {
@@ -148,19 +151,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (match && match.length === 3) {
                     const type = match[1];
                     const id = match[2];
-                    if (type === 'boletin') {
-                        return;
-                    } else {
-                        // Aquí se llama a mostrarModal. Asegúrate de que los modales que usa (ej. 'editar')
-                        // no son el modal de éxito de noticias si quieres que lo maneje el global.
-                        window.mostrarModal(type, id);
-                    }
+                    // Si el tipo es 'boletin', es para el modal 'ver', lo dejamos pasar.
+                    // Si es 'editar', también lo dejamos pasar.
+                    // Cualquier otro tipo que deba ser manejado por mostrarModal()
+                    window.mostrarModal(type, id);
                 }
             }
         });
     }
 
-    // Listener para los formularios de edición (se mantiene)
+    // Listener para los formularios de edición
+    // Se delega a un contenedor si hay múltiples formularios o se añaden dinámicamente.
+    // En este caso, asumimos que están presentes en el DOM al cargar.
     document.querySelectorAll('[id^="editBoletinForm-"]').forEach(form => {
         form.addEventListener('submit', async function (event) {
             event.preventDefault();
@@ -169,15 +171,23 @@ document.addEventListener('DOMContentLoaded', function () {
             const boletinId = formId.split('-')[1];
             const formData = new FormData(this);
 
+            // Añadir método PUT para Laravel
+            formData.append('_method', 'PUT');
+
             const updateButton = this.querySelector('button[type="submit"]');
             if (updateButton) {
                 updateButton.disabled = true;
-                updateButton.textContent = 'Actualizando...';
+                updateButton.innerHTML = `
+                    <span class="flex items-center justify-center w-full">
+                        <span>Actualizando...</span>
+                        <img src="/images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">
+                    </span>
+                `;
             }
 
             try {
                 const response = await fetch(this.action, {
-                    method: 'POST',
+                    method: 'POST', // Siempre POST para Laravel con _method PUT
                     body: formData,
                     headers: {
                         'Accept': 'application/json',
@@ -188,23 +198,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 const result = await response.json();
 
                 if (response.ok) {
-                    if (result.html_row) {
-                        const oldRow = document.getElementById(`boletin-row-${boletinId}`);
-
-                        if (oldRow) {
-                            oldRow.outerHTML = result.html_row;
-                            reindexTableRows();
-                        } else {
-                            window.showGlobalMessage('error', 'Boletín actualizado, pero la tabla no se pudo refrescar. Recargue la página.');
-                        }
-                    } else {
-                        window.showGlobalMessage('success', 'Boletín actualizado, pero no se recibió HTML para refrescar la tabla. Recargue la página.');
-                    }
-
-                    window.cerrarModal('editar', boletinId); // Cierra el modal de edición (esto se mantiene)
-
-                    // Después de la actualización exitosa, mostramos directamente el mensaje global de éxito
+                    window.cerrarModal('editar', boletinId); // Cierra el modal de edición
                     window.showGlobalMessage('success', result.message || 'Boletín actualizado con éxito.');
+
+                    // *** CAMBIO CLAVE AQUÍ: Recargar la página completa después de la actualización ***
+                    setTimeout(() => {
+                        window.location.reload(); // Recarga la página para refrescar todos los datos y la tabla
+                    }, 1500); // Pequeño delay para que el usuario vea el mensaje de éxito
 
                 } else if (response.status === 422) {
                     window.displayValidationErrors(boletinId, result.errors);
@@ -214,44 +214,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } catch (error) {
                 window.showGlobalMessage('error', 'Error de red o conexión al servidor. Inténtalo de nuevo.');
+                console.error('Fetch error:', error);
             } finally {
                 if (updateButton) {
                     updateButton.disabled = false;
-                    updateButton.textContent = 'Guardar Cambios';
+                    updateButton.textContent = 'Guardar Cambios'; // Restaura el texto original
                 }
             }
         });
     });
 
-    function reindexTableRows() {
-        const tableBody = document.querySelector('#boletines-table-body');
-        if (tableBody) {
-            const rows = tableBody.querySelectorAll('tr[id^="boletin-row-"]');
-            rows.forEach((row, index) => {
-                const orderNumberCell = row.querySelector('.boletin-order-number');
-                if (orderNumberCell) {
-                    orderNumberCell.textContent = index + 1;
-                }
-            });
-        } 
-    }
+    // Se elimina la función reindexTableRows y su llamada,
+    // ya que la recarga de página la hace innecesaria.
+    // function reindexTableRows() { /* ... */ }
+    // reindexTableRows(); // Ya no se llama aquí.
 
-    reindexTableRows();
-
-    // Listener para cerrar modales por click externo/botón de cierre
-    // SE MODIFICA PARA EXCLUIR EL MODAL DE ÉXITO DE NOTICIAS,
-    // YA QUE AHORA SE ESPERA QUE showGlobalMessage LO MANEJE
+    // Listener para cerrar modales por click externo/tecla Escape
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('bg-opacity-50') && event.target.closest('[id^="modal-"]')) {
             const modalWrapper = event.target.closest('[id^="modal-"]');
-            // Excluir el modal de éxito de noticias y el modal global de showGlobalMessage
-            // Asumiendo que el modal de éxito de noticias ya no usa "modal-success-"
-            // o que showGlobalMessage() ya maneja su cierre.
+            // Excluimos los modales que tienen su propia lógica de cierre (ej. globalMessageModalVanilla, createBoletinModal)
             if (modalWrapper &&
-                modalWrapper.id !== 'custom-confirm-modal' &&
+                modalWrapper.id !== 'globalMessageModalVanilla' &&
                 modalWrapper.id !== 'createBoletinModal' &&
-                modalWrapper.id !== 'modal-success-' && // Excluimos explícitamente si aún existe
-                modalWrapper.id !== 'globalMessageModalVanilla') { // Excluimos el modal global
+                modalWrapper.id !== 'custom-confirm-modal') // Asumiendo que 'custom-confirm-modal' también tiene su propia lógica
+            {
                 const idParts = modalWrapper.id.split('-');
                 const tipo = idParts[1];
                 const id = idParts[2];
@@ -259,6 +246,28 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            const openModals = document.querySelectorAll('.modal-overlay.flex:not(.hidden)');
+            // Iterar en orden inverso para cerrar el modal más "superior" primero
+            for (let i = openModals.length - 1; i >= 0; i--) {
+                const modal = openModals[i];
+                // Excluimos los modales que tienen su propia lógica de cierre o no deben cerrarse con Escape
+                if (modal.id !== 'globalMessageModalVanilla' &&
+                    modal.id !== 'createBoletinModal' &&
+                    modal.id !== 'custom-confirm-modal')
+                {
+                    const idParts = modal.id.split('-');
+                    const tipo = idParts[1];
+                    const id = idParts[2];
+                    window.cerrarModal(tipo, id);
+                    break; // Cierra solo el modal más alto
+                }
+            }
+        }
+    });
 });
 
+// Asegurarse de que la función global para abrir el modal esté disponible
 window.openCreateBoletinModal = window.openCreateBoletinModalVanilla;

@@ -40,7 +40,7 @@ window.openCreateBoletinModalVanilla = function () {
         createBoletinModal.classList.add('flex'); // Asegura que el modal se centre
         document.body.style.overflow = 'hidden'; // Bloquea el scroll del body
         resetCreateBoletinForm(); // Resetea el formulario al abrir, llevándolo al Paso 1
-    } 
+    }
 };
 
 /**
@@ -196,7 +196,7 @@ function handleDragOver(event) {
     if (fileDropArea) {
         fileDropArea.classList.add('border-green-500', 'border-2', 'bg-green-50/50'); // Ajuste de clases
         fileDropArea.classList.remove('border-gray-300'); // Asegura que el borde gris se quita
-    } 
+    }
 }
 
 /**
@@ -208,7 +208,7 @@ function handleDragLeave(event) {
     if (fileDropArea) {
         fileDropArea.classList.remove('border-green-500', 'border-2', 'bg-green-50/50'); // Ajuste de clases
         fileDropArea.classList.add('border-gray-300'); // Vuelve a añadir el borde gris
-    } 
+    }
 }
 
 /**
@@ -221,7 +221,8 @@ function handleDrop(event) {
     if (fileDropArea) {
         fileDropArea.classList.remove('border-green-500', 'border-2', 'bg-green-50/50'); // Ajuste de clases
         fileDropArea.classList.add('border-gray-300'); // Vuelve a añadir el borde gris
-    } handleFileChange(event.dataTransfer.files);
+    }
+    handleFileChange(event.dataTransfer.files);
 }
 
 /**
@@ -313,54 +314,28 @@ async function handleCreateBoletinSubmit(event) {
             }
         });
 
-        const result = await response.json();
+        const resultStore = await response.json();
 
         if (response.ok) {
-            window.closeCreateBoletinModalVanilla(); // Cierra el modal de creación completamente después de subir
+            window.closeCreateBoletinModalVanilla(); // Cierra el modal de creación
 
-            // Lógica para actualizar la tabla (similar a la de edición)
-            const boletinesTableBody = document.getElementById('boletines-table-body');
-            if (result.boletin_id && boletinesTableBody) {
-                const rowResponse = await fetch(`/boletines/${result.boletin_id}/row-html`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'text/html'
-                    },
-                    credentials: 'include'
-                });
+            window.showGlobalMessage('success', resultStore.message || 'Boletín creado con éxito.');
 
-                if (rowResponse.ok) {
-                    let newRowHtml = await rowResponse.text();
-                    newRowHtml = newRowHtml.trim();
-                    if (newRowHtml.startsWith('<tr')) {
-                        const noBoletinesRow = document.getElementById('no-boletines-row');
-                        if (noBoletinesRow) {
-                            noBoletinesRow.remove();
-                        }
-                        boletinesTableBody.insertAdjacentHTML('afterbegin', newRowHtml);
-                        if (typeof reindexTableRows === 'function') { // Asegurarse de que la función existe
-                            reindexTableRows();
-                        }
-                        window.showGlobalMessage('success', result.message || 'Boletín creado y tabla actualizada.');
-                    } else {
-                        window.showGlobalMessage('error', 'Boletín creado, pero el HTML de la tabla es inesperado. Recargue la página.');
-                    }
-                } else {
-                    window.showGlobalMessage('error', 'Boletín creado, pero no se pudo actualizar la tabla. Recargue la página.');
-                }
-            } else {
-                window.showGlobalMessage('success', result.message || 'Boletín creado con éxito.');
-            }
+            // *** CAMBIO CLAVE AQUÍ: Recargar la página completa ***
+            setTimeout(() => {
+                window.location.reload(); // Recarga la página para que Laravel renderice la tabla y paginación con el nuevo boletín
+            }, 1500); // Pequeño delay para que el usuario vea el mensaje de éxito
 
         } else if (response.status === 422) {
             // Mostrar errores de validación en el formulario
-            displayCreateFormValidationErrors(result.errors);
-            window.showGlobalMessage('error', result.message || 'Por favor, corrige los errores en el formulario.');
+            displayCreateFormValidationErrors(resultStore.errors);
+            window.showGlobalMessage('error', resultStore.message || 'Por favor, corrige los errores en el formulario.');
         } else {
-            window.showGlobalMessage('error', result.message || 'Ocurrió un error inesperado al crear el boletín.');
+            window.showGlobalMessage('error', resultStore.message || 'Ocurrió un error inesperado al crear el boletín.');
         }
     } catch (error) {
         window.showGlobalMessage('error', 'Error de red o conexión al servidor. Inténtalo de nuevo.');
+        console.error('Fetch error:', error); // Log para depuración
     } finally {
         if (submitCreateBoletinButton) {
             submitCreateBoletinButton.disabled = false;
