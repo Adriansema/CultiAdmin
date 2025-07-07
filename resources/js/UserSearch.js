@@ -58,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function () {
         SearchUser.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault(); // Evita el comportamiento predeterminado del Enter
-                console.log('Enter presionado en el input de búsqueda. Aplicando filtros...');
                 applyAllFilters();
             }
         });
@@ -72,7 +71,6 @@ document.addEventListener('DOMContentLoaded', function () {
             SearchUser.focus(); // Opcional: vuelve a poner el foco en el input
 
             // Aplica los filtros (con el campo de búsqueda vacío)
-            console.log('Campo de búsqueda limpiado. Aplicando filtros...');
             applyAllFilters();
         });
     }
@@ -80,14 +78,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Lógica para los selects de filtro (estado y rol) ---
     if (filtrarEstadoSelect) {
         filtrarEstadoSelect.addEventListener('change', function () {
-            console.log('Filtro de estado cambiado. Aplicando filtros...');
             applyAllFilters();
         });
     }
 
     if (filtrarRolSelect) {
         filtrarRolSelect.addEventListener('change', function () {
-            console.log('Filtro de rol cambiado. Aplicando filtros...');
             applyAllFilters();
         });
     }

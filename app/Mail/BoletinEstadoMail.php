@@ -50,7 +50,7 @@ class BoletinEstadoMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.boletin_estado', // Se carga la vista de email
+            view: 'emails.estados.boletin_estado', // Se carga la vista de email
             with: [
                 'boletin' => $this->boletin,
             ],

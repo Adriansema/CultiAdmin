@@ -3,16 +3,16 @@
 @section('content')
 
     @can('editar producto')
-    <div class="inline-block px-20 py-6">
+        <div class="inline-block px-10 py-6">
             <div class="flex items-center space-x-4">
                 <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-                <h1 class="text-3xl whitespace-nowrap font-bold">Editar Producto</h1>
+                <h1 class="text-3xl whitespace-nowrap font-bold">Editar de producto</h1>
             </div>
             <div class="py-2">
-            {!! Breadcrumbs::render('productos.edit', $producto) !!}
+                {!! Breadcrumbs::render('productos.edit', $producto) !!}
             </div>
         </div>
-        
+
         <div class="container mx-auto p-4">
             @if ($errors->any())
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -32,7 +32,7 @@
                 @method('PUT') {{-- Método PUT para actualizaciones en Laravel --}}
 
                 <div class="mb-4">
-                    <label for="tipo" class="block text-gray-700 text-sm font-bold mb-2">Tipo de Producto:</label>
+                    <label for="tipo" class="block text-gray-700 text-sm font-bold mb-2">Tipo de producto:</label>
                     {{-- El tipo no se permite cambiar en la edición según tu controlador, así que lo mostramos deshabilitado --}}
                     <input type="text" name="tipo" id="tipo"
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline"
@@ -42,7 +42,7 @@
                     @enderror
                 </div>
 
-                {{-- Nuevo div para agrupar Imagen y Observaciones (solo para Café/Mora) --}}
+                {{-- Nuevo div para agrupar Imagen y Observaciones (solo para Café/mora) --}}
                 <div id="campos_comunes_no_video_edit">
                     <div class="mb-4">
                         <label for="imagen" class="block text-gray-700 text-sm font-bold mb-2">Imagen Actual:</label>
@@ -52,36 +52,25 @@
                         @else
                             <p class="text-gray-600 text-sm mb-2">No hay imagen actual.</p>
                         @endif
-                        <label for="nueva_imagen" class="block text-gray-700 text-sm font-bold mb-2">Subir Nueva Imagen
-                            (Opcional):</label>
+                        <label for="nueva_imagen" class="block text-gray-700 text-sm font-bold mb-2">Subir nueva imagen:</label>
                         <input type="file" name="imagen" id="nueva_imagen"
                             class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
                         @error('imagen')
                             <p class="text-red-500 text-xs italic">{{ $message }}</p>
                         @enderror
                     </div>
-
-                    <div class="mb-4">
-                        <label for="observaciones" class="block text-gray-700 text-sm font-bold mb-2">Observaciones
-                            Generales:</label>
-                        <textarea name="observaciones" id="observaciones" rows="3"
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('observaciones', $producto->observaciones) }}</textarea>
-                        @error('observaciones')
-                            <p class="text-red-500 text-xs italic">{{ $message }}</p>
-                        @enderror
-                    </div>
                 </div>
 
-                {{-- Campo RutaVideo para productos tipo Café o Mora (PRODUCTO GENERAL) --}}
+                {{-- Campo RutaVideo para productos tipo Café o mora (pRODUCTO GENERAL) --}}
                 {{-- Este div se mostrará/ocultará con JS --}}
                 <div id="campos_ruta_video_producto" class="hidden mt-6 pt-4 border-t border-gray-200">
                     <div class="mb-4">
-                        <label for="RutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del Video (Producto General):</label>
-                        <input type="url" name="RutaVideo" id="RutaVideo"
+                        <label for="rutavideo" class="block text-gray-700 text-sm font-bold mb-2">URL del video</label>
+                        <input type="url" name="rutavideo" id="rutavideo"
                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            value="{{ old('RutaVideo', $producto->RutaVideo) }}"
+                            value="{{ old('rutavideo', $producto->rutavideo) }}"
                             placeholder="https://ejemplo.com/tu-video-general.mp4">
-                        @error('RutaVideo')
+                        @error('rutavideo')
                             <p class="text-red-500 text-xs italic">{{ $message }}</p>
                         @enderror
                     </div>
@@ -90,10 +79,10 @@
                 {{-- Campos específicos para Café --}}
                 @if ($producto->tipo === 'café')
                     <div id="campos_cafe" class="mt-6 pt-4 border-t border-gray-200">
-                        <h2 class="text-xl font-semibold mb-3">Detalles de Café</h2>
+                        <h2 class="text-xl font-semibold mb-3">Detalles de café</h2>
                         <div class="mb-4">
                             <label for="cafe_data_numero_pagina" class="block text-gray-700 text-sm font-bold mb-2">Número de
-                                Página:</label>
+                                página:</label>
                             <input type="number" name="cafe_data[numero_pagina]" id="cafe_data_numero_pagina"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 value="{{ old('cafe_data.numero_pagina', $producto->cafe->numero_pagina ?? '') }}">
@@ -112,7 +101,7 @@
                         </div>
                         <div class="mb-4">
                             <label for="cafe_data_informacion" class="block text-gray-700 text-sm font-bold mb-2">Información de
-                                Café:</label>
+                                café:</label>
                             <textarea name="cafe_data[informacion]" id="cafe_data_informacion" rows="5"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('cafe_data.informacion', $producto->cafe->informacion ?? '') }}</textarea>
                             @error('cafe_data.informacion')
@@ -122,13 +111,13 @@
                     </div>
                 @endif
 
-                {{-- Campos específicos para Mora --}}
+                {{-- Campos específicos para mora --}}
                 @if ($producto->tipo === 'mora')
                     <div id="campos_mora" class="mt-6 pt-4 border-t border-gray-200">
-                        <h2 class="text-xl font-semibold mb-3">Detalles de Mora</h2>
+                        <h2 class="text-xl font-semibold mb-3">Detalles de mora</h2>
                         <div class="mb-4">
                             <label for="mora_data_numero_pagina" class="block text-gray-700 text-sm font-bold mb-2">Número de
-                                Página:</label>
+                                página:</label>
                             <input type="number" name="mora_data[numero_pagina]" id="mora_data_numero_pagina"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 value="{{ old('mora_data.numero_pagina', $producto->mora->numero_pagina ?? '') }}">
@@ -147,8 +136,7 @@
                         </div>
                         <div class="mb-4">
                             <label for="mora_data_informacion" class="block text-gray-700 text-sm font-bold mb-2">Información
-                                de
-                                Mora:</label>
+                                de mora:</label>
                             <textarea name="mora_data[informacion]" id="mora_data_informacion" rows="5"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('mora_data.informacion', $producto->mora->informacion ?? '') }}</textarea>
                             @error('mora_data.informacion')
@@ -161,17 +149,24 @@
                 {{-- Campos específicos para Videos --}}
                 @if ($producto->tipo === 'videos')
                     <div id="campos_videos" class="mt-6 pt-4 border-t border-gray-200">
-                        <h2 class="text-xl font-semibold mb-3">Detalles de Video</h2>
+                        <h2 class="text-xl font-semibold mb-3">Detalles de video</h2>
 
                         {{-- Campo de selección de Subtipo de Video --}}
                         <div class="mb-4">
-                            <label for="subtipo_video" class="block text-gray-700 text-sm font-bold mb-2">Tipo de Video (Subtipo):</label>
+                            <label for="subtipo_video" class="block text-gray-700 text-sm font-bold mb-2">Tipo de video
+                                (Subtipo):</label>
                             <select name="videos_data[tipo]" id="subtipo_video"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                 <option value="">Seleccione un subtipo</option>
-                                <option value="primarios" {{ old('videos_data.tipo', $producto->videos->tipo ?? '') == 'primarios' ? 'selected' : '' }}>Video Primarios</option>
-                                <option value="secundarios" {{ old('videos_data.tipo', $producto->videos->tipo ?? '') == 'secundarios' ? 'selected' : '' }}>Video Secundarios</option>
-                                <option value="categorias" {{ old('videos_data.tipo', $producto->videos->tipo ?? '') == 'categorias' ? 'selected' : '' }}>Video Categorias</option>
+                                <option value="primarios"
+                                    {{ old('videos_data.tipo', $producto->videos->tipo ?? '') == 'primarios' ? 'selected' : '' }}>
+                                    Video primarios</option>
+                                <option value="secundarios"
+                                    {{ old('videos_data.tipo', $producto->videos->tipo ?? '') == 'secundarios' ? 'selected' : '' }}>
+                                    Video secundarios</option>
+                                <option value="categorias"
+                                    {{ old('videos_data.tipo', $producto->videos->tipo ?? '') == 'categorias' ? 'selected' : '' }}>
+                                    Video categorías</option>
                             </select>
                             @error('videos_data.tipo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
@@ -180,22 +175,23 @@
 
                         {{-- Campos específicos para cada subtipo de video --}}
                         <div id="campos_subtipo_primarios" class="hidden mt-4 pt-4 border-t border-gray-200">
-                            <h3 class="text-lg font-semibold mb-2">Campos para Video Primario</h3>
+                            <h3 class="text-lg font-semibold mb-2">Campos para video primario</h3>
+                            <div class="mb-4">
+                                <label for="primarios_titulo"
+                                    class="block text-gray-700 text-sm font-bold mb-2">Título:</label>
+                                <input type="text" name="videos_data[primarios][titulo]" id="primarios_titulo"
+                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    value="{{ old('videos_data.primarios.titulo', $producto->videos->titulo ?? '') }}">
+                                @error('videos_data.primarios.titulo')
+                                    <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                                @enderror
+                            </div>
                             <div class="mb-4">
                                 <label for="primarios_autor" class="block text-gray-700 text-sm font-bold mb-2">Autor:</label>
                                 <input type="text" name="videos_data[primarios][autor]" id="primarios_autor"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     value="{{ old('videos_data.primarios.autor', $producto->videos->autor ?? '') }}">
                                 @error('videos_data.primarios.autor')
-                                    <p class="text-red-500 text-xs italic">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div class="mb-4">
-                                <label for="primarios_titulo" class="block text-gray-700 text-sm font-bold mb-2">Titulo:</label>
-                                <input type="text" name="videos_data[primarios][titulo]" id="primarios_titulo"
-                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    value="{{ old('videos_data.primarios.titulo', $producto->videos->titulo ?? '') }}">
-                                @error('videos_data.primarios.titulo')
                                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -209,10 +205,12 @@
                                 @enderror
                             </div>
                             <div class="mb-4">
-                                <label for="primarios_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del Video (Específico):</label>
+                                <label for="primarios_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del
+                                    video:</label>
                                 <input type="url" name="videos_data[primarios][rutaVideo]" id="primarios_rutaVideo"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    value="{{ old('videos_data.primarios.rutaVideo', $producto->videos->rutaVideo ?? '') }}" placeholder="https://ejemplo.com/tu-video-primario.mp4">
+                                    value="{{ old('videos_data.primarios.rutaVideo', $producto->videos->rutaVideo ?? '') }}"
+                                    placeholder="https://ejemplo.com/tu-video-primario.mp4">
                                 @error('videos_data.primarios.rutaVideo')
                                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                                 @enderror
@@ -220,22 +218,24 @@
                         </div>
 
                         <div id="campos_subtipo_secundarios" class="hidden mt-4 pt-4 border-t border-gray-200">
-                            <h3 class="text-lg font-semibold mb-2">Campos para Video Secundario</h3>
+                            <h3 class="text-lg font-semibold mb-2">Campos para video secundario</h3>
                             <div class="mb-4">
-                                <label for="secundarios_autor" class="block text-gray-700 text-sm font-bold mb-2">Autor:</label>
-                                <input type="text" name="videos_data[secundarios][autor]" id="secundarios_autor"
-                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    value="{{ old('videos_data.secundarios.autor', $producto->videos->autor ?? '') }}">
-                                @error('videos_data.secundarios.autor')
-                                    <p class="text-red-500 text-xs italic">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div class="mb-4">
-                                <label for="secundarios_titulo" class="block text-gray-700 text-sm font-bold mb-2">Titulo:</label>
+                                <label for="secundarios_titulo"
+                                    class="block text-gray-700 text-sm font-bold mb-2">Título:</label>
                                 <input type="text" name="videos_data[secundarios][titulo]" id="secundarios_titulo"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     value="{{ old('videos_data.secundarios.titulo', $producto->videos->titulo ?? '') }}">
                                 @error('videos_data.secundarios.titulo')
+                                    <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div class="mb-4">
+                                <label for="secundarios_autor"
+                                    class="block text-gray-700 text-sm font-bold mb-2">Autor:</label>
+                                <input type="text" name="videos_data[secundarios][autor]" id="secundarios_autor"
+                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    value="{{ old('videos_data.secundarios.autor', $producto->videos->autor ?? '') }}">
+                                @error('videos_data.secundarios.autor')
                                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -249,10 +249,12 @@
                                 @enderror
                             </div>
                             <div class="mb-4">
-                                <label for="secundarios_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del Video (Específico):</label>
+                                <label for="secundarios_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del
+                                    video:</label>
                                 <input type="url" name="videos_data[secundarios][rutaVideo]" id="secundarios_rutaVideo"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    value="{{ old('videos_data.secundarios.rutaVideo', $producto->videos->rutaVideo ?? '') }}" placeholder="https://ejemplo.com/tu-video-secundario.mp4">
+                                    value="{{ old('videos_data.secundarios.rutaVideo', $producto->videos->rutaVideo ?? '') }}"
+                                    placeholder="https://ejemplo.com/tu-video-secundario.mp4">
                                 @error('videos_data.secundarios.rutaVideo')
                                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                                 @enderror
@@ -260,22 +262,24 @@
                         </div>
 
                         <div id="campos_subtipo_categorias" class="hidden mt-4 pt-4 border-t border-gray-200">
-                            <h3 class="text-lg font-semibold mb-2">Campos para Video de Categoría</h3>
+                            <h3 class="text-lg font-semibold mb-2">Campos para video de categoría</h3>
                             <div class="mb-4">
-                                <label for="categorias_autor" class="block text-gray-700 text-sm font-bold mb-2">Autor:</label>
-                                <input type="text" name="videos_data[categorias][autor]" id="categorias_autor"
-                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    value="{{ old('videos_data.categorias.autor', $producto->videos->autor ?? '') }}">
-                                @error('videos_data.categorias.autor')
-                                    <p class="text-red-500 text-xs italic">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div class="mb-4">
-                                <label for="categorias_titulo" class="block text-gray-700 text-sm font-bold mb-2">Titulo:</label>
+                                <label for="categorias_titulo"
+                                    class="block text-gray-700 text-sm font-bold mb-2">Título:</label>
                                 <input type="text" name="videos_data[categorias][titulo]" id="categorias_titulo"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     value="{{ old('videos_data.categorias.titulo', $producto->videos->titulo ?? '') }}">
                                 @error('videos_data.categorias.titulo')
+                                    <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div class="mb-4">
+                                <label for="categorias_autor"
+                                    class="block text-gray-700 text-sm font-bold mb-2">Autor:</label>
+                                <input type="text" name="videos_data[categorias][autor]" id="categorias_autor"
+                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    value="{{ old('videos_data.categorias.autor', $producto->videos->autor ?? '') }}">
+                                @error('videos_data.categorias.autor')
                                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -289,10 +293,12 @@
                                 @enderror
                             </div>
                             <div class="mb-4">
-                                <label for="categorias_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del Video (Específico):</label>
+                                <label for="categorias_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del
+                                    video:</label>
                                 <input type="url" name="videos_data[categorias][rutaVideo]" id="categorias_rutaVideo"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    value="{{ old('videos_data.categorias.rutaVideo', $producto->videos->rutaVideo ?? '') }}" placeholder="https://ejemplo.com/tu-video-categoria.mp4">
+                                    value="{{ old('videos_data.categorias.rutaVideo', $producto->videos->rutaVideo ?? '') }}"
+                                    placeholder="https://ejemplo.com/tu-video-categoria.mp4">
                                 @error('videos_data.categorias.rutaVideo')
                                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                                 @enderror
@@ -302,15 +308,16 @@
                 @endif
 
                 <div class="flex items-center justify-between mt-6">
-                    <button type="submit"
-                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        Actualizar Producto
-                    </button>
-
                     <a href="{{ route('productos.index') }}"
-                        class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
-                        Cancelar
+                        class="bg-[var(--color-textmarca)] hover:bg-[var(--color-texthovermarca)] py-3 px-4 rounded-full text-md font-bold text-white focus:outline-none focus:shadow-outline inline-flex items-center transition duration-150 ease-in-out transform hover:-translate-x-1 shadow-md">
+                        <img src="{{ asset('images/regresar.svg') }}" alt="Regresar" class="w-5 h-6 mr-2">
+                        <span class="whitespace-nowrap text-inherit">{{ __('Cancelar') }}</span>
                     </a>
+                    <button type="submit"
+                        class="bg-[var(--color-sgt)] hover:bg-[var(--color-hoversgt)] py-3 px-4 rounded-full text-md font-bold text-white focus:outline-none focus:shadow-outline inline-flex items-center transition duration-150 ease-in-out transform hover:translate-x-1 shadow-md">
+                        <span class="whitespace-nowrap text-inherit">{{ __('Actualizar producto') }}</span>
+                        <img src="{{ asset('images/siguiente.svg') }}" alt="siguiente" class="w-5 h-6 ml-2">
+                    </button>
                 </div>
             </form>
         </div>
@@ -318,12 +325,13 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const tipoInput = document.getElementById('tipo'); // Es un input readonly ahora
-            const camposComunesNoVideoEdit = document.getElementById('campos_comunes_no_video_edit'); // Nuevo elemento
+            const tipoInput = document.getElementById('tipo'); 
+            const camposComunesNoVideoEdit = document.getElementById(
+            'campos_comunes_no_video_edit');
             const camposCafe = document.getElementById('campos_cafe');
-            const camposMora = document.getElementById('campos_mora');
+            const camposmora = document.getElementById('campos_mora');
             const camposVideos = document.getElementById('campos_videos');
-            const camposRutaVideoProducto = document.getElementById('campos_ruta_video_producto');
+            const camposRutaVideoproducto = document.getElementById('campos_ruta_video_producto');
 
             const subtipoVideoSelect = document.getElementById('subtipo_video');
             const camposSubtipoPrimarios = document.getElementById('campos_subtipo_primarios');
@@ -331,7 +339,7 @@
             const camposSubtipoCategorias = document.getElementById('campos_subtipo_categorias');
 
             /**
-             * Muestra/oculta los campos específicos del producto (Café, Mora, Videos)
+             * Muestra/oculta los campos específicos del producto (Café, mora, Videos)
              * y el campo RutaVideo del producto general.
              */
             function toggleProductFields() {
@@ -342,12 +350,13 @@
                 // en el controlador (aunque el input sea readonly aquí, la lógica de JS
                 // debe ser robusta para la carga inicial).
                 if (camposCafe) camposCafe.classList.add('hidden');
-                if (camposMora) camposMora.classList.add('hidden');
+                if (camposmora) camposmora.classList.add('hidden');
                 if (camposVideos) camposVideos.classList.add('hidden');
-                if (camposRutaVideoProducto) camposRutaVideoProducto.classList.add('hidden');
+                if (camposRutaVideoproducto) camposRutaVideoproducto.classList.add('hidden');
 
                 // Ocultar los campos comunes no-video por defecto (Imagen y Observaciones)
-                if (camposComunesNoVideoEdit) camposComunesNoVideoEdit.classList.add('hidden'); // Ocultar por defecto
+                if (camposComunesNoVideoEdit) camposComunesNoVideoEdit.classList.add(
+                'hidden'); // Ocultar por defecto
 
                 // Ocultar todos los campos de subtipo de video por defecto
                 if (camposSubtipoPrimarios) camposSubtipoPrimarios.classList.add('hidden');
@@ -356,17 +365,21 @@
 
 
                 if (selectedType === 'café') {
-                    if (camposComunesNoVideoEdit) camposComunesNoVideoEdit.classList.remove('hidden'); // Mostrar para Café
+                    if (camposComunesNoVideoEdit) camposComunesNoVideoEdit.classList.remove(
+                    'hidden'); // Mostrar para Café
                     if (camposCafe) camposCafe.classList.remove('hidden');
-                    if (camposRutaVideoProducto) camposRutaVideoProducto.classList.remove('hidden'); // Mostrar RutaVideo para Café
+                    if (camposRutaVideoproducto) camposRutaVideoproducto.classList.remove(
+                    'hidden'); // Mostrar RutaVideo para Café
                 } else if (selectedType === 'mora') {
-                    if (camposComunesNoVideoEdit) camposComunesNoVideoEdit.classList.remove('hidden'); // Mostrar para Mora
-                    if (camposMora) camposMora.classList.remove('hidden');
-                    if (camposRutaVideoProducto) camposRutaVideoProducto.classList.remove('hidden'); // Mostrar RutaVideo para Mora
+                    if (camposComunesNoVideoEdit) camposComunesNoVideoEdit.classList.remove(
+                    'hidden'); // Mostrar para mora
+                    if (camposmora) camposmora.classList.remove('hidden');
+                    if (camposRutaVideoproducto) camposRutaVideoproducto.classList.remove(
+                    'hidden'); // Mostrar RutaVideo para mora
                 } else if (selectedType === 'videos') {
                     // camposComunesNoVideoEdit se mantiene oculto para videos
                     if (camposVideos) camposVideos.classList.remove('hidden');
-                    // No mostrar camposRutaVideoProducto para 'videos'
+                    // No mostrar camposRutaVideoproducto para 'videos'
                     // Y llamar a la función para mostrar/ocultar subtipos de video
                     toggleSubtypeFields();
                 }

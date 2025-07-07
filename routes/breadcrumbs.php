@@ -13,52 +13,52 @@ Breadcrumbs::for('dashboard', function ($trail) {
 
 /*
 |--------------------------------------------------------------------------
-| ADMINISTRADOR
+| PARA ROLES COMO: [SUPERADMIN] [ADMINISTRADOR] [OPERARIO] [FUNCIONARIO]
 |--------------------------------------------------------------------------
 */
 Breadcrumbs::for('usuarios.index', function ($trail) {
     $trail->parent('dashboard');
-    $trail->push('Gestión de Usuarios', route('usuarios.index'));
+    $trail->push('Tabla de usuarios', route('usuarios.index'));
 });
 
 Breadcrumbs::for('usuarios.create', function ($trail) {
     $trail->parent('usuarios.index')
-        ->push('Crear Usuario', route('usuarios.create'));
+        ->push('Crear usuario', route('usuarios.create'));
 });
 
 Breadcrumbs::for('usuarios.show', function ($trail, $usuario) {
     $trail->parent('usuarios.index')
-        ->push('Detalle de Usuario', route('usuarios.show', $usuario));
+        ->push('Detalle de usuario', route('usuarios.show', $usuario));
 });
 
 Breadcrumbs::for('usuarios.edit', function ($trail, $usuario) {
     $trail->parent('usuarios.index')
-        ->push('Editar Usuario', route('usuarios.edit', $usuario));
+        ->push('Editar usuario', route('usuarios.edit', $usuario));
 });
 
 Breadcrumbs::for('productos.index', function ($trail) {
     $trail->parent('dashboard')
-        ->push('Gestión de Productos', route('productos.index'));
+        ->push('Tabla de productos', route('productos.index'));
 });
 
 Breadcrumbs::for('productos.create', function ($trail) {
     $trail->parent('productos.index')
-        ->push('Crear Producto', route('productos.create'));
+        ->push('Crear producto', route('productos.create'));
 });
 
 Breadcrumbs::for('productos.show', function ($trail, $producto) {
     $trail->parent('productos.index')
-        ->push('Detalle de Producto', route('productos.show', $producto));
+        ->push('Detalle de producto', route('productos.show', $producto));
 });
 
 Breadcrumbs::for('productos.edit', function ($trail, $producto) {
     $trail->parent('productos.index')
-        ->push('Editar Producto', route('productos.edit', $producto));
+        ->push('Editar producto', route('productos.edit', $producto));
 });
 
 Breadcrumbs::for('boletines.index', function ($trail) {
     $trail->parent('dashboard')
-        ->push('Gestión de Boletines', route('boletines.index'));
+        ->push('Gestión de boletines', route('boletines.index'));
 });
 
 Breadcrumbs::for('boletines.create', function ($trail) {
@@ -68,17 +68,17 @@ Breadcrumbs::for('boletines.create', function ($trail) {
 
 Breadcrumbs::for('boletines.show', function ($trail, $boletin) {
     $trail->parent('boletines.index')
-        ->push('Detalle de Boletín', route('boletines.show', $boletin));
+        ->push('Detalle de boletín', route('boletines.show', $boletin));
 });
 
 Breadcrumbs::for('boletines.edit', function ($trail, $boletin) {
     $trail->parent('boletines.index')
-        ->push('Editar Boletín', route('boletines.edit', $boletin));
+        ->push('Editar boletín', route('boletines.edit', $boletin));
 });
 
 Breadcrumbs::for('centroAyuda.index', function ($trail) {
     $trail->parent('dashboard')
-        ->push('Centro de Ayuda', route('centroAyuda.index'));
+        ->push('Centro de ayuda', route('centroAyuda.index'));
 });
 
 Breadcrumbs::for('centroAyuda.contactForm', function ($trail) {
@@ -93,22 +93,22 @@ Breadcrumbs::for('accesibilidad.index', function ($trail) {
 
 Breadcrumbs::for('view-user.index', function ($trail) {
     $trail->parent('dashboard')
-        ->push('Vista de Usuarios', route('view-user.index'));
+        ->push('Vista de usuarios', route('view-user.index'));
 });
 
 Breadcrumbs::for('view-user.create', function ($trail) {
     $trail->parent('view-user.index')
-        ->push('Crear Usuario', route('view-user.create'));
+        ->push('Crear usuario', route('view-user.create'));
 });
 
 Breadcrumbs::for('view-user.show', function ($trail, $id) {
     $trail->parent('view-user.index')
-        ->push('Detalle de Usuario', route('view-user.show', $id));
+        ->push('Detalle de usuario', route('view-user.show', $id));
 });
 
 Breadcrumbs::for('view-user.edit', function ($trail, $id) {
     $trail->parent('view-user.index')
-        ->push('Editar Usuario', route('view-user.edit', $id));
+        ->push('Editar usuario', route('view-user.edit', $id));
 });
 
 Breadcrumbs::for('view-user.historial', function ($trail, $id) {
@@ -123,44 +123,20 @@ Breadcrumbs::for('statistics.index', function ($trail) {
 
 Breadcrumbs::for('noticias.index', function ($trail) {
     $trail->parent('dashboard')
-        ->push('Gestion de Noticias', route('noticias.index'));
+        ->push('Gestion de noticias', route('noticias.index'));
 });
 
 Breadcrumbs::for('noticias.create', function ($trail) {
     $trail->parent('noticias.index')
-        ->push('Crear Noticia', route('noticias.create'));
+        ->push('Crear noticia', route('noticias.create'));
 });
 
 Breadcrumbs::for('noticias.show', function ($trail, $noticia) {
     $trail->parent('noticias.index')
-        ->push('Detalle de la Noticia', route('noticias.show', $noticia));
+        ->push('Ver noticia', route('noticias.show', $noticia));
 });
 
 Breadcrumbs::for('noticias.edit', function ($trail, $noticia) {
     $trail->parent('noticias.index')
-        ->push('Editar Noticia', route('noticias.edit', $noticia));
-});
-
-/*
-|--------------------------------------------------------------------------
-| OPERADOR
-|--------------------------------------------------------------------------
-*/
-
-// Página principal del operador (pendientes)
-Breadcrumbs::for('operador.pendientes', function ($trail) {
-    $trail->parent('dashboard'); // Asumiendo que ya tienes 'dashboard' definido
-    $trail->push('Pendientes', route('operador.pendientes'));
-});
-
-// Detalle del producto pendiente
-Breadcrumbs::for('operador.productos.show', function ($trail, $producto) {
-    $trail->parent('operador.pendientes');
-    $trail->push('Producto', route('operador.productos.show', $producto));
-});
-
-// Detalle del boletín pendiente
-Breadcrumbs::for('operador.boletines.show', function ($trail, $boletin) {
-    $trail->parent('operador.pendientes');
-    $trail->push('Boletines', route('operador.boletines.show', $boletin));
+        ->push('Editar noticia', route('noticias.edit', $noticia));
 });

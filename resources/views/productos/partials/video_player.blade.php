@@ -47,6 +47,6 @@
 @else
     {{-- Mensaje si no hay video --}}
     <div class="mb-4 text-gray-600">
-        <strong class="font-semibold">Video del Producto:</strong> No se ha proporcionado un video para este producto.
+        <strong class="font-semibold">Video del producto:</strong> No se ha proporcionado un video para este producto.
     </div>
 @endif

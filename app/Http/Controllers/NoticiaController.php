@@ -133,7 +133,7 @@ class NoticiaController extends Controller
                 'tipo' => 'required|string|max:255',
                 'titulo' => 'required|string|max:255',
                 'clase' => 'required|string|max:255',
-                'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'informacion' => 'required|string',
                 'numero_pagina' => 'required|integer',
                 'autor' => 'required|string|max:255',

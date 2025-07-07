@@ -35,16 +35,12 @@ let isDragging = false;
  * Siempre inicia en el Paso 1.
  */
 window.openCreateBoletinModalVanilla = function () {
-    console.log('DEBUG: openCreateBoletinModalVanilla llamado.');
     if (createBoletinModal) {
         createBoletinModal.classList.remove('hidden');
         createBoletinModal.classList.add('flex'); // Asegura que el modal se centre
         document.body.style.overflow = 'hidden'; // Bloquea el scroll del body
         resetCreateBoletinForm(); // Resetea el formulario al abrir, llevándolo al Paso 1
-        console.log('DEBUG: Modal de creación abierto.');
-    } else {
-        console.error('ERROR: createBoletinModal no encontrado al intentar abrir.');
-    }
+    } 
 };
 
 /**
@@ -52,14 +48,10 @@ window.openCreateBoletinModalVanilla = function () {
  * No resetea el formulario, solo lo oculta.
  */
 window.closeCreateBoletinModalVanilla = function () {
-    console.log('DEBUG: closeCreateBoletinModalVanilla llamado.');
     if (createBoletinModal) {
         createBoletinModal.classList.remove('flex');
         createBoletinModal.classList.add('hidden'); // Oculta el modal
         document.body.style.overflow = ''; // Restaura el scroll del body
-        console.log('DEBUG: Modal de creación cerrado.');
-    } else {
-        console.error('ERROR: createBoletinModal no encontrado al intentar cerrar.');
     }
 };
 
@@ -68,13 +60,10 @@ window.closeCreateBoletinModalVanilla = function () {
  * Mantiene el modal abierto.
  */
 function resetCreateBoletinForm() {
-    console.log('DEBUG: resetCreateBoletinForm llamado.');
-
     // Detener cualquier simulación de carga en progreso
     if (intervalIdForSimulation) {
         clearInterval(intervalIdForSimulation);
         intervalIdForSimulation = null;
-        console.log('DEBUG: Simulación de carga detenida.');
     }
 
     currentFile = null;
@@ -88,7 +77,6 @@ function resetCreateBoletinForm() {
         pdfFileInput.value = ''; // Limpia el input de archivo
     }
 
-    // **Ajuste CRÍTICO para la UI de carga de archivo:**
     // Asegura que el área de drop esté visible y en su estado normal
     if (fileDropArea) {
         fileDropArea.classList.remove('hidden');
@@ -149,14 +137,10 @@ function resetCreateBoletinForm() {
  * @param {FileList} fileList - La lista de archivos recibida del evento.
  */
 function handleFileChange(fileList) {
-    console.log('DEBUG: handleFileChange disparado.');
-    console.log('DEBUG: Files received in handleFileChange:', fileList);
 
     if (fileList && fileList.length > 0) {
         currentFile = fileList[0];
-        console.log('DEBUG: Archivo seleccionado:', currentFile.name);
 
-        // **Ajuste para la UI de carga de archivo:**
         // Ocultar el área de drop y mostrar la vista previa del archivo cargado
         if (fileDropArea) fileDropArea.classList.add('hidden');
         if (fileUploadPreview) fileUploadPreview.classList.remove('hidden');
@@ -195,12 +179,9 @@ function handleFileChange(fileList) {
                 if (createBoletinStep1) createBoletinStep1.classList.add('hidden');
                 if (createBoletinStep2) createBoletinStep2.classList.remove('hidden');
                 if (submitCreateBoletinButton) submitCreateBoletinButton.classList.remove('hidden'); // Muestra el botón de subir
-
-                console.log('DEBUG: Transición a Paso 2. Archivo cargado simuladamente.');
             }
         }, 200);
     } else {
-        console.log('DEBUG: No files found in FileList or fileList is null.');
         resetCreateBoletinForm(); // Si no hay archivo, resetear toda la UI
     }
 }
@@ -212,13 +193,10 @@ function handleFileChange(fileList) {
 function handleDragOver(event) {
     event.preventDefault(); // Previene el comportamiento por defecto (abrir archivo en el navegador)
     isDragging = true;
-    console.log('DEBUG: DragOver event fired.');
     if (fileDropArea) {
         fileDropArea.classList.add('border-green-500', 'border-2', 'bg-green-50/50'); // Ajuste de clases
         fileDropArea.classList.remove('border-gray-300'); // Asegura que el borde gris se quita
-    } else {
-        console.warn('WARNING: fileDropArea is null in handleDragOver.');
-    }
+    } 
 }
 
 /**
@@ -227,13 +205,10 @@ function handleDragOver(event) {
  */
 function handleDragLeave(event) {
     isDragging = false;
-    console.log('DEBUG: DragLeave event fired.');
     if (fileDropArea) {
         fileDropArea.classList.remove('border-green-500', 'border-2', 'bg-green-50/50'); // Ajuste de clases
         fileDropArea.classList.add('border-gray-300'); // Vuelve a añadir el borde gris
-    } else {
-        console.warn('WARNING: fileDropArea is null in handleDragLeave.');
-    }
+    } 
 }
 
 /**
@@ -243,14 +218,10 @@ function handleDragLeave(event) {
 function handleDrop(event) {
     event.preventDefault(); // Previene el comportamiento por defecto (abrir archivo en el navegador)
     isDragging = false;
-    console.log('DEBUG: Drop event fired.');
     if (fileDropArea) {
         fileDropArea.classList.remove('border-green-500', 'border-2', 'bg-green-50/50'); // Ajuste de clases
         fileDropArea.classList.add('border-gray-300'); // Vuelve a añadir el borde gris
-    } else {
-        console.warn('WARNING: fileDropArea is null in handleDrop.');
-    }
-    handleFileChange(event.dataTransfer.files);
+    } handleFileChange(event.dataTransfer.files);
 }
 
 /**
@@ -259,7 +230,6 @@ function handleDrop(event) {
  */
 async function handleCreateBoletinSubmit(event) {
     event.preventDefault();
-    console.log('DEBUG: Submit de formulario de creación detectado.');
 
     if (!currentFile) {
         window.showGlobalMessage('error', 'Por favor, selecciona un archivo PDF.');
@@ -346,7 +316,6 @@ async function handleCreateBoletinSubmit(event) {
         const result = await response.json();
 
         if (response.ok) {
-            console.log('DEBUG: Boletín creado con éxito:', result);
             window.closeCreateBoletinModalVanilla(); // Cierra el modal de creación completamente después de subir
 
             // Lógica para actualizar la tabla (similar a la de edición)
@@ -374,11 +343,9 @@ async function handleCreateBoletinSubmit(event) {
                         }
                         window.showGlobalMessage('success', result.message || 'Boletín creado y tabla actualizada.');
                     } else {
-                        console.error('ERROR: El HTML de la fila es inesperado:', newRowHtml);
                         window.showGlobalMessage('error', 'Boletín creado, pero el HTML de la tabla es inesperado. Recargue la página.');
                     }
                 } else {
-                    console.error('ERROR: No se pudo obtener el HTML de la fila:', await rowResponse.text());
                     window.showGlobalMessage('error', 'Boletín creado, pero no se pudo actualizar la tabla. Recargue la página.');
                 }
             } else {
@@ -386,16 +353,13 @@ async function handleCreateBoletinSubmit(event) {
             }
 
         } else if (response.status === 422) {
-            console.error('DEBUG: Errores de validación (422):', result.errors);
             // Mostrar errores de validación en el formulario
             displayCreateFormValidationErrors(result.errors);
             window.showGlobalMessage('error', result.message || 'Por favor, corrige los errores en el formulario.');
         } else {
-            console.error('DEBUG: Error en la respuesta del servidor:', result);
             window.showGlobalMessage('error', result.message || 'Ocurrió un error inesperado al crear el boletín.');
         }
     } catch (error) {
-        console.error('DEBUG: Error al crear el boletín:', error);
         window.showGlobalMessage('error', 'Error de red o conexión al servidor. Inténtalo de nuevo.');
     } finally {
         if (submitCreateBoletinButton) {
@@ -435,7 +399,6 @@ function displayCreateFormValidationErrors(errors) {
 // --- Event Listeners y Inicialización ---
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('DEBUG: boletin-create-vanilla.js DOMContentLoaded fired.');
 
     // Obtener referencias a los elementos del DOM (¡Verifica que estos IDs coincidan con tu HTML!)
     createBoletinModal = document.getElementById('createBoletinModal');
@@ -469,10 +432,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (closeCreateModalXButton) {
         closeCreateModalXButton.addEventListener('click', function () {
             if (currentStep === 2) {
-                console.log('DEBUG: Clic en X en Paso 2. Reiniciando a Paso 1.');
                 resetCreateBoletinForm();
             } else {
-                console.log('DEBUG: Clic en X en Paso 1. Cerrando modal.');
                 window.closeCreateBoletinModalVanilla();
             }
         });
@@ -480,10 +441,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (cancelCreateModalButton) {
         cancelCreateModalButton.addEventListener('click', function () {
             if (currentStep === 2) {
-                console.log('DEBUG: Clic en Cancelar en Paso 2. Reiniciando a Paso 1.');
                 resetCreateBoletinForm();
             } else {
-                console.log('DEBUG: Clic en Cancelar en Paso 1. Cerrando modal.');
                 window.closeCreateBoletinModalVanilla();
             }
         });
@@ -520,10 +479,8 @@ document.addEventListener('DOMContentLoaded', function () {
         createBoletinModal.addEventListener('click', function (event) {
             if (event.target === createBoletinModal) {
                 if (currentStep === 2) {
-                    console.log('DEBUG: Clic fuera en Paso 2. Reiniciando a Paso 1.');
                     resetCreateBoletinForm();
                 } else {
-                    console.log('DEBUG: Clic fuera en Paso 1. Cerrando modal.');
                     window.closeCreateBoletinModalVanilla();
                 }
             }
@@ -532,10 +489,8 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape' && createBoletinModal && !createBoletinModal.classList.contains('hidden')) {
             if (currentStep === 2) {
-                console.log('DEBUG: Tecla Escape en Paso 2. Reiniciando a Paso 1.');
                 resetCreateBoletinForm();
             } else {
-                console.log('DEBUG: Tecla Escape en Paso 1. Cerrando modal.');
                 window.closeCreateBoletinModalVanilla();
             }
         }
@@ -551,7 +506,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Listener para el botón de eliminar el archivo seleccionado (el "X" en la barra de progreso)
     if (removeSelectedFileButton) {
         removeSelectedFileButton.addEventListener('click', () => {
-            console.log('DEBUG: Botón de eliminar archivo clickeado.');
             resetCreateBoletinForm(); // Esto ocultará la barra y mostrará el área de drop
         });
     }

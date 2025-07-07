@@ -105,7 +105,7 @@
                     <label for="edit_precio_mas_alto_{{ $boletin->id }}"
                         class="block text-sm font-bold text-gray-700">Precio Más Alto</label>
                     <div class="flex items-center gap-2 mt-1"> {{-- Usamos flexbox aquí --}}
-                        <img src="{{ asset('images/subir.svg') }}" alt="Icono subir" class="w-6 h-6">
+                        <img src="{{ asset('images/alto.svg') }}" alt="Icono subir" class="w-6 h-6">
                         <input type="number" step="0.01" name="precio_mas_alto"
                             id="edit_precio_mas_alto_{{ $boletin->id }}"
                             value="{{ old('precio_mas_alto', $boletin->precio_mas_alto) }}"
@@ -132,7 +132,7 @@
                     <label for="edit_precio_mas_bajo_{{ $boletin->id }}"
                         class="block text-sm font-bold text-gray-700">Precio Más Bajo</label>
                     <div class="flex items-center gap-2 mt-1"> {{-- Usamos flexbox aquí --}}
-                        <img src="{{ asset('images/bajar.svg') }}" alt="Iconobajar" class="w-6 h-6">
+                        <img src="{{ asset('images/bajo.svg') }}" alt="Iconobajar" class="w-6 h-6">
                         <input type="number" step="0.01" name="precio_mas_bajo"
                             id="edit_precio_mas_bajo_{{ $boletin->id }}"
                             value="{{ old('precio_mas_bajo', $boletin->precio_mas_bajo) }}"

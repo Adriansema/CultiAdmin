@@ -11,7 +11,7 @@
     <x-slot name="form">
     {{-- Campo de Contraseña Actual --}}
     <div class="col-span-6 sm:col-span-4 relative">
-        <x-label for="current_password" value="{{ __('Contraseña actual') }}" />
+        <x-label for="current_password" value="{{ __('Contraseña actual:') }}" />
         <x-input id="current_password" type="password" class="mt-1 rounded-xl block w-full pr-10" wire:model="state.current_password" autocomplete="current-password" />
         {{-- Contenedor del icono, posicionado absolutamente --}}
         <div class="absolute right-0 pr-3 flex items-center cursor-pointer" style="top: 32px;" onclick="togglePasswordVisibility('current_password', 'toggle_current_password')">
@@ -22,7 +22,7 @@
 
     {{-- Campo de Nueva Contraseña --}}
     <div class="col-span-6 sm:col-span-4 relative">
-        <x-label for="password" value="{{ __('Nueva contraseña') }}" />
+        <x-label for="password" value="{{ __('Nueva contraseña:') }}" />
         <x-input id="password" type="password" class="mt-1 rounded-xl block w-full pr-10" wire:model="state.password" autocomplete="new-password" />
         <div class="absolute right-0 pr-3 flex items-center cursor-pointer" style="top: 32px;" onclick="togglePasswordVisibility('password', 'toggle_password')">
             <img id="toggle_password" src="{{ asset('images/ojo-close.svg') }}" alt="ocultar" class="w-5 h-5 text-gray-500" />
@@ -32,7 +32,7 @@
 
     {{-- Campo de Confirmar Contraseña --}}
     <div class="col-span-6 sm:col-span-4 relative">
-        <x-label for="password_confirmation" value="{{ __('Confirmar contraseña') }}" />
+        <x-label for="password_confirmation" value="{{ __('Confirmar contraseña:') }}" />
         <x-input id="password_confirmation" type="password" class="mt-1 rounded-xl block w-full pr-10" wire:model="state.password_confirmation" autocomplete="new-password" />
         <div class="absolute right-0 pr-3 flex items-center cursor-pointer" style="top: 32px;" onclick="togglePasswordVisibility('password_confirmation', 'toggle_password_confirmation')">
             <img id="toggle_password_confirmation" src="{{ asset('images/ojo-close.svg') }}" alt="ocultar" class="w-5 h-5 text-gray-500" />

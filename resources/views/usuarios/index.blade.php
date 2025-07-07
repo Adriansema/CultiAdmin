@@ -5,8 +5,8 @@
     @can('crear usuario')
         <div class="inline-block px-20 py-6">
             <div class="flex items-center space-x-4">
-                <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-                <h1 class="text-3xl whitespace-nowrap font-bold">Gestión de Usuarios</h1>
+                <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono">
+                <h1 class="text-3xl whitespace-nowrap font-bold">Gestión de usuarios</h1>
             </div>
             <div class="py-2">
                 {!! Breadcrumbs::render('usuarios.index') !!}
@@ -14,19 +14,19 @@
         </div>
 
         <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-3xl p-4 mb-8">
-            <div class="flex items-center justify-between flex-wrap"> {{-- Añadido flex-wrap para responsividad --}}
+            <div class="flex items-center justify-between flex-wrap"> 
 
                 {{-- FORMULARIO DE BÚSQUEDA (solo input de texto) --}}
                 <form id="BuscarUser" action="{{ route('usuarios.index') }}" method="GET"
-                    class="flex items-center w-full max-w-xl mb-4 md:mb-0"> {{-- Ajuste de margen para responsividad --}}
+                    class="flex items-center w-full max-w-xl mb-4 md:mb-0"> 
                     @include('usuarios.partials.search')
                 </form>
 
                 {{-- Contenedor de filtros y botones de acción --}}
-                <div class="flex items-center justify-end py-6 space-x-2 flex-wrap ml-auto"> {{-- Añadido ml-auto y flex-wrap --}}
+                <div class="flex items-center justify-end py-6 space-x-2"> 
                     {{-- SELECT para filtrar por ESTADO --}}
                     <select id="filtrarEstado" name="estado"
-                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all 
+                        class="inline-flex items-center justify-center px-4 py-3 space-x-2 space-x-reverse transition-all 
                         duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] 
                         hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium
                         text-black form-control  hover:border-[var(--color-hover)]
@@ -40,7 +40,7 @@
 
                     {{-- SELECT para filtrar por ROL --}}
                     <select id="filtrarRol" name="rol"
-                        class="inline-flex items-center justify-center px-4 py-2 space-x-2 space-x-reverse transition-all 
+                        class="inline-flex items-center justify-center px-4 py-3 space-x-2 space-x-reverse transition-all 
                         duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] 
                         hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium
                         text-black form-control  hover:border-[var(--color-hover)]
@@ -57,23 +57,25 @@
                         <x-responsive-nav-link href="#" onclick="this.closest('form').submit(); return false;"
                             class="inline-flex items-center group justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] text-white rounded-full w-auto">
                             <span class="text-md font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
-                                {{ __('Exportar Csv') }}
+                                {{ __('Exportar csv') }}
                             </span>
                             <img src="{{ asset('images/export.svg') }}"
-                                class="w-5 h-4 relative inset-0 block group-hover:hidden" alt="Icono Exportar CSV">
+                                class="w-6 h-8 relative inset-0 block group-hover:hidden" alt="Icono Exportar CSV">
                             <img src="{{ asset('images/export-hover.svg') }}"
-                                class="w-5 h-4 relative inset-0 hidden group-hover:block" alt="Icono Exportar CSV">
+                                class="w-6 h-8 relative inset-0 hidden group-hover:block" alt="Icono Exportar CSV">
                         </x-responsive-nav-link>
                     </form>
 
-                    <button type="button" id="create-user-button"
-                        class="inline-flex items-center px-4 py-2 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900]
+                    @if (Auth::user()->hasAnyRole(['SuperAdmin', 'Administrador']))
+                        <button type="button" id="create-user-button"
+                            class="inline-flex items-center px-4 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900]
                         hover:bg-[#61BA33] text-white rounded-full w-auto create-user-button">
-                        <img src="{{ asset('images/signo.svg') }}" class="w-4 h-3" alt="Icono Nuevo Usuario">
-                        <span class="text-md font-medium whitespace-nowrap">
-                            {{ __('Crear Usuario') }}
-                        </span>
-                    </button>
+                            <img src="{{ asset('images/signo.svg') }}" class="w-4 h-3" alt="Icono Nuevo Usuario">
+                            <span class="text-md font-medium whitespace-nowrap">
+                                {{ __('Crear usuario') }}
+                            </span>
+                        </button>
+                    @endif
                 </div>
             </div>
 

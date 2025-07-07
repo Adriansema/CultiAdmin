@@ -12,14 +12,24 @@
             <form action="{{ route('productos.destroy', $producto) }}" method="POST" class="inline-block">
                 @csrf
                 @method('DELETE')
-                <div class="flex justify-end mt-4 space-x-2">
+                <div class="flex items-center">
                     <button type="button" onclick="cerrarModal('producto', '{{ $producto->id }}')"
-                        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
-                        Cancelar
+                       class="bg-[var(--color-textmarca)] hover:bg-[var(--color-texthovermarca)] 
+                        py-3 px-4 rounded-full text-md font-bold text-white focus:outline-none 
+                        focus:shadow-outline inline-flex items-center transition duration-150 
+                        ease-in-out transform hover:-translate-x-1">
+                        <img src="{{ asset('images/regresar.svg') }}" alt="Regresar" class="w-5 h-6 mr-2">
+                        <span class="whitespace-nowrap text-inherit">{{ __('Cancelar') }}</span>
                     </button>
-                    <x-button class="bg-red-600 hover:bg-red-700">
-                        Eliminar
-                    </x-button>
+
+                    <button
+                        class="ml-40 bg-[var(--color-rechazar)] hover:bg-[var(--color-rechazar-hover)] 
+                    py-3 px-4 rounded-full text-md font-bold text-white focus:outline-none 
+                    focus:shadow-outline inline-flex items-center transition duration-150 
+                    ease-in-out transform hover:translate-x-2">
+                        <span class="whitespace-nowrap text-inherit">{{ __('Eliminar') }}</span>
+                        <img src="{{ asset('images/siguiente.svg') }}" alt="siguiente" class="w-5 h-6 ml-2">
+                    </button>
                 </div>
             </form>
         </div>

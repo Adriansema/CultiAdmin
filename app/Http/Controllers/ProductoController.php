@@ -49,6 +49,7 @@ class ProductoController extends Controller
         // 1. Definir las reglas de validación base para el producto.
         $rules = [
             'tipo' => 'required|string|in:café,mora,videos', // El tipo principal de producto
+            'observaciones' => 'nullable|string',
         ];
 
         // 2. Añadir reglas de validación condicionalmente según el tipo de producto.
@@ -56,7 +57,6 @@ class ProductoController extends Controller
 
         if ($tipoProductoPrincipal === 'café') {
             $rules['imagen'] = 'required|image|mimes:jpeg,png,jpg|max:2048';
-            $rules['observaciones'] = 'required|string'; // Asumo que es requerido para café
             $rules['cafe_data.numero_pagina'] = 'required|integer';
             $rules['cafe_data.clase'] = 'required|string|max:100';
             $rules['cafe_data.informacion'] = 'required|string';
@@ -64,7 +64,6 @@ class ProductoController extends Controller
 
         } elseif ($tipoProductoPrincipal === 'mora') {
             $rules['imagen'] = 'required|image|mimes:jpeg,png,jpg|max:2048';
-            $rules['observaciones'] = 'required|string'; // Asumo que es requerido para mora
             $rules['mora_data.numero_pagina'] = 'required|integer';
             $rules['mora_data.clase'] = 'required|string|max:100';
             $rules['mora_data.informacion'] = 'required|string';

@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Asegúrate de que esta función 'mostrarModal' esté definida en algún lugar accesible globalmente
     if (typeof window.mostrarModal !== 'function') {
         window.mostrarModal = function (tipo, id) {
-            console.warn(`Función mostrarModal no definida. Tipo: ${tipo}, ID: ${id}`);
             if (tipo === 'ver') {
                 fetch(`/boletines/${id}`, {
                     headers: {
@@ -55,19 +54,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         if (typeof jQuery !== 'undefined' && typeof jQuery.fn.modal !== 'undefined') {
                             $('#verBoletinModal').modal('show');
-                        } else {
-                            console.warn("jQuery or Bootstrap modal function not found. Ensure they are loaded correctly.");
                         }
                     })
-                    .catch(error => console.error('Error al cargar detalles del boletín:', error));
             } else if (tipo === 'editar') {
                 const editModal = document.getElementById(`editBoletinModal-${id}`);
                 if (editModal) {
                     editModal.classList.remove('hidden');
                     editModal.classList.add('flex');
                     document.body.style.overflow = 'hidden';
-                } else {
-                    console.error(`Modal de edición con ID editBoletinModal-${id} no encontrado.`);
                 }
             } else if (tipo === 'boletin') { // Asumo que 'boletin' es para eliminar
                 const deleteModal = document.getElementById(`deleteBoletinModal-${id}`);
@@ -75,8 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     deleteModal.classList.remove('hidden');
                     deleteModal.classList.add('flex');
                     document.body.style.overflow = 'hidden';
-                } else {
-                    console.error(`Modal de eliminación con ID deleteBoletinModal-${id} no encontrado.`);
                 }
             } else if (tipo === 'validar-boletin') {
                 const validateModal = document.getElementById(`validarBoletinModal-${id}`);
@@ -84,8 +76,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     validateModal.classList.remove('hidden');
                     validateModal.classList.add('flex');
                     document.body.style.overflow = 'hidden';
-                } else {
-                    console.error(`Modal de validación con ID validarBoletinModal-${id} no encontrado.`);
                 }
             } else if (tipo === 'rechazar-boletin') {
                 const rejectModal = document.getElementById(`rechazarBoletinModal-${id}`);
@@ -93,8 +83,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     rejectModal.classList.remove('hidden');
                     rejectModal.classList.add('flex');
                     document.body.style.overflow = 'hidden';
-                } else {
-                    console.error(`Modal de rechazo con ID rechazarBoletinModal-${id} no encontrado.`);
                 }
             }
         };
@@ -136,19 +124,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         return `
             <tr id="boletin-row-${boletin.id}" class="bg-white hover:bg-gray-200">
-                <td class="max-w-xs px-4 py-2 text-gray-800 break-words whitespace-normal align-top boletin-nombre-cell">
+                <td class="px-6 py-4 text-gray-800 break-words whitespace-normal align-top boletin-nombre-cell">
                     ${boletin.nombre ? boletin.nombre.substring(0, 40) + (boletin.nombre.length > 40 ? '...' : '') : ''}
                 </td>
-                <td class="max-w-xs px-4 py-2 text-gray-600 break-words whitespace-normal align-top boletin-descripcion-cell">
+                <td class="px-6 py-4 text-gray-600 break-words whitespace-normal align-top boletin-descripcion-cell">
                     ${boletin.descripcion ? boletin.descripcion.substring(0, 60) + (boletin.descripcion.length > 60 ? '...' : '') : ''}
                 </td>
-                <td class="max-w-xs px-4 py-2 text-gray-600 break-words whitespace-normal align-top boletin-fecha-cell">
+                <td class="px-6 py-4 text-gray-600 break-words whitespace-normal align-top">
                     ${formattedDate}
                     <span class="block text-xs text-gray-500">
                         (${diffForHumans})
                     </span>
                 </td>
-                <td class="px-4 py-2 text-gray-700 align-top whitespace-nowrap boletin-precio-bajo-cell">
+                <td class="px-6 py-4 text-gray-700 align-top whitespace-nowrap boletin-precio-bajo-cell">
                     ${boletin.precio_mas_alto ? `
                         <p class="flex items-center text-green-600">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -159,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         ${boletin.lugar_precio_mas_alto ? `<span class="block text-xs text-gray-500">(${boletin.lugar_precio_mas_alto})</span>` : ''}
                     ` : 'N/A'}
                 </td>
-                <td class="px-4 py-2 text-gray-700 align-top whitespace-nowrap boletin-precio-bajo-cell" >
+                <td class="px-6 py-4 text-gray-700 align-top whitespace-nowrap boletin-precio-bajo-cell" >
                     ${boletin.precio_mas_bajo ? `
                         <p class="flex items-center text-red-600">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -170,42 +158,42 @@ document.addEventListener('DOMContentLoaded', function () {
                         ${boletin.lugar_precio_mas_bajo ? `<span class="block text-xs text-gray-500">(${boletin.lugar_precio_mas_bajo})</span>` : ''}
                     ` : 'N/A'}
                 </td>
-                <td class="px-4 py-2 align-top boletin-estado-cell">
+                <td class="px-6 py-4 align-top boletin-estado-cell">
                     <span
                         class="inline-block px-3 py-2 text-md font-semibold text-white rounded-xl ${estadoBadgeClass}">
                         ${boletin.estado ? boletin.estado.charAt(0).toUpperCase() + boletin.estado.slice(1) : ''}
                     </span>
                 </td>
-                <td class="flex flex-col px-4 py-2 space-y-1 align-top md:space-y-0 md:space-x-2 md:flex-row boletin-acciones-cell">
+                <td class="flex flex-col px-6 py-4 space-y-1 align-top md:space-y-0 md:space-x-2 md:flex-row boletin-acciones-cell">
                     ${boletin.can_crear ? `
                         <button type="button" onclick="mostrarModal('ver', '${boletin.id}')"
-                            class="px-2 py-2 text-sm text-center text-white bg-green-600 rounded-xl hover:bg-green-700">
+                            class="px-3 py-2 text-center text-white bg-green-600 rounded-xl hover:bg-green-700">
                             Ver
                         </button>
                     ` : ''}
                     ${boletin.can_editar ? `
                         <button type="button" onclick="mostrarModal('editar', '${boletin.id}')"
-                            class="px-2 py-2 text-sm text-center text-white bg-yellow-600 rounded-xl hover:bg-yellow-700">
+                            class="px-3 py-2 text-center text-white bg-yellow-600 rounded-xl hover:bg-yellow-700">
                             Editar
                         </button>
                     ` : ''}
                     ${boletin.can_eliminar ? `
                         <button type="button" onclick="mostrarModal('boletin', '${boletin.id}')"
-                            class="w-20 px-2 py-2 text-sm text-center text-white bg-red-600 rounded-xl hover:bg-red-700">
+                            class="px-3 py-2 text-center text-white bg-red-600 rounded-xl hover:bg-red-700">
                             Eliminar
                         </button>
                     ` : ''}
 
                     ${boletin.can_validar ? `
                         <button type="button" onclick="mostrarModal('validar-boletin', '${boletin.id}')"
-                            class="px-2 py-2 text-sm text-center text-white bg-blue-600 rounded-xl hover:bg-blue-700">
+                            class="px-3 py-2 text-center text-white bg-blue-600 rounded-xl hover:bg-blue-700">
                             Validar
                         </button>
                         ` : ''}
 
                     ${boletin.can_validar ? `
                         <button type="button" onclick="mostrarModal('rechazar-boletin', '${boletin.id}')"
-                            class="px-2 py-2 text-sm text-center text-white bg-orange-600 rounded-xl hover:bg-orange-700">
+                            class="px-3 py-2 text-center text-white bg-orange-600 rounded-xl hover:bg-orange-700">
                             Rechazar
                         </button>
                     ` : ''}
@@ -256,8 +244,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         url.searchParams.append('per_page', 5);
 
-        console.log('URL de la solicitud FETCH (combinación de filtros):', url.toString()); // Log útil para depuración
-
         if (tableBody) tableBody.innerHTML = '';
         if (noBoletinesMessageRow) noBoletinesMessageRow.style.display = 'none';
         if (loadingSpinnerRow) loadingSpinnerRow.style.display = 'table-row';
@@ -296,7 +282,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => {
                 if (loadingSpinnerRow) loadingSpinnerRow.style.display = 'none';
-                console.error('Error al obtener boletines filtrados:', error);
                 if (tableBody) {
                     tableBody.innerHTML = '';
                 }

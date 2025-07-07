@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Este botón enviará todos los filtros actuales.
     if (filtrosBotones) {
         filtrosBotones.addEventListener('click', function () {
-            console.log('Botón Filtrar clicado. Aplicando filtros...');
             applyFilters();
         });
     }
@@ -45,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function () {
         buscame.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault(); // Evita que el formulario se envíe de forma predeterminada
-                console.log('Enter presionado en el input. Aplicando filtros...');
                 applyFilters();
             }
         });
@@ -88,7 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 buscame.focus(); // Opcional: vuelve a poner el foco en el input
 
                 // Aplica los filtros (con el campo de búsqueda vacío)
-                console.log('Campo de búsqueda limpiado. Aplicando filtros...');
                 applyFilters();
             });
         }
@@ -97,7 +94,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Lógica para el filtro por estado (cuando cambia el select) ---
     if (filtroEstadoSelect) {
         filtroEstadoSelect.addEventListener('change', function() {
-            console.log('Filtro de estado cambiado. Aplicando filtros...');
             applyFilters();
         });
     }

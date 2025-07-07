@@ -47,7 +47,7 @@ class PqrsConfirmationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.pqrs_confirmation', // La vista Blade que definirá el cuerpo del correo
+            view: 'emails.auth.pqrs_confirmation', // La vista Blade que definirá el cuerpo del correo
             with: [
                 'pqrs' => $this->pqrs, // Pasa el objeto Pqrs a la vista del correo
             ],

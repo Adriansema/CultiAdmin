@@ -27,8 +27,6 @@ window.setFilter = function(filterType, yearToLoadValue = null) {
         return;
     }
 
-    console.log(`DEBUG: setFilter llamado. Tipo de filtro: ${filterType}, Año Seleccionado (directo): ${yearToLoadValue}`);
-
     filtroActual = filterType;
 
     // 1. Actualiza los estilos de los botones de filtro
@@ -43,7 +41,6 @@ window.setFilter = function(filterType, yearToLoadValue = null) {
         if (currentYearDisplay) { // Añadir verificación de existencia
             currentYearDisplay.textContent = currentSelectedYear;
         }
-        console.log(`DEBUG: Año seleccionado en UI personalizada: ${currentSelectedYear}`);
     }
 
     // 3. Llama a la función para cargar los datos desde la API
@@ -59,12 +56,9 @@ window.setFilter = function(filterType, yearToLoadValue = null) {
 // INICIALIZACIÓN DE DOMContentLoaded (Para tareas que requieren el DOM completo)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("DEBUG: DOMContentLoaded - El DOM está completamente cargado. Iniciando componentes.");
-
     // *** VERIFICACIÓN CRÍTICA: Solo si el elemento 'chart' existe, inicializamos el dashboard ***
     const chartDom = document.getElementById('chart');
     if (!chartDom) {
-        console.warn("ADVERTENCIA: Elemento 'chart' no encontrado. Dashboard.js no se inicializará en esta página.");
         return; // Salir de la función si no estamos en la página del dashboard
     }
     // *** FIN VERIFICACIÓN CRÍTICA ***
@@ -95,7 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // --- Carga inicial de datos al cargar la página ---
     window.setFilter('semana');
-    console.log("DEBUG: Carga inicial de dashboard con filtro 'semana'.");
 });
 
 
@@ -219,11 +212,8 @@ function loadData(filterType, value = null) {
         filtroActual = 'semana';
     }
 
-    console.log("DEBUG: Realizando fetch a la URL:", url);
-
     fetch(url)
         .then(response => {
-            console.log("DEBUG: Respuesta HTTP recibida del fetch:", response);
             if (!response.ok) {
                 return response.json().then(errorData => {
                     throw new Error(`Error HTTP! Estado: ${response.status}, Detalle: ${errorData.detalle || response.statusText}`);
@@ -234,13 +224,11 @@ function loadData(filterType, value = null) {
             return response.json();
         })
         .then(data => {
-            console.log("DEBUG: Datos JSON recibidos de la API (loadData):", data);
             localStorage.setItem('dashboardData', JSON.stringify(data));
             renderChart(data);
             updateMetrics(data);
         })
         .catch(error => {
-            console.error('ERROR: Error al obtener estadísticas en loadData:', error);
             const chartDom = document.getElementById('chart');
             if (chartDom) { // Añadir verificación de existencia
                 chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-red-500 p-4">Error al cargar la gráfica: ${error.message}.</div>`;
@@ -288,28 +276,22 @@ function renderChart(data) {
     const chartDom = document.getElementById('chart');
 
     if (!chartDom) {
-        console.error("ECharts ERROR: Contenedor de la gráfica con id 'chart' no encontrado.");
         return;
     }
 
     if (chartDom.offsetWidth === 0 || chartDom.offsetHeight === 0) {
-        console.warn(`ECharts ADVERTENCIA: Contenedor de la gráfica tiene dimensiones cero (${chartDom.offsetWidth}x${chartDom.offsetHeight}). Reintentando renderizar en 200ms...`);
         chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-gray-500">Ajustando la gráfica...</div>`;
         setTimeout(() => renderChart(data), 200);
         return;
     }
 
     if (myChart === null || myChart.isDisposed()) {
-        console.log("ECharts DEBUG: Inicializando ECharts por primera vez o re-inicializando.");
         myChart = echarts.init(chartDom);
         window.addEventListener('resize', function() {
             if (myChart && !myChart.isDisposed()) {
                  myChart.resize();
-                 console.log("ECharts DEBUG: Gráfica redimensionada.");
             }
         });
-    } else {
-        console.log("ECharts DEBUG: Actualizando ECharts con nuevos datos.");
     }
 
     let datosOrdenados = [...(data.vistas || [])];
@@ -399,5 +381,4 @@ function renderChart(data) {
 
     myChart.setOption(options);
     myChart.resize();
-    console.log("ECharts DEBUG: Gráfica renderizada/actualizada con datos:", data.vistas);
 }

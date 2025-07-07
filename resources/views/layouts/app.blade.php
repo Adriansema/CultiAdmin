@@ -58,7 +58,6 @@
     @endif
 
     <script type="module" src="{{ asset('js/accesibilidad.js') }}"></script>
-    @stack('scripts')
 </body>
 
 </html>

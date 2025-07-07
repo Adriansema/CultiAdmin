@@ -7,8 +7,6 @@
  * @param {string} message - El mensaje a mostrar.
  */
 window.showGlobalMessage = function (type, message) {
-    console.log(`--- showGlobalMessage llamada: Tipo=${type}, Mensaje="${message}" ---`);
-
     const modal = document.getElementById('globalMessageModalVanilla');
     const messageText = document.getElementById('globalMessageText');
     const successIcon = document.getElementById('globalMessageSuccessIcon');
@@ -16,7 +14,6 @@ window.showGlobalMessage = function (type, message) {
     const closeButton = document.getElementById('globalMessageCloseButton');
 
     if (!modal || !messageText || !successIcon || !errorIcon || !closeButton) {
-        console.error('ERROR: Elementos del modal de mensaje global no encontrados. Mostrando alert de fallback.');
         alert(type === 'error' ? `Error: ${message}` : `Éxito: ${message}`);
         return;
     }
@@ -49,7 +46,6 @@ window.showGlobalMessage = function (type, message) {
         document.body.classList.remove('modal-open'); // Restaura el scroll
         closeButton.removeEventListener('click', closeHandler); // Limpia el listener
         clearTimeout(autoHideTimer); // Limpia el temporizador si se cierra manualmente
-        console.log('DEBUG: Modal de mensaje global cerrado manualmente.');
     };
     closeButton.addEventListener('click', closeHandler);
 
@@ -60,7 +56,6 @@ window.showGlobalMessage = function (type, message) {
             modal.classList.add('hidden');
             document.body.classList.remove('modal-open');
             closeButton.removeEventListener('click', closeHandler);
-            console.log('DEBUG: Modal de mensaje global cerrado automáticamente.');
         }
     }, 3000); // 3 segundos
 };

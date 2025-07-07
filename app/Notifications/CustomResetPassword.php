@@ -63,25 +63,27 @@ class CustomResetPassword extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        return $this->buildMailMessage($this->resetUrl($notifiable));
+        // Importante: Pasamos $notifiable también a buildMailMessage para poder acceder al nombre en la vista
+        return $this->buildMailMessage($this->resetUrl($notifiable), $notifiable); 
     }
 
-    /**
+     /**
      * Get the reset password notification mail message for the given URL.
      *
      * @param  string  $url
+     * @param  mixed  $notifiable // <-- Añadimos este parámetro para tener el usuario disponible
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    protected function buildMailMessage($url)
+    protected function buildMailMessage($url, $notifiable) 
     {
-        // Aquí es donde personalizarás el contenido del email
         return (new MailMessage)
-            ->subject(Lang::get('Notificación de Restablecimiento de Contraseña para Cultiva SENA')) // Asunto personalizado
-            ->line(Lang::get('¡Hola! Estás recibiendo este correo porque hemos recibido una solicitud de restablecimiento de contraseña para tu cuenta.')) // Línea personalizada
-            ->action(Lang::get('Restablecer Contraseña'), $url) // Botón de acción
-            ->line(Lang::get('Este enlace de restablecimiento de contraseña expirará en :count minutos.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')])) // Línea con tiempo de expiración
-            ->line(Lang::get('Si no solicitaste un restablecimiento de contraseña, no se requiere ninguna acción adicional.')) // Última línea
-            ->salutation(Lang::get('Saludos, El equipo de Cultiva SENA')); // Añadir una salutación final
+            ->subject(Lang::get('Restablecimiento de Contraseña para Cultiva SENA')) 
+            ->view('emails.auth.reset', [ 
+                'url' => $url,
+                'token' => $this->token,
+                'user' => $notifiable, 
+                'expire_minutes' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')
+            ]);
     }
 
     /**
@@ -96,10 +98,11 @@ class CustomResetPassword extends Notification
             return call_user_func(static::$createUrlCallback, $notifiable, $this->token);
         }
 
-        return url(route('password.reset', [
+        // Asegúrate de que APP_URL en tu .env esté configurado correctamente para URLs absolutas.
+        return URL::to(route('password.reset', [
             'token' => $this->token,
             'email' => $notifiable->getEmailForPasswordReset(),
-        ], false));
+        ], false)); // El 'false' al final hace la URL relativa. Puedes quitarlo para URL absoluta si APP_URL no está configurado.
     }
 
     /**

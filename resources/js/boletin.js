@@ -65,7 +65,6 @@ window.clearValidationErrors = function (boletinId) {
  * @param {object} errors - Un objeto con los errores de validación, donde la clave es el nombre del campo.
  */
 window.displayValidationErrors = function (boletinId, errors) {
-    console.log(`--- Función displayValidationErrors llamada para boletín ID: ${boletinId} ---`);
     window.clearValidationErrors(boletinId);
     const form = document.getElementById(`editBoletinForm-${boletinId}`);
     if (form) {
@@ -90,8 +89,6 @@ window.displayValidationErrors = function (boletinId, errors) {
  * @param {string} message - El mensaje a mostrar.
  */
 window.showGlobalMessage = function (type, message) {
-    console.log(`--- Función showGlobalMessage llamada (Vanilla JS): Tipo=${type}, Mensaje="${message}" ---`);
-
     const modal = document.getElementById('globalMessageModalVanilla');
     const messageText = document.getElementById('globalMessageText');
     const successIcon = document.getElementById('globalMessageSuccessIcon');
@@ -99,7 +96,6 @@ window.showGlobalMessage = function (type, message) {
     const closeButton = document.getElementById('globalMessageCloseButton');
 
     if (!modal || !messageText || !successIcon || !errorIcon || !closeButton) {
-        console.error('ERROR: Elementos del modal de mensaje global vanilla no encontrados. Mostrando alert de fallback.');
         alert(type === 'error' ? `Error: ${message}` : `Éxito: ${message}`);
         return;
     }
@@ -125,7 +121,6 @@ window.showGlobalMessage = function (type, message) {
         document.body.classList.remove('modal-open'); // Restaura el scroll
         closeButton.removeEventListener('click', closeHandler);
         clearTimeout(autoHideTimer);
-        console.log('DEBUG: Modal de mensaje global cerrado manualmente.');
     };
     closeButton.addEventListener('click', closeHandler);
 
@@ -136,21 +131,16 @@ window.showGlobalMessage = function (type, message) {
             modal.classList.add('hidden');
             document.body.classList.remove('modal-open');
             closeButton.removeEventListener('click', closeHandler);
-            console.log('DEBUG: Modal de mensaje global cerrado automáticamente.');
         }
     }, 3000);
 };
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('--- DOMContentLoaded event fired: Script loaded and ready ---');
-
     // Delegación de eventos para los botones de acción en la tabla (se mantiene)
     const tableBody = document.querySelector('#boletines-table-body');
     if (tableBody) {
-        console.log('Event listener añadido a #boletines-table-body para delegación de eventos.');
         tableBody.addEventListener('click', function (event) {
-            console.log('Click detectado en la tabla.');
             const targetButton = event.target.closest('button[onclick^="mostrarModal"]');
             if (targetButton) {
                 const onclickAttr = targetButton.getAttribute('onclick');
@@ -158,44 +148,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (match && match.length === 3) {
                     const type = match[1];
                     const id = match[2];
-                    console.log(`Botón de acción clicado: Tipo=${type}, ID=${id}`);
                     if (type === 'boletin') {
-                        console.warn(`ADVERTENCIA: La acción 'boletin' (Eliminar) no está manejada en este script.`);
                         return;
                     } else {
                         // Aquí se llama a mostrarModal. Asegúrate de que los modales que usa (ej. 'editar')
                         // no son el modal de éxito de noticias si quieres que lo maneje el global.
                         window.mostrarModal(type, id);
                     }
-                } else {
-                    console.warn('No se pudieron extraer los argumentos de mostrarModal del atributo onclick.');
                 }
-            } else {
-                console.log('Click no fue en un botón de acción de tabla.');
             }
         });
-    } else {
-        console.warn('Advertencia: #boletines-table-body no encontrado. La delegación de eventos de la tabla no funcionará.');
     }
 
     // Listener para los formularios de edición (se mantiene)
     document.querySelectorAll('[id^="editBoletinForm-"]').forEach(form => {
-        console.log(`Añadiendo event listener de submit al formulario: ${form.id}`);
         form.addEventListener('submit', async function (event) {
-            console.log('--- Submit de formulario detectado ---');
             event.preventDefault();
 
             const formId = this.id;
             const boletinId = formId.split('-')[1];
             const formData = new FormData(this);
 
-            console.log(`Boletín ID para actualización: ${boletinId}`);
-
             const updateButton = this.querySelector('button[type="submit"]');
             if (updateButton) {
                 updateButton.disabled = true;
                 updateButton.textContent = 'Actualizando...';
-                console.log('Botón de actualización deshabilitado.');
             }
 
             try {
@@ -208,32 +185,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
 
-                console.log('--- Fetch Response recibido ---');
-                console.log('Response Status:', response.status);
-
                 const result = await response.json();
 
                 if (response.ok) {
-                    console.log('--- Fetch Data Procesado (Éxito) ---');
-                    console.log('Boletín actualizado con éxito:', result);
-                    console.log('HTML recibido para depuración:', result.html_row);
-
                     if (result.html_row) {
                         const oldRow = document.getElementById(`boletin-row-${boletinId}`);
-                        console.log('Buscando oldRow con ID:', `boletin-row-${boletinId}`);
-                        console.log('oldRow encontrado:', oldRow);
 
                         if (oldRow) {
                             oldRow.outerHTML = result.html_row;
-                            console.log('Fila reemplazada en el DOM.');
                             reindexTableRows();
-                            console.log('reindexTableRows llamado.');
                         } else {
-                            console.error(`Error: oldRow con ID boletin-row-${boletinId} no encontrado para reemplazar.`);
                             window.showGlobalMessage('error', 'Boletín actualizado, pero la tabla no se pudo refrescar. Recargue la página.');
                         }
                     } else {
-                        console.warn('Advertencia: result.html_row no presente en la respuesta del servidor.');
                         window.showGlobalMessage('success', 'Boletín actualizado, pero no se recibió HTML para refrescar la tabla. Recargue la página.');
                     }
 
@@ -243,47 +207,33 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.showGlobalMessage('success', result.message || 'Boletín actualizado con éxito.');
 
                 } else if (response.status === 422) {
-                    console.error('--- Errores de validación (422) ---');
-                    console.error('Errores:', result.errors);
                     window.displayValidationErrors(boletinId, result.errors);
                     window.showGlobalMessage('error', result.message || 'Por favor, corrige los errores en el formulario.');
                 } else {
-                    console.error('--- Error HTTP (no 2xx ni 422) ---');
-                    console.error('Error en la respuesta del servidor:', result);
                     window.showGlobalMessage('error', result.message || 'Ocurrió un error inesperado al actualizar el boletín.');
                 }
             } catch (error) {
-                console.error('--- Fetch Catch (Error de red/parsing) ---');
-                console.error('Error al actualizar el boletín:', error);
                 window.showGlobalMessage('error', 'Error de red o conexión al servidor. Inténtalo de nuevo.');
             } finally {
                 if (updateButton) {
                     updateButton.disabled = false;
                     updateButton.textContent = 'Guardar Cambios';
-                    console.log('Botón de actualización re-habilitado.');
                 }
             }
         });
     });
 
     function reindexTableRows() {
-        console.log('--- Función reindexTableRows llamada ---');
         const tableBody = document.querySelector('#boletines-table-body');
         if (tableBody) {
             const rows = tableBody.querySelectorAll('tr[id^="boletin-row-"]');
-            console.log(`Encontradas ${rows.length} filas para re-indexar.`);
             rows.forEach((row, index) => {
                 const orderNumberCell = row.querySelector('.boletin-order-number');
                 if (orderNumberCell) {
                     orderNumberCell.textContent = index + 1;
-                    console.log(`Fila ${row.id} re-indexada a ${index + 1}.`);
-                } else {
-                    console.log(`Celda de número de orden no encontrada para fila ${row.id}.`);
                 }
             });
-        } else {
-            console.warn('Advertencia: tbody con ID #boletines-table-body no encontrado para reindexTableRows.');
-        }
+        } 
     }
 
     reindexTableRows();
@@ -306,7 +256,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const tipo = idParts[1];
                 const id = idParts[2];
                 window.cerrarModal(tipo, id);
-                console.log(`Cerrando modal por click externo/botón de cierre: ${modalWrapper.id}`);
             }
         }
     });

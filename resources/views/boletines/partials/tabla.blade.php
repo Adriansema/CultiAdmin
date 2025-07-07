@@ -1,5 +1,5 @@
-<div class="overflow-x-auto w-full rounded-xl">
-    <table class="min-w-full text-sm text-left">
+<div class="overflow-x-auto rounded-2xl">
+    <table class="min-w-full text-md text-left">
         <thead class="bg-[var(--color-tabla)]">
             <tr>
                 <th class="px-6 py-3 font-bold text-left text-gray-600">Nombre</th>
@@ -16,7 +16,7 @@
                 @include('boletines.partials.boletin_row', ['boletin' => $boletin])
             @empty
                 <tr id="no-boletines-row">
-                    <td colspan="9" class="px-4 py-4 text-sm text-center text-gray-500 whitespace-nowrap"> 
+                    <td colspan="9" class="px-6 py-4 text-center text-gray-500"> 
                         No hay boletines para mostrar.
                     </td>
                 </tr>

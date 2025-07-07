@@ -154,7 +154,7 @@
                         <div>
                             <label for="precioMasAlto" class="block text-sm font-bold text-gray-700">Precio Más Alto</label>
                             <div class="flex items-center gap-2 mt-1">
-                                <img src="{{ asset('images/subir.svg') }}" alt="Icono subir" class="w-6 h-6 flex-shrink-0">
+                                <img src="{{ asset('images/alto.svg') }}" alt="Icono subir" class="w-6 h-6 flex-shrink-0">
                                 <input type="number" step="0.01" name="precio_mas_alto"
                                     id="precioMasAlto"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
@@ -178,7 +178,7 @@
                         <div>
                             <label for="precioMasBajo" class="block text-sm font-bold text-gray-700">Precio Más Bajo</label>
                             <div class="flex items-center gap-2 mt-1">
-                                <img src="{{ asset('images/bajar.svg') }}" alt="Icono bajar" class="w-6 h-6 flex-shrink-0">
+                                <img src="{{ asset('images/bajo.svg') }}" alt="Icono bajar" class="w-6 h-6 flex-shrink-0">
                                 <input type="number" step="0.01" name="precio_mas_bajo"
                                     id="precioMasBajo"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"

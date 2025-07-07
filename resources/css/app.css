@@ -117,6 +117,8 @@ html {
     --color-hover: #009400;
     --color-hovercaja: #E9F3E4;
     --color-focus: #ffffff;
+    --color-rechazar: #DC2626;
+    --color-rechazar-hover: #EF4444;
   }
 }
 
@@ -140,6 +142,9 @@ html {
 
     --color-activar: #FEECB0;
     --color-textActivar: #8B6B00;
+
+    --color-estasAct: #BBCFF9;
+    --color-estaActex: #143681;
   }
 }
 

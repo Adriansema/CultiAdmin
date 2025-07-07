@@ -23,7 +23,7 @@
                  </tr>
              @else
                  @foreach ($usuarios as $usuario)
-                     <tr class="bg-white hover:bg-gray-100">
+                     <tr class="bg-white hover:bg-gray-200">
 
                          <td class="px-6 py-4 flex items-center relative">
                              <span>{{ $usuario->roles->pluck('name')->join(', ') }}</span>
@@ -84,7 +84,7 @@
                              {{ $usuario->email }}
                          </td>
 
-                         <td class="py-4">
+                         <td class="px-6 py-4">
                              {{-- Condicional principal: Solo mostrar el botón de toggle si NO es el usuario autenticado --}}
                              @if ($usuario->id !== Auth::id())
                                  {{-- Condición adicional: Calcular si el botón de toggle debe mostrarse --}}
@@ -157,13 +157,13 @@
                                         a roles inferiores como Operario y Funcionarios --}}
                                      <span
                                          class="px-4 py-2 text-sm rounded-lg
-                                            {{ $usuario->id === Auth::id() ? 'bg-blue-200 text-blue-800' : '' }} {{-- Si es tu propio usuario --}}
+                                            {{ $usuario->id === Auth::id() ? 'bg-[var(--color-estasAct)] text-[var(--color-estaActex)]' : '' }} {{-- Si es tu propio usuario --}}
                                             {{ $usuario->id !== Auth::id() && $usuario->estado === 'activo' ? 'bg-[var(--color-activo)] text-[var(--color-textAct)]' : '' }} {{-- Si es otro usuario activo --}}
                                             {{ $usuario->id !== Auth::id() && $usuario->estado === 'inactivo' ? 'bg-[var(--color-inactivo)] text-[var(--color-textInact)]' : '' }} {{-- Si es otro usuario inactivo --}}
                                             inline-flex items-center justify-center space-x-1 cursor-not-allowed">
                                          <span>
                                              @if ($usuario->id === Auth::id())
-                                                 {{ $usuario->estado === 'activo' ? 'Estas Activo' : 'Estas Inactivo' }}
+                                                 {{ $usuario->estado === 'activo' ? 'Estas activo' : 'Estas inactivo' }}
                                              @else
                                                  {{ ucfirst($usuario->estado) }}
                                              @endif
@@ -179,12 +179,12 @@
                              @else
                                  {{-- Este bloque es para la fila del propio usuario logueado (sin botón de toggle) de que no se puede auto-desactivarse --}}
                                  <span
-                                     class="px-4 py-2 text-sm rounded-lg
-                                            bg-blue-200 text-blue-800
+                                     class="px-3 py-2 text-sm rounded-lg
+                                            bg-[var(--color-estasAct)] text-[var(--color-estaActex)]
                                             inline-flex items-center justify-center space-x-1 cursor-not-allowed">
-                                     <span>{{ $usuario->estado === 'activo' ? 'Estas Activo' : 'Estas Inactivo' }}</span>
+                                     <span>{{ $usuario->estado === 'activo' ? 'Estas activo' : 'Estas inactivo' }}</span>
                                      <span
-                                         class="w-3 h-3 rounded-full {{ $usuario->estado === 'activo' ? 'bg-green-500' : 'bg-red-500' }}"></span>
+                                         {{-- class="w-3 h-3 rounded-full {{ $usuario->estado === 'activo' ? '' : '' }}"> --}}</span>
                                  </span>
                              @endif
                          </td>

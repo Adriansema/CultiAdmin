@@ -29,7 +29,6 @@
             </div>
         </div>
     @empty
-        <p class="text-gray-700 p-4 bg-white rounded-lg shadow-md no-boletines-message">No hay boletines recientes para
-            mostrar.</p>
+        
     @endforelse
 </div>

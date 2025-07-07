@@ -55,14 +55,14 @@
         @endif
 
         <div class="col-span-6 sm:col-span-4">
-            <x-label for="name" value="{{ __('Name') }}" />
+            <x-label for="name" value="{{ __('Nombre:') }}" />
             <x-input id="name" type="text" class="block w-full rounded-xl mt-1" wire:model="state.name" required
                 autocomplete="name" />
             <x-input-error for="name" class="mt-2" />
         </div>
 
         <div class="col-span-6 sm:col-span-4">
-            <x-label for="email" value="{{ __('Email') }}" />
+            <x-label for="email" value="{{ __('Correo electrónico:') }}" />
             <x-input id="email" type="email" class="block rounded-xl w-full mt-1" wire:model="state.email"
                 required autocomplete="username" />
             <x-input-error for="email" class="mt-2" />

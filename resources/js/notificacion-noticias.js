@@ -39,35 +39,37 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Función para manejar la visibilidad del mensaje "No hay noticias"
-    function toggleNoNewsMessage() {
-        const noticiasScrollContainer = document.querySelector('.noticias-scroll-container');
-        // Contamos cuántos elementos de noticia REALES quedan
-        const remainingNoticias = noticiasScrollContainer.querySelectorAll('[id^="noticia-"]').length;
-        const existingNoNewsMessage = noticiasScrollContainer.querySelector('.no-noticias-message');
+   function toggleNoNewsMessage() {
+    const noticiasScrollContainer = document.querySelector('.noticias-scroll-container');
 
-        if (remainingNoticias === 0) {
-            // Si no quedan noticias y el mensaje NO está ya presente, lo insertamos
-            if (!existingNoNewsMessage) {
-                noticiasScrollContainer.insertAdjacentHTML('beforeend', noNewsMessageHtml);
-            }
-        } else {
-            // Si quedan noticias y el mensaje SÍ está presente, lo eliminamos
-            if (existingNoNewsMessage) {
-                existingNoNewsMessage.remove();
-            }
+    // ¡IMPORTANTE! Verificar si el contenedor existe
+    if (!noticiasScrollContainer) {
+        console.error('ERROR: .noticias-scroll-container no encontrado. Asegúrate de que este elemento exista en tu HTML.');
+        return; // Salir de la función si el contenedor no se encuentra
+    }
+
+    // Contamos cuántos elementos de noticia REALES quedan
+    const remainingNoticias = noticiasScrollContainer.querySelectorAll('[id^="noticia-"]').length;
+    const existingNoNewsMessage = noticiasScrollContainer.querySelector('.no-noticias-message');
+
+    if (remainingNoticias === 0) {
+        // Si no quedan noticias y el mensaje NO está ya presente, lo insertamos
+        if (!existingNoNewsMessage) {
+            noticiasScrollContainer.insertAdjacentHTML('beforeend', noNewsMessageHtml);
+        }
+    } else {
+        // Si quedan noticias y el mensaje SÍ está presente, lo eliminamos
+        if (existingNoNewsMessage) {
+            existingNoNewsMessage.remove();
         }
     }
+}
 
 
     markAsReadButtons.forEach(button => {
         button.addEventListener('click', function () {
             const noticiaId = this.dataset.noticiaId;
             const noticiaElement = document.getElementById(`noticia-${noticiaId}`);
-
-            // --- Depuración ---
-            console.log('Botón clickeado para Noticia ID:', noticiaId);
-            console.log('Elemento de Noticia encontrado:', noticiaElement);
-            // --- Fin de depuración ---
 
             if (noticiaElement) {
                 // Añadir clase para la animación de desvanecimiento
@@ -85,13 +87,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                     .then(response => {
                         if (!response.ok) {
-                            console.error('Network response was not ok:', response.status, response.statusText);
                             return response.json().then(err => { throw new Error(err.message || 'Error del servidor'); });
                         }
                         return response.json();
                     })
                     .then(data => {
-                        console.log('Noticia marcada como leída en el servidor:', data);
                         // Eliminar el elemento del DOM después de la animación y la confirmación del servidor
                         noticiaElement.addEventListener('transitionend', function () {
                             noticiaElement.remove();
@@ -100,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         }, { once: true });
                     })
                     .catch(error => {
-                        console.error('Error al marcar como leída:', error);
                         // Si hay un error, revertir la animación y mostrar un mensaje
                         noticiaElement.classList.remove('fade-out');
                         alert('Hubo un error al marcar la noticia como leída. Inténtalo de nuevo: ' + error.message);

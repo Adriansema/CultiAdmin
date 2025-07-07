@@ -52,7 +52,7 @@ class ProductoEstadoMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.producto_estado',
+            view: 'emails.estados.producto_estado',
             with: [
                 'producto' => $this->producto,
             ],

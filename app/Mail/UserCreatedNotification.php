@@ -9,7 +9,8 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\Mailables\Markdown; // Importa Markdown para usar la vista Blade de Markdown
+// No necesitamos Illuminate\Mail\Mailables\Markdown si no estamos usando Markdown de Laravel
+// use Illuminate\Mail\Mailables\Markdown; 
 
 class UserCreatedNotification extends Mailable
 {
@@ -17,16 +18,16 @@ class UserCreatedNotification extends Mailable
 
     public $user;
     public $appName;
-    public $generatedPassword; // Nueva propiedad para la contraseña generada
+    public $generatedPassword;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(User $user, string $generatedPassword) // Añade $generatedPassword al constructor
+    public function __construct(User $user, string $generatedPassword)
     {
         $this->user = $user;
-        $this->appName = config('app.name'); // Obtiene el nombre de la aplicación
-        $this->generatedPassword = $generatedPassword; // Asigna la contraseña
+        $this->appName = config('app.name');
+        $this->generatedPassword = $generatedPassword;
     }
 
     /**
@@ -35,7 +36,7 @@ class UserCreatedNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Tu cuenta ha sido creada en ' . $this->appName,
+            subject: '¡Bienvenido a ' . $this->appName . '! Tu cuenta ha sido creada',
         );
     }
 
@@ -45,11 +46,12 @@ class UserCreatedNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.user-created-notification', // Usa tu vista markdown
+            view: 'emails.auth.user-created-notification', 
             with: [
-                'userName' => $this->user->name,
+                'user' => $this->user, 
+                'userName' => $this->user->name, 
                 'appName' => $this->appName,
-                'generatedPassword' => $this->generatedPassword, // Pasa la contraseña a la vista
+                'generatedPassword' => $this->generatedPassword,
             ],
         );
     }

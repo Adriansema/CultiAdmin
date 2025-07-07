@@ -72,7 +72,6 @@ const REQUIRED_COLUMNS = {
  * Resetea el estado de importación y cierra todos los modales.
  */
 function resetImportCsvFlow() {
-    console.log('ImportaCsv.js: Reseteando flujo de importación...');
     importCsvState = {
         uploadModalOpen: false,
         previewModalOpen: false,
@@ -175,7 +174,6 @@ function updateModalVisibility() {
 
 // Exporta esta función para que pueda ser llamada desde formulario.js
 export function openImportCsvModal() {
-    console.log('ImportaCsv.js: openImportCsvModal función llamada (abre modal de carga).');
     resetImportCsvFlow();
     importCsvState.uploadModalOpen = true; // Esto asegura que el modal de carga de archivo se abra.
     updateModalVisibility(); // Esto actualiza la visibilidad de los modales.
@@ -260,7 +258,6 @@ function validateCsvRows(usersData) {
  * @returns {Promise<Array<string>>} Una promesa que resuelve con una lista de errores de duplicados.
  */
 async function checkDuplicatesEarly(usersData) {
-    console.log('ImportaCsv.js: Realizando validación temprana de duplicados con el backend.');
     const formData = new FormData();
     formData.append('_token', importCsvState.csrfToken);
     formData.append('users_data', JSON.stringify(usersData));
@@ -275,7 +272,6 @@ async function checkDuplicatesEarly(usersData) {
         });
 
         const data = await response.json();
-        console.log('Respuesta del backend para duplicados tempranos:', data);
 
         if (!response.ok) {
             if (data.detailed_errors) {
@@ -306,7 +302,6 @@ async function checkDuplicatesEarly(usersData) {
         }
         return []; // No hay duplicados o no se detectaron en la respuesta
     } catch (error) {
-        console.error('Error de red durante la validación temprana de duplicados:', error);
         // Si hay un error de red, lo tratamos como un error general en el flujo principal
         return [`Error de red al verificar duplicados: ${error.message}`];
     }
@@ -320,7 +315,6 @@ async function checkDuplicatesEarly(usersData) {
  */
 function renderCsvPreview(validData) {
     if (!csvPreviewTableBody) {
-        console.error("csvPreviewTableBody no encontrado. No se puede renderizar la previsualización.");
         return;
     }
 
@@ -421,7 +415,6 @@ async function handleFileProcessing(file) {
         // Solo si no hay errores de frontend y hay usuarios válidos
         if (importCsvState.validUsers.length > 0) {
             const earlyDuplicates = await checkDuplicatesEarly(importCsvState.validUsers);
-            console.log('Duplicados detectados en checkDuplicatesEarly:', earlyDuplicates); // LOG AÑADIDO
 
             if (earlyDuplicates && earlyDuplicates.length > 0) {
                 importCsvState.duplicateErrors = earlyDuplicates;
@@ -444,7 +437,6 @@ async function handleFileProcessing(file) {
         updateModalVisibility();
 
     } catch (error) {
-        console.error('Error general durante el procesamiento del archivo CSV:', error);
         importCsvState.parsedUsers = [];
         importCsvState.validUsers = [];
         importCsvState.invalidUsers = [];
@@ -595,7 +587,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (confirmImportActionButton) {
         confirmImportActionButton.addEventListener('click', async function () {
-            console.log('ImportaCsv.js: Confirmar importación de usuarios.');
             // Deshabilitar botón y mostrar spinner
             const originalBtnText = confirmImportActionButton.innerHTML;
             confirmImportActionButton.disabled = true;
@@ -615,7 +606,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 const data = await response.json();
-                console.log('Respuesta del backend (Importación Final):', data); // LOG CLAVE PARA DEBUGGING
 
                 // Restablecer el botón
                 confirmImportActionButton.disabled = false;
@@ -689,7 +679,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }, 500); // Recargar rápidamente
                 }
             } catch (error) {
-                console.error('Error de red o inesperado durante la importación CSV:', error);
                 // Restablecer el botón
                 confirmImportActionButton.disabled = false;
                 confirmImportActionButton.innerHTML = originalBtnText;

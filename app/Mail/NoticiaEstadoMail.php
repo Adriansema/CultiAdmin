@@ -54,7 +54,7 @@ class NoticiaEstadoMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.noticias_estado', // Ruta de la vista Blade
+            view: 'emails.estados.noticias_estado', // Ruta de la vista Blade
             with: [
                 'noticia' => $this->noticia, // Pasa la instancia de la noticia a la vista
             ],
