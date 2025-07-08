@@ -21,7 +21,7 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    // use CustomResetPassword; // <-- ¡ELIMINA ESTA LÍNEA! Es el problema.
+
 
     protected $table = 'users';
 
@@ -34,6 +34,8 @@ class User extends Authenticatable
         'document',
         'lastname',
         'phone',
+        'last_login_at',
+        'is_online',
     ];
 
     protected $hidden = [
@@ -51,6 +53,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'estado' => 'string',
+        'last_login_at' => 'datetime',
     ];
 
     protected $guard_name = 'web';

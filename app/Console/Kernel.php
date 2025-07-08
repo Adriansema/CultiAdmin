@@ -26,7 +26,14 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('comentarios:limpiar')->everyTwoMinutes();
+        $schedule->command('users:mark-offline')->everyFiveMinutes(); // Marca usuarios inactivos como offline
     }
+    /**
+     * Registra las tareas programadas.
+     *
+     * @return void
+     */
+
 
     /**
      * Aquí puedes registrar comandos adicionales si fuera necesario.
@@ -34,6 +41,7 @@ class Kernel extends ConsoleKernel
     protected function commands()
     {
         $this->load(__DIR__ . '/Commands');
+        require base_path('routes/console.php');
     }
 }
 

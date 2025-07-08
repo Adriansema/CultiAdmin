@@ -33,13 +33,13 @@ Route::prefix('pqrs')->name('pqrs.')->group(function () {
 // Ruta para generar masivos usuarios
 Route::get('/exportar-csv', [ExportarCsvController::class, 'generarCsv']);
 
-// Ruta para verificar si el correo existe 
+// Ruta para verificar si el correo existe
 Route::post('/check-email', [UsuarioController::class, 'checkEmailExists'])->name('check-email');
 
-// Para verificar si el documento existe 
+// Para verificar si el documento existe
 Route::post('/check-document', [UsuarioController::class, 'checkDocumentExists'])->name('check-document');
 
-// Para el reenvío del email de activación (PÚBLICAS por si el usuario no puede loguearse) 
+// Para el reenvío del email de activación (PÚBLICAS por si el usuario no puede loguearse)
 // Formulario para solicitar el reenvío del email de activación
 Route::get('/resend-activation', [UsuarioController::class, 'showResendActivationForm'])->name('resend.activation.form');
 
@@ -64,6 +64,7 @@ Route::get('/public-statistics', [StatisticController::class, 'index'])->name('s
 // Grupo de rutas que requieren AUTENTICACIÓN y verificación de correo electrónico
 // ------------------------------------------------------------------------------------
 Route::middleware([
+    'web',
      'auth:sanctum',
      config('jetstream.auth_session'),
      'verified',
@@ -167,7 +168,7 @@ Route::middleware([
           Route::delete('/{noticia}', [NoticiaController::class, 'destroy'])->name('destroy')->middleware('can:eliminar noticia');
      });
 
-     // Ruta de Estadística protegida  
+     // Ruta de Estadística protegida
      Route::get('/admin/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index')->middleware('can:ver estadisticas');
 });
 

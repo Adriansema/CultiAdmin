@@ -1,5 +1,8 @@
 <?php
 
+error_reporting(E_ALL); // Muestra todos los tipos de errores
+ini_set('display_errors', 1); // Muestra los errores directamente en la página
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 

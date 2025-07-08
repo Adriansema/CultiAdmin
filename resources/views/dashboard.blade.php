@@ -156,12 +156,12 @@
                         class="hover:text-[var(--color-hovertextver)] group py-2 px-2 rounded-full text-md font-bold text-gray-700 focus:outline-none focus:shadow-outline inline-flex items-center transition duration-150 ease-in-out">
                         <span class="whitespace-nowrap text-inherit">{{ __('Ver Todo') }}</span>
                         <img src="{{ asset('images/verTodo.svg') }}"
-                            class="w-10 h-8 relative inset-0 block group-hover:hidden" alt="Icono de Importar">
+                            class="relative inset-0 block w-10 h-8 group-hover:hidden" alt="Icono de Importar">
                         <img src="{{ asset('images/hoverTodo.svg') }}"
-                            class="w-10 h-8 relative inset-0 hidden group-hover:block" alt="Icono de importar hover">
+                            class="relative inset-0 hidden w-10 h-8 group-hover:block" alt="Icono de importar hover">
                     </x-responsive-nav-link>
                 </div>
-                <div id="mensajes-noticias" class="p-2 rounded-2xl flex-grow"> {{-- Añadido flex-grow --}}
+                <div id="mensajes-noticias" class="flex-grow p-2 rounded-2xl"> {{-- Añadido flex-grow --}}
                     @include('partials.notification-noticia')
                 </div>
             </section>
@@ -181,13 +181,13 @@
                         class="hover:text-[var(--color-hovertextver)] group py-2 px-2 rounded-full text-md font-bold text-gray-700 focus:outline-none focus:shadow-outline inline-flex items-center transition duration-150 ease-in-out">
                         <span class="whitespace-nowrap text-inherit">{{ __('Ver Todos') }}</span>
                         <img src="{{ asset('images/verTodo.svg') }}"
-                            class="w-10 h-8 relative inset-0 block group-hover:hidden" alt="Icono de Ver Todo">
+                            class="relative inset-0 block w-10 h-8 group-hover:hidden" alt="Icono de Ver Todo">
                         <img src="{{ asset('images/hoverTodo.svg') }}"
-                            class="w-10 h-8 relative inset-0 hidden group-hover:block" alt="Icono de Ver Todo hover">
+                            class="relative inset-0 hidden w-10 h-8 group-hover:block" alt="Icono de Ver Todo hover">
                     </x-responsive-nav-link>
                 </div>
 
-                <div id="mensajes-boletines" class="p-2 rounded-2xl flex-grow"> {{-- Añadido flex-grow --}}
+                <div id="mensajes-boletines" class="flex-grow p-2 rounded-2xl"> {{-- Añadido flex-grow --}}
                     @include('partials.notification-boletin')
                 </div>
             </section>
