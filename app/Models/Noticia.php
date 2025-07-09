@@ -9,7 +9,7 @@ class Noticia extends Model
 {
     use HasFactory;
 
-    // Especifica el nombre de la tabla. Laravel lo inferiría como 'noticias', así que es opcional,
+    // Especifica el nombre de la tabla. Laravel lo inferiria como 'noticias', asi que es opcional,
     // pero lo dejo para mayor claridad.
     protected $table = 'noticias';
 
@@ -35,14 +35,14 @@ class Noticia extends Model
     ];
 
     /**
-     * Define la relación belongsTo con el modelo User.
-     * Una Noticia pertenece a un Usuario (quien la creó).
+     * Define la relacion belongsTo con el modelo User.
+     * Una Noticia pertenece a un Usuario (quien la creo).
      */
     public function user()
     {
-        // 'user_id' es la clave foránea en la tabla 'noticias'
+        // 'user_id' es la clave foranea en la tabla 'noticias'
         // 'id_usuario' es la clave primaria en la tabla 'usuario' (modelo User)
-        // Asegúrate de que 'id_usuario' sea la clave primaria de tu tabla de usuarios.
+        // Asegurate de que 'id_usuario' sea la clave primaria de tu tabla de usuarios.
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

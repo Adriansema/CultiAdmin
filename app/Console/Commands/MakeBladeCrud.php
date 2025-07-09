@@ -15,7 +15,7 @@ class MakeBladeCrud extends Command
     protected $signature = 'make:blade-crud {name}';
 
     /**
-     * La descripción del comando de la consola.
+     * La descripcion del comando de la consola.
      *
      * @var string
      */
@@ -53,7 +53,7 @@ class MakeBladeCrud extends Command
         <!-- Formulario para {$title} -->
         <form method="POST" action="#">
             @csrf
-            <!-- Campos aquí -->
+            <!-- Campos aqui -->
         </form>
         BLADE
                             : <<<BLADE

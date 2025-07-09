@@ -19,14 +19,14 @@ class PqrsConfirmationMail extends Mailable
      *
      * @var \App\Models\Pqrs
      */
-    public $pqrs; // Declara una propiedad pública para pasar el objeto Pqrs a la vista
+    public $pqrs; // Declara una propiedad publica para pasar el objeto Pqrs a la vista
 
     /**
      * Create a new message instance.
      */
     public function __construct(Pqrs $pqrs) // Recibe el objeto Pqrs en el constructor
     {
-        $this->pqrs = $pqrs; // Asigna el objeto Pqrs a la propiedad pública
+        $this->pqrs = $pqrs; // Asigna el objeto Pqrs a la propiedad publica
     }
 
     /**
@@ -35,8 +35,8 @@ class PqrsConfirmationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Confirmación de Recepción de tu PQR - Ref: ' . $this->pqrs->id, // Asunto del correo
-            // Utiliza la configuración de Laravel para el email del remitente
+            subject: 'Confirmacion de Recepcion de tu PQR - Ref: ' . $this->pqrs->id, // Asunto del correo
+            // Utiliza la configuracion de Laravel para el email del remitente
             from: config('mail.from.address', 'noreply@tudominio.com'),
         );
     }
@@ -47,7 +47,7 @@ class PqrsConfirmationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.auth.pqrs_confirmation', // La vista Blade que definirá el cuerpo del correo
+            view: 'emails.auth.pqrs_confirmation', // La vista Blade que definira el cuerpo del correo
             with: [
                 'pqrs' => $this->pqrs, // Pasa el objeto Pqrs a la vista del correo
             ],
@@ -61,6 +61,6 @@ class PqrsConfirmationMail extends Mailable
      */
     public function attachments(): array
     {
-        return []; // Aquí puedes añadir archivos adjuntos si los hubiera
+        return []; // Aqui puedes anadir archivos adjuntos si los hubiera
     }
 }

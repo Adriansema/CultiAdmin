@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Mail\BoletinEstadoMail;
 
 use App\Http\Controllers\Controller;
-use App\Services\OperarioAndFuncionarioService; // Asegúrate de que el nombre del servicio sea correcto
+use App\Services\OperarioAndFuncionarioService; // Asegurate de que el nombre del servicio sea correcto
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
@@ -16,14 +16,14 @@ use Illuminate\Support\Facades\Auth;
 class PendienteBolController extends Controller
 {
     /**
-     * Muestra la lista de boletines pendientes de revisión para el operador.
+     * Muestra la lista de boletines pendientes de revision para el operador.
      */
     public function index(Request $request, OperarioAndFuncionarioService $operarioAndFuncionarioService)
     {
-        // Autorizar la acción: 'ver boletines pendiente'
+        // Autorizar la accion: 'ver boletines pendiente'
         Gate::authorize('validar boletin');
 
-        // Obtener solo los boletines filtrados utilizando el método específico del servicio
+        // Obtener solo los boletines filtrados utilizando el metodo especifico del servicio
         $boletines = $operarioAndFuncionarioService->obtenerBoletinesFiltrados($request);
 
         // Retorna la vista con los boletines pendientes
@@ -31,12 +31,12 @@ class PendienteBolController extends Controller
     }
 
     /**
-     * Retorna boletines pendientes de revisión filtrados en formato JSON.
-     * Este método se enfoca exclusivamente en los boletines.
+     * Retorna boletines pendientes de revision filtrados en formato JSON.
+     * Este metodo se enfoca exclusivamente en los boletines.
      */
     public function getFilteredBoletins(Request $request, OperarioAndFuncionarioService $operarioAndFuncionarioService)
     {
-        // Obtener solo los boletines utilizando el método específico del servicio
+        // Obtener solo los boletines utilizando el metodo especifico del servicio
         $boletines = $operarioAndFuncionarioService->obtenerBoletinesFiltrados($request);
 
         // Retornar solo los boletines en formato JSON
@@ -46,19 +46,19 @@ class PendienteBolController extends Controller
     }
 
     /**
-     * Muestra un Boletín en detalle para el Operador.
+     * Muestra un Boletin en detalle para el Operador.
      */
     public function show($id)
     {
-        // Encuentra el boletín por ID o falla
+        // Encuentra el boletin por ID o falla
         $boletin = Boletin::findOrFail($id);
 
-        // Retorna la vista de detalle del boletín
+        // Retorna la vista de detalle del boletin
         return view('boletines.show', compact('boletin'));
     }
 
     /**
-     * Valida/Aprueba un Boletín.
+     * Valida/Aprueba un Boletin.
      */
     public function validar(Request $request, $id)
     {
@@ -80,7 +80,7 @@ class PendienteBolController extends Controller
     }
 
     /**
-     * Rechaza un Boletín.
+     * Rechaza un Boletin.
      */
     public function rechazar(Request $request, $id)
     {

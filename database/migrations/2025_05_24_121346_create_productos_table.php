@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
-            $table->string('tipo'); // Tipo de producto (café, mora, videos)
+            $table->string('tipo'); // Tipo de producto (cafe, mora, videos)
 
-            // Campos que pueden estar vacíos
+            // Campos que pueden estar vacios
             $table->string('imagen')->nullable();
             $table->string('rutavideo')->nullable();
             $table->text('observaciones')->nullable();

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('Bienvenido a Cultiva SENA') }}</title>
+    <title>{{ __('Tu acceso ha sido creado – ¡Bienvenido(a) a Cultiva Sena!') }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,10 +12,10 @@
             color: #333333;
             margin: 0;
             padding: 0;
-            /* Degradado de fondo */
-            background: linear-gradient(to bottom, #A8E61D, #4CAF50); /* Verde claro a verde más oscuro */
-            background-color: #4CAF50; /* Color de fallback */
+            background: linear-gradient(to bottom, #A8E61D, #4CAF50);
+            background-color: #4CAF50;
         }
+
         .container {
             max-width: 600px;
             margin: 20px auto;
@@ -23,49 +24,57 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         .header {
             text-align: center;
             padding-bottom: 20px;
             border-bottom: 1px solid #eeeeee;
         }
+
         .header img {
-            max-width: 150px; /* Ajusta el tamaño de tu logo */
+            max-width: 150px;
             height: auto;
         }
+
         .header h1 {
-            color: #39A900; /* Color principal de tu marca */
+            color: #39A900;
             margin-top: 10px;
             font-size: 24px;
         }
+
         .content {
             padding: 20px 0;
         }
+
         .password-box {
-            background-color: #e6ffed; /* Un verde claro para el fondo de la contraseña */
-            border: 2px solid #38a169; /* Borde verde oscuro */
+            background-color: #e6ffed;
+            border: 2px solid #38a169;
             border-radius: 12px;
             padding: 15px 20px;
             text-align: center;
             font-size: 1.5em;
             font-weight: bold;
-            color: #0F6F20; /* Color de texto para la contraseña */
-            word-break: break-all; /* Para que la contraseña larga no desborde */
-            margin-bottom: 25px; /* Espacio debajo de la caja de contraseña */
+            color: #0F6F20;
+            word-break: break-all;
+            margin-bottom: 25px;
         }
+
         .button-container {
             text-align: center;
             margin: 30px 0;
         }
+
         .button {
             display: inline-block;
-            background-color: #39A900; /* Color principal del botón */
-            color: #ffffff !important; /* !important para asegurar el color de texto */
+            background-color: #39A900;
+            color: #ffffff !important;
             padding: 12px 25px;
             text-decoration: none;
             border-radius: 5px;
             font-size: 16px;
             font-weight: bold;
         }
+
         .footer {
             text-align: center;
             padding-top: 20px;
@@ -73,23 +82,24 @@
             font-size: 12px;
             color: #777777;
         }
+
         a {
             color: #39A900;
             text-decoration: none;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
-            {{-- Asegúrate de que esta URL sea absoluta para clientes de correo --}}
-            <img src="{{ URL::to('images/CultivaAdmin.png') }}" alt="Logo Cultiva Admin" style="max-width: 150px; height: auto;">
-            <h1>{{ __('Bienvenido a Cultiva SENA') }}</h1>
+            <img src="{{ URL::to('images/CultivaAdmin.png') }}" alt="Logo Cultiva Admin">
+            <h1>{{ __('Tu acceso ha sido creado') }}</h1>
         </div>
 
         <div class="content">
             @php
-                $currentHour = now()->hour; // Hora actual en Dosquebradas, Risaralda, Colombia (UTC-5)
+                $currentHour = now()->hour;
                 $saludo = '';
 
                 if ($currentHour >= 5 && $currentHour < 12) {
@@ -101,31 +111,46 @@
                 }
             @endphp
 
-            <p>{{ $saludo }} **{{ $userName }}**,</p>
-            <p>{{ __('Nos complace informarte que tu cuenta ha sido creada exitosamente en Cultiva SENA.') }}</p>
+            <p>{{ $saludo }} {{ $userName }},</p>
 
-            <p>{{ __('Tu contraseña generada para el primer ingreso es:') }}</p>
+            <p>
+                Te damos la bienvenida a <strong>Cultiva Sena</strong>, la plataforma para gestionar productos agrícolas
+                con eficiencia y confianza.
+            </p>
+
+            <p>Hemos creado tu cuenta, y estos son tus datos de acceso:</p>
+
+            <p><strong> Usuario:</strong> {{ $userEmail }}</p>
+            <p><strong> Contraseña temporal:</strong></p>
             <div class="password-box">
                 {{ $generatedPassword }}
             </div>
 
-            <p style="font-size: 16px; color: #4a5568; line-height: 1.6;">
-                {{ __('Esta contraseña ha sido generada exclusivamente para que realices tu primer ingreso al sistema.') }}
-                {{ __('Úsala al iniciar sesión por primera vez en Cultiva SENA. Luego podrás cambiarla por una de tu preferencia desde tu perfil.') }}
+            <p style="font-size: 16px; color: #4a5568;">
+                Por tu seguridad, esta contraseña es <strong>temporal</strong>.
+                Te recomendamos cambiarla apenas inicies sesión.
             </p>
 
             <div class="button-container">
-                {{-- Si tienes una URL para el login, cámbiala aquí --}}
-                <a href="{{ url('/login') }}" class="button">{{ __('Ir al Inicio de Sesión') }}</a>
+                <a href="{{ url('/login') }}" class="button">{{ __('Iniciar sesión') }}</a>
             </div>
 
-            <p>{{ __('Gracias por unirte a nuestra comunidad.') }}</p>
+            <p>
+                Si no solicitaste esta cuenta o tienes alguna duda, por favor escríbenos a <a
+                    href="mailto:soporteayuda2025@gmail.com">soporteayuda2025@gmail.com</a>.
+                Estamos para ayudarte.
+            </p>
+
+            <p>Gracias por ser parte de este cultivo digital 🌿</p>
         </div>
 
         <div class="footer">
-            <p>{{ __('Saludos,') }}<br>{{ __('El equipo de Cultiva SENA') }}</p>
-            <p>&copy; {{ date('Y') }} Cultiva SENA. Todos los derechos reservados.</p>
+            <p>— El equipo de Cultiva Sena</p>
+            <p><em>🛡️ Este mensaje es confidencial. No compartas tu contraseña con nadie. Si sospechas de un acceso no
+                    autorizado, contáctanos de inmediato.</em></p>
+            <p>&copy; {{ date('Y') }} Cultiva Sena. Todos los derechos reservados.</p>
         </div>
     </div>
 </body>
+
 </html>

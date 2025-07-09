@@ -22,6 +22,6 @@ class LoginResponse implements LoginResponseContract
         }
 
         return redirect()->intended(RouteServiceProvider::HOME); //Ruta por defecto
-        // Puedes personalizar la redirección según tus necesidades
+        // Puedes personalizar la redireccion segun tus necesidades
     }
 }

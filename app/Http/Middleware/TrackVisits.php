@@ -12,8 +12,8 @@ class TrackVisits
     {
         // Guardar la visita en la tabla 'vissit'
         DB::table('visits')->insert([
-            'page' => $request->path(), // Página visitada
-            'ip' => $request->ip(),     // Dirección IP del visitante
+            'page' => $request->path(), // Pagina visitada
+            'ip' => $request->ip(),     // Direccion IP del visitante
             'created_at' => now()       // Fecha y hora de la visita
         ]);
 

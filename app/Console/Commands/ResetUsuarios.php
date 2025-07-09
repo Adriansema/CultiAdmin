@@ -15,10 +15,10 @@ class ResetUsuarios extends Command
     {
         $this->info('Eliminando todos los usuarios...');
 
-        // Desactiva restricciones de clave foránea si existen dependencias
+        // Desactiva restricciones de clave foranea si existen dependencias
         DB::statement('SET session_replication_role = replica');
 
-        // Vacía la tabla users
+        // Vacia la tabla users
         User::truncate();
 
         // Reinicia la secuencia del ID

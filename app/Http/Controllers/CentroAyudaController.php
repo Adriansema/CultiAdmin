@@ -30,6 +30,6 @@ class CentroAyudaController extends Controller
         // Enviar el correo
         Mail::to(env('MAIL_FROM_ADDRESS'))->send(new ContactFormMail($request->all()));
 
-        return redirect()->route('centroAyuda.index')->with('success', '¡Tu mensaje fue enviado con éxito!');
+        return redirect()->route('centroAyuda.index')->with('success', '!Tu mensaje fue enviado con exito!');
     }
 }

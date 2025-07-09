@@ -17,7 +17,7 @@ class Pqrs extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id', // Permitimos user_id porque podría venir de un usuario logueado
+        'user_id', // Permitimos user_id porque podria venir de un usuario logueado
         'email',
         'nombre',
         'telefono',

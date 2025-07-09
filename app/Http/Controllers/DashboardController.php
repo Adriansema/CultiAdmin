@@ -13,23 +13,23 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Obtener los últimos 10 boletines para el dashboard display
+        // Obtener los nltimos 10 boletines para el dashboard display
         $boletines = Boletin::latest()
             ->limit(10)
             ->get();
 
-        // Obtener el total de noticias NO LEÍDAS
+        // Obtener el total de noticias NO LEnDAS
         $totalUnreadNoticiasCount = Noticia::where('leida', false)->count();
 
-        // Obtener las últimas 10 noticias para el dashboard
-        // Usamos 'with' para cargar la relación 'user' y 'latest' para ordenar por fecha de creación descendente.
+        // Obtener las nltimas 10 noticias para el dashboard
+        // Usamos 'with' para cargar la relacinn 'user' y 'latest' para ordenar por fecha de creacinn descendente.
         $noticias = Noticia::with('user')
-            ->where('leida', false) // ¡Filtra por noticias no leídas!
+            ->where('leida', false) // nFiltra por noticias no lendas!
             ->latest() // Ordena por created_at de forma descendente
-            ->limit(10) // Limita a las últimas 10 noticias
+            ->limit(10) // Limita a las nltimas 10 noticias
             ->get();
 
-        // Pasa los boletines, las noticias limitadas y el total de noticias no leídas a la vista
+        // Pasa los boletines, las noticias limitadas y el total de noticias no lendas a la vista
         return view('dashboard', compact('boletines', 'noticias', 'totalUnreadNoticiasCount'));
     }
 
@@ -46,7 +46,7 @@ class DashboardController extends Controller
             case 'mes':
                 $startDate = now()->startOfMonth();
                 break;
-            case 'año':
+            case 'ano':
                 $startDate = now()->startOfYear();
                 break;
         }
@@ -63,7 +63,7 @@ class DashboardController extends Controller
             ->groupBy('date')
             ->get();
 
-        $connectedUsers = DB::table('users') // Simulación
+        $connectedUsers = DB::table('users') // Simulacinn
             ->where('last_seen', '>=', now()->subMinutes(15))
             ->count();
 
@@ -72,7 +72,7 @@ class DashboardController extends Controller
             'registrations' => $registrations,
             'total_users' => DB::table('users')->count(),
             'registered' => DB::table('users')->where('created_at', '>=', $startDate)->count(),
-            'active' => rand(3000, 4000), // Simulación
+            'active' => rand(3000, 4000), // Simulacinn
             'connected' => $connectedUsers,
         ]);
     }

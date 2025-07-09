@@ -18,7 +18,7 @@ class PreventBackHistory
         $response = $next($request);
 
         // Agregamos las cabeceras para prevenir el cacheado en el navegador
-        // Esta es la forma más compatible de agregar las cabeceras.
+        // Esta es la forma mas compatible de agregar las cabeceras.
         $response->headers->set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');

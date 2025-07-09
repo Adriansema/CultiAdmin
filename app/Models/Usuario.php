@@ -34,5 +34,5 @@ class Usuario extends Model // Cambiado de Authenticatable a Model
         'codigo_verificacion',
     ];
 
-    // Se ha eliminado el método getAuthPassword() ya que este modelo no se usará para autenticación.
+    // Se ha eliminado el metodo getAuthPassword() ya que este modelo no se usara para autenticacion.
 }

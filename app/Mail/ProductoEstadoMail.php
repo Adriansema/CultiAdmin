@@ -29,16 +29,16 @@ class ProductoEstadoMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        // Se utiliza el tipo de producto (café o mora) en el asunto
-        $itemTypeName = ucfirst($this->producto->tipo); // 'Café' o 'Mora'
-        $subject = "Actualización de tu {$itemTypeName}: ";
+        // Se utiliza el tipo de producto (cafe o mora) en el asunto
+        $itemTypeName = ucfirst($this->producto->tipo); // 'Cafe' o 'Mora'
+        $subject = "Actualizacion de tu {$itemTypeName}: ";
 
         if ($this->producto->estado === 'aprobado') {
-            $subject .= '¡Aprobado!';
+            $subject .= '!Aprobado!';
         } elseif ($this->producto->estado === 'rechazado') {
-            $subject .= '¡Rechazado!';
+            $subject .= '!Rechazado!';
         } else {
-            $subject .= 'Pendiente de Revisión'; // En caso de que se envíe con otro estado
+            $subject .= 'Pendiente de Revision'; // En caso de que se envie con otro estado
         }
 
         return new Envelope(

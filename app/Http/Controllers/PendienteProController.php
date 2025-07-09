@@ -16,14 +16,14 @@ use Illuminate\Support\Facades\Auth;
 class PendienteProController extends Controller
 {
     /**
-     * Muestra la lista de productos pendientes de revisión para el operador.
+     * Muestra la lista de productos pendientes de revision para el operador.
      */
-    public function index(Request $request, OperarioAndFuncionarioService $operarioAndFuncionarioService) // Inyección del nuevo servicio
+    public function index(Request $request, OperarioAndFuncionarioService $operarioAndFuncionarioService) // Inyeccion del nuevo servicio
     {
-        // Autorizar la acción: 'ver productos pendiente'
+        // Autorizar la accion: 'ver productos pendiente'
         Gate::authorize('validar producto');
 
-        // Obtener solo los productos filtrados utilizando el método específico del servicio
+        // Obtener solo los productos filtrados utilizando el metodo especifico del servicio
         $productos = $operarioAndFuncionarioService->obtenerProductosFiltrados($request);
 
         // Retorna la vista con los productos pendientes
@@ -31,12 +31,12 @@ class PendienteProController extends Controller
     }
 
     /**
-     * Retorna productos pendientes de revisión filtrados en formato JSON.
-     * Este método se enfoca exclusivamente en los productos.
+     * Retorna productos pendientes de revision filtrados en formato JSON.
+     * Este metodo se enfoca exclusivamente en los productos.
      */
     public function getFilteredProducts(Request $request, OperarioAndFuncionarioService $operarioAndFuncionarioService)
     {
-        // Obtener solo los productos utilizando el método específico del servicio
+        // Obtener solo los productos utilizando el metodo especifico del servicio
         $productos = $operarioAndFuncionarioService->obtenerProductosFiltrados($request);
 
         // Retornar solo los productos en formato JSON
@@ -69,14 +69,14 @@ class PendienteProController extends Controller
         $producto->update([
             'estado' => 'aprobado',
             'observaciones' => null, // Limpia las observaciones si las hubiera
-            'validado_por_user_id' => Auth::id(), // Registra quién lo validó
+            'validado_por_user_id' => Auth::id(), // Registra quien lo valido
             'rechazado_por_user_id' => null, // Limpia el ID de rechazador
         ]);
 
         // Encuentra al creador del producto para enviar el correo
         $creador = User::find($producto->user_id);
         if ($creador && $creador->email) {
-            // Envía un correo notificando el cambio de estado
+            // Envia un correo notificando el cambio de estado
             Mail::to($creador->email)->send(new ProductoEstadoMail($producto));
         }
 
@@ -100,14 +100,14 @@ class PendienteProController extends Controller
         $producto->update([
             'estado' => 'rechazado',
             'observaciones' => $request->observaciones, // Guarda las observaciones del rechazo
-            'rechazado_por_user_id' => Auth::id(), // Registra quién lo rechazó
+            'rechazado_por_user_id' => Auth::id(), // Registra quien lo rechazo
             'validado_por_user_id' => null, // Limpia el ID de validador
         ]);
 
         // Encuentra al creador del producto para enviar el correo
         $creador = User::find($producto->user_id);
         if ($creador && $creador->email) {
-            // Envía un correo notificando el cambio de estado
+            // Envia un correo notificando el cambio de estado
             Mail::to($creador->email)->send(new ProductoEstadoMail($producto));
         }
 

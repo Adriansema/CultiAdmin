@@ -10,7 +10,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use App\Notifications\CustomResetPassword; // <-- Esta importación está CORRECTA y es necesaria.
+use App\Notifications\CustomResetPassword; // <-- Esta importacion esta CORRECTA y es necesaria.
 
 class User extends Authenticatable
 {
@@ -21,7 +21,7 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    // use CustomResetPassword; // <-- ¡ELIMINA ESTA LÍNEA! Es el problema.
+    // use CustomResetPassword; // <-- !ELIMINA ESTA LiNEA! Es el problema.
 
     protected $table = 'users';
 
@@ -78,8 +78,8 @@ class User extends Authenticatable
      */
     public function sendPasswordResetNotification($token)
     {
-        // Esta línea está bien porque la importación de arriba (`use App\Notifications\CustomResetPassword;`)
-        // le dice a PHP dónde encontrar la clase `CustomResetPassword` cuando la instanciamos aquí.
+        // Esta linea esta bien porque la importacion de arriba (`use App\Notifications\CustomResetPassword;`)
+        // le dice a PHP donde encontrar la clase `CustomResetPassword` cuando la instanciamos aqui.
         $this->notify(new CustomResetPassword($token));
     }
 }

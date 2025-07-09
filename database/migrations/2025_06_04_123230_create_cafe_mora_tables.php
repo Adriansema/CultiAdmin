@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * Ejecuta las migraciones para crear las tablas con claves foráneas.
+     * Ejecuta las migraciones para crear las tablas con claves foraneas.
      */
     public function up(): void
     {

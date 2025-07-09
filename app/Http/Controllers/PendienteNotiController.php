@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 class PendienteNotiController extends Controller
 {
     /**
-     * Muestra la lista de noticias pendientes de revisión para el operador.
+     * Muestra la lista de noticias pendientes de revision para el operador.
      */
     public function index(Request $request, OperarioAndFuncionarioService $operadorService)
     {
@@ -29,15 +29,15 @@ class PendienteNotiController extends Controller
     }
 
     /**
-     * Retorna noticias pendientes de revisión filtradas en formato JSON.
+     * Retorna noticias pendientes de revision filtradas en formato JSON.
      */
     public function getFilteredNews(Request $request, OperarioAndFuncionarioService $operadorService)
     {
-        // Asumiendo que OperadorService tiene un método similar para noticias
+        // Asumiendo que OperadorService tiene un metodo similar para noticias
         $data = $operadorService->obtenerNoticiasFiltradas($request);
 
         return response()->json([
-            // Si también manejas productos relacionados con noticias, inclúyelos aquí.
+            // Si tambien manejas productos relacionados con noticias, incluyelos aqui.
             // Para este ejemplo, solo se devuelven noticias.
             'noticias' => $data['noticias'],
         ]);
@@ -67,14 +67,14 @@ class PendienteNotiController extends Controller
         $noticia->update([
             'estado' => 'aprobado',
             'observaciones' => null, // Limpia las observaciones si las hubiera
-            'validado_por_user_id' => Auth::id(), // Registra quién la validó
+            'validado_por_user_id' => Auth::id(), // Registra quien la valido
             'rechazado_por_user_id' => null, // Limpia el ID de rechazador
         ]);
 
         // Encuentra al creador de la noticia para enviar el correo
         $creador = User::find($noticia->user_id);
         if ($creador && $creador->email) {
-            // Envía un correo notificando el cambio de estado
+            // Envia un correo notificando el cambio de estado
             Mail::to($creador->email)->send(new NoticiaEstadoMail($noticia));
         }
 
@@ -99,18 +99,18 @@ class PendienteNotiController extends Controller
         $noticia->update([
             'estado' => 'rechazado',
             'observaciones' => $request->observaciones, // Guarda las observaciones del rechazo
-            'rechazado_por_user_id' => Auth::id(), // Registra quién la rechazó
+            'rechazado_por_user_id' => Auth::id(), // Registra quien la rechazo
             'validado_por_user_id' => null, // Limpia el ID de validador
         ]);
 
         // Encuentra al creador de la noticia para enviar el correo
         $creador = User::find($noticia->user_id);
         if ($creador && $creador->email) {
-            // Envía un correo notificando el cambio de estado
+            // Envia un correo notificando el cambio de estado
             Mail::to($creador->email)->send(new NoticiaEstadoMail($noticia));
         }
 
-        // Redirige de vuelta con un mensaje de estado y el ID de la noticia para posible redirección
+        // Redirige de vuelta con un mensaje de estado y el ID de la noticia para posible redireccion
         return back()
             ->with('status_noticia', 'rechazado')
             ->with('noticia_id_for_redirect', $noticia->id);

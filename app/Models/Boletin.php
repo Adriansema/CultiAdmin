@@ -55,7 +55,7 @@ class Boletin extends Model
         if (is_null($this->precio_mas_alto)) {
             return 'N/A'; // O un valor predeterminado si no hay precio
         }
-        // Formato para español de Colombia: 2 decimales, coma para decimales, punto para miles
+        // Formato para espanol de Colombia: 2 decimales, coma para decimales, punto para miles
         return '$' . number_format($this->precio_mas_alto, 2, ',', '.');
     }
 
@@ -69,7 +69,7 @@ class Boletin extends Model
         if (is_null($this->precio_mas_bajo)) {
             return 'N/A'; // O un valor predeterminado si no hay precio
         }
-        // Formato para español de Colombia: 2 decimales, coma para decimales, punto para miles
+        // Formato para espanol de Colombia: 2 decimales, coma para decimales, punto para miles
         return '$' . number_format($this->precio_mas_bajo, 2, ',', '.');
     }
 }

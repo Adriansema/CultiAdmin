@@ -8,21 +8,21 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-// Asegura que la localización de Carbon sea global para el contexto del controlador
+// Asegura que la localizacion de Carbon sea global para el contexto del controlador
 Carbon::setLocale(App::getLocale());
 
 class StatisticController extends Controller
 {
     /**
-     * Muestra la página del dashboard con los filtros y la gráfica.
-     * Este método se encarga de cargar la vista inicial y los años disponibles.
+     * Muestra la pagina del dashboard con los filtros y la grafica.
+     * Este metodo se encarga de cargar la vista inicial y los anos disponibles.
      */
     public function showDashboardPage(Request $request)
     {
         $currentYear = Carbon::now()->year;
         $availableYears = [];
 
-        // Obtener el año más antiguo de registros en la tabla 'users' para la lista de años del dropdown.
+        // Obtener el ano mas antiguo de registros en la tabla 'users' para la lista de anos del dropdown.
         $firstRecordYear = DB::table('users')->min(DB::raw('EXTRACT(YEAR FROM created_at)'));
 
         $startYear = max(2025, $firstRecordYear ?? $currentYear);
@@ -41,7 +41,7 @@ class StatisticController extends Controller
     }
 
     /**
-     * Este método obtiene los datos para la gráfica y las métricas,
+     * Este metodo obtiene los datos para la grafica y las metricas,
      * basado en los filtros enviados desde el frontend.
      */
     public function getStatistics(Request $request)
@@ -58,19 +58,19 @@ class StatisticController extends Controller
             $inicio = null;
             $fin = null;
 
-            // --- Lógica CLAVE: Determinar la tabla base para la gráfica dinámicamente ---
+            // --- Logica CLAVE: Determinar la tabla base para la grafica dinamicamente ---
             $baseChartQuery = null;
-            $isUsersChart = ($filtro === 'año' && $chartSubFilter === 'month');
+            $isUsersChart = ($filtro === 'ano' && $chartSubFilter === 'month');
 
             if ($isUsersChart) {
                 $baseChartQuery = DB::table('users');
-                Log::info('DEBUG (Backend): Gráfica consultando la tabla "users" (Registros).');
+                Log::info('DEBUG (Backend): Grafica consultando la tabla "users" (Registros).');
             } else {
                 $baseChartQuery = DB::table('visits');
-                Log::info('DEBUG (Backend): Gráfica consultando la tabla "visits" (Visitas).');
+                Log::info('DEBUG (Backend): Grafica consultando la tabla "visits" (Visitas).');
             }
 
-            $baseDateForFiltering = ($filtro === 'año') ? Carbon::create($selectedYear, 1, 1) : Carbon::now();
+            $baseDateForFiltering = ($filtro === 'ano') ? Carbon::create($selectedYear, 1, 1) : Carbon::now();
             $dbDateFormatter = (env('DB_CONNECTION') === 'pgsql') ? "TO_CHAR(created_at, 'YYYY-MM-DD')" : "DATE_FORMAT(created_at, '%Y-%m-%d')";
             $dbWeekFormatter = (env('DB_CONNECTION') === 'pgsql') ? 'FLOOR((EXTRACT(DAY FROM created_at) - 1) / 7) + 1' : 'CEIL(DAY(created_at) / 7)';
             $dbMonthFormatter = (env('DB_CONNECTION') === 'pgsql') ? "EXTRACT(MONTH FROM created_at)" : "MONTH(created_at)";
@@ -109,14 +109,14 @@ class StatisticController extends Controller
 
                 case 'semana':
                     $fin = $baseDateForFiltering->copy()->endOfDay();
-                    $inicio = $fin->copy()->subDays(6)->startOfDay(); // Los últimos 7 días terminando hoy
+                    $inicio = $fin->copy()->subDays(6)->startOfDay(); // Los ultimos 7 dias terminando hoy
                     Log::info("DEBUG (Backend): Filtro 'semana'. Rango: {$inicio->toDateTimeString()} a {$fin->toDateTimeString()}");
 
                     $tempVistas = [];
                     for ($i = 6; $i >= 0; $i--) {
                         $date = $fin->copy()->subDays($i);
                         $formattedDateKey = $date->toDateString();
-                        $groupLabel = $date->translatedFormat('D d M.'); // Añadido el punto final para consistencia
+                        $groupLabel = $date->translatedFormat('D d M.'); // Anadido el punto final para consistencia
                         $tempVistas[$formattedDateKey] = (object)['grupo' => ucfirst(str_replace('.', '', $groupLabel)), 'total' => 0];
                         Log::debug("DEBUG (Backend): Semana - Fecha: {$formattedDateKey}, Label PHP: {$date->translatedFormat('D d M')}, Label para Grupo: {$tempVistas[$formattedDateKey]->grupo}");
                     }
@@ -146,7 +146,7 @@ class StatisticController extends Controller
                                                ->orderBy('grupo')
                                                ->get();
 
-                    // Rellenar solo hasta la semana actual del mes si el año es el actual
+                    // Rellenar solo hasta la semana actual del mes si el ano es el actual
                     $currentWeekOfMonth = (int)ceil(Carbon::now()->day / 7);
                     $weeksToIterate = (Carbon::now()->month === $baseDateForFiltering->month && Carbon::now()->year === $baseDateForFiltering->year)
                                         ? $currentWeekOfMonth
@@ -168,10 +168,10 @@ class StatisticController extends Controller
                     Log::info('DEBUG (Backend): Datos generados para mes:', ['vistas' => $vistas->toArray()]);
                     break;
 
-                case 'año':
+                case 'ano':
                     $inicio = Carbon::create($selectedYear, 1, 1)->startOfYear();
                     $fin = Carbon::create($selectedYear, 12, 31)->endOfYear();
-                    Log::info("DEBUG (Backend): Filtro 'año'. Año: {$selectedYear}. Subfiltro: {$chartSubFilter}. Rango: {$inicio->toDateTimeString()} a {$fin->toDateTimeString()}");
+                    Log::info("DEBUG (Backend): Filtro 'ano'. Ano: {$selectedYear}. Subfiltro: {$chartSubFilter}. Rango: {$inicio->toDateTimeString()} a {$fin->toDateTimeString()}");
 
                     $currentMonth = Carbon::now()->month;
                     $currentWeekOfYear = Carbon::now()->weekOfYear;
@@ -192,7 +192,7 @@ class StatisticController extends Controller
                             if ($selectedYear === Carbon::now()->year) {
                                 $monthsToIterate = $currentMonth; // Solo hasta el mes actual
                             } elseif ($selectedYear > Carbon::now()->year) {
-                                $monthsToIterate = 0; // Si es un año futuro, no hay datos aún
+                                $monthsToIterate = 0; // Si es un ano futuro, no hay datos aun
                             }
 
                             for ($i = 1; $i <= $monthsToIterate; $i++) {
@@ -207,7 +207,7 @@ class StatisticController extends Controller
                             }
                             ksort($tempVistas);
                             $vistas = collect(array_values($tempVistas));
-                            Log::info('DEBUG (Backend): Datos generados para año (mes):', ['vistas' => $vistas->toArray()]);
+                            Log::info('DEBUG (Backend): Datos generados para ano (mes):', ['vistas' => $vistas->toArray()]);
                             break;
 
                         case 'week':
@@ -224,9 +224,9 @@ class StatisticController extends Controller
                             $weeksInSelectedYear = (new Carbon("{$selectedYear}-12-31"))->weekOfYear;
                             $weeksToIterate = $weeksInSelectedYear;
                             if ($selectedYear === Carbon::now()->year) {
-                                $weeksToIterate = $currentWeekOfYear; // Solo hasta la semana actual del año
+                                $weeksToIterate = $currentWeekOfYear; // Solo hasta la semana actual del ano
                             } elseif ($selectedYear > Carbon::now()->year) {
-                                $weeksToIterate = 0; // Si es un año futuro, no hay datos aún
+                                $weeksToIterate = 0; // Si es un ano futuro, no hay datos aun
                             }
 
                             for ($i = 1; $i <= $weeksToIterate; $i++) {
@@ -239,7 +239,7 @@ class StatisticController extends Controller
                                 }
                             }
                             $vistas = collect(array_values($tempVistas));
-                            Log::info('DEBUG (Backend): Datos generados para año (semana):', ['vistas' => $vistas->toArray()]);
+                            Log::info('DEBUG (Backend): Datos generados para ano (semana):', ['vistas' => $vistas->toArray()]);
                             break;
 
                         case 'day':
@@ -254,9 +254,9 @@ class StatisticController extends Controller
                             $daysInSelectedYear = Carbon::create($selectedYear, 1, 1)->daysInYear;
                             $daysToIterate = $daysInSelectedYear;
                             if ($selectedYear === Carbon::now()->year) {
-                                $daysToIterate = $currentDayOfYear; // Solo hasta el día actual del año
+                                $daysToIterate = $currentDayOfYear; // Solo hasta el dia actual del ano
                             } elseif ($selectedYear > Carbon::now()->year) {
-                                $daysToIterate = 0; // Si es un año futuro, no hay datos aún
+                                $daysToIterate = 0; // Si es un ano futuro, no hay datos aun
                             }
 
                             for ($i = 1; $i <= $daysToIterate; $i++) {
@@ -273,11 +273,11 @@ class StatisticController extends Controller
                             }
                             ksort($tempVistas);
                             $vistas = collect(array_values($tempVistas));
-                            Log::info('DEBUG (Backend): Datos generados para año (día):', ['vistas' => $vistas->toArray()]);
+                            Log::info('DEBUG (Backend): Datos generados para ano (dia):', ['vistas' => $vistas->toArray()]);
                             break;
 
                         case 'hour':
-                            // Para 'hour', siempre se muestra el día actual del año seleccionado, hasta la hora actual
+                            // Para 'hour', siempre se muestra el dia actual del ano seleccionado, hasta la hora actual
                             $targetDateForHours = Carbon::create($selectedYear, Carbon::now()->month, Carbon::now()->day);
 
                             $hoursToIterate = 24;
@@ -306,7 +306,7 @@ class StatisticController extends Controller
                                 }
                             }
                             $vistas = collect(array_values($tempVistas));
-                            Log::info('DEBUG (Backend): Datos generados para año (hora):', ['vistas' => $vistas->toArray()]);
+                            Log::info('DEBUG (Backend): Datos generados para ano (hora):', ['vistas' => $vistas->toArray()]);
                             break;
                     }
                     break;
@@ -360,7 +360,7 @@ class StatisticController extends Controller
 
                     $tempVistas = [];
                     $minYear = $inicio->year;
-                    $maxYear = Carbon::now()->year; // Solo hasta el año actual
+                    $maxYear = Carbon::now()->year; // Solo hasta el ano actual
                     for ($year = $minYear; $year <= $maxYear; $year++) {
                         $tempVistas[$year] = (object)['grupo' => (string)$year, 'total' => 0];
                     }
@@ -405,7 +405,7 @@ class StatisticController extends Controller
             $activos = DB::table('users')->where('last_login_at', '>=', Carbon::now()->subMinutes(30))->count();
             $conectados = DB::table('users')->where('is_online', true)->count();
 
-            Log::info('Datos de estadísticas enviados FINAL:', [
+            Log::info('Datos de estadisticas enviados FINAL:', [
                 'filtro' => $filtro,
                 'selectedYear' => $selectedYear,
                 'chartSubFilter' => $chartSubFilter,
@@ -429,9 +429,9 @@ class StatisticController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            Log::error('Error al obtener estadísticas: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Error al obtener estadisticas: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json([
-                'error' => 'Error interno del servidor al obtener estadísticas',
+                'error' => 'Error interno del servidor al obtener estadisticas',
                 'detalle' => $e->getMessage(),
                 'trace' => env('APP_DEBUG') ? $e->getTraceAsString() : null,
             ], 500);

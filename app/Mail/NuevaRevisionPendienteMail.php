@@ -16,14 +16,14 @@ class NuevaRevisionPendienteMail extends Mailable
     use Queueable, SerializesModels;
 
     /**
-     * La instancia del elemento (Producto o Boletin) pendiente de revisión.
+     * La instancia del elemento (Producto o Boletin) pendiente de revision.
      *
      * @var \Illuminate\Database\Eloquent\Model
      */
-    public $item; // Este contendrá el objeto Producto o Boletin
+    public $item; // Este contendra el objeto Producto o Boletin
 
     /**
-     * El tipo de elemento a revisar (ej. 'Café', 'Mora', 'Boletín').
+     * El tipo de elemento a revisar (ej. 'Cafe', 'Mora', 'Boletin').
      *
      * @var string
      */
@@ -33,7 +33,7 @@ class NuevaRevisionPendienteMail extends Mailable
      * Crea una nueva instancia de mensaje.
      *
      * @param \Illuminate\Database\Eloquent\Model $item       El objeto del elemento (Producto o Boletin).
-     * @param string|null                         $itemTipo   El tipo de elemento (ej. 'Café', 'Mora', 'Boletín').
+     * @param string|null                         $itemTipo   El tipo de elemento (ej. 'Cafe', 'Mora', 'Boletin').
      */
     public function __construct($item, ?string $itemTipo = null) // Eliminamos $detallesItem del constructor
     {
@@ -48,10 +48,10 @@ class NuevaRevisionPendienteMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        // Un asunto claro para que el operario identifique rápidamente de qué se trata
-        $subject = "¡Nueva Revisión Pendiente! - " . ucfirst($this->itemTipo);
+        // Un asunto claro para que el operario identifique rapidamente de que se trata
+        $subject = "!Nueva Revision Pendiente! - " . ucfirst($this->itemTipo);
 
-        // Añade el ID del elemento al asunto si está disponible
+        // Anade el ID del elemento al asunto si esta disponible
         if (isset($this->item->id)) {
             $subject .= " (ID: " . $this->item->id . ")";
         }
@@ -64,7 +64,7 @@ class NuevaRevisionPendienteMail extends Mailable
     }
 
     /**
-     * Obtiene la definición del contenido del mensaje.
+     * Obtiene la definicion del contenido del mensaje.
      */
     public function content(): Content
     {
@@ -73,7 +73,7 @@ class NuevaRevisionPendienteMail extends Mailable
             with: [
                 'item' => $this->item,     // Solo pasamos el item principal
                 'itemTipo' => $this->itemTipo, // Y el tipo de item
-                // Ya no necesitamos pasar 'detallesItem' aquí porque la vista no lo usa
+                // Ya no necesitamos pasar 'detallesItem' aqui porque la vista no lo usa
             ],
         );
     }

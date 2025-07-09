@@ -2,14 +2,14 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\User; // Asegúrate de importar tu modelo User
+use App\Models\User; // Asegurate de importar tu modelo User
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
 use App\Models\IntentoAcceso; // Si usas IntentoAcceso
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Support\Facades\Validator;    // Importa el facade de Validator
-use App\Actions\Fortify\PasswordValidationRules; // Importa el trait que contiene tus reglas de validación de contraseña
-use Illuminate\Validation\ValidationException; // Importa la clase para lanzar excepciones de validación
+use App\Actions\Fortify\PasswordValidationRules; // Importa el trait que contiene tus reglas de validacion de contrasena
+use Illuminate\Validation\ValidationException; // Importa la clase para lanzar excepciones de validacion
 
 class AttemptToAuthenticate
 {
@@ -18,9 +18,9 @@ class AttemptToAuthenticate
 
     public function handle(Request $request, callable $next)
     {
-        // --- Lógica de validación de robustez de contraseña ---
+        // --- Logica de validacion de robustez de contrasena ---
         $validator = Validator::make($request->all(), [
-            'password' => $this->passwordRules(true), // <-- Pasa 'true' aquí
+            'password' => $this->passwordRules(true), // <-- Pasa 'true' aqui
         ]);
 
         if ($validator->fails()) {
@@ -28,11 +28,11 @@ class AttemptToAuthenticate
                 'password' => $validator->errors()->first('password'),
             ]);
         }
-        // --- FIN de la lógica de validación de robustez de contraseña ---
+        // --- FIN de la logica de validacion de robustez de contrasena ---
 
         $user = User::where(Fortify::username(), $request->{Fortify::username()})->first();
 
-        // Registro de intento de acceso (ajustado para ser más robusto si el usuario no existe)
+        // Registro de intento de acceso (ajustado para ser mas robusto si el usuario no existe)
         if ($user) {
             IntentoAcceso::create([
                 'user_id' => $user->id,
@@ -52,7 +52,7 @@ class AttemptToAuthenticate
 
 
         if ($user && $user->estado === 'inactivo') {
-            // Disparar un evento de fallo de autenticación
+            // Disparar un evento de fallo de autenticacion
             event(new Failed('web', $user, $request->merge([
                 'password' => '****',
             ])->all()));
@@ -61,9 +61,9 @@ class AttemptToAuthenticate
             return redirect()->route('login')->withInput($request->only(Fortify::username()))->with('inactivo', true);
         }
 
-        // Si el usuario está activo o no se encontró, Fortify continúa con el siguiente paso del pipeline.
-        // Aquí es donde el pipeline de Fortify continuará con la verificación de contraseña
-        // a través de la acción Laravel\Fortify\Actions\AttemptToAuthenticate::class
+        // Si el usuario esta activo o no se encontro, Fortify continua con el siguiente paso del pipeline.
+        // Aqui es donde el pipeline de Fortify continuara con la verificacion de contrasena
+        // a traves de la accion Laravel\Fortify\Actions\AttemptToAuthenticate::class
         return $next($request);
     }
 }

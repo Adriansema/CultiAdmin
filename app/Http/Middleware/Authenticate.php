@@ -6,17 +6,17 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-// Este middleware es el encargado de verificar si el usuario actual está autenticado (logueado).
-// Su propósito principal es proteger rutas: si un usuario no ha iniciado sesión y trata de acceder
-// a una ruta protegida por este middleware, será redirigido automáticamente a la página de login.
-// La lógica real de autenticación y redirección reside en la clase base de Laravel (Illuminate\Auth\Middleware\Authenticate)
-// de la cual este middleware hereda. Este archivo actúa como un "placeholder" o un punto de personalización.
+// Este middleware es el encargado de verificar si el usuario actual esta autenticado (logueado).
+// Su proposito principal es proteger rutas: si un usuario no ha iniciado sesion y trata de acceder
+// a una ruta protegida por este middleware, sera redirigido automaticamente a la pagina de login.
+// La logica real de autenticacion y redireccion reside en la clase base de Laravel (Illuminate\Auth\Middleware\Authenticate)
+// de la cual este middleware hereda. Este archivo actua como un "placeholder" o un punto de personalizacion.
 class Authenticate
 {
     /**
      * Maneja una solicitud HTTP entrante.
      *
-     * En este método, la lógica heredada de la clase padre (Illuminate\Auth\Middleware\Authenticate)
+     * En este metodo, la logica heredada de la clase padre (Illuminate\Auth\Middleware\Authenticate)
      * se encarga de:
      * 1. Comprobar si hay un usuario autenticado para el "guard" por defecto (generalmente 'web').
      * 2. Si no hay usuario autenticado, redirigir la solicitud a la ruta de login.
@@ -26,10 +26,10 @@ class Authenticate
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // La implementación clave de autenticación y redirección sucede "antes" de este punto
-        // en la clase padre o en métodos que se llaman internamente.
-        // Si el usuario no está autenticado, la ejecución nunca llegará a esta línea;
-        // en su lugar, se producirá una redirección.
-        return $next($request); // Pasa la solicitud al siguiente punto si el usuario está autenticado.
+        // La implementacion clave de autenticacion y redireccion sucede "antes" de este punto
+        // en la clase padre o en metodos que se llaman internamente.
+        // Si el usuario no esta autenticado, la ejecucion nunca llegara a esta linea;
+        // en su lugar, se producira una redireccion.
+        return $next($request); // Pasa la solicitud al siguiente punto si el usuario esta autenticado.
     }
 }

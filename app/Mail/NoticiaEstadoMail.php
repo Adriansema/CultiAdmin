@@ -36,11 +36,11 @@ class NoticiaEstadoMail extends Mailable
     {
         $subject = '';
         if ($this->noticia->estado === 'aprobado') {
-            $subject = '¡Tu noticia ha sido APROBADA!';
+            $subject = '!Tu noticia ha sido APROBADA!';
         } elseif ($this->noticia->estado === 'rechazado') {
             $subject = 'Tu noticia ha sido RECHAZADA';
         } else {
-            $subject = 'Actualización de estado de tu noticia';
+            $subject = 'Actualizacion de estado de tu noticia';
         }
 
         return new Envelope(
@@ -49,7 +49,7 @@ class NoticiaEstadoMail extends Mailable
     }
 
     /**
-     * Obtiene la definición del contenido del mensaje.
+     * Obtiene la definicion del contenido del mensaje.
      */
     public function content(): Content
     {

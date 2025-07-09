@@ -35,15 +35,15 @@ class FortifyServiceProvider extends ServiceProvider
     {
         $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
 
-        // ¡Aquí es donde definimos el pipeline de autenticación!
+        // !Aqui es donde definimos el pipeline de autenticacion!
         Fortify::authenticateThrough(function (Request $request) {
-            return array_filter([ // Usamos array_filter para eliminar nulos si alguna acción es opcional
-                \App\Actions\Fortify\AttemptToAuthenticate::class, // <-- Tu acción personalizada
-                // Las acciones predeterminadas de Fortify siguen aquí y son CRUCIALES para la autenticación de contraseña
+            return array_filter([ // Usamos array_filter para eliminar nulos si alguna accion es opcional
+                \App\Actions\Fortify\AttemptToAuthenticate::class, // <-- Tu accion personalizada
+                // Las acciones predeterminadas de Fortify siguen aqui y son CRUCIALES para la autenticacion de contrasena
                 \Laravel\Fortify\Actions\EnsureLoginIsNotThrottled::class, // Para el rate limiting
                 \Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable::class, // Si usas 2FA
-                \Laravel\Fortify\Actions\AttemptToAuthenticate::class, // <-- La acción predeterminada de Fortify que VERIFICA LA CONTRASEÑA
-                \Laravel\Fortify\Actions\PrepareAuthenticatedSession::class, // Prepara la sesión si el login es exitoso
+                \Laravel\Fortify\Actions\AttemptToAuthenticate::class, // <-- La accion predeterminada de Fortify que VERIFICA LA CONTRASEnA
+                \Laravel\Fortify\Actions\PrepareAuthenticatedSession::class, // Prepara la sesion si el login es exitoso
             ]);
         });
 

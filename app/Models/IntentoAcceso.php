@@ -19,13 +19,13 @@ class IntentoAcceso extends Model
         'email',
         'ip_address',
         'user_agent',
-        // 'created_at' y 'updated_at' son manejados automáticamente por timestamps()
+        // 'created_at' y 'updated_at' son manejados automaticamente por timestamps()
     ];
 
     /**
      * Get the user that owns the access attempt.
      *
-     * Define la relación con el modelo User
+     * Define la relacion con el modelo User
      */
     public function user()
     {

@@ -12,12 +12,12 @@ class RouteServiceProvider extends ServiceProvider
 {
 
     /**
-     * Esta es la ruta a la que los usuarios son redirigidos después del login.
+     * Esta es la ruta a la que los usuarios son redirigidos despues del login.
      */
     public const HOME = '/dashboard';
 
     /**
-     * Define tus rutas aquí.
+     * Define tus rutas aqui.
      */
     public function boot(): void
     {

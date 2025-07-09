@@ -14,17 +14,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pqrs', function (Blueprint $table) {
-            $table->id(); // ID único para cada PQR
+            $table->id(); // ID unico para cada PQR
 
             // Si el PQR puede ser enviado por un usuario autenticado, puedes enlazarlo
-            // Usamos nullable() porque el PQR del modal vendrá de un usuario NO autenticado
+            // Usamos nullable() porque el PQR del modal vendra de un usuario NO autenticado
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
 
             $table->string('email', 255); // Email de contacto del remitente (obligatorio)
             $table->string('nombre', 255)->nullable(); // Nombre del remitente (opcional)
-            $table->string('telefono', 50)->nullable(); // Teléfono del remitente (opcional)
+            $table->string('telefono', 50)->nullable(); // Telefono del remitente (opcional)
 
-            $table->string('asunto', 255); // Asunto o título del PQR
+            $table->string('asunto', 255); // Asunto o titulo del PQR
             $table->text('mensaje'); // Contenido detallado del PQR
 
             // Tipo de PQR (Pregunta, Queja, Reclamo, Sugerencia, etc.)

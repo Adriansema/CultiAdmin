@@ -8,7 +8,7 @@ use App\Models\Comentario;
 class LimpiarComentarios extends Command
 {
     protected $signature = 'comentarios:limpiar';
-    protected $description = 'Eliminar comentarios de más de 2 minutos';
+    protected $description = 'Eliminar comentarios de mas de 2 minutos';
 
     public function handle()
     {

@@ -6,7 +6,7 @@ use App\Models\Noticia; // Importa el modelo Noticia
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth; // Para obtener el ID del usuario autenticado
-use Illuminate\Support\Facades\Storage; // Para manejar la carga de imágenes
+use Illuminate\Support\Facades\Storage; // Para manejar la carga de imagenes
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log; // Importar la clase Log para registrar errores
 use Illuminate\Database\QueryException; //
@@ -17,8 +17,8 @@ class NoticiaController extends Controller
 {
     public function index(Request $request, NoticiaService $noticiaService)
     {
-        // Autorización para ver la lista de noticias
-        Gate::authorize('crear noticia'); // Asegúrate de que este permiso es el adecuado
+        // Autorizacion para ver la lista de noticias
+        Gate::authorize('crear noticia'); // Asegurate de que este permiso es el adecuado
 
         // Llama al servicio para obtener las noticias filtradas/paginadas
         $noticias = $noticiaService->obtenerNoticiaFiltradas($request);
@@ -46,7 +46,7 @@ class NoticiaController extends Controller
             'tipo' => 'required|string|max:255',
             'titulo' => 'required|string|max:255',
             'clase' => 'required|string|max:255',
-            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validación para imagen
+            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validacion para imagen
             'informacion' => 'required|string',
             'numero_pagina' => 'required|integer',
             'autor' => 'required|string|max:255',
@@ -55,12 +55,12 @@ class NoticiaController extends Controller
         $messages = [];
 
         try {
-            // 2. Lógica para guardar la imagen (si se ha subido).
+            // 2. Logica para guardar la imagen (si se ha subido).
             $imagenPath = null;
             if ($request->hasFile('imagen')) {
                 $file = $request->file('imagen');
 
-                // Genera un nombre de archivo único con la extensión original del cliente
+                // Genera un nombre de archivo unico con la extension original del cliente
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
                 // Guarda la imagen en storage/app/public/noticias con el nombre generado
@@ -68,7 +68,7 @@ class NoticiaController extends Controller
             }
 
             // 3. Crear la nueva noticia.
-            // Si Noticia::create() falla, lanzará una excepción que será capturada por el bloque catch.
+            // Si Noticia::create() falla, lanzara una excepcion que sera capturada por el bloque catch.
             Noticia::create([
                 'user_id' => Auth::id(),
                 'tipo' => $request->tipo,
@@ -78,30 +78,30 @@ class NoticiaController extends Controller
                 'informacion' => $request->informacion,
                 'numero_pagina' => $request->numero_pagina,
                 'autor' => $request->autor,
-                'leida' => false, // ¡Nueva columna, por defecto false!
+                'leida' => false, // Nueva columna, por defecto false!
             ]);
 
-            // Si la creación es exitosa, el código continúa aquí.
-            return redirect()->route('noticias.index')->with('success_message', '¡Noticia creada con éxito!');
+            // Si la creacion es exitosa, el codigo continua aqui.
+            return redirect()->route('noticias.index')->with('success_message', '!Noticia creada con exito!');
 
         } catch (QueryException $e) {
-            // Captura errores específicos de la base de datos
+            // Captura errores especificos de la base de datos
             Log::error('Error de base de datos al crear noticia: ' . $e->getMessage());
-            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al crear la noticia. Por favor, inténtalo de nuevo.');
+            return redirect()->back()->with('error_message', 'Ocurrio un error de base de datos al crear la noticia. Por favor, intentalo de nuevo.');
         } catch (\Exception $e) {
-            // Captura cualquier otra excepción inesperada
+            // Captura cualquier otra excepcion inesperada
             Log::error('Error inesperado al crear noticia: ' . $e->getMessage());
-            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al crear la noticia. Por favor, inténtalo de nuevo.');
+            return redirect()->back()->with('error_message', 'Ocurrio un error inesperado al crear la noticia. Por favor, intentalo de nuevo.');
         }
     }
 
     /**
      * Display the specified resource.
-     * Muestra los detalles de una noticia específica.
+     * Muestra los detalles de una noticia especifica.
      */
     public function show(Noticia $noticia)
     {
-        // Carga la relación 'user' para mostrar quién la creó.
+        // Carga la relacion 'user' para mostrar quien la creo.
         $noticia->load('user');
         return view('noticias.show', compact('noticia'));
     }
@@ -125,7 +125,7 @@ class NoticiaController extends Controller
         Gate::authorize('editar noticia');
 
         try {
-            // Guarda el estado original de la noticia antes de cualquier actualización
+            // Guarda el estado original de la noticia antes de cualquier actualizacion
             $originalEstado = $noticia->estado;
 
             // Valida los datos de la solicitud
@@ -139,7 +139,7 @@ class NoticiaController extends Controller
                 'autor' => 'required|string|max:255',
             ]);
 
-            // 1. Lógica para actualizar la imagen.
+            // 1. Logica para actualizar la imagen.
             if ($request->hasFile('imagen')) {
                 // Eliminar imagen anterior si existe
                 if ($noticia->imagen && Storage::disk('public')->exists($noticia->imagen)) {
@@ -153,13 +153,13 @@ class NoticiaController extends Controller
                 $noticia->imagen = $imagenPath; // Asigna la nueva ruta
             }
 
-            // 2. Lógica para cambiar el estado a 'pendiente' si la noticia fue editada
+            // 2. Logica para cambiar el estado a 'pendiente' si la noticia fue editada
             //    y su estado anterior era 'aprobado' o 'rechazado'.
-            //    Esto asegura que una noticia editada vuelva al flujo de revisión.
+            //    Esto asegura que una noticia editada vuelva al flujo de revision.
             if ($originalEstado === 'aprobado' || $originalEstado === 'rechazado') {
                 $noticia->estado = 'pendiente';
                 $noticia->observaciones = null; // Limpia las observaciones anteriores si las hubiera
-                // Si tienes un campo específico para observaciones del operador, también límpialo:
+                // Si tienes un campo especifico para observaciones del operador, tambien limpialo:
                 // $noticia->observaciones_operador = null;
             }
 
@@ -173,20 +173,20 @@ class NoticiaController extends Controller
             $noticia->numero_pagina = $request->numero_pagina;
             $noticia->autor = $request->autor;
 
-            // Guarda todos los cambios en la base de datos en una sola operación
+            // Guarda todos los cambios en la base de datos en una sola operacion
             $noticia->save();
 
-            // Si la actualización es exitosa, el código continúa aquí.
-            return redirect()->route('noticias.index')->with('success_message', '¡Noticia actualizada con éxito!');
+            // Si la actualizacion es exitosa, el codigo continua aqui.
+            return redirect()->route('noticias.index')->with('success_message', '!Noticia actualizada con exito!');
 
         } catch (QueryException $e) {
-            // Captura errores específicos de la base de datos
+            // Captura errores especificos de la base de datos
             Log::error('Error de base de datos al actualizar noticia (ID: ' . $noticia->id . '): ' . $e->getMessage());
-            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al actualizar la noticia. Por favor, inténtalo de nuevo.');
+            return redirect()->back()->with('error_message', 'Ocurrio un error de base de datos al actualizar la noticia. Por favor, intentalo de nuevo.');
         } catch (\Exception $e) {
-            // Captura cualquier otra excepción inesperada
+            // Captura cualquier otra excepcion inesperada
             Log::error('Error inesperado al actualizar noticia (ID: ' . $noticia->id . '): ' . $e->getMessage());
-            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al actualizar la noticia. Por favor, inténtalo de nuevo.');
+            return redirect()->back()->with('error_message', 'Ocurrio un error inesperado al actualizar la noticia. Por favor, intentalo de nuevo.');
         }
     }
 
@@ -205,8 +205,8 @@ class NoticiaController extends Controller
         // 2. Eliminar la noticia.
         $noticia->delete();
 
-        // 3. Redirigir al índice de noticias con un mensaje de éxito.
-        return redirect()->route('noticias.index')->with('success', 'Noticia eliminada con éxito.');
+        // 3. Redirigir al indice de noticias con un mensaje de exito.
+        return redirect()->route('noticias.index')->with('success', 'Noticia eliminada con exito.');
     }
 
     /**
@@ -224,8 +224,8 @@ class NoticiaController extends Controller
             'Expires' => '0',
         ];
 
-        // Columnas que se incluirán en el CSV.
-        // Asegúrate de que estos nombres coincidan con los nombres de las columnas en tu tabla 'noticias'.
+        // Columnas que se incluiran en el CSV.
+        // Asegurate de que estos nombres coincidan con los nombres de las columnas en tu tabla 'noticias'.
         $columns = [
             'id',
             'user_id',
@@ -248,7 +248,7 @@ class NoticiaController extends Controller
             // Escribe los encabezados del CSV
             fputcsv($file, $columns);
 
-            // Obtiene todas las noticias. Para conjuntos de datos muy grandes, considera paginación
+            // Obtiene todas las noticias. Para conjuntos de datos muy grandes, considera paginacion
             // o chunking para evitar problemas de memoria.
             // Ejemplo con chunking (recomendado para muchos registros):
             Noticia::chunk(2000, function ($noticias) use ($file, $columns) {
@@ -256,20 +256,20 @@ class NoticiaController extends Controller
                     $row = [];
                     foreach ($columns as $column) {
                         // Accede al atributo del modelo.
-                        // Para 'imagen', podrías querer la URL completa en lugar de solo la ruta de almacenamiento.
-                        // Si 'informacion' puede contener saltos de línea, fputcsv los manejará correctamente.
+                        // Para 'imagen', podrias querer la URL completa en lugar de solo la ruta de almacenamiento.
+                        // Si 'informacion' puede contener saltos de linea, fputcsv los manejara correctamente.
                         $value = $noticia->$column;
 
-                        // Si la columna es 'imagen' y quieres la URL pública, puedes hacer esto:
+                        // Si la columna es 'imagen' y quieres la URL publica, puedes hacer esto:
                         if ($column === 'imagen' && $value) {
-                            $value = asset('storage/' . $value); // Asume que 'noticias' está en el disco 'public'
+                            $value = asset('storage/' . $value); // Asume que 'noticias' esta en el disco 'public'
                         }
 
                         // Si la columna es 'informacion' y necesitas limpiar caracteres especiales o HTML:
                         if ($column === 'informacion' && $value) {
                             $value = strip_tags($value); // Elimina etiquetas HTML
                             $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'); // Decodifica entidades HTML
-                            $value = str_replace(["\r", "\n"], " ", $value); // Reemplaza saltos de línea por espacios
+                            $value = str_replace(["\r", "\n"], " ", $value); // Reemplaza saltos de linea por espacios
                         }
 
                         $row[] = $value;
@@ -285,18 +285,18 @@ class NoticiaController extends Controller
     }
 
     /**
-     * Obtiene las noticias más recientes para mostrar en el dashboard.
+     * Obtiene las noticias mas recientes para mostrar en el dashboard.
      *
      * @return \Illuminate\View\View
      */
     public function getDashboardNoticias()
     {
-        // Obtener las últimas 5 noticias, ordenadas por fecha de creación descendente.
-        // Asegúrate de cargar la relación 'user' si quieres mostrar el autor.
+        // Obtener las ultimas 5 noticias, ordenadas por fecha de creacion descendente.
+        // Asegurate de cargar la relacion 'user' si quieres mostrar el autor.
         $noticias = Noticia::with('user')
             ->where('leida', false)
             ->latest() // Ordena por created_at de forma descendente
-            ->limit(5) // Limita a las últimas 5 noticias
+            ->limit(5) // Limita a las ultimas 5 noticias
             ->get();
 
         // Retorna la vista parcial con las noticias.
@@ -304,7 +304,7 @@ class NoticiaController extends Controller
     }
 
     /**
-     * Marca una noticia como leída.
+     * Marca una noticia como leida.
      *
      * @param  \App\Models\Noticia  $noticia
      * @return \Illuminate\Http\JsonResponse
@@ -314,6 +314,6 @@ class NoticiaController extends Controller
         $noticia->leida = true;
         $noticia->save();
 
-        return response()->json(['message' => 'Noticia marcada como leída.']);
+        return response()->json(['message' => 'Noticia marcada como leida.']);
     }
 }

@@ -36,7 +36,7 @@ class UserCreatedNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '¡Bienvenido a ' . $this->appName . '! Tu cuenta ha sido creada',
+            subject: '!Bienvenido a ' . $this->appName . '! Tu cuenta ha sido creada',
         );
     }
 

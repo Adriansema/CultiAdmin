@@ -28,7 +28,7 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         // Log personalizado
-        Log::error('Excepción detectada', [
+        Log::error('Excepcion detectada', [
             'url' => $request->fullUrl(),
             'message' => $exception->getMessage(),
             'exception' => get_class($exception),

@@ -12,7 +12,7 @@ use App\Console\Commands\ResetUsuarios;
 class Kernel extends ConsoleKernel
 {
     /**
-     * Aquí se registran los comandos personalizados.
+     * Aqui se registran los comandos personalizados.
      */
     protected $commands = [
         LimpiarComentarios::class,
@@ -21,7 +21,7 @@ class Kernel extends ConsoleKernel
     ];
 
     /**
-     * Aquí se define la programación de tareas.
+     * Aqui se define la programacion de tareas.
      */
     protected function schedule(Schedule $schedule)
     {
@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
     }
 
     /**
-     * Aquí puedes registrar comandos adicionales si fuera necesario.
+     * Aqui puedes registrar comandos adicionales si fuera necesario.
      */
     protected function commands()
     {

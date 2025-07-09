@@ -22,12 +22,12 @@ class ExportarCsvController extends Controller
         $usuarios = [];
 
         // Tipos de documento comunes en Colombia (ejemplo)
-        $documentTypes = ['CC', 'TI', 'CE', 'PAS', 'NIT']; // Añadido PAS, NIT para variedad
+        $documentTypes = ['CC', 'TI', 'CE', 'PAS', 'NIT']; // Anadido PAS, NIT para variedad
 
-        // Delegar la generación de usuarios según el tipo solicitado
+        // Delegar la generacion de usuarios segun el tipo solicitado
         switch ($type) {
             case 'vacio':
-                // No se añaden usuarios, se generará un CSV con solo encabezados.
+                // No se anaden usuarios, se generara un CSV con solo encabezados.
                 $filename = 'usuarios_vacio_' . now()->format('Ymd_His') . '_' . Str::random(5) . '.csv';
                 break;
             case 'duplicados':
@@ -60,8 +60,8 @@ class ExportarCsvController extends Controller
 
         // Escribe los datos de cada usuario
         foreach ($usuarios as $usuario) {
-            // Asegúrate de que el orden de los datos coincida exactamente con los encabezados
-            // y que los campos existan (si faltan, fputcsv pondrá un campo vacío)
+            // Asegurate de que el orden de los datos coincida exactamente con los encabezados
+            // y que los campos existan (si faltan, fputcsv pondra un campo vacio)
             fputcsv($file, [
                 $usuario['name'] ?? '',
                 $usuario['lastname'] ?? '',
@@ -141,7 +141,7 @@ class ExportarCsvController extends Controller
     {
         $usuarios = $this->generarUsuariosCorrectos($faker, $documentTypes); // Genera una base de usuarios correctos
         
-        // Añadir 3 usuarios duplicados
+        // Anadir 3 usuarios duplicados
         for ($i = 0; $i < 3; $i++) {
             // Duplicar un email existente del primer usuario
             if (isset($usuarios[0])) {
@@ -172,12 +172,12 @@ class ExportarCsvController extends Controller
             }
         }
 
-        shuffle($usuarios); // Mezclar para que los duplicados no estén al principio
+        shuffle($usuarios); // Mezclar para que los duplicados no esten al principio
         return $usuarios;
     }
 
     /**
-     * Genera un array de usuarios con algunos datos inválidos (ej. email mal formado, documento con letras).
+     * Genera un array de usuarios con algunos datos invalidos (ej. email mal formado, documento con letras).
      * @param \Faker\Generator $faker
      * @param array $documentTypes
      * @return array
@@ -186,12 +186,12 @@ class ExportarCsvController extends Controller
     {
         $usuarios = $this->generarUsuariosCorrectos($faker, $documentTypes); // Genera una base de usuarios correctos
 
-        // Modificar algunos para que sean inválidos
+        // Modificar algunos para que sean invalidos
         if (isset($usuarios[0])) {
             $usuarios[0]['email'] = 'email_invalido.com'; // Email sin @
         }
         if (isset($usuarios[1])) {
-            $usuarios[1]['document'] = 'ABC123XYZ'; // Documento no numérico
+            $usuarios[1]['document'] = 'ABC123XYZ'; // Documento no numerico
         }
         if (isset($usuarios[2])) {
             $usuarios[2]['role'] = 'RolNoExiste'; // Rol que no existe
@@ -215,16 +215,16 @@ class ExportarCsvController extends Controller
 
         // Eliminar algunos campos obligatorios
         if (isset($usuarios[0])) {
-            $usuarios[0]['name'] = ''; // Nombre vacío
+            $usuarios[0]['name'] = ''; // Nombre vacio
         }
         if (isset($usuarios[1])) {
-            $usuarios[1]['email'] = ''; // Email vacío
+            $usuarios[1]['email'] = ''; // Email vacio
         }
         if (isset($usuarios[2])) {
             unset($usuarios[2]['document']); // Documento faltante (se espera '')
         }
         if (isset($usuarios[3])) {
-            $usuarios[3]['role'] = ''; // Rol vacío
+            $usuarios[3]['role'] = ''; // Rol vacio
         }
         if (isset($usuarios[4])) {
             $usuarios[4]['type_document'] = null; // Tipo de documento nulo

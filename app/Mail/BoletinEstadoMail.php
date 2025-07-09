@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Boletin; // Asegúrate de que el modelo Boletin esté importado correctamente
+use App\Models\Boletin; // Asegurate de que el modelo Boletin este importado correctamente
 
 class BoletinEstadoMail extends Mailable
 {
@@ -29,14 +29,14 @@ class BoletinEstadoMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        $subject = 'Actualización del estado de tu Boletín: ';
+        $subject = 'Actualizacion del estado de tu Boletin: ';
 
         if ($this->boletin->estado === 'aprobado') {
-            $subject .= '¡Aprobado!';
+            $subject .= '!Aprobado!';
         } elseif ($this->boletin->estado === 'rechazado') {
-            $subject .= '¡Rechazado!';
+            $subject .= '!Rechazado!';
         } else {
-            $subject .= 'Pendiente de Revisión'; // Estado por defecto si no es aprobado ni rechazado
+            $subject .= 'Pendiente de Revision'; // Estado por defecto si no es aprobado ni rechazado
         }
 
         return new Envelope(
@@ -45,7 +45,7 @@ class BoletinEstadoMail extends Mailable
     }
 
     /**
-     * Obtiene la definición del contenido del mensaje.
+     * Obtiene la definicion del contenido del mensaje.
      */
     public function content(): Content
     {

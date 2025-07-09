@@ -1,6 +1,6 @@
 <?php
 
-//TODO: Este es el archivo central para configurar cómo Laravel maneja las sesiones.
+//TODO: Este es el archivo central para configurar como Laravel maneja las sesiones.
 
 use Illuminate\Support\Str;
 
@@ -20,12 +20,12 @@ return [
     |
     */
 
-    //TODO: Ubicación de Almacenamiento de Sesiones
+    //TODO: Ubicacion de Almacenamiento de Sesiones
     /**
-     * Migración Necesaria: Debes ejecutar php artisan session:table y luego php artisan migrate para crear la tabla sessions en tu base de datos.
-     * Ubicación: Tu tabla sessions en la base de datos.
-     * Propósito: Los datos de la sesión se almacenarán como registros en esta tabla. Esto es útil para balanceo de carga o 
-     * para tener un control más centralizado de las sesiones.
+     * Migracion Necesaria: Debes ejecutar php artisan session:table y luego php artisan migrate para crear la tabla sessions en tu base de datos.
+     * Ubicacion: Tu tabla sessions en la base de datos.
+     * Proposito: Los datos de la sesion se almacenaran como registros en esta tabla. Esto es util para balanceo de carga o 
+     * para tener un control mas centralizado de las sesiones.
      */
     'driver' => env('SESSION_DRIVER', 'database'),
 

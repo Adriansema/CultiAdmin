@@ -63,7 +63,7 @@ class CustomResetPassword extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        // Importante: Pasamos $notifiable también a buildMailMessage para poder acceder al nombre en la vista
+        // Importante: Pasamos $notifiable tambien a buildMailMessage para poder acceder al nombre en la vista
         return $this->buildMailMessage($this->resetUrl($notifiable), $notifiable); 
     }
 
@@ -71,13 +71,13 @@ class CustomResetPassword extends Notification
      * Get the reset password notification mail message for the given URL.
      *
      * @param  string  $url
-     * @param  mixed  $notifiable // <-- Añadimos este parámetro para tener el usuario disponible
+     * @param  mixed  $notifiable // <-- Anadimos este parametro para tener el usuario disponible
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     protected function buildMailMessage($url, $notifiable) 
     {
         return (new MailMessage)
-            ->subject(Lang::get('Restablecimiento de Contraseña para Cultiva SENA')) 
+            ->subject(Lang::get('Restablecimiento de Contrasena para Cultiva SENA')) 
             ->view('emails.auth.reset', [ 
                 'url' => $url,
                 'token' => $this->token,
@@ -98,11 +98,11 @@ class CustomResetPassword extends Notification
             return call_user_func(static::$createUrlCallback, $notifiable, $this->token);
         }
 
-        // Asegúrate de que APP_URL en tu .env esté configurado correctamente para URLs absolutas.
+        // Asegurate de que APP_URL en tu .env este configurado correctamente para URLs absolutas.
         return URL::to(route('password.reset', [
             'token' => $this->token,
             'email' => $notifiable->getEmailForPasswordReset(),
-        ], false)); // El 'false' al final hace la URL relativa. Puedes quitarlo para URL absoluta si APP_URL no está configurado.
+        ], false)); // El 'false' al final hace la URL relativa. Puedes quitarlo para URL absoluta si APP_URL no esta configurado.
     }
 
     /**
