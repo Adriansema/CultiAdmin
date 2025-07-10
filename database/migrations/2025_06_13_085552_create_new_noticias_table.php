@@ -25,6 +25,8 @@ return new class extends Migration
             $table->string('estado', 255)->default('pendiente'); // Estado (ej. 'pendiente', 'aprobada', 'rechazada')
             $table->string('autor', 255)->nullable()->default(null);
             $table->text('observaciones')->nullable();
+             $table->foreignId('validado_por_user_id')->nullable()->constrained('users')->onDelete('set null')->after('observaciones');
+            $table->foreignId('rechazado_por_user_id')->nullable()->constrained('users')->onDelete('set null')->after('validado_por_user_id');
             $table->timestamps(); // Columnas created_at y updated_at
         });
     }

@@ -48,8 +48,8 @@ class PendienteNotiController extends Controller
      */
     public function show($id)
     {
-        // Encuentra la noticia por ID o falla
-        $noticia = Noticia::findOrFail($id);
+             // en la vista sin hacer consultas adicionales en el Blade.
+        $noticia = Noticia::with(['validador', 'rechazador'])->findOrFail($id);
 
         // Retorna la vista de detalle de la noticia
         return view('noticias.show', compact('noticia'));
@@ -63,10 +63,14 @@ class PendienteNotiController extends Controller
         // Encuentra la noticia por ID o falla
         $noticia = Noticia::findOrFail($id);
 
+        $request->validate([
+            'observaciones' => 'nullable|string|max:500',
+        ]);
+
         // Actualiza el estado de la noticia a 'aprobado'
         $noticia->update([
             'estado' => 'aprobado',
-            'observaciones' => null, // Limpia las observaciones si las hubiera
+            'observaciones'=> $request->observaciones , // Limpia las observaciones si las hubiera
             'validado_por_user_id' => Auth::id(), // Registra quien la valido
             'rechazado_por_user_id' => null, // Limpia el ID de rechazador
         ]);
