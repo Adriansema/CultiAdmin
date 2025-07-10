@@ -31,7 +31,7 @@
 
             </div>
             <div class="flex items-center justify-between">
-                {{-- Botón para volver al inicio de sesión (primero para que aparezca a la izquierda) --}}
+                {{-- Boton para volver al inicio de sesion (primero para que aparezca a la izquierda) --}}
                 <a href="{{ route('login') }}"
                     class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-sm font-semibold py-2 px-4 rounded-lg text-center
                              focus:outline-none focus:shadow-outline">

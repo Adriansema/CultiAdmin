@@ -33,7 +33,7 @@
                                  $loggedInUser = Auth::user();
                                  $targetUser = $usuario; // Usuario en la fila actual
 
-                                 // Regla 1: Si el usuario logueado es Operario o Funcionario, NO puede editar NINGÚN usuario.
+                                 // Regla 1: Si el usuario logueado es Operario o Funcionario, NO puede editar NINGuN usuario.
                                  if ($loggedInUser->hasAnyRole(['Operario', 'Funcionario'])) {
                                      $canEditTargetUser = false;
                                  }
@@ -51,7 +51,7 @@
                                      ) {
                                          $canEditTargetUser = false;
                                      }
-                                     // Si el Administrador está viendo un Operario o Funcionario, $canEditTargetUser permanece true.
+                                     // Si el Administrador esta viendo un Operario o Funcionario, $canEditTargetUser permanece true.
                                  }
                                  // Regla 3: Si el usuario logueado es SuperAdmin, puede editar a cualquiera
                                  // No se necesita un 'else' explícito aquí, ya que $canEditTargetUser permanece true por defecto
@@ -61,7 +61,7 @@
 
                              @can('editar usuario')
                                  @if ($canEditTargetUser && $loggedInUser)
-                                     {{-- Muestra el botón interactivo si el usuario tiene permiso y se cumplen las condiciones --}}
+                                     {{-- Muestra el boton interactivo si el usuario tiene permiso y se cumplen las condiciones --}}
                                      <button type="button" class="ml-2 edit-user-button"
                                          data-user-id="{{ $usuario->id }}">
                                          <img src="{{ asset('images/lapiz.svg') }}" class="w-4 h-4" alt="editar">
@@ -85,20 +85,20 @@
                          </td>
 
                          <td class="px-6 py-4">
-                             {{-- Condicional principal: Solo mostrar el botón de toggle si NO es el usuario autenticado --}}
+                             {{-- Condicional principal: Solo mostrar el boton de toggle si NO es el usuario autenticado --}}
                              @if ($usuario->id !== Auth::id())
-                                 {{-- Condición adicional: Calcular si el botón de toggle debe mostrarse --}}
+                                 {{-- Condicion adicional: Calcular si el boton de toggle debe mostrarse --}}
                                  @php
                                      $loggedInUser = Auth::user();
-                                     $canShowToggleButton = true; // Por defecto, se asume que se puede mostrar el botón
+                                     $canShowToggleButton = true; // Por defecto, se asume que se puede mostrar el boton
 
-                                     // Regla 1 (UI): Si el usuario logueado es Operario o Funcionario, NO puede ver el botón para NINGÚN otro usuario.
+                                     // Regla 1 (UI): Si el usuario logueado es Operario o Funcionario, NO puede ver el boton para NINGÚN otro usuario.
                                      if ($loggedInUser->hasAnyRole(['Operario', 'Funcionario'])) {
                                          $canShowToggleButton = false;
                                      }
-                                     // Regla 2 (UI): Si el usuario logueado es un Administrador (y no Operario/Funcionario por la condición anterior)
+                                     // Regla 2 (UI): Si el usuario logueado es un Administrador (y no Operario/Funcionario por la condicion anterior)
                                      elseif ($loggedInUser->hasRole('Administrador')) {
-                                         // Un Administrador no puede ver el botón para un SuperAdmin o para otro Administrador.
+                                         // Un Administrador no puede ver el boton para un SuperAdmin o para otro Administrador.
                                          // (Ya sabemos que no es el propio usuario por el if principal: $usuario->id !== Auth::id())
                                          if ($usuario->hasRole('SuperAdmin') || $usuario->hasRole('Administrador')) {
                                              $canShowToggleButton = false;
@@ -114,13 +114,13 @@
                                          @csrf
                                          @method('PATCH')
 
-                                         {{-- ! botón dinámico que permite cambiar el estado de un usuario (de "activo" a "inactivo" y viceversa) --}}
+                                         {{-- ! boton dinamico que permite cambiar el estado de un usuario (de "activo" a "inactivo" y viceversa) --}}
                                          <button type="submit"
                                              class="group relative px-4 py-2 text-sm rounded-lg text-[var(--color-textAct)] transition-colors duration-300
                                                 {{ $usuario->estado === 'activo' ? 'bg-[var(--color-activo)] hover:bg-[var(--color-desactivar)]' : 'bg-[var(--color-inactivo)] hover:bg-[var(--color-activar)]' }}
                                                 inline-flex items-center justify-center">
-                                             {{-- !El botón se adapta visualmente: --}}
-                                             {{-- Usamos inline-flex para el botón --}}
+                                             {{-- !El boton se adapta visualmente: --}}
+                                             {{-- Usamos inline-flex para el boton --}}
 
                                              {{-- !Muestra el estado actual del usuario (Activo/Inactivo) con su propio color y un icono específico para ese estado. --}}
                                              {{-- ? Contenido para el estado normal (Activo/Inactivo) --}}
@@ -128,7 +128,7 @@
                                                  class="flex items-center space-x-2 transition-opacity duration-300
                                             {{ $usuario->estado === 'activo' ? '' : 'text-[var(--color-textInact)]' }}
                                             group-hover:opacity-0 pointer-events-none">
-                                                 {{-- Añadir pointer-events-none aquí también --}}
+                                                 {{-- Anadir pointer-events-none aquí tambien --}}
                                                  <span>{{ ucfirst($usuario->estado) }}</span>
 
                                                  {{-- ? Icono para el estado "activo" o "inactivo" --}}
@@ -136,7 +136,7 @@
                                                      alt="Icono {{ $usuario->estado }}" class="w-4 h-4">
                                              </span>
 
-                                             {{-- !Al pasar el ratón por encima, el botón cambia para indicar la acción que se realizará (Desactivar/Activar), mostrando el color correspondiente y un icono distinto para la acción. --}}
+                                             {{-- !Al pasar el raton por encima, el boton cambia para indicar la accion que se realizara (Desactivar/Activar), mostrando el color correspondiente y un icono distinto para la accion. --}}
                                              {{-- ? Contenido para el estado al hacer hover (Desactivar/Activar) --}}
                                              <span
                                                  class="absolute inset-0 flex items-center justify-center space-x-2
@@ -145,7 +145,7 @@
                                             pointer-events-none">
                                                  <span>{{ $usuario->estado === 'activo' ? 'Desactivar' : 'Activar' }}</span>
 
-                                                 {{-- ? Icono para la acción al hacer hover ("Desactivar" o "Activar") --}}
+                                                 {{-- ? Icono para la accion al hacer hover ("Desactivar" o "Activar") --}}
                                                  <img src="{{ asset('images/' . ($usuario->estado === 'activo' ? 'desact-flecha.svg' : 'activar-flecha.svg')) }}"
                                                      alt="Icono Hover" class="w-4 h-4">
                                              </span>
@@ -177,7 +177,7 @@
                                      </span>
                                  @endif
                              @else
-                                 {{-- Este bloque es para la fila del propio usuario logueado (sin botón de toggle) de que no se puede auto-desactivarse --}}
+                                 {{-- Este bloque es para la fila del propio usuario logueado (sin boton de toggle) de que no se puede auto-desactivarse --}}
                                  <span
                                      class="px-3 py-2 text-sm rounded-lg
                                             bg-[var(--color-estasAct)] text-[var(--color-estaActex)]

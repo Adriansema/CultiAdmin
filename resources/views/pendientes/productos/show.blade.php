@@ -15,7 +15,7 @@
         @php
             $campos = [
                'historia' => 'Historia',
-                'productos y sus características' => 'Productos',
+                'productos y sus caracteristicas' => 'Productos',
                 'variantes' => 'Variantes',
                 'enfermedades' => 'Enfermedades',
                 'insumos' => 'Insumos',
@@ -56,7 +56,7 @@
             @endif
         @endforeach
 
-        <!-- Botón volver -->
+        <!-- Boton volver -->
         <div class="mt-6">
             <a href="{{ route('operador.pendientes') }}"
                 class="inline-block px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700">

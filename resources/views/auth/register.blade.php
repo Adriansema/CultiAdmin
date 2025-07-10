@@ -29,9 +29,9 @@
 
             <!-- actualizacion 09/04/2025 -->
 
-                {{-- Campo de Contraseña 
+                {{-- Campo de Contrasena 
                 <div class="relative mt-4">
-                    <x-label for="password" value="Contraseña" />
+                    <x-label for="password" value="Contrasena" />
                     <x-input id="password" class="block w-full pr-10 mt-1" type="password" name="password" required autocomplete="new-password" />
                     <button type="button" onclick="togglePassword('password', this)"
                         class="absolute text-gray-500 transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-700">
@@ -46,9 +46,9 @@
                     </button>
                 </div>
 
-                {{-- Confirmación
+                {{-- Confirmacion
                 <div class="relative mt-4">
-                    <x-label for="password_confirmation" value="Confirmar Contraseña" />
+                    <x-label for="password_confirmation" value="Confirmar Contrasena" />
                     <x-input id="password_confirmation" class="block w-full pr-10 mt-1" type="password" name="password_confirmation" required autocomplete="new-password" />
                     <button type="button" onclick="togglePassword('password_confirmation', this)"
                         class="absolute text-gray-500 transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-700">

@@ -3,7 +3,7 @@
         <div class="w-full max-w-xl p-6 bg-[var(--color-gris1)] rounded-lg shadow-xl space-y-4 ">
             {{-- Detalles del Boletin --}}
             @if ($boletin->archivo)
-                <div class="mt-4 flex justify-between gap-4"> {{-- Contenedor principal con flexbox y gap para la separación --}}
+                <div class="mt-4 flex justify-between gap-4"> {{-- Contenedor principal con flexbox y gap para la separacion --}}
 
                     {{-- Div del Contenido (Izquierda) --}}
                     <div class="flex-grow p-3 bg-gray-50 rounded-md "> {{-- flex-grow para ocupar espacio y estilos de tarjeta --}}

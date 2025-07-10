@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Confirmación de Recepción de tu PQR</title>
+    <title>Confirmacion de Recepcion de tu PQR</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -76,13 +76,13 @@
     <div class="container">
         <h1>¡Hola {{ $pqrs->nombre ?? 'Estimado Usuario' }}!</h1>
 
-        <p>Agradecemos tu comunicación. Hemos recibido exitosamente tu PQR y le hemos asignado la siguiente referencia:</p>
+        <p>Agradecemos tu comunicacion. Hemos recibido exitosamente tu PQR y le hemos asignado la siguiente referencia:</p>
 
         <div class="highlight-box">
             <strong>Referencia de tu PQR: {{ $pqrs->id }}</strong>
         </div>
 
-        <p>A continuación, puedes encontrar un resumen de los detalles de tu solicitud:</p>
+        <p>A continuacion, puedes encontrar un resumen de los detalles de tu solicitud:</p>
 
         <ul>
             <li><strong>Tipo de Solicitud:</strong> {{ ucfirst($pqrs->tipo) }}</li>
@@ -92,24 +92,24 @@
                     {{ $pqrs->mensaje }}
                 </p>
             </li>
-            <li><strong>Fecha y Hora de Envío:</strong> {{ $pqrs->created_at->format('d/m/Y H:i A') }}</li>
+            <li><strong>Fecha y Hora de Envio:</strong> {{ $pqrs->created_at->format('d/m/Y H:i A') }}</li>
             {{-- Si tienes el email del remitente en el PQR --}}
             @if (!empty($pqrs->email))
                 <li><strong>Email de Contacto:</strong> {{ $pqrs->email }}</li>
             @endif
-            {{-- Si tienes un campo para el número de teléfono --}}
+            {{-- Si tienes un campo para el numero de telefono --}}
             @if (!empty($pqrs->telefono))
-                <li><strong>Teléfono de Contacto:</strong> {{ $pqrs->telefono }}</li>
+                <li><strong>Telefono de Contacto:</strong> {{ $pqrs->telefono }}</li>
             @endif
-            {{-- Puedes añadir otros campos relevantes aquí --}}
+            {{-- Puedes anadir otros campos relevantes aqui --}}
         </ul>
 
-        <p>Nuestro equipo de soporte revisará tu solicitud con la referencia **{{ $pqrs->id }}** y te contactará a la brevedad posible, o a más tardar dentro de nuestros plazos de respuesta establecidos.</p>
+        <p>Nuestro equipo de soporte revisara tu solicitud con la referencia **{{ $pqrs->id }}** y te contactara a la brevedad posible, o a mas tardar dentro de nuestros plazos de respuesta establecidos.</p>
 
         <p>Agradecemos tu paciencia mientras procesamos tu PQR.</p>
 
         <div class="footer">
-            <p>Este es un mensaje automático, por favor no respondas a este correo.</p>
+            <p>Este es un mensaje automatico, por favor no respondas a este correo.</p>
             <p>Atentamente,<br>El equipo de Tu Empresa</p>
             <p>&copy; {{ date('Y') }} Tu Empresa. Todos los derechos reservados.</p>
         </div>

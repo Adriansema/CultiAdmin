@@ -58,22 +58,22 @@ Breadcrumbs::for('productos.edit', function ($trail, $producto) {
 
 Breadcrumbs::for('boletines.index', function ($trail) {
     $trail->parent('dashboard')
-        ->push('Gestión de boletines', route('boletines.index'));
+        ->push('Gestion de boletines', route('boletines.index'));
 });
 
 Breadcrumbs::for('boletines.create', function ($trail) {
     $trail->parent('boletines.index')
-        ->push('Crear Boletín', route('boletines.create'));
+        ->push('Crear Boletin', route('boletines.create'));
 });
 
 Breadcrumbs::for('boletines.show', function ($trail, $boletin) {
     $trail->parent('boletines.index')
-        ->push('Detalle de boletín', route('boletines.show', $boletin));
+        ->push('Detalle de boletin', route('boletines.show', $boletin));
 });
 
 Breadcrumbs::for('boletines.edit', function ($trail, $boletin) {
     $trail->parent('boletines.index')
-        ->push('Editar boletín', route('boletines.edit', $boletin));
+        ->push('Editar boletin', route('boletines.edit', $boletin));
 });
 
 Breadcrumbs::for('centroAyuda.index', function ($trail) {
@@ -118,7 +118,7 @@ Breadcrumbs::for('view-user.historial', function ($trail, $id) {
 
 Breadcrumbs::for('statistics.index', function ($trail) {
     $trail->parent('dashboard')
-        ->push('Estadísticas', route('statistics.index'));
+        ->push('Estadisticas', route('statistics.index'));
 });
 
 Breadcrumbs::for('noticias.index', function ($trail) {

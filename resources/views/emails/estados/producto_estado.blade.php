@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Actualización de tu {{ ucfirst($producto->tipo) }}</title>
+    <title>Actualizacion de tu {{ ucfirst($producto->tipo) }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -87,7 +87,7 @@
             margin-top: 25px;
             display: block; /* Para que ocupe todo el ancho disponible si es necesario */
             width: fit-content; /* Se ajusta al contenido */
-            margin-left: auto; /* Centrar el botón */
+            margin-left: auto; /* Centrar el boton */
             margin-right: auto;
         }
         .button:hover {
@@ -106,7 +106,7 @@
 <body>
     <div class="container">
         <h1>Hola,</h1>
-        <p>Te informamos sobre una actualización en el estado de tu **{{ strtolower(ucfirst($producto->tipo)) }}** con ID **{{ $producto->id }}**.</p>
+        <p>Te informamos sobre una actualizacion en el estado de tu **{{ strtolower(ucfirst($producto->tipo)) }}** con ID **{{ $producto->id }}**.</p>
 
         <div class="status-box status-{{ strtolower($producto->estado) }}">
             Tu {{ strtolower(ucfirst($producto->tipo)) }} ha sido **{{ ucfirst($producto->estado) }}**.
@@ -123,11 +123,11 @@
                     No hay observaciones adicionales del operador.
                 @endif
             </li>
-            <li><strong>Fecha de Actualización:</strong> {{ $producto->updated_at ? $producto->updated_at->format('d/m/Y H:i A') : 'N/A' }}</li>
+            <li><strong>Fecha de Actualizacion:</strong> {{ $producto->updated_at ? $producto->updated_at->format('d/m/Y H:i A') : 'N/A' }}</li>
         </ul>
 
         @if ($producto->estado === 'rechazado')
-            <p>Tu {{ strtolower(ucfirst($producto->tipo)) }} ha sido **rechazada**. Te recomendamos revisar las observaciones del operador y editar el elemento para una nueva validación.</p>
+            <p>Tu {{ strtolower(ucfirst($producto->tipo)) }} ha sido **rechazada**. Te recomendamos revisar las observaciones del operador y editar el elemento para una nueva validacion.</p>
             <p style="text-align: center;">
                 <a href="{{ route('productos.edit', $producto->id) }}" class="button">
                     Ir a Editar {{ ucfirst($producto->tipo) }}
@@ -136,10 +136,10 @@
         @elseif ($producto->estado === 'aprobado')
             <p>¡Felicidades! Tu {{ strtolower(ucfirst($producto->tipo)) }} ha sido **aprobada** y ya está disponible.</p>
         @else
-            <p>Tu {{ strtolower(ucfirst($producto->tipo)) }} actualmente está **pendiente** de revisión por parte de un operario. Te notificaremos cuando haya una actualización.</p>
+            <p>Tu {{ strtolower(ucfirst($producto->tipo)) }} actualmente está **pendiente** de revision por parte de un operario. Te notificaremos cuando haya una actualizacion.</p>
         @endif
 
-        <p>Gracias por tu paciencia y colaboración.</p>
+        <p>Gracias por tu paciencia y colaboracion.</p>
 
         <div class="footer">
             <p>Este es un mensaje automático, por favor no respondas a este correo.</p>

@@ -20,6 +20,7 @@
 
             <div class="mt-8 space-y-4">
 
+                <!-- Boton para Contraste Alto -->
                 <div>
                     <button id="toggle-contrast"
                         class="px-4 py-2 text-white bg-gray-800 rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -28,6 +29,7 @@
                     </button>
                 </div>
 
+                <!-- Boton para Aumentar Fuente -->
                 <div class="flex items-center justify-center space-x-4">
                     <button id="increase-font"
                         class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -39,6 +41,7 @@
                     </button>
                 </div>
 
+                <!-- Boton para Modo Oscuro -->
                 <div>
                     <button id="toggle-dark-mode"
                         class="px-4 py-2 text-white bg-black rounded hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
