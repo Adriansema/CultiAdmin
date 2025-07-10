@@ -1,5 +1,5 @@
 // Importaciones necesarias
-import * as echarts from 'echarts'; // Para las gráficas de datos
+import * as echarts from 'echarts'; // Para las graficas de datos
 
 // =========================================================================
 // VARIABLES GLOBALES (Solo inicializarlas si el script se va a ejecutar)
@@ -14,16 +14,16 @@ let currentSelectedYear = new Date().getFullYear();
 
 /**
  * @function window.setFilter
- * @description Función global llamada por los eventos `onclick` de los botones de filtro.
- * Controla el filtro activo, la visibilidad del selector de año y la carga de datos.
- * @param {string} filterType - El tipo de filtro a activar (ej. 'semana', 'año').
- * @param {number} [yearToLoadValue=null] - El año específico si el filtro es 'año' (opcional, para uso interno).
+ * @description Funcion global llamada por los eventos `onclick` de los botones de filtro.
+ * Controla el filtro activo, la visibilidad del selector de ano y la carga de datos.
+ * @param {string} filterType - El tipo de filtro a activar (ej. 'semana', 'ano').
+ * @param {number} [yearToLoadValue=null] - El ano especifico si el filtro es 'ano' (opcional, para uso interno).
  */
 window.setFilter = function(filterType, yearToLoadValue = null) {
-    // Si el elemento principal del dashboard (la gráfica) no existe, salimos
+    // Si el elemento principal del dashboard (la grafica) no existe, salimos
     const chartDom = document.getElementById('chart');
     if (!chartDom) {
-        console.warn('ADVERTENCIA: setFilter llamado en una página sin el elemento "chart". Ignorando.');
+        console.warn('ADVERTENCIA: setFilter llamado en una pagina sin el elemento "chart". Ignorando.');
         return;
     }
 
@@ -32,20 +32,20 @@ window.setFilter = function(filterType, yearToLoadValue = null) {
     // 1. Actualiza los estilos de los botones de filtro
     setActiveFilterButton(filterType);
 
-    // 2. Solo actualiza el valor del año mostrado si el filtro es 'año'
-    if (filterType === 'año') {
+    // 2. Solo actualiza el valor del ano mostrado si el filtro es 'ano'
+    if (filterType === 'ano') {
         if (yearToLoadValue !== null) {
             currentSelectedYear = yearToLoadValue;
         }
         const currentYearDisplay = document.getElementById('currentYearDisplay');
-        if (currentYearDisplay) { // Añadir verificación de existencia
+        if (currentYearDisplay) { // Anadir verificacion de existencia
             currentYearDisplay.textContent = currentSelectedYear;
         }
     }
 
-    // 3. Llama a la función para cargar los datos desde la API
-    if (filterType === 'año') {
-        loadData('año', currentSelectedYear);
+    // 3. Llama a la funcion para cargar los datos desde la API
+    if (filterType === 'ano') {
+        loadData('ano', currentSelectedYear);
     } else {
         loadData(filterType);
     }
@@ -53,41 +53,41 @@ window.setFilter = function(filterType, yearToLoadValue = null) {
 
 
 // =========================================================================
-// INICIALIZACIÓN DE DOMContentLoaded (Para tareas que requieren el DOM completo)
+// INICIALIZACION DE DOMContentLoaded (Para tareas que requieren el DOM completo)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", function () {
-    // *** VERIFICACIÓN CRÍTICA: Solo si el elemento 'chart' existe, inicializamos el dashboard ***
+    // *** VERIFICACION CRITICA: Solo si el elemento 'chart' existe, inicializamos el dashboard ***
     const chartDom = document.getElementById('chart');
     if (!chartDom) {
-        return; // Salir de la función si no estamos en la página del dashboard
+        return; // Salir de la funcion si no estamos en la pagina del dashboard
     }
-    // *** FIN VERIFICACIÓN CRÍTICA ***
+    // *** FIN VERIFICACION CRITICA ***
 
 
-    // --- Configuración inicial del año y sus botones ---
+    // --- Configuracion inicial del ano y sus botones ---
     const currentYearDisplay = document.getElementById('currentYearDisplay');
     const prevYearBtn = document.getElementById('prevYearBtn');
     const nextYearBtn = document.getElementById('nextYearBtn');
 
-    if (currentYearDisplay) { // Añadir verificación de existencia
+    if (currentYearDisplay) { // Anadir verificacion de existencia
         currentYearDisplay.textContent = currentSelectedYear;
     }
 
-    if (prevYearBtn) { // Añadir verificación de existencia
+    if (prevYearBtn) { // Anadir verificacion de existencia
         prevYearBtn.addEventListener('click', () => {
             currentSelectedYear--;
-            window.setFilter('año', currentSelectedYear);
+            window.setFilter('ano', currentSelectedYear);
         });
     }
 
-    if (nextYearBtn) { // Añadir verificación de existencia
+    if (nextYearBtn) { // Anadir verificacion de existencia
         nextYearBtn.addEventListener('click', () => {
             currentSelectedYear++;
-            window.setFilter('año', currentSelectedYear);
+            window.setFilter('ano', currentSelectedYear);
         });
     }
 
-    // --- Carga inicial de datos al cargar la página ---
+    // --- Carga inicial de datos al cargar la pagina ---
     window.setFilter('semana');
 });
 
@@ -98,11 +98,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /**
  * @function setActiveFilterButton
- * @description Actualiza los estilos de los botones de filtro y la visibilidad del selector de año.
+ * @description Actualiza los estilos de los botones de filtro y la visibilidad del selector de ano.
  * @param {string} filterType - El tipo de filtro activo.
  */
 function setActiveFilterButton(filterType) {
-    // 1. Restablecer estilos para todos los botones estándar
+    // 1. Restablecer estilos para todos los botones estandar
     document.querySelectorAll('.filter-btn').forEach(button => {
         button.classList.remove(
             'bg-green-600', 'text-white', 'shadow-md', 'border', 'border-green-600',
@@ -116,7 +116,7 @@ function setActiveFilterButton(filterType) {
         );
     });
 
-    // 2. Restablecer estilos para el grupo de filtro "Año" (yearFilterGroup)
+    // 2. Restablecer estilos para el grupo de filtro "Ano" (yearFilterGroup)
     const yearFilterGroup = document.getElementById('yearFilterGroup');
     const customYearSelector = document.getElementById('customYearSelector');
     const yearLabel = document.getElementById('yearLabel');
@@ -152,7 +152,7 @@ function setActiveFilterButton(filterType) {
     }
 
     // 3. Aplicar estilos al elemento que fue activado
-    if (filterType === 'año') {
+    if (filterType === 'ano') {
         if (yearFilterGroup) {
             yearFilterGroup.classList.remove(
                 'text-darkblue', 'border', 'border-transparent', 'hover:border-darkblue', 'hover:bg-blue-50'
@@ -180,7 +180,7 @@ function setActiveFilterButton(filterType) {
         }
     } else {
         const activeButton = document.querySelector(`.filter-btn[data-filtro="${filterType}"]`);
-        if (activeButton) { // Añadir verificación de existencia
+        if (activeButton) { // Anadir verificacion de existencia
             activeButton.classList.remove(
                 'text-green-600', 'border', 'border-transparent', 'hover:border-green-500', 'hover:bg-green-50'
             );
@@ -196,15 +196,15 @@ function setActiveFilterButton(filterType) {
 
 /**
  * @function loadData
- * @description Realiza una solicitud fetch a la API para obtener datos de estadísticas.
- * @param {string} filterType - El tipo de filtro solicitado (ej. 'semana', 'año').
- * @param {string|number} [value=null] - Valor adicional del filtro (ej. el año para 'año').
+ * @description Realiza una solicitud fetch a la API para obtener datos de estadisticas.
+ * @param {string} filterType - El tipo de filtro solicitado (ej. 'semana', 'ano').
+ * @param {string|number} [value=null] - Valor adicional del filtro (ej. el ano para 'ano').
  */
 function loadData(filterType, value = null) {
     let url = `/api/estadisticas?`;
 
-    if (filterType === 'año' && value) {
-        url += `filter=año&year=${value}`;
+    if (filterType === 'ano' && value) {
+        url += `filter=ano&year=${value}`;
     } else if (['ultimos3dias', 'semana', 'mes', 'todo'].includes(filterType)) {
         url += `filter=${filterType}`;
     } else {
@@ -230,8 +230,8 @@ function loadData(filterType, value = null) {
         })
         .catch(error => {
             const chartDom = document.getElementById('chart');
-            if (chartDom) { // Añadir verificación de existencia
-                chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-red-500 p-4">Error al cargar la gráfica: ${error.message}.</div>`;
+            if (chartDom) { // Anadir verificacion de existencia
+                chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-red-500 p-4">Error al cargar la grafica: ${error.message}.</div>`;
                 if (myChart) { myChart.dispose(); myChart = null; }
             }
             updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 });
@@ -240,7 +240,7 @@ function loadData(filterType, value = null) {
 
 /**
  * @function updateMetrics
- * @description Actualiza los valores y porcentajes en las tarjetas de métricas.
+ * @description Actualiza los valores y porcentajes en las tarjetas de metricas.
  * @param {object} data - Objeto con los datos de usuarios, activos, conectados, registrados.
  */
 function updateMetrics(data) {
@@ -269,7 +269,7 @@ function updateMetrics(data) {
 
 /**
  * @function renderChart
- * @description Renderiza o actualiza la gráfica ECharts.
+ * @description Renderiza o actualiza la grafica ECharts.
  * @param {object} data - Objeto con los datos de 'vistas' y 'selectedFilter' de la API.
  */
 function renderChart(data) {
@@ -280,7 +280,7 @@ function renderChart(data) {
     }
 
     if (chartDom.offsetWidth === 0 || chartDom.offsetHeight === 0) {
-        chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-gray-500">Ajustando la gráfica...</div>`;
+        chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-gray-500">Ajustando la grafica...</div>`;
         setTimeout(() => renderChart(data), 200);
         return;
     }
@@ -297,19 +297,19 @@ function renderChart(data) {
     let datosOrdenados = [...(data.vistas || [])];
 
     if (!Array.isArray(datosOrdenados) || datosOrdenados.length === 0) {
-        chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-gray-500">No hay datos válidos para mostrar para este período.</div>`;
+        chartDom.innerHTML = `<div class="flex justify-center items-center h-full text-gray-500">No hay datos validos para mostrar para este periodo.</div>`;
         updateMetrics({ usuarios: 0, registrados: 0, activos: 0, conectados: 0 });
         if (myChart) { myChart.clear(); myChart.dispose(); myChart = null; }
         return;
     }
 
-    // Lógica de ordenamiento para el eje X
+    // Logica de ordenamiento para el eje X
     switch (data.selectedFilter) {
         case 'ultimos3dias':
-            const dayNamesOrderUltimos3Días = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+            const dayNamesOrderUltimos3Dias = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
             datosOrdenados.sort((a, b) => {
-                const indexA = dayNamesOrderUltimos3Días.indexOf(a.grupo.toLowerCase());
-                const indexB = dayNamesOrderUltimos3Días.indexOf(b.grupo.toLowerCase());
+                const indexA = dayNamesOrderUltimos3Dias.indexOf(a.grupo.toLowerCase());
+                const indexB = dayNamesOrderUltimos3Dias.indexOf(b.grupo.toLowerCase());
                 if (indexA === -1 && indexB === -1) return 0;
                 if (indexA === -1) return 1;
                 if (indexB === -1) return -1;
@@ -333,7 +333,7 @@ function renderChart(data) {
         case 'mes':
             datosOrdenados.sort((a, b) => parseInt(a.grupo.replace('Semana ', '')) - parseInt(b.grupo.replace('Semana ', '')));
             break;
-        case 'año':
+        case 'ano': // Cambiado 'año' a 'ano'
             const mesesOrden = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
             datosOrdenados.sort((a, b) => mesesOrden.indexOf(a.grupo.toLowerCase()) - mesesOrden.indexOf(b.grupo.toLowerCase()));
             break;
@@ -349,7 +349,7 @@ function renderChart(data) {
 
     let seriesChartName = 'Visitas';
 
-    if (data.selectedFilter === 'año') {
+    if (data.selectedFilter === 'ano') { // Cambiado 'año' a 'ano'
         seriesChartName = 'Registros';
     }
 
@@ -363,6 +363,7 @@ function renderChart(data) {
                 if (previousValue === 0) { changeInfo = `Cambio: N/A (desde 0)`; }
                 else { const percentageChange = ((valorActual - previousValue) / previousValue * 100).toFixed(1); changeInfo = `Cambio: ${percentageChange}%`; }
             }
+            // Los strings en los tooltips pueden mantener tildes si tu HTML y JS son UTF-8
             return `<div class="p-2"><strong>${dataPoint.name}</strong><br>${seriesName}: <strong>${valorActual}</strong><br>${changeInfo}</div>`;
         }},
         grid: { left: '3%', right: '4%', top: '10%', bottom: '3%', containLabel: true },
@@ -374,7 +375,7 @@ function renderChart(data) {
             itemStyle: { color: '#22c55e' }, lineStyle: { width: 1.5 }, symbolSize: 8
         }],
         title: {
-            text: '',
+            text: '', // El titulo se controla desde el HTML/Blade si lo tienes
             left: 'center', top: '2%', textStyle: { color: '#333', fontSize: 18, fontWeight: 'bold' }
         }
     };

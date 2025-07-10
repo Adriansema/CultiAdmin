@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const noticiasContainer = document.querySelector('.noticias-scroll-container');
 
-    //  Verifica que el contenedor de noticias exista
+    // Verifica que el contenedor de noticias exista
     if (noticiasContainer) {
 
         // Obtener el token CSRF de la meta etiqueta
@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const markAsReadButtons = document.querySelectorAll('.mark-as-read-btn');
 
-        // HTML del mensaje cuando no hay noticias
+        // HTML del mensaje cuando no hay noticias (ya es ASCII)
         const noNewsMessageHtml = `<p class="text-gray-700 p-4 bg-white rounded-lg shadow-md no-noticias-message">No hay noticias recientes para mostrar.</p>`;
 
-        // Función para actualizar el contador de noticias en el encabezado
+        // Funcion para actualizar el contador de noticias en el encabezado
         function updateUnreadNewsCount(change) {
             const unreadNewsCountElement = document.getElementById('unread-news-count');
             if (unreadNewsCountElement) {
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Parsear el conteo actual
                 if (currentCountText === '+9') {
-                    currentCount = 10; // Asumimos que si es "+9", hay 10 o más
+                    currentCount = 10; // Asumimos que si es "+9", hay 10 o mas
                 } else {
                     currentCount = parseInt(currentCountText) || 0;
                 }
@@ -43,27 +43,28 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Función para manejar la visibilidad del mensaje "No hay noticias"
+        // Funcion para manejar la visibilidad del mensaje "No hay noticias"
         function toggleNoNewsMessage() {
             const noticiasScrollContainer = document.querySelector('.noticias-scroll-container');
 
             // ¡IMPORTANTE! Verificar si el contenedor existe
             if (!noticiasScrollContainer) {
-                console.error('ERROR: .noticias-scroll-container no encontrado. Asegúrate de que este elemento exista en tu HTML.');
-                return; // Salir de la función si el contenedor no se encuentra
+                // CAMBIO: Mensaje console.error sin caracteres no ASCII
+                console.error('ERROR: .noticias-scroll-container no encontrado. Asegurate de que este elemento exista en tu HTML.');
+                return; // Salir de la funcion si el contenedor no se encuentra
             }
 
-            // Contamos cuántos elementos de noticia REALES quedan
+            // Contamos cuantos elementos de noticia REALES quedan
             const remainingNoticias = noticiasScrollContainer.querySelectorAll('[id^="noticia-"]').length;
             const existingNoNewsMessage = noticiasScrollContainer.querySelector('.no-noticias-message');
 
             if (remainingNoticias === 0) {
-                // Si no quedan noticias y el mensaje NO está ya presente, lo insertamos
+                // Si no quedan noticias y el mensaje NO esta ya presente, lo insertamos
                 if (!existingNoNewsMessage) {
                     noticiasScrollContainer.insertAdjacentHTML('beforeend', noNewsMessageHtml);
                 }
             } else {
-                // Si quedan noticias y el mensaje SÍ está presente, lo eliminamos
+                // Si quedan noticias y el mensaje SI esta presente, lo eliminamos
                 if (existingNoNewsMessage) {
                     existingNoNewsMessage.remove();
                 }
@@ -77,10 +78,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noticiaElement = document.getElementById(`noticia-${noticiaId}`);
 
                 if (noticiaElement) {
-                    // Añadir clase para la animación de desvanecimiento
+                    // Anadir clase para la animacion de desvanecimiento
                     noticiaElement.classList.add('fade-out');
 
-                    // Enviar petición al servidor para marcarla como leída
+                    // Enviar peticion al servidor para marcarla como leida
                     fetch(`/noticia/${noticiaId}/mark-as-read`, {
                         method: 'POST',
                         headers: {
@@ -92,12 +93,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     })
                         .then(response => {
                             if (!response.ok) {
+                                // Mensaje de error del servidor (ya es ASCII)
                                 return response.json().then(err => { throw new Error(err.message || 'Error del servidor'); });
                             }
                             return response.json();
                         })
                         .then(data => {
-                            // Eliminar el elemento del DOM después de la animación y la confirmación del servidor
+                            // Eliminar el elemento del DOM despues de la animacion y la confirmacion del servidor
                             noticiaElement.addEventListener('transitionend', function () {
                                 noticiaElement.remove();
                                 updateUnreadNewsCount(-1); // Decrementar el contador
@@ -105,15 +107,16 @@ document.addEventListener('DOMContentLoaded', function () {
                             }, { once: true });
                         })
                         .catch(error => {
-                            // Si hay un error, revertir la animación y mostrar un mensaje
+                            // Si hay un error, revertir la animacion y mostrar un mensaje
                             noticiaElement.classList.remove('fade-out');
-                            alert('Hubo un error al marcar la noticia como leída. Inténtalo de nuevo: ' + error.message);
+                            // CAMBIO: Mensaje de alerta sin caracteres no ASCII
+                            alert('Hubo un error al marcar la noticia como leida. Intentalo de nuevo: ' + error.message);
                         });
                 }
             });
         });
 
-        // Ejecutar al cargar la página para asegurar que el mensaje se muestra/oculta correctamente si no hay noticias al inicio
+        // Ejecutar al cargar la pagina para asegurar que el mensaje se muestra/oculta correctamente si no hay noticias al inicio
         toggleNoNewsMessage();
     }
 });

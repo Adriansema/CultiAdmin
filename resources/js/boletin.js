@@ -1,5 +1,5 @@
 window.mostrarModal = function (type, id) {
-    console.log(`--- Función mostrarModal llamada: tipo=${type}, id=${id} ---`);
+    console.log(`--- Funcion mostrarModal llamada: tipo=${type}, id=${id} ---`);
 
     // Cierra todos los modales del mismo tipo antes de abrir el nuevo
     document.querySelectorAll(`[id^="modal-${type}-"]`).forEach(m => {
@@ -14,7 +14,7 @@ window.mostrarModal = function (type, id) {
     if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
-        document.body.classList.add('modal-open'); // Añadir para bloquear scroll
+        document.body.classList.add('modal-open'); // Anadir para bloquear scroll
         console.log(`Mostrando modal: modal-${type}-${id}`);
     } else {
         console.warn(`Advertencia: Modal con ID modal-${type}-${id} no encontrado.`);
@@ -22,7 +22,7 @@ window.mostrarModal = function (type, id) {
 };
 
 window.cerrarModal = function (type, id) {
-    console.log(`--- Función cerrarModal llamada: tipo=${type}, id=${id} ---`);
+    console.log(`--- Funcion cerrarModal llamada: tipo=${type}, id=${id} ---`);
     const modal = document.getElementById(`modal-${type}-${id}`);
     if (modal) {
         modal.classList.add('hidden');
@@ -34,21 +34,21 @@ window.cerrarModal = function (type, id) {
         }
         console.log(`Ocultando modal: modal-${type}-${id}`);
         if (type === 'editar') {
-            window.clearValidationErrors(id); // Limpia errores de validación al cerrar modal de edición
+            window.clearValidationErrors(id); // Limpia errores de validacion al cerrar modal de edicion
         }
     } else {
         console.warn(`Advertencia: Modal con ID modal-${type}-${id} no encontrado para cerrar.`);
     }
 };
 
-// --- Funciones de Validación (Se mantienen) ---
+// --- Funciones de Validacion (Se mantienen) ---
 
 /**
- * Limpia los mensajes de error de validación y los bordes rojos de los campos de un formulario.
- * @param {string|number} boletinId - El ID del boletín cuyo formulario se va a limpiar.
+ * Limpia los mensajes de error de validacion y los bordes rojos de los campos de un formulario.
+ * @param {string|number} boletinId - El ID del boletin cuyo formulario se va a limpiar.
  */
 window.clearValidationErrors = function (boletinId) {
-    console.log(`--- Función clearValidationErrors llamada para boletín ID: ${boletinId} ---`);
+    console.log(`--- Funcion clearValidationErrors llamada para boletin ID: ${boletinId} ---`);
     const form = document.getElementById(`editBoletinForm-${boletinId}`);
     if (form) {
         const errorDivs = form.querySelectorAll(`[id$="_error_${boletinId}"]`);
@@ -63,9 +63,9 @@ window.clearValidationErrors = function (boletinId) {
 };
 
 /**
- * Muestra los mensajes de error de validación en el formulario del modal.
- * @param {string|number} boletinId - El ID del boletín cuyo formulario mostrará los errores.
- * @param {object} errors - Un objeto con los errores de validación, donde la clave es el nombre del campo.
+ * Muestra los mensajes de error de validacion en el formulario del modal.
+ * @param {string|number} boletinId - El ID del boletin cuyo formulario mostrara los errores.
+ * @param {object} errors - Un objeto con los errores de validacion, donde la clave es el nombre del campo.
  */
 window.displayValidationErrors = function (boletinId, errors) {
     window.clearValidationErrors(boletinId); // Limpia errores antes de mostrar los nuevos
@@ -84,10 +84,10 @@ window.displayValidationErrors = function (boletinId, errors) {
     }
 };
 
-// --- Función de Mensaje Global (Se mantiene, es tu nuevo enfoque para mensajes de éxito/error) ---
+// --- Funcion de Mensaje Global (Se mantiene, es tu nuevo enfoque para mensajes de exito/error) ---
 
 /**
- * Muestra un mensaje global de éxito o error utilizando un modal vanilla JS.
+ * Muestra un mensaje global de exito o error utilizando un modal vanilla JS.
  * @param {string} type - El tipo de mensaje ('success' o 'error').
  * @param {string} message - El mensaje a mostrar.
  */
@@ -99,7 +99,7 @@ window.showGlobalMessage = function (type, message) {
     const closeButton = document.getElementById('globalMessageCloseButton');
 
     if (!modal || !messageText || !successIcon || !errorIcon || !closeButton) {
-        alert(type === 'error' ? `Error: ${message}` : `Éxito: ${message}`);
+        alert(type === 'error' ? `Error: ${message}` : `Exito: ${message}`);
         return;
     }
 
@@ -117,7 +117,7 @@ window.showGlobalMessage = function (type, message) {
     modal.classList.add('flex');
     document.body.classList.add('modal-open'); // Usa la clase para bloquear el scroll
 
-    // Cierra el modal al hacer clic en el botón OK
+    // Cierra el modal al hacer clic en el boton OK
     const closeHandler = () => {
         modal.classList.remove('flex');
         modal.classList.add('hidden');
@@ -127,7 +127,7 @@ window.showGlobalMessage = function (type, message) {
     };
     closeButton.addEventListener('click', closeHandler);
 
-    // Cierra el modal automáticamente después de 3 segundos
+    // Cierra el modal automaticamente despues de 3 segundos
     const autoHideTimer = setTimeout(() => {
         if (!modal.classList.contains('hidden')) {
             modal.classList.remove('flex');
@@ -140,7 +140,7 @@ window.showGlobalMessage = function (type, message) {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Delegación de eventos para los botones de acción en la tabla (se mantiene)
+    // Delegacion de eventos para los botones de accion en la tabla (se mantiene)
     const tableBody = document.querySelector('#boletines-table-body');
     if (tableBody) {
         tableBody.addEventListener('click', function (event) {
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const type = match[1];
                     const id = match[2];
                     // Si el tipo es 'boletin', es para el modal 'ver', lo dejamos pasar.
-                    // Si es 'editar', también lo dejamos pasar.
+                    // Si es 'editar', tambien lo dejamos pasar.
                     // Cualquier otro tipo que deba ser manejado por mostrarModal()
                     window.mostrarModal(type, id);
                 }
@@ -160,9 +160,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Listener para los formularios de edición
-    // Se delega a un contenedor si hay múltiples formularios o se añaden dinámicamente.
-    // En este caso, asumimos que están presentes en el DOM al cargar.
+    // Listener para los formularios de edicion
+    // Se delega a un contenedor si hay multiples formularios o se anaden dinamicamente.
+    // En este caso, asumimos que estan presentes en el DOM al cargar.
     document.querySelectorAll('[id^="editBoletinForm-"]').forEach(form => {
         form.addEventListener('submit', async function (event) {
             event.preventDefault();
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const boletinId = formId.split('-')[1];
             const formData = new FormData(this);
 
-            // Añadir método PUT para Laravel
+            // Anadir metodo PUT para Laravel
             formData.append('_method', 'PUT');
 
             const updateButton = this.querySelector('button[type="submit"]');
@@ -198,22 +198,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 const result = await response.json();
 
                 if (response.ok) {
-                    window.cerrarModal('editar', boletinId); // Cierra el modal de edición
-                    window.showGlobalMessage('success', result.message || 'Boletín actualizado con éxito.');
+                    window.cerrarModal('editar', boletinId); // Cierra el modal de edicion
+                    window.showGlobalMessage('success', result.message || 'Boletin actualizado con exito.');
 
-                    // *** CAMBIO CLAVE AQUÍ: Recargar la página completa después de la actualización ***
+                    // *** CAMBIO CLAVE AQUI: Recargar la pagina completa despues de la actualizacion ***
                     setTimeout(() => {
-                        window.location.reload(); // Recarga la página para refrescar todos los datos y la tabla
-                    }, 1500); // Pequeño delay para que el usuario vea el mensaje de éxito
+                        window.location.reload(); // Recarga la pagina para refrescar todos los datos y la tabla
+                    }, 1500); // Pequeno delay para que el usuario vea el mensaje de exito
 
                 } else if (response.status === 422) {
                     window.displayValidationErrors(boletinId, result.errors);
                     window.showGlobalMessage('error', result.message || 'Por favor, corrige los errores en el formulario.');
                 } else {
-                    window.showGlobalMessage('error', result.message || 'Ocurrió un error inesperado al actualizar el boletín.');
+                    window.showGlobalMessage('error', result.message || 'Ocurrio un error inesperado al actualizar el boletin.');
                 }
             } catch (error) {
-                window.showGlobalMessage('error', 'Error de red o conexión al servidor. Inténtalo de nuevo.');
+                window.showGlobalMessage('error', 'Error de red o conexion al servidor. Intentalo de nuevo.');
                 console.error('Fetch error:', error);
             } finally {
                 if (updateButton) {
@@ -224,20 +224,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Se elimina la función reindexTableRows y su llamada,
-    // ya que la recarga de página la hace innecesaria.
+    // Se elimina la funcion reindexTableRows y su llamada,
+    // ya que la recarga de pagina la hace innecesaria.
     // function reindexTableRows() { /* ... */ }
-    // reindexTableRows(); // Ya no se llama aquí.
+    // reindexTableRows(); // Ya no se llama aqui.
 
     // Listener para cerrar modales por click externo/tecla Escape
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('bg-opacity-50') && event.target.closest('[id^="modal-"]')) {
             const modalWrapper = event.target.closest('[id^="modal-"]');
-            // Excluimos los modales que tienen su propia lógica de cierre (ej. globalMessageModalVanilla, createBoletinModal)
+            // Excluimos los modales que tienen su propia logica de cierre (ej. globalMessageModalVanilla, createBoletinModal)
             if (modalWrapper &&
                 modalWrapper.id !== 'globalMessageModalVanilla' &&
                 modalWrapper.id !== 'createBoletinModal' &&
-                modalWrapper.id !== 'custom-confirm-modal') // Asumiendo que 'custom-confirm-modal' también tiene su propia lógica
+                modalWrapper.id !== 'custom-confirm-modal') // Asumiendo que 'custom-confirm-modal' tambien tiene su propia logica
             {
                 const idParts = modalWrapper.id.split('-');
                 const tipo = idParts[1];
@@ -250,10 +250,10 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
             const openModals = document.querySelectorAll('.modal-overlay.flex:not(.hidden)');
-            // Iterar en orden inverso para cerrar el modal más "superior" primero
+            // Iterar en orden inverso para cerrar el modal mas "superior" primero
             for (let i = openModals.length - 1; i >= 0; i--) {
                 const modal = openModals[i];
-                // Excluimos los modales que tienen su propia lógica de cierre o no deben cerrarse con Escape
+                // Excluimos los modales que tienen su propia logica de cierre o no deben cerrarse con Escape
                 if (modal.id !== 'globalMessageModalVanilla' &&
                     modal.id !== 'createBoletinModal' &&
                     modal.id !== 'custom-confirm-modal')
@@ -262,12 +262,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     const tipo = idParts[1];
                     const id = idParts[2];
                     window.cerrarModal(tipo, id);
-                    break; // Cierra solo el modal más alto
+                    break; // Cierra solo el modal mas alto
                 }
             }
         }
     });
 });
 
-// Asegurarse de que la función global para abrir el modal esté disponible
+// Asegurarse de que la funcion global para abrir el modal este disponible
 window.openCreateBoletinModal = window.openCreateBoletinModalVanilla;

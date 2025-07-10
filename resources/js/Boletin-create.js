@@ -4,17 +4,17 @@ let closeCreateModalXButton;
 let cancelCreateModalButton;
 let pdfFileInput; // Input de tipo file
 let createBoletinForm;
-let createBoletinStep1; // Contenedor del Paso 1 (Nombre, Descripción, Carga PDF)
+let createBoletinStep1; // Contenedor del Paso 1 (Nombre, Descripcion, Carga PDF)
 let createBoletinStep2; // Contenedor del Paso 2 (Indicadores de Precio)
-let fileDropArea; // El div que actúa como área de drop y click para el archivo
+let fileDropArea; // El div que actua como area de drop y click para el archivo
 
-// Referencias para la barra de progreso y previsualización (AJUSTADAS)
+// Referencias para la barra de progreso y previsualizacion (AJUSTADAS)
 let fileUploadPreview;      // Contenedor de la barra de progreso y nombre de archivo (el que se muestra/oculta)
 let previewFileName;        // El span para el nombre del archivo (antes selectedFileNameDisplay)
-let previewFileSizeDisplay; // Texto para el tamaño del archivo en la previsualización.
+let previewFileSizeDisplay; // Texto para el tamano del archivo en la previsualizacion.
 let progressBar;            // La barra de progreso de HTML.
 let progressText;           // El texto de porcentaje de la barra de progreso.
-let removeSelectedFileButton; // El botón para quitar el archivo
+let removeSelectedFileButton; // El boton para quitar el archivo
 let intervalIdForSimulation = null; // variable para guardar el ID del intervalo
 
 let bulletinNameInput;
@@ -31,7 +31,7 @@ let isDragging = false;
 // --- Funciones para manejar el modal ---
 
 /**
- * Abre el modal de creación de boletines.
+ * Abre el modal de creacion de boletines.
  * Siempre inicia en el Paso 1.
  */
 window.openCreateBoletinModalVanilla = function () {
@@ -39,12 +39,12 @@ window.openCreateBoletinModalVanilla = function () {
         createBoletinModal.classList.remove('hidden');
         createBoletinModal.classList.add('flex'); // Asegura que el modal se centre
         document.body.style.overflow = 'hidden'; // Bloquea el scroll del body
-        resetCreateBoletinForm(); // Resetea el formulario al abrir, llevándolo al Paso 1
+        resetCreateBoletinForm(); // Resetea el formulario al abrir, llevandolo al Paso 1
     }
 };
 
 /**
- * Cierra el modal de creación de boletines por completo.
+ * Cierra el modal de creacion de boletines por completo.
  * No resetea el formulario, solo lo oculta.
  */
 window.closeCreateBoletinModalVanilla = function () {
@@ -60,7 +60,7 @@ window.closeCreateBoletinModalVanilla = function () {
  * Mantiene el modal abierto.
  */
 function resetCreateBoletinForm() {
-    // Detener cualquier simulación de carga en progreso
+    // Detener cualquier simulacion de carga en progreso
     if (intervalIdForSimulation) {
         clearInterval(intervalIdForSimulation);
         intervalIdForSimulation = null;
@@ -77,13 +77,13 @@ function resetCreateBoletinForm() {
         pdfFileInput.value = ''; // Limpia el input de archivo
     }
 
-    // Asegura que el área de drop esté visible y en su estado normal
+    // Asegura que el area de drop este visible y en su estado normal
     if (fileDropArea) {
         fileDropArea.classList.remove('hidden');
         fileDropArea.classList.remove('border-green-500', 'border-2', 'bg-green-50/50'); // Limpia estilos de drag
         fileDropArea.classList.add('border-gray-300'); // Restaura el borde normal
     }
-    // Oculta la sección de previsualización/progreso
+    // Oculta la seccion de previsualizacion/progreso
     if (fileUploadPreview) {
         fileUploadPreview.classList.add('hidden');
     }
@@ -99,7 +99,7 @@ function resetCreateBoletinForm() {
         progressText.textContent = '0%';
     }
     if (previewFileSizeDisplay) {
-        previewFileSizeDisplay.textContent = ''; // Limpia el tamaño
+        previewFileSizeDisplay.textContent = ''; // Limpia el tamano
     }
 
 
@@ -118,10 +118,10 @@ function resetCreateBoletinForm() {
         createBoletinStep2.classList.add('hidden');
     }
     if (submitCreateBoletinButton) {
-        submitCreateBoletinButton.classList.add('hidden'); // Oculta el botón de subir
+        submitCreateBoletinButton.classList.add('hidden'); // Oculta el boton de subir
     }
 
-    // Limpiar clases de validación si las hubiera
+    // Limpiar clases de validacion si las hubiera
     document.querySelectorAll('#createBoletinForm .border-red-500').forEach(el => {
         el.classList.remove('border-red-500');
     });
@@ -133,7 +133,7 @@ function resetCreateBoletinForm() {
 // --- Funciones de manejo de eventos ---
 
 /**
- * Maneja la selección de archivos (input o drop).
+ * Maneja la seleccion de archivos (input o drop).
  * @param {FileList} fileList - La lista de archivos recibida del evento.
  */
 function handleFileChange(fileList) {
@@ -141,19 +141,19 @@ function handleFileChange(fileList) {
     if (fileList && fileList.length > 0) {
         currentFile = fileList[0];
 
-        // Ocultar el área de drop y mostrar la vista previa del archivo cargado
+        // Ocultar el area de drop y mostrar la vista previa del archivo cargado
         if (fileDropArea) fileDropArea.classList.add('hidden');
         if (fileUploadPreview) fileUploadPreview.classList.remove('hidden');
 
-        // Mostrar nombre y tamaño del archivo inmediatamente
-        if (previewFileName) { // Usar previewFileName aquí
+        // Mostrar nombre y tamano del archivo inmediatamente
+        if (previewFileName) { // Usar previewFileName aqui
             previewFileName.textContent = currentFile.name;
         }
         if (previewFileSizeDisplay) {
             previewFileSizeDisplay.textContent = `${(currentFile.size / (1024 * 1024)).toFixed(2)} MB`;
         }
 
-        // Resetear la barra de progreso para la simulación
+        // Resetear la barra de progreso para la simulacion
         if (progressBar) progressBar.style.width = '0%';
         if (progressText) progressText.textContent = '0%';
 
@@ -170,15 +170,15 @@ function handleFileChange(fileList) {
                 clearInterval(intervalIdForSimulation); // Limpia al finalizar naturalmente
                 intervalIdForSimulation = null; // Resetea la variable
 
-                // Asegurar que la barra llegue a 100% al finalizar la simulación
+                // Asegurar que la barra llegue a 100% al finalizar la simulacion
                 if (progressBar) progressBar.style.width = '100%';
                 if (progressText) progressText.textContent = '100%';
 
                 currentStep = 2; // Avanza al Paso 2
-                // Transición visual a Paso 2
+                // Transicion visual a Paso 2
                 if (createBoletinStep1) createBoletinStep1.classList.add('hidden');
                 if (createBoletinStep2) createBoletinStep2.classList.remove('hidden');
-                if (submitCreateBoletinButton) submitCreateBoletinButton.classList.remove('hidden'); // Muestra el botón de subir
+                if (submitCreateBoletinButton) submitCreateBoletinButton.classList.remove('hidden'); // Muestra el boton de subir
             }
         }, 200);
     } else {
@@ -187,7 +187,7 @@ function handleFileChange(fileList) {
 }
 
 /**
- * Maneja el arrastre de archivos sobre el área de carga.
+ * Maneja el arrastre de archivos sobre el area de carga.
  * @param {Event} event - El evento de arrastre.
  */
 function handleDragOver(event) {
@@ -200,19 +200,19 @@ function handleDragOver(event) {
 }
 
 /**
- * Maneja cuando un archivo sale del área de arrastre.
+ * Maneja cuando un archivo sale del area de arrastre.
  * @param {Event} event - El evento de arrastre.
  */
 function handleDragLeave(event) {
     isDragging = false;
     if (fileDropArea) {
         fileDropArea.classList.remove('border-green-500', 'border-2', 'bg-green-50/50'); // Ajuste de clases
-        fileDropArea.classList.add('border-gray-300'); // Vuelve a añadir el borde gris
+        fileDropArea.classList.add('border-gray-300'); // Vuelve a anadir el borde gris
     }
 }
 
 /**
- * Maneja el soltar de archivos en el área de carga.
+ * Maneja el soltar de archivos en el area de carga.
  * @param {Event} event - El evento de soltar.
  */
 function handleDrop(event) {
@@ -220,14 +220,14 @@ function handleDrop(event) {
     isDragging = false;
     if (fileDropArea) {
         fileDropArea.classList.remove('border-green-500', 'border-2', 'bg-green-50/50'); // Ajuste de clases
-        fileDropArea.classList.add('border-gray-300'); // Vuelve a añadir el borde gris
+        fileDropArea.classList.add('border-gray-300'); // Vuelve a anadir el borde gris
     }
     handleFileChange(event.dataTransfer.files);
 }
 
 /**
- * Maneja el envío del formulario de creación de boletines.
- * @param {Event} event - El evento de envío del formulario.
+ * Maneja el envio del formulario de creacion de boletines.
+ * @param {Event} event - El evento de envio del formulario.
  */
 async function handleCreateBoletinSubmit(event) {
     event.preventDefault();
@@ -238,7 +238,17 @@ async function handleCreateBoletinSubmit(event) {
     }
 
     const formData = new FormData(createBoletinForm);
-    formData.append('archivo', currentFile); // Aseguramos que el archivo se añade al FormData
+    formData.append('archivo', currentFile); // Aseguramos que el archivo se anade al FormData
+
+    // --- SANITIZACION DE DATOS DE USUARIO ANTES DE ENVIAR ---
+    // Limpiar nombre y descripcion de caracteres no ASCII
+    let cleanedBulletinName = bulletinNameInput.value.replace(/[^\x00-\x7F]/g, '');
+    let cleanedBulletinDescription = bulletinDescriptionInput.value.replace(/[^\x00-\x7F]/g, '');
+
+    formData.set('name', cleanedBulletinName); // Usar la version limpia
+    formData.set('description', cleanedBulletinDescription); // Usar la version limpia
+    // --- FIN SANITIZACION DE NOMBRE Y DESCRIPCION ---
+
 
     // Pre-procesamiento de precios: Limpiar y convertir a punto decimal
     let precioMasAltoVal = document.getElementById('precioMasAlto').value;
@@ -249,35 +259,43 @@ async function handleCreateBoletinSubmit(event) {
     let cleanedPrecioMasAlto = precioMasAltoVal ? String(precioMasAltoVal).replace(/[^\d.,]/g, '').replace(/,/g, '.') : '';
     let cleanedPrecioMasBajo = precioMasBajoVal ? String(precioMasBajoVal).replace(/[^\d.,]/g, '').replace(/,/g, '.') : '';
 
+    // --- SANITIZACION DE LUGARES DE PRECIO (texto libre) ---
+    // Aplicamos la limpieza a las variables intermedias para los campos de lugar
+    let cleanedLugarPrecioMasAlto = lugarPrecioMasAltoVal.replace(/[^\x00-\x7F]/g, '');
+    let cleanedLugarPrecioMasBajo = lugarPrecioMasBajoVal.replace(/[^\x00-\x7F]/g, '');
+    // --- FIN SANITIZACION DE LUGARES ---
+
+
     let processedPrecioMasAlto = parseFloat(cleanedPrecioMasAlto) || null;
     let processedPrecioMasBajo = parseFloat(cleanedPrecioMasBajo) || null;
 
     const hasPrecioAlto = processedPrecioMasAlto !== null;
-    const hasLugarAlto = lugarPrecioMasAltoVal.trim() !== '';
+    // Usar la version limpia y corregir .trim()
+    const hasLugarAlto = cleanedLugarPrecioMasAlto.trim() !== '';
     const hasPrecioBajo = processedPrecioMasBajo !== null;
-    const hasLugarBajo = lugarPrecioMasBajoVal.trim() !== '';
+    // Usar la version limpia y corregir .trim()
+    const hasLugarBajo = cleanedLugarPrecioMasBajo.trim() !== '';
 
     if ((hasPrecioAlto && !hasLugarAlto) || (!hasPrecioAlto && hasLugarAlto)) {
-        window.showGlobalMessage('error', 'Para el precio más alto, por favor ingresa tanto el precio como el lugar, o déjalos ambos vacíos.');
-        // Puedes añadir un div de error específico para esto en tu HTML y mostrarlo aquí
-        // document.getElementById('precio_mas_alto_error').textContent = '...'
+        // Mensaje sin caracteres no ASCII
+        window.showGlobalMessage('error', 'Para el precio mas alto, por favor ingresa tanto el precio como el lugar, o dejalos ambos vacios.');
         return;
     }
     if ((hasPrecioBajo && !hasLugarBajo) || (!hasPrecioBajo && hasLugarBajo)) {
-        window.showGlobalMessage('error', 'Para el precio más bajo, por favor ingresa tanto el precio como el lugar, o déjalos ambos vacíos.');
-        // document.getElementById('precio_mas_bajo_error').textContent = '...'
+        // Mensaje sin caracteres no ASCII
+        window.showGlobalMessage('error', 'Para el precio mas bajo, por favor ingresa tanto el precio como el lugar, o dejalos ambos vacios.');
         return;
     }
 
     // Setear los valores procesados en el formData para que sean enviados correctamente
-    // Solo si tienen un valor, de lo contrario, no se añaden o se setean a null/vacío según tu backend espere
     if (hasPrecioAlto) {
         formData.set('precio_mas_alto', processedPrecioMasAlto);
     } else {
-        formData.delete('precio_mas_alto'); // O setear a un string vacío si el backend lo espera
+        formData.delete('precio_mas_alto');
     }
     if (hasLugarAlto) {
-        formData.set('lugar_precio_mas_alto', lugarPrecioMasAltoVal);
+        // CRUCIAL: Usar la version limpia al anadir al formData
+        formData.set('lugar_precio_mas_alto', cleanedLugarPrecioMasAlto);
     } else {
         formData.delete('lugar_precio_mas_alto');
     }
@@ -287,15 +305,15 @@ async function handleCreateBoletinSubmit(event) {
         formData.delete('precio_mas_bajo');
     }
     if (hasLugarBajo) {
-        formData.set('lugar_precio_mas_bajo', lugarPrecioMasBajoVal);
+        // CRUCIAL: Usar la version limpia al anadir al formData
+        formData.set('lugar_precio_mas_bajo', cleanedLugarPrecioMasBajo);
     } else {
         formData.delete('lugar_precio_mas_bajo');
     }
 
-    // Deshabilitar botón y mostrar spinner
+    // Deshabilitar boton y mostrar spinner
     if (submitCreateBoletinButton) {
         submitCreateBoletinButton.disabled = true;
-        // La animación de carga es solo visual, el texto real no cambiará inmediatamente
         submitCreateBoletinButton.innerHTML = `
             <span class="flex items-center justify-center w-full">
                 <span>Subiendo...</span>
@@ -317,39 +335,41 @@ async function handleCreateBoletinSubmit(event) {
         const resultStore = await response.json();
 
         if (response.ok) {
-            window.closeCreateBoletinModalVanilla(); // Cierra el modal de creación
+            window.closeCreateBoletinModalVanilla(); // Cierra el modal de creacion
 
-            window.showGlobalMessage('success', resultStore.message || 'Boletín creado con éxito.');
+            // Mensaje sin caracteres no ASCII
+            window.showGlobalMessage('success', resultStore.message || 'Boletin creado con exito.');
 
-            // *** CAMBIO CLAVE AQUÍ: Recargar la página completa ***
             setTimeout(() => {
-                window.location.reload(); // Recarga la página para que Laravel renderice la tabla y paginación con el nuevo boletín
-            }, 1500); // Pequeño delay para que el usuario vea el mensaje de éxito
+                window.location.reload(); // Recarga la pagina
+            }, 1500);
 
         } else if (response.status === 422) {
-            // Mostrar errores de validación en el formulario
             displayCreateFormValidationErrors(resultStore.errors);
+            // Mensaje sin caracteres no ASCII
             window.showGlobalMessage('error', resultStore.message || 'Por favor, corrige los errores en el formulario.');
         } else {
-            window.showGlobalMessage('error', resultStore.message || 'Ocurrió un error inesperado al crear el boletín.');
+            // Mensaje sin caracteres no ASCII
+            window.showGlobalMessage('error', resultStore.message || 'Ocurrio un error inesperado al crear el boletin.');
         }
     } catch (error) {
-        window.showGlobalMessage('error', 'Error de red o conexión al servidor. Inténtalo de nuevo.');
-        console.error('Fetch error:', error); // Log para depuración
+        // Mensaje sin caracteres no ASCII
+        window.showGlobalMessage('error', 'Error de red o conexion al servidor. Intentalo de nuevo.');
+        console.error('Fetch error:', error);
     } finally {
         if (submitCreateBoletinButton) {
             submitCreateBoletinButton.disabled = false;
-            submitCreateBoletinButton.innerHTML = 'Subir Boletín'; // Restaura el texto original
+            // Mensaje sin caracteres no ASCII
+            submitCreateBoletinButton.innerHTML = 'Subir Boletin';
         }
     }
 }
 
 /**
- * Muestra los errores de validación en el formulario de creación.
+ * Muestra los errores de validacion en el formulario de creacion.
  * @param {object} errors - Objeto de errores de la respuesta del servidor.
  */
 function displayCreateFormValidationErrors(errors) {
-    // Limpiar errores anteriores
     document.querySelectorAll('#createBoletinForm .border-red-500').forEach(el => {
         el.classList.remove('border-red-500');
     });
@@ -362,8 +382,7 @@ function displayCreateFormValidationErrors(errors) {
         if (inputField) {
             inputField.classList.add('border-red-500');
         }
-        // Asume que tienes un div con id="nombre_campo_error" o data-field
-        const errorDiv = document.querySelector(`.validation-error-message[data-field="${field}"]`); // Busca por data-field
+        const errorDiv = document.querySelector(`.validation-error-message[data-field="${field}"]`);
         if (errorDiv) {
             errorDiv.textContent = errors[field][0];
         }
@@ -371,30 +390,27 @@ function displayCreateFormValidationErrors(errors) {
 }
 
 
-// --- Event Listeners y Inicialización ---
+// --- Event Listeners y Inicializacion ---
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Obtener referencias a los elementos del DOM (¡Verifica que estos IDs coincidan con tu HTML!)
     createBoletinModal = document.getElementById('createBoletinModal');
     createBoletinModalContent = document.getElementById('createBoletinModalContent');
     closeCreateModalXButton = document.getElementById('closeCreateModalXButton');
     cancelCreateModalButton = document.getElementById('cancelCreateModalButton');
-    pdfFileInput = document.getElementById('pdfFileInput'); // <-- Input oculto para seleccionar archivo
+    pdfFileInput = document.getElementById('pdfFileInput');
     createBoletinForm = document.getElementById('createBoletinForm');
     createBoletinStep1 = document.getElementById('createBoletinStep1');
     createBoletinStep2 = document.getElementById('createBoletinStep2');
 
-    // Elementos de la UI de carga/previsualización
-    fileDropArea = document.getElementById('fileDropArea'); // El área grande para drag/click
-    fileUploadPreview = document.getElementById('fileUploadPreview'); // El contenedor de la barra de progreso
-    previewFileName = document.getElementById('previewFileName'); // El nombre del archivo en la previsualización
-    previewFileSizeDisplay = document.getElementById('previewFileSize'); // El tamaño del archivo en la previsualización
-    progressBar = document.getElementById('progressBar'); // La barra de progreso visual
-    progressText = document.getElementById('progressText'); // El texto del porcentaje
-    removeSelectedFileButton = document.getElementById('removeSelectedFileButton'); // El botón "X" para quitar el archivo
+    fileDropArea = document.getElementById('fileDropArea');
+    fileUploadPreview = document.getElementById('fileUploadPreview');
+    previewFileName = document.getElementById('previewFileName');
+    previewFileSizeDisplay = document.getElementById('previewFileSize');
+    progressBar = document.getElementById('progressBar');
+    progressText = document.getElementById('progressText');
+    removeSelectedFileButton = document.getElementById('removeSelectedFileButton');
 
-    // Elementos de los campos del formulario
     bulletinNameInput = document.getElementById('bulletinName');
     bulletinNameCharCount = document.getElementById('bulletinNameCharCount');
     bulletinDescriptionInput = document.getElementById('bulletinDescription');
@@ -402,8 +418,6 @@ document.addEventListener('DOMContentLoaded', function () {
     submitCreateBoletinButton = document.getElementById('submitCreateBoletinButton');
 
 
-    // Añadir Event Listeners para los botones de cierre
-    // ... (Tu lógica para closeCreateModalXButton y cancelCreateModalButton ya es correcta) ...
     if (closeCreateModalXButton) {
         closeCreateModalXButton.addEventListener('click', function () {
             if (currentStep === 2) {
@@ -423,17 +437,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Listener para el input de tipo file (oculto)
     if (pdfFileInput) {
         pdfFileInput.addEventListener('change', (event) => handleFileChange(event.target.files));
     }
 
-    // Listener para el formulario de envío
     if (createBoletinForm) {
         createBoletinForm.addEventListener('submit', handleCreateBoletinSubmit);
     }
 
-    // Event listeners para el contador de caracteres
     if (bulletinNameInput) {
         bulletinNameInput.addEventListener('input', () => {
             if (bulletinNameCharCount) {
@@ -449,7 +460,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Event listeners para click fuera del modal y tecla Escape
     if (createBoletinModal) {
         createBoletinModal.addEventListener('click', function (event) {
             if (event.target === createBoletinModal) {
@@ -471,23 +481,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Event listeners para drag and drop
     if (fileDropArea) {
         fileDropArea.addEventListener('dragover', handleDragOver);
         fileDropArea.addEventListener('dragleave', handleDragLeave);
         fileDropArea.addEventListener('drop', handleDrop);
     }
 
-    // Listener para el botón de eliminar el archivo seleccionado (el "X" en la barra de progreso)
     if (removeSelectedFileButton) {
         removeSelectedFileButton.addEventListener('click', () => {
-            resetCreateBoletinForm(); // Esto ocultará la barra y mostrará el área de drop
+            resetCreateBoletinForm();
         });
     }
 
-    // Inicializar el formulario en el estado correcto al cargar la página
     resetCreateBoletinForm();
 });
 
-// Asegurarse de que la función global para abrir el modal esté disponible
 window.openCreateBoletinModal = window.openCreateBoletinModalVanilla;

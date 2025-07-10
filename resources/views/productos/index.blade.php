@@ -8,7 +8,8 @@
         <div class="inline-block px-10 py-6">
             <div class="flex items-center space-x-4">
                 <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-                <h1 class="text-3xl whitespace-nowrap font-bold">Gestion de productos</h1>
+                {{-- CORRECCIÓN AQUÍ: "Gestion" -> "Gestión" --}}
+                <h1 class="text-3xl whitespace-nowrap font-bold">Gestión de productos</h1>
             </div>
             <div class="py-2">
                 {!! Breadcrumbs::render('productos.index') !!}
@@ -75,8 +76,8 @@
 
             @forelse ($productos as $producto)
                 @include('productos.partials.modal-delete', ['producto' => $producto]) {{-- Asegúrate de pasar la variable producto --}}
-                @include('pendientes.partials.modal-producto-rechazar')
-                @include('pendientes.partials.modal-producto-validar')
+                @include('pendientes.partials.modal-producto-rechazar') {{-- Posiblemente necesite revisión --}}
+                @include('pendientes.partials.modal-producto-validar') {{-- Posiblemente necesite revisión --}}
             @empty
                 {{-- Si no hay boletines, no se renderiza ningún modal --}}
             @endforelse

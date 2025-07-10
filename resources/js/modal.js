@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     hideContact();
                     showSuccess();
 
-                    // Cierre automático tras 3s
+                    // Cierre automatico tras 3s
                     setTimeout(() => {
                         hideSuccess();
                         form.reset();

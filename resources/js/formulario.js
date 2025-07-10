@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const prevButton = document.getElementById('prevStepButton');
     const generatePasswordButton = document.getElementById('generatePasswordButton');
     const cancelButton = document.getElementById('cancelButton');
-    const importCsvButton = document.getElementById('importCsvButton'); // Referencia al botón Importar CSV
+    const importCsvButton = document.getElementById('importCsvButton'); // Referencia al boton Importar CSV
 
     const step1Content = document.getElementById('step1Content');
     const step2Content = document.getElementById('step2Content');
@@ -35,19 +35,19 @@ document.addEventListener('DOMContentLoaded', async function () {
     const roleCheckboxes = document.querySelectorAll('input[name="roles[]"]');
     const permissionCheckboxes = document.querySelectorAll('input[name="permissions[]"]');
 
-    // Referencias a los inputs del Paso 3 (contraseña)
+    // Referencias a los inputs del Paso 3 (contrasena)
     const passwordInput = document.getElementById('password');
     const passwordConfirmationInput = document.getElementById('password_confirmation');
     const togglePasswordVisibility = document.getElementById('togglePasswordVisibility');
     const toggleConfirmPasswordVisibility = document.getElementById('toggleConfirmPasswordVisibility');
 
-    // ELEMENTOS DEL MODAL DE CONFIRMACIÓN
+    // ELEMENTOS DEL MODAL DE CONFIRMACION
     const confirmModal = document.getElementById('confirmModal');
     const confirmMessageBody = document.getElementById('confirmMessageBody');
     const confirmCancelButton = document.getElementById('confirmCancelButton');
     const confirmActionButton = document.getElementById('confirmActionButton');
 
-    // REFERENCIAS A LOS ELEMENTOS DEL MODAL DE NOTIFICACIÓN GLOBAL
+    // REFERENCIAS A LOS ELEMENTOS DEL MODAL DE NOTIFICACION GLOBAL
     const appNotificationModal = document.getElementById('appNotificationModal');
     const appNotificationIconContainer = document.getElementById('appNotificationIconContainer');
     const appNotificationSuccessIcon = document.getElementById('appNotificationSuccessIcon');
@@ -55,9 +55,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     const appNotificationText = document.getElementById('appNotificationText');
     const appNotificationCloseButton = document.getElementById('appNotificationCloseButton');
 
-    // Verificaciones iniciales de elementos (importante para depuración)
+    // Verificaciones iniciales de elementos (importante para depuracion)
     if (!userFormModal) { console.error('ERROR: userFormModal no encontrado.'); return; }
-    if (!nextButton) console.error('ERROR: nextStepButton no encontrado. ¡Este es crucial!');
+    if (!nextButton) console.error('ERROR: nextStepButton no encontrado. Este es crucial!');
     if (!prevButton) console.error('ERROR: prevButton no encontrado.');
     if (!generatePasswordButton) console.error('ERROR: generatePasswordButton no encontrado.');
     if (!importCsvButton) console.error('ERROR: importCsvButton no encontrado.');
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (!lastnameInput) console.error('ERROR: lastnameInput no encontrado.');
     if (!phoneInput) console.error('ERROR: phoneInput no encontrado.');
 
-    // Verificaciones para el nuevo modal de notificación
+    // Verificaciones para el nuevo modal de notificacion
     if (!appNotificationModal) console.error('ERROR: appNotificationModal no encontrado.');
     if (!appNotificationIconContainer) console.error('ERROR: appNotificationIconContainer no encontrado.');
     if (!appNotificationSuccessIcon) console.error('ERROR: appNotificationSuccessIcon no encontrado.');
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Estado global del modal
     let modalData = {
-        isOpen: false, // Indica si el modal principal está abierto
+        isOpen: false, // Indica si el modal principal esta abierto
         isEditMode: false,
         currentStep: 1,
         userId: null,
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             usuarios: { crear: false, editar: false }
         },
 
-        // Mapeo de nombres de permiso de Spatie a sus módulos
+        // Mapeo de nombres de permiso de Spatie a sus modulos
         modulePermissionMap: {
             'productos': ['crear producto', 'editar producto', 'validar producto', 'eliminar producto'],
             'noticias': ['crear noticia', 'editar noticia', 'validar noticia', 'eliminar noticia'],
@@ -119,10 +119,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         successMessage: '',
         csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
 
-        // ESTADOS PARA EL MODAL DE NOTIFICACIÓN GLOBAL
+        // ESTADOS PARA EL MODAL DE NOTIFICACION GLOBAL
         isAppNotificationModalOpen: false,
         appNotificationMessage: '',
-        appNotificationIsSuccess: true, // true para éxito (verde), false para error (rojo)
+        appNotificationIsSuccess: true, // true para exito (verde), false para error (rojo)
     };
 
     // ! Funciones Auxiliares
@@ -170,7 +170,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                     console.log(`Permiso '${spatiePerName}' mapeado a ${moduleKey}.${actionKey} y establecido a ${setState}`);
                     return true;
                 } else {
-                    console.warn(`[Mapeo Fallido] Acción '${actionKey}' o módulo '${moduleKey}' no definido para '${spatiePerName}' en modalData.permisos.`);
+                    // CAMBIO: 'módulo' a 'modulo'
+                    console.warn(`[Mapeo Fallido] Accion '${actionKey}' o modulo '${moduleKey}' no definido para '${spatiePerName}' en modalData.permisos.`);
                 }
             }
         }
@@ -180,11 +181,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     function applyRoleDefaultPermissions(roleName) {
         console.log('JS: Aplicando permisos por defecto para el rol:', roleName);
-        resetPermissions();
-
-        const defaultPermsForRole = modalData.rolePermissionsMapping[roleName];
         console.log('JS: Permisos por defecto para este rol:', defaultPermsForRole);
 
+        const defaultPermsForRole = modalData.rolePermissionsMapping[roleName];
         if (defaultPermsForRole && defaultPermsForRole.length > 0) {
             defaultPermsForRole.forEach(permName => {
                 updateModalDataPermission(permName, true);
@@ -218,7 +217,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         resetPermissions();
         modalData.errors = {};
         modalData.successMessage = '';
-        // Resetear también el estado del modal de notificación global
+        // Resetear tambien el estado del modal de notificacion global
         modalData.isAppNotificationModalOpen = false;
         modalData.appNotificationMessage = '';
         modalData.appNotificationIsSuccess = true;
@@ -262,11 +261,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         } else {
             userFormModal.classList.remove('opacity-100');
             userFormModal.classList.add('opacity-0');
-            // Usa transitionend para asegurarse de que pointer-events-none se aplique después de la animación de cierre
+            // Usa transitionend para asegurarse de que pointer-events-none se aplique despues de la animacion de cierre
             const onTransitionEnd = (event) => {
                 if (event.propertyName === 'opacity') {
                     userFormModal.classList.add('pointer-events-none');
-                    // Solo remover overflow-hidden si NO hay otro modal abierto (ej. el de notificación global)
+                    // Solo remover overflow-hidden si NO hay otro modal abierto (ej. el de notificacion global)
                     if (!modalData.isAppNotificationModalOpen) {
                         document.body.classList.remove('overflow-hidden');
                     }
@@ -278,14 +277,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     /**
-     * Gestiona la visibilidad y el contenido del modal de notificación global.
+     * Gestiona la visibilidad y el contenido del modal de notificacion global.
      */
     function updateAppNotificationModalVisibility() {
         if (appNotificationModal) {
             if (modalData.isAppNotificationModalOpen) {
                 appNotificationModal.classList.remove('hidden');
-                appNotificationModal.classList.add('flex'); // Añadir flex para centrar contenido
-                document.body.classList.add('overflow-hidden'); // Asegurar que el scroll del body esté desactivado
+                appNotificationModal.classList.add('flex'); // Anadir flex para centrar contenido
+                document.body.classList.add('overflow-hidden'); // Asegurar que el scroll del body este desactivado
 
                 appNotificationText.textContent = modalData.appNotificationMessage;
                 if (appNotificationSuccessIcon && appNotificationErrorIcon) { // Asegurarse de que los iconos existan
@@ -301,7 +300,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 appNotificationModal.classList.add('hidden');
                 appNotificationModal.classList.remove('flex');
                 // Solo remover overflow-hidden si NO hay otro modal abierto (ej. userFormModal)
-                if (!modalData.isOpen) { // Verificar si el modal principal del formulario también está cerrado
+                if (!modalData.isOpen) { // Verificar si el modal principal del formulario tambien esta cerrado
                     document.body.classList.remove('overflow-hidden');
                 }
             }
@@ -309,9 +308,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     /**
-     * Muestra el modal de notificación global.
+     * Muestra el modal de notificacion global.
      * @param {string} message - El mensaje de texto a mostrar.
-     * @param {boolean} isSuccess - True para éxito (icono verde), false para error (icono rojo).
+     * @param {boolean} isSuccess - True para exito (icono verde), false para error (icono rojo).
      */
     function showAppNotification(message, isSuccess) {
         modalData.appNotificationMessage = message;
@@ -324,7 +323,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         console.log('JS: updateModalUI llamado. Paso actual:', modalData.currentStep, 'Modo:', modalData.isEditMode ? 'Editar' : 'Crear');
 
         // Control de visibilidad del modal principal
-        updateModalVisibility(); // Ahora se llama a la función dedicada
+        updateModalVisibility(); // Ahora se llama a la funcion dedicada
 
         if (modalTitle) {
             modalTitle.textContent = modalData.isEditMode ? 'Editar Usuario' : 'Registrar Nuevo Usuario';
@@ -335,7 +334,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (step2Content) step2Content.classList.toggle('hidden', modalData.currentStep !== 2);
         if (step3Content) step3Content.classList.toggle('hidden', modalData.currentStep !== 3);
 
-        // Actualizar indicadores de paso (íconos y texto)
+        // Actualizar indicadores de paso (iconos y texto)
         if (step1Indicator && step2Indicator && step3Indicator) {
             const imgStep1 = step1Indicator.querySelector('img');
             const spanStep1 = step1Indicator.querySelector('span');
@@ -357,7 +356,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             spanStep3.classList.remove('text-gray-700');
             spanStep3.classList.add('text-gray-400');
 
-            // Establecer estados según el paso actual
+            // Establecer estados segun el paso actual
             if (modalData.currentStep >= 1) {
                 imgStep1.src = (modalData.currentStep === 1) ? '/images/paso1_activo.svg' : '/images/paso1_completado.svg';
                 spanStep1.classList.remove('text-gray-400');
@@ -377,7 +376,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         }
 
-        // CONTROL DE VISIBILIDAD DE LOS BOTONES DE NAVEGACIÓN
+        // CONTROL DE VISIBILIDAD DE LOS BOTONES DE NAVEGACION
         if (nextButton) {
             nextButton.classList.remove('hidden');
 
@@ -390,17 +389,17 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         }
 
-        // Botón "Atrás" (Regresar): visible en Paso 2 y 3, oculto en Paso 1
+        // Boton "Atras" (Regresar): visible en Paso 2 y 3, oculto en Paso 1
         if (prevButton) {
             prevButton.classList.toggle('hidden', modalData.currentStep === 1);
         }
 
-        // Botón "Generar Contraseña"
+        // Boton "Generar Contrasena"
         if (generatePasswordButton) {
             generatePasswordButton.classList.toggle('hidden', modalData.currentStep !== 3 || modalData.isEditMode);
         }
 
-        // Botón "Importar CSV": visible solo en Paso 1, oculto en Paso 2 y 3
+        // Boton "Importar CSV": visible solo en Paso 1, oculto en Paso 2 y 3
         if (importCsvButton) {
             importCsvButton.classList.toggle('hidden', modalData.currentStep !== 1);
         }
@@ -456,7 +455,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         }
     }
-
     function renderSuccessMessage() {
         if (modalData.successMessage && successMessageContainer) {
             successMessageContainer.innerHTML = `<span>${modalData.successMessage}</span>`;
@@ -466,7 +464,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // Función para actualizar los valores de los inputs y el estado de los checkboxes/radios
+    // Funcion para actualizar los valores de los inputs y el estado de los checkboxes/radios
     function updateFormValues() {
         // 1. Llenar campos de texto del Paso 1
         if (nameInput) nameInput.value = modalData.name;
@@ -476,7 +474,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (typeDocumentSelect) typeDocumentSelect.value = modalData.type_document;
         if (documentInput) documentInput.value = modalData.document;
 
-        // 2. Llenar campos de contraseña del Paso 3
+        // 2. Llenar campos de contrasena del Paso 3
         if (passwordInput) passwordInput.value = modalData.password;
         if (passwordConfirmationInput) passwordConfirmationInput.value = modalData.passwordConfirmation;
 
@@ -523,7 +521,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     window.openCreateModal = function () {
-        console.log('JS: openCreateModal función llamada.');
+        console.log('JS: openCreateModal funcion llamada.');
         resetForm();
         modalData.isEditMode = false;
         modalData.userId = null;
@@ -535,7 +533,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
     window.openEditModal = async function (userId) {
-        console.log('JS: openEditModal función llamada para userId:', userId);
+        console.log('JS: openEditModal funcion llamada para userId:', userId);
         resetForm();
         modalData.isEditMode = true;
         modalData.userId = userId;
@@ -550,10 +548,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || 'Error al cargar datos del usuario para edición.');
+                throw new Error(data.message || 'Error al cargar datos del usuario para edicion.');
             }
 
-            // Asignar datos básicos (incluyendo nuevos campos)
+            // Asignar datos basicos (incluyendo nuevos campos)
             modalData.name = data.name || '';
             modalData.lastname = data.lastname || '';
             modalData.email = data.email || '';
@@ -574,13 +572,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                 });
             }
 
-            // En modo edición, los campos de contraseña se mantienen vacíos,
+            // En modo edicion, los campos de contrasena se mantienen vacios,
             modalData.password = '';
             modalData.passwordConfirmation = '';
 
             updateFormValues();
         } catch (error) {
-            console.error('Error al cargar datos para edición:', error);
+            console.error('Error al cargar datos para edicion:', error);
             modalData.errors.general = error.message;
             modalData.isOpen = false;
             updateModalUI();
@@ -588,7 +586,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
     window.closeModal = function () {
-        console.log('JS: closeModal función llamada.');
+        console.log('JS: closeModal funcion llamada.');
         modalData.isOpen = false;
         resetForm();
         modalData.errors = {};
@@ -596,7 +594,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         updateModalUI();
     };
 
-    // ************* FUNCIÓN PRINCIPAL DE AVANCE / CONFIRMACIÓN *************
+    // ************* FUNCION PRINCIPAL DE AVANCE / CONFIRMACION *************
     function handleNextAction() {
         console.log('JS: handleNextAction llamado. Paso actual:', modalData.currentStep);
         modalData.errors = {};
@@ -613,48 +611,48 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             if (!modalData.name) { modalData.errors.name = 'El nombre es obligatorio.'; hasError = true; }
             if (!modalData.lastname) { modalData.errors.lastname = 'El apellido es obligatorio.'; hasError = true; }
-            if (!modalData.email || !/\S+@\S+\.\S+/.test(modalData.email)) { modalData.errors.email = 'El correo no es válido.'; hasError = true; }
+            if (!modalData.email || !/\S+@\S+\.\S+/.test(modalData.email)) { modalData.errors.email = 'El correo no es valido.'; hasError = true; }
 
-            // --- VALIDACIÓN DE TELÉFONO ACTUALIZADA ---
+            // --- VALIDACION DE TELEFONO ACTUALIZADA ---
             if (!modalData.phone) {
-                modalData.errors.phone = 'El teléfono es obligatorio.';
+                modalData.errors.phone = 'El telefono es obligatorio.';
                 hasError = true;
-            } else if (!/^\d{10}$/.test(modalData.phone)) { // Revisa si son exactamente 10 dígitos numéricos
-                modalData.errors.phone = `El teléfono debe tener 10 dígitos (actualmente tiene ${modalData.phone.length}).`;
+            } else if (!/^\d{10}$/.test(modalData.phone)) { // Revisa si son exactamente 10 digitos numericos
+                modalData.errors.phone = `El telefono debe tener 10 digitos (actualmente tiene ${modalData.phone.length}).`;
                 hasError = true;
             }
 
             if (!modalData.type_document) { modalData.errors.type_document = 'Debe seleccionar un tipo de documento.'; hasError = true; }
 
-            // --- VALIDACIÓN DE DOCUMENTO ACTUALIZADA ---
+            // --- VALIDACION DE DOCUMENTO ACTUALIZADA ---
             if (!modalData.document) {
-                modalData.errors.document = 'El número de documento es obligatorio.'; // Corregido el typo
+                modalData.errors.document = 'El numero de documento es obligatorio.'; // Corregido el typo
                 hasError = true;
             } else {
-                // Revisa el tipo de documento para aplicar la regla de validación correcta
+                // Revisa el tipo de documento para aplicar la regla de validacion correcta
                 switch (modalData.type_document) {
                     case 'PPT':
                         if (!/^\d{7}$/.test(modalData.document)) {
-                            modalData.errors.document = `Para PPT, el documento debe tener 7 dígitos (actualmente tiene ${modalData.document.length}).`;
+                            modalData.errors.document = `Para PPT, el documento debe tener 7 digitos (actualmente tiene ${modalData.document.length}).`;
                             hasError = true;
                         }
                         break;
                     case 'PEP':
                         if (!/^\d{15}$/.test(modalData.document)) {
-                            modalData.errors.document = `Para PEP, el documento debe tener 15 dígitos (actualmente tiene ${modalData.document.length}).`;
+                            modalData.errors.document = `Para PEP, el documento debe tener 15 digitos (actualmente tiene ${modalData.document.length}).`;
                             hasError = true;
                         }
                         break;
                     case 'CC':
                         if (!/^\d{8,10}$/.test(modalData.document)) {
-                            modalData.errors.document = `Para CC, el documento debe tener entre 8 y 10 dígitos (actualmente tiene ${modalData.document.length}).`;
+                            modalData.errors.document = `Para CC, el documento debe tener entre 8 y 10 digitos (actualmente tiene ${modalData.document.length}).`;
                             hasError = true;
                         }
                         break;
                     case 'TI':
                     case 'CE':
                         if (!/^\d{10}$/.test(modalData.document)) {
-                            modalData.errors.document = `Para ${modalData.type_document}, el documento debe tener 10 dígitos (actualmente tiene ${modalData.document.length}).`;
+                            modalData.errors.document = `Para ${modalData.type_document}, el documento debe tener 10 digitos (actualmente tiene ${modalData.document.length}).`;
                             hasError = true;
                         }
                         break;
@@ -684,17 +682,17 @@ document.addEventListener('DOMContentLoaded', async function () {
             modalData.password = passwordInput.value;
             modalData.passwordConfirmation = passwordConfirmationInput.value;
 
-            // Validaciones de contraseña (solo si NO estamos en modo edición o si la contraseña no está vacía)
+            // Validaciones de contrasena (solo si NO estamos en modo edicion o si la contrasena no esta vacia)
             if (!modalData.isEditMode || (modalData.isEditMode && (modalData.password || modalData.passwordConfirmation))) {
                 if (!modalData.password) {
-                    modalData.errors.password = 'La contraseña es obligatoria.';
+                    modalData.errors.password = 'La contrasena es obligatoria.';
                     hasError = true;
                 } else if (modalData.password.length < 8) {
-                    modalData.errors.password = 'La contraseña debe tener al menos 8 caracteres.';
+                    modalData.errors.password = 'La contrasena debe tener al menos 8 caracteres.';
                     hasError = true;
                 }
                 if (modalData.password !== modalData.passwordConfirmation) {
-                    modalData.errors.password_confirmation = 'Las contraseñas no coinciden.';
+                    modalData.errors.password_confirmation = 'Las contrasenas no coinciden.';
                     hasError = true;
                 }
             }
@@ -707,7 +705,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         updateModalUI();
     }
 
-    // ************* FUNCIÓN DE RETROCESO DE PASO *************
+    // ************* FUNCION DE RETROCESO DE PASO *************
     function handlePrevAction() {
         console.log('JS: handlePrevAction llamado. Paso actual:', modalData.currentStep);
         modalData.errors = {};
@@ -717,34 +715,34 @@ document.addEventListener('DOMContentLoaded', async function () {
         updateModalUI();
     }
 
-    // ************* NUEVA FUNCIÓN PARA IMPORTAR CSV *************
+    // ************* NUEVA FUNCION PARA IMPORTAR CSV *************
     function handleImportCsv() {
-        console.log('JS: handleImportCsv llamado. Iniciando flujo de importación CSV.');
-        // Ocultar el modal principal de creación/edición de usuario
+        console.log('JS: handleImportCsv llamado. Iniciando flujo de importacion CSV.');
+        // Ocultar el modal principal de creacion/edicion de usuario
         if (userFormModal) {
             userFormModal.classList.remove('opacity-100');
             userFormModal.classList.add('opacity-0', 'pointer-events-none');
-            // NO REMOVER document.body.classList.remove('overflow-hidden') aquí, el modal de importación lo manejará
+            // NO REMOVER document.body.classList.remove('overflow-hidden') aqui, el modal de importacion lo manejara
         }
-        // Llamar a la función para abrir el modal de importación CSV del nuevo módulo
+        // Llamar a la funcion para abrir el modal de importacion CSV del nuevo modulo
         openImportCsvModal();
     }
 
-    // ************* FUNCIÓN PARA ALTERNAR VISIBILIDAD DE CONTRASEÑA EN EL MODAL DE CONFIRMACIÓN *************
+    // ************* FUNCION PARA ALTERNAR VISIBILIDAD DE CONTRASENA EN EL MODAL DE CONFIRMACION *************
     window.toggleConfirmPasswordVisibilityInModal = function (buttonElement) {
-        const passwordInputInModal = buttonElement.previousElementSibling; // El input es el hermano anterior del botón
+        const passwordInputInModal = buttonElement.previousElementSibling; // El input es el hermano anterior del boton
         if (passwordInputInModal) {
             const type = passwordInputInModal.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInputInModal.setAttribute('type', type);
             buttonElement.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
-            buttonElement.setAttribute('title', type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
+            buttonElement.setAttribute('title', type === 'password' ? 'Mostrar contrasena' : 'Ocultar contrasena');
         }
     };
 
-    // ************* FUNCIONES PARA EL MODAL DE CONFIRMACIÓN *************
+    // ************* FUNCIONES PARA EL MODAL DE CONFIRMACION *************
     function openConfirmModal() {
         console.log('JS: openConfirmModal llamado.');
-        // Ocultar el modal principal antes de mostrar el de confirmación
+        // Ocultar el modal principal antes de mostrar el de confirmacion
         userFormModal.classList.remove('opacity-100');
         userFormModal.classList.add('opacity-0', 'pointer-events-none');
 
@@ -757,7 +755,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             // Replicando el estilo del radio button seleccionado: bg-indigo-200, text-indigo-800, con_marca.svg
             rolesHtml += `
                 <span class="bg-indigo-200 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold inline-flex items-center mr-2 mb-2">
-                    <img src="/images/con_marca.svg" alt="icono de verificación" class="w-4 h-4 mr-1">
+                    <img src="/images/con_marca.svg" alt="icono de verificacion" class="w-4 h-4 mr-1">
                     ${modalData.selectedRole}
                 </span>
             `;
@@ -777,7 +775,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             // Generar los permisos como tags/chips con clases de Tailwind
             permissionsHtml = selectedPermissionsForConfirm.map(perm =>
                 `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold inline-block mr-2 mb-2">${perm}</span>`
-            ).join(''); // Unir sin comas, los márgenes ya separan
+            ).join(''); // Unir sin comas, los margenes ya separan
         } else {
             permissionsHtml += `<span class="text-gray-600">(Ninguno seleccionado)</span>`;
         }
@@ -785,28 +783,25 @@ document.addEventListener('DOMContentLoaded', async function () {
         let passwordDisplayHtml = '';
         if (!modalData.isEditMode && modalData.password) {
             passwordDisplayHtml = `
-                <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contraseña generada:</h4>
+                <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contrasena generada:</h4>
                 <div class="relative flex items-center mb-4 bg-gray-100 p-3 rounded-lg border border-gray-200">
-                    <!-- AÑADIDO ID AL INPUT Y TIPO INICIAL PASSWORD -->
                     <input type="password" id="confirmPasswordDisplayInput" value="${modalData.password}" readonly
-                        class="w-full bg-transparent text-gray-800 text-base font-mono focus:outline-none cursor-not-allowed pr-12" /> <!-- pr-12 para espacio -->
-                    <!-- CAMBIADO ONCLICK Y ICONO INICIAL -->
-                    <button type="button" class="absolute right-4 text-gray-500 hover:text-gray-700" title="Mostrar contraseña" onclick="toggleConfirmPasswordVisibilityInModal(this)">
+                        class="w-full bg-transparent text-gray-800 text-base font-mono focus:outline-none cursor-not-allowed pr-12" /> <button type="button" class="absolute right-4 text-gray-500 hover:text-gray-700" title="Mostrar contrasena" onclick="toggleConfirmPasswordVisibilityInModal(this)">
                         <img src="/images/ojo-close.svg" alt="Mostrar/Ocultar" class="w-5 h-5" />
                     </button>
                 </div>
-                <p class="text-gray-600 text-sm mb-4">Esta contraseña se enviará al correo del usuario.</p>
+                <p class="text-gray-600 text-sm mb-4">Esta contrasena se enviara al correo del usuario.</p>
             `;
         } else if (modalData.isEditMode && modalData.password) {
             passwordDisplayHtml = `
-                <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contraseña a actualizar:</h4>
-                <p class="text-gray-600 text-sm mb-4">Se actualizará la contraseña a la ingresada.</p>
+                <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contrasena a actualizar:</h4>
+                <p class="text-gray-600 text-sm mb-4">Se actualizara la contrasena a la ingresada.</p>
             `;
         }
 
 
         confirmMessageBody.innerHTML = `
-            <p class="text-gray-700 text-lg mb-6">Estás a punto de <span class="font-bold">${modalData.isEditMode ? 'actualizar' : 'registrar'}</span> un usuario con la siguiente información:</p>
+            <p class="text-gray-700 text-lg mb-6">Estas a punto de <span class="font-bold">${modalData.isEditMode ? 'actualizar' : 'registrar'}</span> un usuario con la siguiente informacion:</p>
             
             <div class="bg-gray-50 p-4 rounded-lg shadow-inner mb-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -819,11 +814,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                         <p class="text-gray-900 font-semibold">${modalData.type_document} ${modalData.document}</p>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Correo Electrónico:</p>
+                        <p class="text-sm font-medium text-gray-500">Correo Electronico:</p>
                         <p class="text-gray-900 font-semibold">${modalData.email}</p>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Teléfono:</p>
+                        <p class="text-sm font-medium text-gray-500">Telefono:</p>
                         <p class="text-gray-900 font-semibold">${modalData.phone}</p>
                     </div>
                     <div class="md:col-span-2">
@@ -842,7 +837,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             
             ${passwordDisplayHtml}
             
-            <p class="text-gray-700 text-lg mt-6 font-semibold">¿Confirmas ${modalData.isEditMode ? 'la actualización' : 'la creación'} de este usuario con estas atribuciones?</p>
+            <p class="text-gray-700 text-lg mt-6 font-semibold">Confirmas ${modalData.isEditMode ? 'la actualizacion' : 'la creacion'} de este usuario con estas atribuciones?</p>
         `;
 
         // Ajustar el contenedor de botones para el espacio
@@ -857,7 +852,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         console.log('JS: closeConfirmModal llamado.');
         confirmModal.classList.remove('opacity-100', 'flex');
         confirmModal.classList.add('opacity-0', 'pointer-events-none');
-        // Mostrar el modal principal si aún debería estar abierto
+        // Mostrar el modal principal si aun deberia estar abierto
         if (modalData.isOpen) {
             userFormModal.classList.remove('opacity-0', 'pointer-events-none');
             userFormModal.classList.add('opacity-100');
@@ -865,9 +860,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     async function submitFormConfirmed() {
-        console.log('JS: submitFormConfirmed llamado. Iniciando envío.');
+        console.log('JS: submitFormConfirmed llamado. Iniciando envio.');
 
-        // Deshabilitar botón y mostrar spinner en el botón del modal de confirmación
+        // Deshabilitar boton y mostrar spinner en el boton del modal de confirmacion
         const actionButton = confirmActionButton;
         const originalBtnText = actionButton.innerHTML;
         actionButton.disabled = true;
@@ -878,8 +873,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             </span>
         `;
 
-        // NO cerramos el modal de confirmación aquí todavía.
-        // Se mantendrá abierto con el spinner visible mientras se envía la solicitud.
+        // NO cerramos el modal de confirmacion aqui todavia.
+        // Se mantendra abierto con el spinner visible mientras se envia la solicitud.
 
         const formData = new FormData();
         formData.append('_token', modalData.csrfToken);
@@ -894,7 +889,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             url = `/usuario`;
         }
 
-        // AÑADIR TODOS LOS DATOS RECOPILADOS DE TODOS LOS PASOS
+        // ANADIR TODOS LOS DATOS RECOPILADOS DE TODOS LOS PASOS
         formData.append('name', modalData.name);
         formData.append('lastname', modalData.lastname);
         formData.append('email', modalData.email);
@@ -927,7 +922,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             formData.append('permissions[]', '');
         }
 
-        console.log(`JS: Enviando solicitud de ${modalData.isEditMode ? 'EDICIÓN' : 'CREACIÓN'} a URL: ${url} con método ${method}.`);
+        console.log(`JS: Enviando solicitud de ${modalData.isEditMode ? 'EDICION' : 'CREACION'} a URL: ${url} con metodo ${method}.`);
 
         try {
             const response = await fetch(url, {
@@ -940,24 +935,24 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             const data = await response.json();
 
-            // Volver a habilitar el botón del modal de confirmación
+            // Volver a habilitar el boton del modal de confirmacion
             actionButton.disabled = false;
             actionButton.innerHTML = originalBtnText;
 
-            // AHORA SÍ: Cerrar el modal de confirmación
+            // AHORA SI: Cerrar el modal de confirmacion
             closeConfirmModal();
 
-            // Asegurarse de que el modal principal del formulario esté completamente oculto
+            // Asegurarse de que el modal principal del formulario este completamente oculto
             modalData.isOpen = false;
-            updateModalVisibility(); // Esto activará la lógica para ocultar userFormModal
+            updateModalVisibility(); // Esto activara la logica para ocultar userFormModal
 
             if (response.ok) {
-                // Éxito: Mostrar el nuevo modal de notificación global
-                const successMessage = modalData.isEditMode ? '¡Tu usuario se ha actualizado correctamente!' : '¡Tu usuario se ha creado correctamente!';
-                showAppNotification(successMessage, true); // True para éxito
+                // Exito: Mostrar el nuevo modal de notificacion global
+                const successMessage = modalData.isEditMode ? 'Tu usuario se ha actualizado correctamente!' : 'Tu usuario se ha creado correctamente!';
+                showAppNotification(successMessage, true); // True para exito
             } else {
-                // Errores: Mostrar mensaje de error en el nuevo modal de notificación global
-                console.error('Error en la respuesta del envío:', data);
+                // Errores: Mostrar mensaje de error en el nuevo modal de notificacion global
+                console.error('Error en la respuesta del envio:', data);
                 let errorMessage = 'Hubo un error al ' + (modalData.isEditMode ? 'actualizar' : 'crear') + ' el usuario.';
 
                 if (data.errors) {
@@ -971,18 +966,18 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         } catch (error) {
             console.error('Error de red o inesperado:', error);
-            // Volver a habilitar el botón
+            // Volver a habilitar el boton
             actionButton.disabled = false;
             actionButton.innerHTML = originalBtnText;
 
-            // AHORA SÍ: Cerrar el modal de confirmación
+            // AHORA SI: Cerrar el modal de confirmacion
             closeConfirmModal();
 
-            // Asegurarse de que el modal principal del formulario esté completamente oculto
+            // Asegurarse de que el modal principal del formulario este completamente oculto
             modalData.isOpen = false;
-            updateModalVisibility(); // Esto activará la lógica para ocultar userFormModal
+            updateModalVisibility(); // Esto activara la logica para ocultar userFormModal
 
-            showAppNotification('Error de conexión o inesperado. Por favor, inténtalo de nuevo.', false); // False para error
+            showAppNotification('Error de conexion o inesperado. Por favor, intentalo de nuevo.', false); // False para error
         }
     }
 
@@ -1027,7 +1022,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
-    // NUEVO: Event Listener para el botón Importar CSV
+    // NUEVO: Event Listener para el boton Importar CSV
     if (importCsvButton) {
         importCsvButton.addEventListener('click', handleImportCsv);
     }
@@ -1062,7 +1057,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     });
 
-    // Lógica para el manejo de roles (click en el label para el estilo)
+    // Logica para el manejo de roles (click en el label para el estilo)
     const roleLabels = document.querySelectorAll('.role-label');
     roleLabels.forEach(label => {
         label.addEventListener('click', function () {
@@ -1074,13 +1069,13 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     });
 
-    // ************* Funciones para mostrar/ocultar contraseña (Paso 3) *************
+    // ************* Funciones para mostrar/ocultar contrasena (Paso 3) *************
     if (togglePasswordVisibility) {
         togglePasswordVisibility.addEventListener('click', function () {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
             this.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
-            this.setAttribute('title', type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
+            this.setAttribute('title', type === 'password' ? 'Mostrar contrasena' : 'Ocultar contrasena');
         });
     }
 
@@ -1089,16 +1084,16 @@ document.addEventListener('DOMContentLoaded', async function () {
             const type = passwordConfirmationInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordConfirmationInput.setAttribute('type', type);
             this.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
-            this.setAttribute('title', type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
+            this.setAttribute('title', type === 'password' ? 'Mostrar contrasena' : 'Ocultar contrasena');
         });
     }
 
-    // LISTENER PARA EL BOTÓN CERRAR DEL MODAL GLOBAL DE NOTIFICACIONES
+    // LISTENER PARA EL BOTON CERRAR DEL MODAL GLOBAL DE NOTIFICACIONES
     if (appNotificationCloseButton) {
         appNotificationCloseButton.addEventListener('click', function () {
             modalData.isAppNotificationModalOpen = false; // Oculta el modal global
             updateAppNotificationModalVisibility(); // Actualiza la visibilidad
-            window.location.reload(); // Recarga la página para refrescar la tabla de usuarios
+            window.location.reload(); // Recarga la pagina para refrescar la tabla de usuarios
         });
     }
 });

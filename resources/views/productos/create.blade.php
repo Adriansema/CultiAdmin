@@ -362,8 +362,7 @@
                             @enderror
                         </div>
                     </div>
-
-                    <div id="campos_subtipo_Preparacion_terreno_siembra"
+<div id="campos_subtipo_Preparacion_terreno_siembra"
                         class="hidden mt-4 pt-4 border-t border-gray-200">
                         <h3 class="text-lg font-semibold mb-2">Campos para Video Preparación del Terreno y Siembra</h3>
                         <div class="mb-4">
@@ -409,7 +408,7 @@
                                 id="Preparacion_terreno_siembra_rutaVideo"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Preparacion_terreno_siembra.rutaVideo') border-red-500 @else border-gray-300 @enderror"
                                 value="{{ old('videos_data.Preparacion_terreno_siembra.rutaVideo') }}"
-                                placeholder="https://ejemplo.com/tu-video-preparacion.mp4">
+                                placeholder="https://ejemplo.com/tu-video-preparación.mp4"> {{-- CORRECCIÓN AQUÍ --}}
                             @error('videos_data.Preparacion_terreno_siembra.rutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
@@ -512,13 +511,13 @@
                                 id="Metodos_recoleccion_rutaVideo"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Metodos_recoleccion.rutaVideo') border-red-500 @else border-gray-300 @enderror"
                                 value="{{ old('videos_data.Metodos_recoleccion.rutaVideo') }}"
-                                placeholder="https://ejemplo.com/tu-video-recoleccion.mp4">
+                                placeholder="https://ejemplo.com/tu-video-recolección.mp4"> {{-- CORRECCIÓN AQUÍ --}}
                             @error('videos_data.Metodos_recoleccion.rutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
-
+                    
                     <div id="campos_subtipo_Cuidados_cosecha" class="hidden mt-4 pt-4 border-t border-gray-200">
                         <h3 class="text-lg font-semibold mb-2">Campos para Video Cuidados de la Cosecha</h3>
                         <div class="mb-4">

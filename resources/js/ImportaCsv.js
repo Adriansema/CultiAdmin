@@ -1,22 +1,22 @@
 // Estado global para el flujo de importación CSV
 let importCsvState = {
-    // Control de visibilidad de los modales principales del flujo de importación
+    // Control de visibilidad de los modales principales del flujo de importacion
     uploadModalOpen: false, // Modal de carga de archivo
-    previewModalOpen: false, // Modal de previsualización (Rol y Nombre)
-    confirmModalOpen: false, // Modal de confirmación final
+    previewModalOpen: false, // Modal de previsualizacion (Rol y Nombre)
+    confirmModalOpen: false, // Modal de confirmacion final
 
     // Control de visibilidad de los modales de mensaje de error
-    emptyModalOpen: false, // Modal de archivo vacío
+    emptyModalOpen: false, // Modal de archivo vacio
     duplicatesModalOpen: false, // Modal de usuarios duplicados
-    missingDataModalOpen: false, // Modal de datos faltantes/inválidos
+    missingDataModalOpen: false, // Modal de datos faltantes/invalidos
 
     parsedUsers: [], // Todos los usuarios parseados del CSV
-    validUsers: [], // Usuarios que pasaron la validación del frontend y se enviarán al backend
-    invalidUsers: [], // Usuarios con errores de validación en el frontend
+    validUsers: [], // Usuarios que pasaron la validacion del frontend y se enviaran al backend
+    invalidUsers: [], // Usuarios con errores de validacion en el frontend
 
-    // Datos de errores específicos para mostrar en los modales
+    // Datos de errores especificos para mostrar en los modales
     duplicateErrors: [], // Errores de duplicados detectados por el backend (tanto tempranos como finales)
-    backendValidationErrors: [], // Otros errores de validación detectados por el backend (campos faltantes/invalidos)
+    backendValidationErrors: [], // Otros errores de validacion detectados por el backend (campos faltantes/invalidos)
 
     csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 };
@@ -54,7 +54,7 @@ const importCsvMissingDataModal = document.getElementById('importCsvMissingDataM
 const closeMissingDataModalButton = document.getElementById('closeMissingDataModalButton');
 const returnFromMissingDataModalButton = document.getElementById('returnFromMissingDataModalButton');
 const missingDataList = document.getElementById('missingDataList');
-const missingDataModalTitle = document.getElementById('missingDataModalTitle'); 
+const missingDataModalTitle = document.getElementById('missingDataModalTitle');
 const missingDataDescription = document.getElementById('missingDataDescription');
 
 // Columnas requeridas y sus nombres amigables para los mensajes de error (frontend validation)
@@ -62,14 +62,14 @@ const REQUIRED_COLUMNS = {
     name: 'Nombre',
     lastname: 'Apellido',
     email: 'Correo',
-    phone: 'Teléfono',
-    type_document: 'Tipo de Documento',
-    document: 'Documento',
-    role: 'Rol'
+    phone: 'Telefono', // CAMBIO: 'Teléfono' a 'Telefono'
+    type_document: 'Tipo de Documento', // Ya es ASCII
+    document: 'Documento', // Ya es ASCII
+    role: 'Rol' // Ya es ASCII
 };
 
 /**
- * Resetea el estado de importación y cierra todos los modales.
+ * Resetea el estado de importacion y cierra todos los modales.
  */
 function resetImportCsvFlow() {
     importCsvState = {
@@ -89,7 +89,7 @@ function resetImportCsvFlow() {
 
     // Limpiar input file
     if (csvFileInput) csvFileInput.value = '';
-    // Limpiar tabla de previsualización
+    // Limpiar tabla de previsualizacion
     if (csvPreviewTableBody) csvPreviewTableBody.innerHTML = '';
     if (detectedUsersCount) detectedUsersCount.textContent = '0';
     if (csvPreviewTableContainer) csvPreviewTableContainer.classList.add('hidden'); // Ocultar tabla
@@ -97,10 +97,10 @@ function resetImportCsvFlow() {
 
     updateModalVisibility();
     document.body.classList.remove('overflow-hidden'); // Asegurarse de liberar el scroll del body
-    
-    // === IMPORTANTE: SE ELIMINÓ LA LÓGICA QUE RE-ABRÍA userFormModal AQUÍ ===
-    // La decisión de qué modal abrir después de un reset se maneja en los listeners
-    // o en la función que inicia el flujo (ej. openImportCsvModal).
+
+    // === IMPORTANTE: SE ELIMINO LA LOGICA QUE RE-ABRIA userFormModal AQUI ===
+    // La decision de que modal abrir despues de un reset se maneja en los listeners
+    // o en la funcion que inicia el flujo (ej. openImportCsvModal).
     /* const userFormModal = document.getElementById('userFormModal');
     if (userFormModal) {
         userFormModal.classList.remove('opacity-0', 'pointer-events-none');
@@ -125,7 +125,7 @@ function updateModalVisibility() {
     let anyModalOpen = false;
     modals.forEach(modal => {
         if (modal.element) {
-            // Remover cualquier listener de transición existente para evitar múltiples ejecuciones
+            // Remover cualquier listener de transicion existente para evitar multiples ejecuciones
             const existingListener = modal.element._transitionEndListener;
             if (existingListener) {
                 modal.element.removeEventListener('transitionend', existingListener);
@@ -135,22 +135,22 @@ function updateModalVisibility() {
             if (modal.isOpen) {
                 // Abrir modal:
                 // 1. Asegurarse de que sea interactivo (quitar pointer-events-none)
-                // 2. Establecer opacidad a 100 para iniciar la transición de entrada
-                // 3. Asegurarse de que 'flex' esté presente para el centrado.
-                //    (Debería estar permanentemente en el HTML del modal para evitar el "disparo").
+                // 2. Establecer opacidad a 100 para iniciar la transicion de entrada
+                // 3. Asegurarse de que 'flex' este presente para el centrado.
+                //    (Deberia estar permanentemente en el HTML del modal para evitar el "disparo").
                 modal.element.classList.remove('pointer-events-none');
                 modal.element.classList.add('opacity-100');
                 anyModalOpen = true;
             } else {
                 // Cerrar modal:
-                // 1. Establecer opacidad a 0 para iniciar la transición de salida
+                // 1. Establecer opacidad a 0 para iniciar la transicion de salida
                 modal.element.classList.remove('opacity-100');
                 modal.element.classList.add('opacity-0');
 
-                // 2. Añadir pointer-events-none SOLO después de que la transición de opacidad termine.
-                //    Esto asegura que el modal mantenga su posición centrada mientras se desvanece.
+                // 2. Anadir pointer-events-none SOLO despues de que la transicion de opacidad termine.
+                //    Esto asegura que el modal mantenga su posicion centrada mientras se desvanece.
                 const onTransitionEnd = (event) => {
-                    // Solo actuar si la transición es de 'opacity'
+                    // Solo actuar si la transicion es de 'opacity'
                     if (event.propertyName === 'opacity') {
                         modal.element.classList.add('pointer-events-none'); // Hacerlo no interactuable
                         modal.element.removeEventListener('transitionend', onTransitionEnd); // Remover el listener
@@ -172,13 +172,13 @@ function updateModalVisibility() {
 }
 
 
-// Exporta esta función para que pueda ser llamada desde formulario.js
+// Exporta esta funcion para que pueda ser llamada desde formulario.js
 export function openImportCsvModal() {
     resetImportCsvFlow();
     importCsvState.uploadModalOpen = true; // Esto asegura que el modal de carga de archivo se abra.
     updateModalVisibility(); // Esto actualiza la visibilidad de los modales.
 
-    // Asegurarse de que el modal principal de creación de usuario se oculte
+    // Asegurarse de que el modal principal de creacion de usuario se oculte
     const userFormModal = document.getElementById('userFormModal');
     if (userFormModal) {
         userFormModal.classList.remove('opacity-100');
@@ -188,7 +188,7 @@ export function openImportCsvModal() {
 
 
 /**
- * Función para parsear el archivo CSV usando PapaParse.
+ * Funcion para parsear el archivo CSV usando PapaParse.
  * @param {File} file - El archivo CSV a parsear.
  * @returns {Promise<Array<Object>>} Una promesa que resuelve con los datos parseados.
  */
@@ -200,6 +200,7 @@ function parseCsvFile(file) {
             trimHeaders: true,
             complete: function (results) {
                 if (results.errors.length > 0) {
+                    // Ya es ASCII: 'Errores estructurales en CSV:'
                     reject(new Error(`Errores estructurales en CSV: ${results.errors.map(e => e.message).join(', ')}`));
                 } else {
                     resolve(results.data);
@@ -225,21 +226,24 @@ function validateCsvRows(usersData) {
         const errors = [];
         const lineNumber = index + 2;
 
-        // Verificar campos requeridos
+        // Verificar campos requeridos (Ya es ASCII)
         for (const key in REQUIRED_COLUMNS) {
             if (userData[key] === undefined || userData[key] === null || String(userData[key]).trim() === '') {
+                // Ya es ASCII: 'Falta valor en columna '
                 errors.push(`Falta valor en columna '${REQUIRED_COLUMNS[key]}'`);
             }
         }
 
-        // Validación de formato de email (mínima)
+        // Validacion de formato de email (minima)
         if (userData.email && !/\S+@\S+\.\S+/.test(userData.email)) {
-            errors.push(`Valor no válido en columna 'Correo electrónico'`);
+            // CAMBIO: 'Valor no válido en columna 'Correo electrónico''
+            errors.push(`Valor no valido en columna 'Correo electronico'`);
         }
 
-        // Ejemplo: Validar que el campo 'document' solo contenga dígitos
+        // Ejemplo: Validar que el campo 'document' solo contenga digitos
         if (userData.document && !/^\d+$/.test(userData.document)) {
-            errors.push(`El documento '${userData.document}' solo debe contener dígitos.`);
+            // CAMBIO: 'El documento '${userData.document}' solo debe contener dígitos.'
+            errors.push(`El documento '${userData.document}' solo debe contener digitos.`);
         }
 
         if (errors.length > 0) {
@@ -251,10 +255,9 @@ function validateCsvRows(usersData) {
 
     return { valid: validUsers, invalid: invalidUsers };
 }
-
 /**
- * Realiza una validación temprana de duplicados contactando al backend.
- * @param {Array<Object>} usersData - Los usuarios válidos del frontend para verificar duplicados.
+ * Realiza una validacion temprana de duplicados contactando al backend.
+ * @param {Array<Object>} usersData - Los usuarios validos del frontend para verificar duplicados.
  * @returns {Promise<Array<string>>} Una promesa que resuelve con una lista de errores de duplicados.
  */
 async function checkDuplicatesEarly(usersData) {
@@ -278,20 +281,23 @@ async function checkDuplicatesEarly(usersData) {
                 const duplicates = [];
                 for (const lineNumberKey in data.detailed_errors) {
                     data.detailed_errors[lineNumberKey].forEach(errorMsg => {
-                        const displayLineNumber = lineNumberKey.replace('Línea ', '');
+                        // CAMBIO: 'Línea' a 'Linea'
+                        const displayLineNumber = lineNumberKey.replace('Linea ', '');
                         const cleanErrorMsg = errorMsg.replace(/La fila \d+:\s*/, '');
 
                         if (cleanErrorMsg.includes('ya existe en el sistema')) {
                             // Intentamos obtener los datos del usuario original parseado para mostrar el email/documento
-                            // Nota: lineNumberKey es "Línea X", necesitamos "X" para el índice
+                            // Nota: lineNumberKey es "Linea X", necesitamos "X" para el indice
                             const originalUserIndex = parseInt(displayLineNumber) - 2; // -2 por index 0 y encabezado
                             const originalUser = importCsvState.parsedUsers[originalUserIndex];
 
                             let errorDetail = '';
-                            if (cleanErrorMsg.includes('El correo electrónico')) {
+                            // CAMBIO: 'El correo electrónico' a 'El correo electronico'
+                            if (cleanErrorMsg.includes('El correo electronico')) {
                                 errorDetail = `Correo [${originalUser ? originalUser.email : 'N/A'}]`;
-                            } else if (cleanErrorMsg.includes('El número de documento')) {
-                                errorDetail = `Número de documento [${originalUser ? originalUser.document : 'N/A'}]`;
+                                // CAMBIO: 'El número de documento' a 'El numero de documento'
+                            } else if (cleanErrorMsg.includes('El numero de documento')) {
+                                errorDetail = `Numero de documento [${originalUser ? originalUser.document : 'N/A'}]`;
                             }
                             duplicates.push(`Fila ${displayLineNumber}: ${errorDetail}`);
                         }
@@ -309,9 +315,9 @@ async function checkDuplicatesEarly(usersData) {
 
 
 /**
- * Renderiza la tabla de previsualización con solo Rol y Nombre.
- * Corresponde a la Imagen 1 del último set (la tabla dentro del modal).
- * @param {Array<Object>} validData - Usuarios que pasaron la validación del frontend.
+ * Renderiza la tabla de previsualizacion con solo Rol y Nombre.
+ * Corresponde a la Imagen 1 del ultimo set (la tabla dentro del modal).
+ * @param {Array<Object>} validData - Usuarios que pasaron la validacion del frontend.
  */
 function renderCsvPreview(validData) {
     if (!csvPreviewTableBody) {
@@ -368,7 +374,7 @@ async function handleFileProcessing(file) {
         const parsedData = await parseCsvFile(file);
         importCsvState.parsedUsers = parsedData;
 
-        // --- Paso 1: Validación Frontend (vacío, campos faltantes/formato inválido) ---
+        // --- Paso 1: Validacion Frontend (vacio, campos faltantes/formato invalido) ---
         if (importCsvState.parsedUsers.length === 0) {
             importCsvState.emptyModalOpen = true;
             updateModalVisibility();
@@ -385,7 +391,7 @@ async function handleFileProcessing(file) {
                 errors: item.errors
             }));
 
-            // Lógica para determinar el tipo de error predominante
+            // Logica para determinar el tipo de error predominante
             let missingCount = 0;
             let invalidCount = 0;
             importCsvState.invalidUsers.forEach(userError => {
@@ -411,27 +417,27 @@ async function handleFileProcessing(file) {
             return;
         }
 
-        // --- Paso 2: Validación de Duplicados Temprana (con el Backend) ---
-        // Solo si no hay errores de frontend y hay usuarios válidos
+        // --- Paso 2: Validacion de Duplicados Temprana (con el Backend) ---
+        // Solo si no hay errores de frontend y hay usuarios validos
         if (importCsvState.validUsers.length > 0) {
             const earlyDuplicates = await checkDuplicatesEarly(importCsvState.validUsers);
 
             if (earlyDuplicates && earlyDuplicates.length > 0) {
                 importCsvState.duplicateErrors = earlyDuplicates;
-                renderDuplicatesErrors(importCsvState.duplicateErrors);
+                renderDuplicatesErrors(importCsvState.duplicateErrors); // <--- Llamada con la lista de duplicados
                 importCsvState.duplicatesModalOpen = true;
                 updateModalVisibility();
                 return;
             }
         } else {
-            // Esto ocurre si parsedData tiene datos pero todos son inválidos por el frontend.
-            // Ya se manejó arriba en invalidUsers.length > 0, pero como fallback.
-            importCsvState.emptyModalOpen = true; // Considerar como vacío efectivo si no hay válidos.
+            // Esto ocurre si parsedData tiene datos pero todos son invalidos por el frontend.
+            // Ya se manejo arriba en invalidUsers.length > 0, pero como fallback.
+            importCsvState.emptyModalOpen = true; // Considerar como vacio efectivo si no hay validos.
             updateModalVisibility();
             return;
         }
 
-        // --- Paso 3: Si todo es válido (frontend y duplicados), mostrar previsualización ---
+        // --- Paso 3: Si todo es valido (frontend y duplicados), mostrar previsualizacion ---
         renderCsvPreview(importCsvState.validUsers);
         importCsvState.previewModalOpen = true;
         updateModalVisibility();
@@ -451,7 +457,7 @@ async function handleFileProcessing(file) {
 
 
 /**
- * Renderiza la lista de errores de datos faltantes/inválidos en el modal correspondiente.
+ * Renderiza la lista de errores de datos faltantes/invalidos en el modal correspondiente.
  * @param {Array<{lineNumber: string|number, errors: Array<string>}>} errorsList
  */
 function renderMissingDataErrors(errorsList, errorCategory) {
@@ -461,23 +467,27 @@ function renderMissingDataErrors(errorsList, errorCategory) {
     if (missingDataModalTitle) {
         if (errorCategory === 'faltantes') {
             missingDataModalTitle.textContent = 'Campos Faltantes';
+            // CAMBIO: 'Datos Inválidos' a 'Datos Invalidos'
         } else if (errorCategory === 'invalidos') {
-            missingDataModalTitle.textContent = 'Datos Inválidos';
+            missingDataModalTitle.textContent = 'Datos Invalidos';
+            // CAMBIO: 'Datos Faltantes o Inválidos' a 'Datos Faltantes o Invalidos'
         } else if (errorCategory === 'mixtos') {
-            missingDataModalTitle.textContent = 'Datos Faltantes o Inválidos';
+            missingDataModalTitle.textContent = 'Datos Faltantes o Invalidos';
         } else {
             missingDataModalTitle.textContent = 'Error en Datos'; // Para errores generales de procesamiento
         }
     }
 
-    // Actualizar el texto descriptivo del modal según la categoría de error
+    // Actualizar el texto descriptivo del modal segun la categoria de error
     if (missingDataDescription) {
         if (errorCategory === 'faltantes') {
             missingDataDescription.textContent = 'Se han detectado filas con campos faltantes. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
+            // CAMBIO: 'Se han detectado filas con datos inválidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:'
         } else if (errorCategory === 'invalidos') {
-            missingDataDescription.textContent = 'Se han detectado filas con datos inválidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
+            missingDataDescription.textContent = 'Se han detectado filas con datos invalidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
+            // CAMBIO: 'Se han detectado filas con campos faltantes o formatos inválidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:'
         } else if (errorCategory === 'mixtos') {
-            missingDataDescription.textContent = 'Se han detectado filas con campos faltantes o formatos inválidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
+            missingDataDescription.textContent = 'Se han detectado filas con campos faltantes o formatos invalidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
         } else { // 'general' o cualquier otro caso
             missingDataDescription.textContent = 'Se han detectado errores al procesar el archivo. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los detalles:';
         }
@@ -491,7 +501,8 @@ function renderMissingDataErrors(errorsList, errorCategory) {
         });
         listHtml += '</ul>';
     } else {
-        listHtml = '<p class="text-gray-600">No se encontraron errores de datos faltantes/inválidos.</p>';
+        // CAMBIO: 'No se encontraron errores de datos faltantes/inválidos.'
+        listHtml = '<p class="text-gray-600">No se encontraron errores de datos faltantes/invalidos.</p>';
     }
     if (missingDataList) {
         missingDataList.innerHTML = listHtml;
@@ -500,9 +511,9 @@ function renderMissingDataErrors(errorsList, errorCategory) {
 
 /**
  * Renderiza la lista de errores de usuarios duplicados en el modal correspondiente.
- * @param {Array<string>} errorsArray - Ej: ["Fila 3: Correo [test@example.com]", "Fila 7: Número de documento [12345]"]
+ * @param {Array<string>} errorsArray - Ej: ["Fila 3: Correo [test@example.com]", "Fila 7: Numero de documento [12345]"]
  */
-function renderDuplicatesErrors(errorsArray) { // Renombrado el parámetro para evitar conflicto
+function renderDuplicatesErrors(errorsArray) { // Renombrado el parametro para evitar conflicto
     let listHtml = '';
     if (errorsArray.length > 0) {
         listHtml = '<ul class="list-disc pl-5 text-gray-800">';
@@ -550,13 +561,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // === LISTENERS PARA LOS BOTONES DEL MODAL DE PREVISUALIZACIÓN (importCsvPreviewModal) ===
+    // === LISTENERS PARA LOS BOTONES DEL MODAL DE PREVISUALIZACION (importCsvPreviewModal) ===
     if (closePreviewModalButton) {
         closePreviewModalButton.addEventListener('click', resetImportCsvFlow);
     }
     if (previewPrevButton) {
         previewPrevButton.addEventListener('click', function () {
-            importCsvState.previewModalOpen = false; // Cierra la previsualización
+            importCsvState.previewModalOpen = false; // Cierra la previsualizacion
             importCsvState.uploadModalOpen = true; // Abre el modal de carga
             updateModalVisibility();
         });
@@ -564,32 +575,34 @@ document.addEventListener('DOMContentLoaded', function () {
     if (previewNextButton) {
         previewNextButton.addEventListener('click', function () {
             if (importCsvState.validUsers.length > 0) {
-                importCsvState.previewModalOpen = false; // Cierra la previsualización
-                importCsvState.confirmModalOpen = true; // Abre el modal de confirmación
-                renderImportSummary(); // Prepara el resumen para la confirmación
+                importCsvState.previewModalOpen = false; // Cierra la previsualizacion
+                importCsvState.confirmModalOpen = true; // Abre el modal de confirmacion
+                renderImportSummary(); // Prepara el resumen para la confirmacion
                 updateModalVisibility();
             } else {
-                console.warn('Intentó avanzar sin usuarios válidos en la previsualización.');
+                // CAMBIO: 'Intentó avanzar sin usuarios válidos en la previsualización.'
+                console.warn('Intento avanzar sin usuarios validos en la previsualizacion.');
             }
         });
     }
 
-    // === LISTENERS PARA LOS BOTONES DEL MODAL DE CONFIRMACIÓN (importCsvConfirmModal) ===
+    // === LISTENERS PARA LOS BOTONES DEL MODAL DE CONFIRMACION (importCsvConfirmModal) ===
     if (closeConfirmImportModalButton) {
         closeConfirmImportModalButton.addEventListener('click', resetImportCsvFlow);
     }
     if (confirmImportPrevButton) {
         confirmImportPrevButton.addEventListener('click', function () {
-            importCsvState.confirmModalOpen = false; // Cierra la confirmación
-            importCsvState.previewModalOpen = true; // Abre la previsualización
+            importCsvState.confirmModalOpen = false; // Cierra la confirmacion
+            importCsvState.previewModalOpen = true; // Abre la previsualizacion
             updateModalVisibility();
         });
     }
     if (confirmImportActionButton) {
         confirmImportActionButton.addEventListener('click', async function () {
-            // Deshabilitar botón y mostrar spinner
+            // Deshabilitar boton y mostrar spinner
             const originalBtnText = confirmImportActionButton.innerHTML;
             confirmImportActionButton.disabled = true;
+            // CAMBIO: 'Cargando...'
             confirmImportActionButton.innerHTML = `Importando <img src="/images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">`;
 
             const formData = new FormData();
@@ -607,7 +620,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const data = await response.json();
 
-                // Restablecer el botón
+                // Restablecer el boton
                 confirmImportActionButton.disabled = false;
                 confirmImportActionButton.innerHTML = originalBtnText;
 
@@ -615,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     importCsvState.duplicateErrors = [];
                     importCsvState.backendValidationErrors = [];
 
-                    // Ocultar el modal de confirmación
+                    // Ocultar el modal de confirmacion
                     importCsvState.confirmModalOpen = false;
 
                     if (data.detailed_errors) {
@@ -625,8 +638,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         for (const lineNumberKey in data.detailed_errors) {
                             const lineErrors = data.detailed_errors[lineNumberKey];
                             lineErrors.forEach(errorMsg => {
-                                const displayLineNumber = lineNumberKey.replace('Línea ', '');
-                                 // La expresión regular ahora incluye el espacio después del número de fila y el ":"
+                                // CAMBIO: 'Línea '
+                                const displayLineNumber = lineNumberKey.replace('Linea ', '');
+                                 // La expresion regular ahora incluye el espacio despues del numero de fila y el ":"
                                 const cleanErrorMsg = errorMsg.replace(/La fila \d+:\s*/, '');
 
                                 if (cleanErrorMsg.includes('ya existe en el sistema')) {
@@ -635,10 +649,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                     const originalUser = importCsvState.parsedUsers[originalUserIndex];
 
                                     let errorDetail = '';
-                                    if (cleanErrorMsg.includes('El correo electrónico')) {
+                                    // CAMBIO: 'El correo electrónico'
+                                    if (cleanErrorMsg.includes('El correo electronico')) {
                                         errorDetail = `Correo [${originalUser ? originalUser.email : 'N/A'}]`;
-                                    } else if (cleanErrorMsg.includes('El número de documento')) {
-                                        errorDetail = `Número de documento [${originalUser ? originalUser.document : 'N/A'}]`;
+                                        // CAMBIO: 'El número de documento'
+                                    } else if (cleanErrorMsg.includes('El numero de documento')) {
+                                        errorDetail = `Numero de documento [${originalUser ? originalUser.document : 'N/A'}]`;
                                     }
                                     newDuplicateErrors.push(`Fila ${displayLineNumber}: ${errorDetail}`);
                                 } else {
@@ -672,18 +688,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     updateModalVisibility(); // Asegurar que el modal de error se muestre
                 } else {
-                    // Éxito: Cerrar todos los modales de importación y recargar la página
+                    // Exito: Cerrar todos los modales de importacion y recargar la pagina
                     resetImportCsvFlow();
                     setTimeout(() => {
+                        // CAMBIO: 'Recargar rápidamente'
                         window.location.reload();
-                    }, 500); // Recargar rápidamente
+                    }, 500); // Recargar rapidamente
                 }
             } catch (error) {
-                // Restablecer el botón
+                // Restablecer el boton
                 confirmImportActionButton.disabled = false;
                 confirmImportActionButton.innerHTML = originalBtnText;
 
-                importCsvState.confirmModalOpen = false; // Ocultar modal de confirmación
+                importCsvState.confirmModalOpen = false; // Ocultar modal de confirmacion
                 importCsvState.backendValidationErrors = [{ lineNumber: 'Red', errors: [`Error de red o del servidor: ${error.message}`] }];
                 renderMissingDataErrors(importCsvState.backendValidationErrors);
                 importCsvState.missingDataModalOpen = true;
@@ -692,7 +709,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Función para renderizar el resumen de importación (en importCsvConfirmModal)
+    // Funcion para renderizar el resumen de importacion (en importCsvConfirmModal)
     function renderImportSummary() {
         if (!importSummaryContent) return;
         const roleCounts = {};
@@ -702,7 +719,8 @@ document.addEventListener('DOMContentLoaded', function () {
             roleCounts[role] = (roleCounts[role] || 0) + 1;
         });
 
-        let summaryHtml = '<p class="text-gray-900 text-lg font-semibold mb-4">Se importarán los siguientes usuarios:</p>';
+        // CAMBIO: 'Se importarán los siguientes usuarios:'
+        let summaryHtml = '<p class="text-gray-900 text-lg font-semibold mb-4">Se importaran los siguientes usuarios:</p>';
         summaryHtml += '<ul class="list-disc pl-5 mb-4">';
         for (const role in roleCounts) {
             summaryHtml += `<li class="text-gray-800"><span class="font-bold">${roleCounts[role]}</span> usuario(s) con el rol <span class="font-bold">${role}</span>.</li>`;
@@ -724,4 +742,3 @@ document.addEventListener('DOMContentLoaded', function () {
     if (closeMissingDataModalButton) closeMissingDataModalButton.addEventListener('click', openImportCsvModal);
     if (returnFromMissingDataModalButton) returnFromMissingDataModalButton.addEventListener('click', openImportCsvModal);
 });
-
