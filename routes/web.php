@@ -17,12 +17,12 @@ use App\Http\Controllers\PendienteProController;
 use App\Http\Controllers\PendienteNotiController;
 use App\Http\Controllers\AccesibilidadController;
 use App\Http\Middleware\PreventBackHistory;
-use App\Http\Controllers\Auth\NewPasswordController;       // Para establecer la nueva contraseña
+use App\Http\Controllers\Auth\NewPasswordController;       // Para establecer la nueva contrasena
 use App\Http\Controllers\Auth\PasswordResetLinkController; // Para la solicitud de restablecimiento
 
 
 // ------------------------------------------------------------------------------------
-// Rutas PÚBLICAS (No requieren autenticación)
+// Rutas PuBLICAS (No requieren autenticacion)
 // ------------------------------------------------------------------------------------
 
 // Rutas para PQRS
@@ -37,15 +37,15 @@ Route::post('/check-email', [UsuarioController::class, 'checkEmailExists'])->nam
 // Para verificar si el documento existe 
 Route::post('/check-document', [UsuarioController::class, 'checkDocumentExists'])->name('check-document');
 
-// Para el reenvío del email de activación (PÚBLICAS por si el usuario no puede loguearse) 
-// Formulario para solicitar el reenvío del email de activación
+// Para el reenvio del email de activacion (PuBLICAS por si el usuario no puede loguearse) 
+// Formulario para solicitar el reenvio del email de activacion
 Route::get('/resend-activation', [UsuarioController::class, 'showResendActivationForm'])->name('resend.activation.form');
 
-// Procesa la solicitud de reenvío del email de activación
+// Procesa la solicitud de reenvio del email de activacion
 Route::post('/resend-activation', [UsuarioController::class, 'resendActivationEmail'])->name('resend.activation.email');
 
 // ------------------------------------------------------------------------------------
-// Grupo de rutas que requieren AUTENTICACIÓN y verificación de correo electrónico
+// Grupo de rutas que requieren AUTENTICACIoN y verificacion de correo electronico
 // ------------------------------------------------------------------------------------
 Route::middleware([
      'auth:sanctum',
@@ -71,11 +71,11 @@ Route::middleware([
      // Ruta de Accesibilidad
      Route::get('/accesibilidad', [AccesibilidadController::class, 'index'])->name('accesibilidad.index');
 
-     // Ruta de Estadística publica
+     // Ruta de Estadistica publica
      Route::get('/public-statistics', [StatisticController::class, 'index'])->name('statistics.index.public');
 
 
-     // --- Módulo de PRODUCTOS ---
+     // --- Modulo de PRODUCTOS ---
      Route::prefix('producto')->name('productos.')->group(function () {
           Route::get('/', [ProductoController::class, 'index'])->name('index')->middleware('can:crear producto');
           Route::get('/create', [ProductoController::class, 'create'])->name('create');
@@ -88,47 +88,47 @@ Route::middleware([
           Route::delete('/{producto}', [ProductoController::class, 'destroy'])->name('destroy')->middleware('can:eliminar producto');
      });
 
-     // --- Módulo de BOLETINES ---
+     // --- Modulo de BOLETINES ---
      Route::prefix('boletines')->name('boletines.')->group(function () {
 
-          // Ruta principal para listar boletines y manejar los filtros via GET (recarga de página)
+          // Ruta principal para listar boletines y manejar los filtros via GET (recarga de pagina)
           Route::get('/', [BoletinController::class, 'index'])->name('index')->middleware('can:crear boletin');
 
-          // Rutas de creación
+          // Rutas de creacion
           Route::get('/create', [BoletinController::class, 'create'])->name('create');
           Route::post('/', [BoletinController::class, 'store'])->name('store');
 
-          // Rutas de importación y exportación (mantienen su lógica)
-          Route::post('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf'); // Si existe este método en tu controlador
+          // Rutas de importacion y exportacion (mantienen su logica)
+          Route::post('/importar-pdf', [BoletinController::class, 'importarPdf'])->name('importarPdf'); // Si existe este metodo en tu controlador
           Route::get('/exportar-csv', [BoletinController::class, 'exportarCSV'])->name('exportarCSV');
 
 
-          // Rutas con parámetros de modelo (asegúrate de que {boletin} se resuelva a un modelo Boletin)
+          // Rutas con parametros de modelo (asegurate de que {boletin} se resuelva a un modelo Boletin)
           Route::get('/{boletin}/download', [BoletinController::class, 'downloadBoletin'])->name('download');
 
           Route::get('/{boletin}/edit', [BoletinController::class, 'edit'])->name('edit')->middleware('can:editar boletin');
           Route::put('/{boletin}', [BoletinController::class, 'update'])->name('update')->middleware('can:editar boletin');
           Route::delete('/{boletin}', [BoletinController::class, 'destroy'])->name('destroy')->middleware('can:eliminar boletin');
 
-          // Ruta para mostrar un boletín específico (si es usada para un modal "Ver" o similar)
+          // Ruta para mostrar un boletin especifico (si es usada para un modal "Ver" o similar)
           Route::get('/{boletin}', [BoletinController::class, 'show'])->name('show');
      });
 
      // ... otras rutas que puedas tener ...
 
-     // --- Módulo de PENDIENTES ( PRODUCTOS Y BOLETINES y NOTICIAS ) ---
+     // --- Modulo de PENDIENTES ( PRODUCTOS Y BOLETINES y NOTICIAS ) ---
      Route::prefix('pendiente')->name('pendientes.')->group(function () {
 
           // Rutas para Productos Pendientes
           Route::get('/productos', [PendienteProController::class, 'index'])->name('productos.index')->middleware('can:validar producto');
-          Route::get('/productos/filtrados', [PendienteProController::class, 'getFilteredProducts'])->name('productos.filtrados'); // Añadida o confirmada
+          Route::get('/productos/filtrados', [PendienteProController::class, 'getFilteredProducts'])->name('productos.filtrados'); // Anadida o confirmada
           Route::get('/productos/{producto}', [PendienteProController::class, 'show'])->name('productos.show');
           Route::post('/productos/{producto}/validar', [PendienteProController::class, 'validar'])->name('productos.validar');
           Route::post('/productos/{producto}/rechazar', [PendienteProController::class, 'rechazar'])->name('productos.rechazar');
 
-          // Rutas para Boletines Pendientes (ACTUALIZADAS AQUÍ)
+          // Rutas para Boletines Pendientes (ACTUALIZADAS AQUi)
           Route::get('/boletines', [PendienteBolController::class, 'index'])->name('boletines.index')->middleware('can:validar boletin');
-          Route::get('/boletines/filtrados', [PendienteBolController::class, 'getFilteredBoletins'])->name('boletines.filtrados'); // ¡Nueva ruta añadida!
+          Route::get('/boletines/filtrados', [PendienteBolController::class, 'getFilteredBoletins'])->name('boletines.filtrados'); // !Nueva ruta anadida!
           Route::get('/boletines/{boletin}', [PendienteBolController::class, 'show'])->name('boletines.show');
           Route::post('/boletines/{boletin}/validar', [PendienteBolController::class, 'validar'])->name('boletines.validar');
           Route::post('/boletines/{boletin}/rechazar', [PendienteBolController::class, 'rechazar'])->name('boletines.rechazar');
@@ -142,7 +142,7 @@ Route::middleware([
      });
 
 
-     // --- Módulo de USUARIOS ---
+     // --- Modulo de USUARIOS ---
      Route::prefix('usuario')->name('usuarios.')->group(function () {
           Route::get('role-permissions-map', [UsuarioController::class, 'getRolePermissionsMap'])->name('role-permissions-map');
           Route::get('/filtered-users', [UsuarioController::class, 'getFilteredUsers'])->name('filtered.ajax');
@@ -158,7 +158,7 @@ Route::middleware([
           Route::get('/usuarios/{usuario}/data', [UsuarioController::class, 'getUserData'])->name('users.data')->middleware('can:editar usuario');
      });
 
-     // --- Módulo de NOTICIAS ---
+     // --- Modulo de NOTICIAS ---
      Route::prefix('noticia')->name('noticias.')->group(function () {
           Route::get('/', [NoticiaController::class, 'index'])->name('index')->middleware('can:crear noticia');
           Route::get('/create', [NoticiaController::class, 'create'])->name('create');
@@ -171,7 +171,7 @@ Route::middleware([
           Route::delete('/{noticia}', [NoticiaController::class, 'destroy'])->name('destroy')->middleware('can:eliminar noticia');
      });
 
-     // Ruta de Estadística protegida  
+     // Ruta de Estadistica protegida  
      Route::get('/admin/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index')->middleware('can:ver estadisticas');
 });
 
@@ -180,9 +180,9 @@ Route::middleware([
 // ------------------------------------------------------------------------------------
 Route::fallback(function () {
      if (!Auth::check()) {
-          // Si el usuario no está autenticado, redirige a la página de login
+          // Si el usuario no esta autenticado, redirige a la pagina de login
           return redirect()->route('login');
      }
-     // Si el usuario está autenticado pero la ruta no se encuentra, redirige al dashboard
-     return redirect()->route('dashboard')->with('error', 'La página solicitada no existe o no tienes permiso para acceder a ella.');
+     // Si el usuario esta autenticado pero la ruta no se encuentra, redirige al dashboard
+     return redirect()->route('dashboard')->with('error', 'La pagina solicitada no existe o no tienes permiso para acceder a ella.');
 });

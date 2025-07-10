@@ -177,10 +177,10 @@ return [
 
     'custom' => [
         'archivo_upload' => [
-            // Opción A: Mensaje literal si solo permites PDF y quieres que siempre diga eso
+            // Opcion A: Mensaje literal si solo permites PDF y quieres que siempre diga eso
             //'mimes' => 'This file type is not supported, only PDF files are allowed.',
 
-            // Opción B: Mensaje dinámico que muestra los tipos de archivo permitidos
+            // Opcion B: Mensaje dinamico que muestra los tipos de archivo permitidos
             'mimes' => 'This file type is not supported. Only :values file types are allowed.',
         ],
         'password' => [

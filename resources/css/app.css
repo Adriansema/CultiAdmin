@@ -180,7 +180,7 @@ html {
   -moz-appearance: none;
   /* Para Firefox */
   appearance: none;
-  /* Estándar */
+  /* Estandar */
   background-image: none;
   /* Asegura que no haya imagen de fondo por defecto */
   padding-right: 2.2rem;
@@ -204,15 +204,15 @@ html {
   position: absolute;
   top: 50%;
   right: 0.75rem;
-  /* Ajusta la posición de la flecha */
+  /* Ajusta la posicion de la flecha */
   transform: translateY(-50%);
   /* Centra verticalmente */
   pointer-events: none;
   /* Asegura que la flecha no intercepte clics */
   width: 1.10rem;
-  /* Ajusta el tamaño de la flecha (w-5 de Tailwind) */
+  /* Ajusta el tamano de la flecha (w-5 de Tailwind) */
   height: 1.25rem;
-  /* Ajusta el tamaño de la flecha (h-5 de Tailwind) */
+  /* Ajusta el tamano de la flecha (h-5 de Tailwind) */
 }
 
 /* En tu archivo CSS principal, o en tu input.css si usas PostCSS/Tailwind */
@@ -229,7 +229,7 @@ html {
 /* Define una clase personalizada para el contenedor de la imagen de fondo de inicio sesion */
 .fullscreen-image-overlay-purple {
   position: fixed;
-  /* Hace que el elemento sea fijo en la ventana de visualización */
+  /* Hace que el elemento sea fijo en la ventana de visualizacion */
   top: 0;
   left: 0;
   width: 100vw;
@@ -239,7 +239,7 @@ html {
   overflow: hidden;
   /* Oculta cualquier contenido que se desborde, previniendo el scroll */
   z-index: -1;
-  /* Coloca la imagen de fondo detrás de otros elementos de la página */
+  /* Coloca la imagen de fondo detras de otros elementos de la pagina */
   display: flex;
   /* Usa flexbox para centrar la imagen */
   justify-content: center;
@@ -255,22 +255,22 @@ html {
   height: 100%;
   /* La imagen ocupa el 100% de la altura de su contenedor */
   object-fit: cover;
-  /* Ajusta la imagen para cubrir el área sin distorsión, recortando si es necesario */
+  /* Ajusta la imagen para cubrir el area sin distorsion, recortando si es necesario */
   object-position: center;
   /* Centra la imagen dentro de su contenedor */
 }
 
-/* Pseudo-elemento para la superposición morada */
+/* Pseudo-elemento para la superposicion morada */
 .fullscreen-image-overlay-purple::before {
   content: '';
-  /* Contenido vacío para el pseudo-elemento */
+  /* Contenido vacio para el pseudo-elemento */
   position: absolute;
   /* Posicionamiento absoluto sobre la imagen */
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  /* Aquí está el nuevo estilo de gradiente:
+  /* Aqui esta el nuevo estilo de gradiente:
      - Empieza con morado opaco (rgba(128, 0, 128, 0.5)) en el centro (0%)
      - Transiciona a negro opaco (rgba(0, 0, 0, 0.7)) a partir del 50% del radio
      - Termina en negro opaco (rgba(0, 0, 0, 0.7)) al 100% del radio
@@ -286,10 +286,10 @@ html {
   pointer-events: none;
   /* Permite que los eventos de clic pasen a la imagen subyacente */
   z-index: 1;
-  /* Asegura que la superposición esté sobre la imagen */
+  /* Asegura que la superposicion este sobre la imagen */
 }
 
-/* Estilos para tu formulario de inicio de sesión */
+/* Estilos para tu formulario de inicio de sesion */
 .login-form {
   /* ... otros estilos que ya tengas para tu formulario ... */
   background-color: white;
@@ -298,11 +298,11 @@ html {
   /* Si tiene padding interno */
   margin: 20px;
 
-  /* Para rounded-xl (borde redondeado más grande) */
+  /* Para rounded-xl (borde redondeado mas grande) */
   border-radius: 24px;
-  /* Un valor común para rounded-xl. Puedes ajustar a 16px si lo ves necesario */
+  /* Un valor comun para rounded-xl. Puedes ajustar a 16px si lo ves necesario */
 
-  /* Para max-w-lg (ancho máximo) */
+  /* Para max-w-lg (ancho maximo) */
   max-width: 36rem;
   /* El valor equivalente a max-w-lg en Tailwind (512px) */
   width: 100%;
@@ -310,7 +310,7 @@ html {
 
   /* Estilo para el shadow brillante blanco */
   /* box-shadow: 0 0 10px 1px rgba(255, 255, 255, 0.50); */
-  /* Ajusta los valores según necesites */
+  /* Ajusta los valores segun necesites */
 }
 
 .recuperar-form {
@@ -321,7 +321,7 @@ html {
 
   border-radius: 24px;
 
-  /* Para max-w-lg (ancho máximo) */
+  /* Para max-w-lg (ancho maximo) */
   max-width: 36rem;
   /* El valor equivalente a max-w-lg en Tailwind (512px) */
   width: 100%;
@@ -354,26 +354,26 @@ html {
 /* Estilos para el scrollbar en navegadores basados en WebKit (Chrome, Safari, Edge) */
 .noticias-scroll-container::-webkit-scrollbar {
   width: 6px;
-  /* Ancho del scrollbar, más delgado */
+  /* Ancho del scrollbar, mas delgado */
 }
 
 .noticias-scroll-container::-webkit-scrollbar-track {
   background: #e0e0e0;
-  /* CAMBIO: Fondo del track más visible, un gris claro */
+  /* CAMBIO: Fondo del track mas visible, un gris claro */
   border-radius: 10px;
   /* Mantenemos el radio si el track es visible */
 }
 
 .noticias-scroll-container::-webkit-scrollbar-thumb {
   background: #555;
-  /* Color del thumb, más oscuro */
+  /* Color del thumb, mas oscuro */
   border-radius: 9999px;
-  /* Completamente redondeado (píldora) */
+  /* Completamente redondeado (pildora) */
 }
 
 .noticias-scroll-container::-webkit-scrollbar-thumb:hover {
   background: #333;
-  /* Color del thumb al pasar el ratón, aún más oscuro */
+  /* Color del thumb al pasar el raton, aun mas oscuro */
 }
 
 .noticias-scroll-container::-webkit-scrollbar-button {
@@ -389,7 +389,7 @@ html {
   /* CAMBIO: thumb color track color para Firefox */
 }
 
-/* Clase para la animación de desvanecimiento */
+/* Clase para la animacion de desvanecimiento */
 .fade-out {
   opacity: 0;
   transform: translateY(-20px);
@@ -416,21 +416,21 @@ html {
 
 .boletines-scroll-container::-webkit-scrollbar-track {
   background: #e0e0e0;
-  /* CAMBIO: Fondo del track más visible, un gris claro */
+  /* CAMBIO: Fondo del track mas visible, un gris claro */
   border-radius: 10px;
   /* Mantenemos el radio si el track es visible */
 }
 
 .boletines-scroll-container::-webkit-scrollbar-thumb {
   background: #555;
-  /* Color del thumb, más oscuro */
+  /* Color del thumb, mas oscuro */
   border-radius: 9999px;
-  /* Completamente redondeado (píldora) */
+  /* Completamente redondeado (pildora) */
 }
 
 .boletines-scroll-container::-webkit-scrollbar-thumb:hover {
   background: #333;
-  /* Color del thumb al pasar el ratón, aún más oscuro */
+  /* Color del thumb al pasar el raton, aun mas oscuro */
 }
 
 .boletines-scroll-container::-webkit-scrollbar-button {
@@ -446,7 +446,7 @@ html {
   /* CAMBIO: thumb color track color para Firefox */
 }
 
-/* Clase para la animación de desvanecimiento (si se decide usar, por ejemplo, para ocultar un boletín descargado) */
+/* Clase para la animacion de desvanecimiento (si se decide usar, por ejemplo, para ocultar un boletin descargado) */
 .fade-out-boletin {
   opacity: 0;
   transform: translateY(-20px);

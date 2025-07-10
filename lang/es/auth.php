@@ -4,17 +4,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Líneas de Lenguaje para Autenticación
+    | Lineas de Lenguaje para Autenticacion
     |--------------------------------------------------------------------------
     |
-    | Las siguientes líneas de lenguaje se utilizan durante la autenticación para
+    | Las siguientes lineas de lenguaje se utilizan durante la autenticacion para
     | varios mensajes que necesitamos mostrar al usuario. Eres libre de modificar
-    | estas líneas de lenguaje de acuerdo a los requisitos de tu aplicación.
+    | estas lineas de lenguaje de acuerdo a los requisitos de tu aplicacion.
     |
     */
 
-    'failed' => 'el correo o la contraseña no coincide.',
-    'password' => 'La contraseña proporcionada es incorrecta.',
-    'throttle' => 'Demasiados intentos de inicio de sesión. Por favor, inténtalo de nuevo en :seconds segundos.',
+    'failed' => 'el correo o la contrasena no coincide.',
+    'password' => 'La contrasena proporcionada es incorrecta.',
+    'throttle' => 'Demasiados intentos de inicio de sesion. Por favor, intentalo de nuevo en :seconds segundos.',
 
 ];

@@ -78,7 +78,7 @@
                 @include('pendientes.partials.modal-noticia-rechazar')
                 @include('pendientes.partials.modal-noticia-validar')
             @empty
-                {{-- Si no hay noticias, no se renderiza ningún modal aquí --}}
+                {{-- Si no hay noticias, no se renderiza ningun modal aqui --}}
             @endforelse
 
             @if ($noticias->total() > 0 && $noticias->hasPages())

@@ -6,7 +6,7 @@
         <div class="inline-block px-20 py-6">
             <div class="flex items-center space-x-4">
                 <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono">
-                <h1 class="text-3xl whitespace-nowrap font-bold">Gestión de usuarios</h1>
+                <h1 class="text-3xl whitespace-nowrap font-bold">Gestion de usuarios</h1>
             </div>
             <div class="py-2">
                 {!! Breadcrumbs::render('usuarios.index') !!}
@@ -16,13 +16,13 @@
         <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-3xl p-4 mb-8">
             <div class="flex items-center justify-between flex-wrap"> 
 
-                {{-- FORMULARIO DE BÚSQUEDA (solo input de texto) --}}
+                {{-- FORMULARIO DE BuSQUEDA (solo input de texto) --}}
                 <form id="BuscarUser" action="{{ route('usuarios.index') }}" method="GET"
                     class="flex items-center w-full max-w-xl mb-4 md:mb-0"> 
                     @include('usuarios.partials.search')
                 </form>
 
-                {{-- Contenedor de filtros y botones de acción --}}
+                {{-- Contenedor de filtros y botones de accion --}}
                 <div class="flex items-center justify-end py-6 space-x-2"> 
                     {{-- SELECT para filtrar por ESTADO --}}
                     <select id="filtrarEstado" name="estado"
@@ -89,7 +89,7 @@
             @endif
 
             @include('usuarios.partials.formulario', [
-                'roles' => $roles, // Estos sí se pasan, son roles del sistema
+                'roles' => $roles, // Estos si se pasan, son roles del sistema
                 'permissions' => $permissions, // Estos también, son permisos del sistema
             ])
 

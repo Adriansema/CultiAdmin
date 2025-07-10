@@ -39,7 +39,7 @@
                         </button>
                         @include('pendientes.partials.modal-boletin-validar')
 
-                        <!-- Botón que abre el modal -->
+                        <!-- Boton que abre el modal -->
                         <button type="button" onclick="mostrarModal('rechazar-boletin', '{{ $boletin->id }}')"
                             class="text-red-600 hover:underline">
                             Rechazar

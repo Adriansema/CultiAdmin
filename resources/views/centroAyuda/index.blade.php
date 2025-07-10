@@ -4,13 +4,13 @@
     <div class="inline-block px-8 py-10">
         <div class="flex items-center space-x-2">
             <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-            <h1 class="text-3xl whitespace-nowrap font-bold">Centro de ayuda de la aplicación</h1>
+            <h1 class="text-3xl whitespace-nowrap font-bold">Centro de ayuda de la aplicacion</h1>
         </div>
         {!! Breadcrumbs::render('centroAyuda.index') !!}
     </div>
 
     <div class="container py-8 mx-auto">
-        <!-- Contenido de pestañas -->
+        <!-- Contenido de pestanas -->
         <div class="pt-6 space-y-6 tab-content" id="helpTabsContent">
             <div class="tab-pane fade show active" id="faq" role="tabpanel" aria-labelledby="faq-tab">
                 @include('centroAyuda.partials.faq')
@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <!-- Modal de éxito -->
+        <!-- Modal de exito -->
         <div id="successModal" class="fixed inset-0 z-30 hidden bg-black bg-opacity-50">
             <div class="relative px-6 py-4 mx-auto my-40 text-center bg-white rounded-lg shadow-lg w-80">
                 <button id="closeSuccessBtn" class="absolute text-gray-500 top-3 right-3 hover:text-gray-800">

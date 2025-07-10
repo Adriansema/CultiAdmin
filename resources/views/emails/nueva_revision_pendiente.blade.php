@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Nueva Revisión Pendiente - {{ ucfirst($itemTipo) }}</title>
+    <title>Nueva Revision Pendiente - {{ ucfirst($itemTipo) }}</title>
     <style>
         /* Estilos generales para el cuerpo del correo */
         body {
@@ -19,14 +19,14 @@
             /* Puede que necesites un wrapper adicional o una tabla si el cliente de correo lo ignora */
         }
 
-        /* Contenedor principal del correo, que ahora tendrá su propio fondo blanco explícito */
+        /* Contenedor principal del correo, que ahora tendra su propio fondo blanco explicito */
         .container {
             max-width: 600px;
             margin: 20px auto;
             padding: 20px 30px;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
-            background-color: #FFFFFF; /* Fondo blanco explícito para el contenido */
+            background-color: #FFFFFF; /* Fondo blanco explicito para el contenido */
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
@@ -40,7 +40,7 @@
             border-bottom: 1px solid #eee;
         }
 
-        /* Párrafos de texto */
+        /* Parrafos de texto */
         p {
             margin-bottom: 15px;
             font-size: 15px;
@@ -100,19 +100,19 @@
 
         /* Contenedor del icono, centrado y con espacio */
         .icon-container {
-            text-align: center; /* Asegura que la imagen esté centrada */
+            text-align: center; /* Asegura que la imagen este centrada */
             margin-bottom: 15px;
         }
 
         /* Estilo para el logo */
         .logo-img {
-            max-width: 150px; /* Tamaño máximo del logo */
+            max-width: 150px; /* Tamano maximo del logo */
             height: auto;    /* Mantener proporciones */
             display: inline-block; /* Asegura que se centre con text-align: center */
-            /* Eliminar opacity-90 que podría hacerla menos visible */
+            /* Eliminar opacity-90 que podria hacerla menos visible */
         }
 
-        /* Estilo para el botón de acción */
+        /* Estilo para el boton de accion */
         .button {
             display: inline-block;
             background-color: #6C5CE7;
@@ -131,7 +131,7 @@
             background-color: #5849C9;
         }
 
-        /* Pie de página */
+        /* Pie de pagina */
         .footer {
             margin-top: 40px;
             text-align: center;
@@ -157,11 +157,11 @@
                         <div class="icon-container">
                             <img src="{{ url('/images/cultivasena.svg') }}" alt="Logo Cultiva Sena" class="logo-img" style="max-width: 150px; height: auto; display: block; margin: 0 auto;">
                         </div>
-                        <h2>¡Nueva Revisión Pendiente!</h2>
-                        <p>Un nuevo elemento ha sido registrado y está esperando tu atención.</p>
+                        <h2>¡Nueva Revision Pendiente!</h2>
+                        <p>Un nuevo elemento ha sido registrado y esta esperando tu atencion.</p>
                     </div>
 
-                    <p>Tienes un nuevo elemento de tipo **{{ ucfirst($itemTipo) }}** pendiente de revisión.</p>
+                    <p>Tienes un nuevo elemento de tipo **{{ ucfirst($itemTipo) }}** pendiente de revision.</p>
 
                     <p><strong>Detalles Clave del {{ strtolower($itemTipo) }}:</strong></p>
                     <ul>
@@ -179,8 +179,8 @@
 
                     <p>Por favor, ingresa al sistema para revisar a fondo este elemento y gestionar su estado.</p>
                     <p style="text-align: center;">
-                        {{-- Condicionalmente dirige al usuario según el tipo de ítem --}}
-                        @if ($itemTipo === 'Boletín')
+                        {{-- Condicionalmente dirige al usuario segun el tipo de item --}}
+                        @if ($itemTipo === 'Boletin')
                             <a href="{{ route('pendientes.boletines.index') }}" class="button">
                                 Ir a Boletines Pendientes
                             </a>
@@ -189,7 +189,7 @@
                                 Ir a Productos Pendientes
                             </a>
                         @else
-                            {{-- Fallback si no es ni boletín ni producto --}}
+                            {{-- Fallback si no es ni boletin ni producto --}}
                             <a href="{{ route('dashboard') }}" class="button">
                                 Ir a la Plataforma
                             </a>

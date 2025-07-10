@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('Restablecer Contraseña - Cultiva SENA') }}</title>
+    <title>{{ __('Restablecer Contrasena - Cultiva SENA') }}</title>
     <style>
-        /* Estilos básicos para compatibilidad de email. Tailwind no funciona directamente aquí sin post-procesamiento. */
+        /* Estilos basicos para compatibilidad de email. Tailwind no funciona directamente aqui sin post-procesamiento. */
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
@@ -13,7 +13,7 @@
             margin: 0;
             padding: 0;
             /* Degradado para el fondo del body */
-            background: linear-gradient(to bottom, #A8E61D, #4CAF50); /* Verde claro a verde más oscuro */
+            background: linear-gradient(to bottom, #A8E61D, #4CAF50); /* Verde claro a verde mas oscuro */
             background-color: #4CAF50; /* Color de fallback para clientes que no soportan degradados */
         }
         .container {
@@ -30,7 +30,7 @@
             border-bottom: 1px solid #eeeeee;
         }
         .header img {
-            max-width: 150px; /* Ajusta el tamaño de tu logo */
+            max-width: 150px; /* Ajusta el tamano de tu logo */
             height: auto;
         }
         .header h1 {
@@ -47,7 +47,7 @@
         }
         .button {
             display: inline-block;
-            background-color: #39A900; /* Color principal del botón */
+            background-color: #39A900; /* Color principal del boton */
             color: #ffffff !important; /* !important para asegurar el color de texto */
             padding: 12px 25px;
             text-decoration: none;
@@ -71,9 +71,9 @@
 <body>
     <div class="container">
         <div class="header">
-            {{-- Puedes usar un logo aquí --}}
+            {{-- Puedes usar un logo aqui --}}
             <img src="{{ asset('images/logo-cultiva-sena.png') }}" alt="Cultiva SENA Logo">
-            <h1>{{ __('Restablecimiento de Contraseña') }}</h1>
+            <h1>{{ __('Restablecimiento de Contrasena') }}</h1>
         </div>
 
         <div class="content">
@@ -82,7 +82,7 @@
                 $saludo = '';
 
                 if ($currentHour >= 5 && $currentHour < 12) {
-                    $saludo = 'Buenos días';
+                    $saludo = 'Buenos dias';
                 } elseif ($currentHour >= 12 && $currentHour < 19) {
                     $saludo = 'Buenas tardes';
                 } else {
@@ -91,15 +91,15 @@
             @endphp
 
             <p>{{ $saludo }} **{{ $user->name ?? 'Usuario' }}**,</p>
-            <p>{{ __('Estás recibiendo este correo porque hemos recibido una solicitud de restablecimiento de contraseña para tu cuenta.') }}</p>
+            <p>{{ __('Estas recibiendo este correo porque hemos recibido una solicitud de restablecimiento de contrasena para tu cuenta.') }}</p>
 
             <div class="button-container">
-                <a href="{{ $url }}" class="button">{{ __('Restablecer Contraseña') }}</a>
+                <a href="{{ $url }}" class="button">{{ __('Restablecer Contrasena') }}</a>
             </div>
 
-            <p>{{ __('Este enlace de restablecimiento de contraseña expirará en :count minutos.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]) }}</p>
+            <p>{{ __('Este enlace de restablecimiento de contrasena expirara en :count minutos.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]) }}</p>
 
-            <p>{{ __('Si no solicitaste un restablecimiento de contraseña, no se requiere ninguna acción adicional.') }}</p>
+            <p>{{ __('Si no solicitaste un restablecimiento de contrasena, no se requiere ninguna accion adicional.') }}</p>
         </div>
 
         <div class="footer">

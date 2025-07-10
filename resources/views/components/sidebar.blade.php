@@ -3,7 +3,7 @@
     class="h-full flex flex-col transition-all duration-1000 bg-[#00304D] text-white flex-shrink-0 overflow-y-auto overflow-x-hidden">
 
     <div class="flex items-center justify-between px-4 py-3">
-        {{-- Logo + botón de colapsar --}}
+        {{-- Logo + boton de colapsar --}}
         <div class="flex items-center shrink-0" :class="!sidebarOpen && 'justify-center w-full'">
             <a href="{{ route('dashboard') }}">
                 <x-application-mark class="block w-auto h-9" />
@@ -96,17 +96,17 @@
 
     <nav class="flex-1 px-6 pt-4 space-y-2 mt-40">
         <div class="px-2 space-y-2">
-            {{-- Separar la navegación principal de los ajustes --}}
+            {{-- Separar la navegacion principal de los ajustes --}}
             <div x-show="sidebarOpen" x-transition class="px-7 py-2 text-sm text-[var(--color-ajustes)] mt-8">
                 {{ __('Ajustes') }}
             </div>
 
-            {{-- Gestión de Usuarios (el div con x-data que contiene el botón y el menú) --}}
-            {{-- Este div ya no necesita ser 'relative' para el menú desplegable si usamos 'fixed' --}}
+            {{-- Gestion de Usuarios (el div con x-data que contiene el boton y el menu) --}}
+            {{-- Este div ya no necesita ser 'relative' para el menu desplegable si usamos 'fixed' --}}
             <div x-data="{ userMenuOpen: false }" class="px-2 space-y-2">
                 @canany(['crear usuario'])
                     <a href="#" @click.prevent="userMenuOpen = !userMenuOpen" x-ref="userMenuButton"
-                        {{-- Añadir una referencia para Alpine.js --}}
+                        {{-- Anadir una referencia para Alpine.js --}}
                         :class="sidebarOpen
                             ?
                             '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[14px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
@@ -118,29 +118,29 @@
                                 class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('usuarios.index') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
                                 {{ __('Gestion de usuarios') }}
                             </span>
-                            {{-- Icono de flecha para indicar que es un menú desplegable --}}
+                            {{-- Icono de flecha para indicar que es un menu desplegable --}}
                             <img src="{{ asset('images/abrir-menu-2.svg') }}" class="w-3 h-4 ml-2"
                                 alt="icono de abrir-menu" x-show="sidebarOpen" :class="userMenuOpen ? '-rotate-90' : ''">
                         </div>
                     </a>
                 @endcanany
 
-                {{-- Menú desplegable --}}
+                {{-- Menu desplegable --}}
                 <div x-show="userMenuOpen" @click.away="userMenuOpen = false"
                     x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
                     x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75"
                     x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                     x-init="$watch('userMenuOpen', (value) => {
                         if (value) {
-                            {{-- Calcular la posición solo cuando se abre --}}
+                            {{-- Calcular la posicion solo cuando se abre --}}
                             $nextTick(() => {
                                 const buttonRect = $refs.userMenuButton.getBoundingClientRect();
                                 $el.style.top = `${buttonRect.top - 8}px`;
                                 $el.style.left = `${buttonRect.right + 8}px`; // Ajusta el '8' si es necesario
                             });
                         } else {
-                            {{-- Cuando se cierra, permitir que la transición use las últimas posiciones calculadas --}}
-                            {{-- No limpiamos el style inmediatamente, Alpine.js se encargará de ocultarlo --}}
+                            {{-- Cuando se cierra, permitir que la transicion use las ultimas posiciones calculadas --}}
+                            {{-- No limpiamos el style inmediatamente, Alpine.js se encargara de ocultarlo --}}
                         }
                     });" class="fixed z-50 w-auto bg-white rounded-xl shadow-2xl py-2">
 
@@ -213,7 +213,7 @@
                 </div>
             </a>
 
-            {{-- Cerrar Sesión --}}
+            {{-- Cerrar Sesion --}}
             <form method="POST" action="{{ route('logout') }}" class="mt-auto">
                 @csrf
                 <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();"
@@ -222,10 +222,10 @@
                         'flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
                         'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                     <div class="flex items-center w-full transition-all duration-300 ease-in-out">
-                        <img src="{{ asset('images/off.svg') }}" class="w-4 h-4" alt="Cerrar Sesión">
+                        <img src="{{ asset('images/off.svg') }}" class="w-4 h-4" alt="Cerrar Sesion">
                         <span x-show="sidebarOpen" x-transition
                             class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
-                            {{ __('Cerrar sesión') }}
+                            {{ __('Cerrar sesion') }}
                         </span>
                     </div>
                 </a>

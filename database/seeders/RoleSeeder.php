@@ -14,16 +14,16 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        // Importante: Reiniciar la caché de permisos de Spatie.
+        // Importante: Reiniciar la cache de permisos de Spatie.
         // Esto asegura que cualquier cambio en roles o permisos se refleje inmediatamente.
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // --- 1. Definir TODOS los Permisos del sistema ---
-        // Se definen todos los permisos posibles que existiran en tu aplicación.
+        // Se definen todos los permisos posibles que existiran en tu aplicacion.
         // Esto es crucial porque todos los permisos deben existir antes de asignarlos a roles.
         $allSystemPermissions = [
 
-            // Permisos para el Módulo de Gestión de Usuarios
+            // Permisos para el Modulo de Gestion de Usuarios
             'crear usuario',
             'editar usuario',
 
@@ -36,17 +36,17 @@ class RoleSeeder extends Seeder
             // Permisos para Boletines (Validar/Rechazar)
             'validar boletin',
 
-            // Permisos para el Módulo de Cultivos
+            // Permisos para el Modulo de Cultivos
             'crear producto',
             'editar producto',
             'eliminar producto',
 
-            // Permisos para el Módulo de Noticias 
+            // Permisos para el Modulo de Noticias 
             'crear noticia',
             'editar noticia',
             'eliminar noticia',
 
-            // Permisos para el Módulo de Boletines
+            // Permisos para el Modulo de Boletines
             'crear boletin',
             'editar boletin',
             'eliminar boletin',
@@ -65,36 +65,36 @@ class RoleSeeder extends Seeder
         $superAdminRole = Role::firstOrCreate(['name' => 'SuperAdmin', 'guard_name' => 'web']);
         $superAdminRole->givePermissionTo(Permission::all()); // Le damos todos los permisos existentes en el sistema
 
-        // Rol: Administrador - Con permisos básicos por defecto según tu especificación
+        // Rol: Administrador - Con permisos basicos por defecto segun tu especificacion
         $adminRole = Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => 'web']);
         $adminRole->givePermissionTo([
             'crear producto',
             'crear usuario',
         ]);
 
-        // Rol: Operario - Con permisos básicos por defecto según tu especificación
+        // Rol: Operario - Con permisos basicos por defecto segun tu especificacion
         $operarioRole = Role::firstOrCreate(['name' => 'Operario', 'guard_name' => 'web']);
         $operarioRole->givePermissionTo([
             'crear noticia',
         ]);
 
-        // Rol: Funcionario - Con permisos básicos por defecto según tu especificación
+        // Rol: Funcionario - Con permisos basicos por defecto segun tu especificacion
         $funcionarioRole = Role::firstOrCreate(['name' => 'Funcionario', 'guard_name' => 'web']);
         $funcionarioRole->givePermissionTo([
             'crear boletin',
         ]);
 
         // --- 4. Crear o Actualizar Usuario SuperAdmin y Asignar Rol ---
-        // Este usuario será el punto de entrada inicial para gestionar el sistema.
+        // Este usuario sera el punto de entrada inicial para gestionar el sistema.
         $superAdminUser = User::firstOrCreate(
-            ['email' => 'super@admin.com'], // Condición de búsqueda: Email único
+            ['email' => 'super@admin.com'], // Condicion de busqueda: Email unico
             [ // Datos a crear si no se encuentra
                 'name'              => 'SuperAdmin', // Nombre descriptivo
                 'lastname'          => 'SuperAdministrador',
                 'phone'             => '3156489578',
                 'type_document'     => 'CC',
                 'document'          => '1000000000',
-                'password'          => Hash::make('SuperAdmin_2025!'), // Contraseña segura
+                'password'          => Hash::make('SuperAdmin_2025!'), // Contrasena segura
                 'email_verified_at' => now(), // Marca el correo como verificado
             ]
         );

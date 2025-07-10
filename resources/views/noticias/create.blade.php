@@ -24,7 +24,7 @@
                 <select name="tipo" id="tipo"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('tipo') border-red-500 @enderror">
                     <option value="">Seleccione un tipo</option>
-                    <option value="café" {{ old('tipo') == 'café' ? 'selected' : '' }}>Café</option>
+                    <option value="cafe" {{ old('tipo') == 'cafe' ? 'selected' : '' }}>Cafe</option>
                     <option value="mora" {{ old('tipo') == 'mora' ? 'selected' : '' }}>Mora</option>
                 </select>
                 @error('tipo')
@@ -32,10 +32,10 @@
                 @enderror
             </div>
 
-            <!-- Campo: Título (Requerido) -->
+            <!-- Campo: Titulo (Requerido) -->
             <div class="mb-4">
                 <label for="titulo" class="block text-gray-700 text-sm font-bold mb-2">
-                    Título: <span class="text-red-500">*</span>
+                    Titulo: <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="titulo" id="titulo"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('titulo') border-red-500 @enderror"
@@ -83,10 +83,10 @@
                 @enderror
             </div>
 
-            <!-- Campo: Información (Requerido) -->
+            <!-- Campo: Informacion (Requerido) -->
             <div class="mb-4">
                 <label for="informacion" class="block text-gray-700 text-sm font-bold mb-2">
-                    Información: <span class="text-red-500">*</span>
+                    Informacion: <span class="text-red-500">*</span>
                 </label>
                 <textarea name="informacion" id="informacion" rows="5"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('informacion') border-red-500 @enderror">{{ old('informacion') }}</textarea>
@@ -95,10 +95,10 @@
                 @enderror
             </div>
 
-            <!-- Campo: Número de Página (Requerido) -->
+            <!-- Campo: Numero de Pagina (Requerido) -->
             <div class="mb-4">
                 <label for="numero_pagina" class="block text-gray-700 text-sm font-bold mb-2">
-                    Número de página: <span class="text-red-500">*</span>
+                    Numero de pagina: <span class="text-red-500">*</span>
                 </label>
                 <input type="number" name="numero_pagina" id="numero_pagina"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('numero_pagina') border-red-500 @enderror"

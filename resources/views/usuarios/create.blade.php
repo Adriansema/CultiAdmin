@@ -19,7 +19,7 @@
                 <div class="flex items-center justify-center mb-8">
                     <div class="flex items-center text-gray-700">
                         <img src="{{ asset('images/1_Dpaso.svg') }}" alt="paso 1" class="w-7 h-10 mr-2">
-                        <span class="font-semibold">Datos básicos</span>
+                        <span class="font-semibold">Datos basicos</span>
                     </div>
                     <div class="mx-4 text-gray-400">
                         <img src="{{ asset('images/medio_1_2.svg') }}" alt="flecha" class="w-2 h-3 mr-2"> 
@@ -41,9 +41,9 @@
                                     class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none focus:outline-none">
                                     &times;
                                 </button>
-                                <img src="{{ asset('images/check.svg') }}" alt="Icono de éxito"
+                                <img src="{{ asset('images/check.svg') }}" alt="Icono de exito"
                                     class="mx-auto h-24 w-24 mb-4">
-                                <h2 class="text-2xl font-bold text-green-600 mb-4">¡Éxito!</h2>
+                                <h2 class="text-2xl font-bold text-green-600 mb-4">¡exito!</h2>
                                 <p class="text-gray-700 text-base">
                                     {{ session('success') }}
                                 </p>
@@ -115,9 +115,9 @@
                                 {{ old('type_document') ? 'text-gray-900' : 'text-gray-500' }}" 
                                 onchange="this.className = this.value ? 'w-full px-3 py-2 text-sm border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900' : 'w-full px-3 py-2 text-sm border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-500'">
                                 <option value="">Seleccione el tipo de documento</option> 
-                                <option value="CC" {{ old('type_document') == 'CC' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                                <option value="CC" {{ old('type_document') == 'CC' ? 'selected' : '' }}>Cedula de Ciudadania</option>
                                 <option value="TI" {{ old('type_document') == 'TI' ? 'selected' : '' }}>Tarjeta de Identidad</option>
-                                <option value="CE" {{ old('type_document') == 'CE' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                                <option value="CE" {{ old('type_document') == 'CE' ? 'selected' : '' }}>Cedula de Extranjeria</option>
                                 <option value="NIT" {{ old('type_document') == 'NIT' ? 'selected' : '' }}>NIT</option>
                             </select>
                             @error('type_document')

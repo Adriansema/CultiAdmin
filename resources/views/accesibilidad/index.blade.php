@@ -4,7 +4,7 @@
     <div class="inline-block px-20 py-6">
         <div class="flex items-center space-x-4">
             <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono">
-            <h1 class="text-3xl whitespace-nowrap font-bold">Accesibilidad de la aplicación</h1>
+            <h1 class="text-3xl whitespace-nowrap font-bold">Accesibilidad de la aplicacion</h1>
         </div>
         <div class="py-2">
             {!! Breadcrumbs::render('accesibilidad.index') !!}
@@ -20,7 +20,7 @@
 
             <div class="mt-8 space-y-4">
 
-                <!-- Botón para Contraste Alto -->
+                <!-- Boton para Contraste Alto -->
                 <div>
                     <button id="toggle-contrast"
                         class="px-4 py-2 text-white bg-gray-800 rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -29,19 +29,19 @@
                     </button>
                 </div>
 
-                <!-- Botón para Aumentar Fuente -->
+                <!-- Boton para Aumentar Fuente -->
                 <div class="flex items-center justify-center space-x-4">
                     <button id="increase-font"
                         class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Aumentar Tamaño de Fuente
+                        Aumentar Tamano de Fuente
                     </button>
                     <button id="decrease-font"
                         class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Disminuir Tamaño de Fuente
+                        Disminuir Tamano de Fuente
                     </button>
                 </div>
 
-                <!-- Botón para Modo Oscuro -->
+                <!-- Boton para Modo Oscuro -->
                 <div>
                     <button id="toggle-dark-mode"
                         class="px-4 py-2 text-white bg-black rounded hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">

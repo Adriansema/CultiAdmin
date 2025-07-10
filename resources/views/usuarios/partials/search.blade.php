@@ -2,20 +2,20 @@
 
 <div class="relative flex items-center w-full max-w-xl">
     <input type="text"
-           id="SearchUser" {{-- Confirma que este es el ID correcto para tu input de búsqueda de usuarios --}}
+           id="SearchUser" {{-- Confirma que este es el ID correcto para tu input de busqueda de usuarios --}}
            name="q"
            placeholder="Buscar usuario"
            class="form-control border border-[var(--color-ajustes)] hover:border-[var(--color-hover)] rounded-2xl pr-10 py-3 w-full
                   focus:border-[var(--color-hover)] focus:outline-none focus:ring-0"
            value="{{ request('q') }}" />
 
-    {{-- Ícono de Lupa (search.svg) --}}
+    {{-- Icono de Lupa (search.svg) --}}
     <img src="{{ asset('images/search.svg') }}"
          id="searchIcon" {{-- CRUCIAL: Este ID es usado en JS --}}
          class="w-6 h-5 absolute right-3 top-1/2 -translate-y-1/2 {{ request('q') ? 'hidden' : '' }}"
-         alt="icono de búsqueda">
+         alt="icono de busqueda">
 
-    {{-- Contenedor del ícono de Borrar (Equis.svg / Equis-Hover.svg) --}}
+    {{-- Contenedor del Icono de Borrar (Equis.svg / Equis-Hover.svg) --}}
     <div id="clearIconContainer" {{-- CRUCIAL: Este ID es usado en JS --}}
          class="w-4 h-5 absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer group {{ request('q') ? '' : 'hidden' }}">
         <img src="{{ asset('images/Equis.svg') }}"

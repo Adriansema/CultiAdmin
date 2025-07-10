@@ -141,12 +141,12 @@
                 Estamos para ayudarte.
             </p>
 
-            <p>Gracias por ser parte de este cultivo digital 🌿</p>
+            <p>Gracias por ser parte de este cultivo digital</p>
         </div>
 
         <div class="footer">
-            <p>— El equipo de Cultiva Sena</p>
-            <p><em>🛡️ Este mensaje es confidencial. No compartas tu contraseña con nadie. Si sospechas de un acceso no
+            <p>El equipo de Cultiva Sena</p>
+            <p><em>Este mensaje es confidencial. No compartas tu contraseña con nadie. Si sospechas de un acceso no
                     autorizado, contáctanos de inmediato.</em></p>
             <p>&copy; {{ date('Y') }} Cultiva Sena. Todos los derechos reservados.</p>
         </div>

@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Models\User; // Asegúrate de que esta es la ruta correcta a tu modelo User
+use App\Models\User; // Asegurate de que esta es la ruta correcta a tu modelo User
 use Illuminate\Support\Facades\Log; // Importa la fachada Log
 
 class SimulateVisitsFromUsersSeeder extends Seeder
@@ -15,9 +15,9 @@ class SimulateVisitsFromUsersSeeder extends Seeder
      *
      * @return void
      */
-    public function run(): void // Asegúrate de que es `void` o no tiene `return` si solo hace inserts.
+    public function run(): void // Asegurate de que es `void` o no tiene `return` si solo hace inserts.
     {
-        Log::info('SimulateVisitsFromUsersSeeder: Iniciando ejecución del seeder.');
+        Log::info('SimulateVisitsFromUsersSeeder: Iniciando ejecucion del seeder.');
 
         try {
             // Opcional: Vaciar la tabla visits antes de insertar nuevos datos simulados
@@ -28,7 +28,7 @@ class SimulateVisitsFromUsersSeeder extends Seeder
         } catch (\Throwable $e) {
             $this->command->error('Error al truncar la tabla visits: ' . $e->getMessage());
             Log::error('SimulateVisitsFromUsersSeeder: Error al truncar visits. ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return; // Detener la ejecución si no se puede truncar
+            return; // Detener la ejecucion si no se puede truncar
         }
 
         try {
@@ -37,21 +37,21 @@ class SimulateVisitsFromUsersSeeder extends Seeder
             Log::info('SimulateVisitsFromUsersSeeder: Total de usuarios encontrados: ' . $users->count());
 
             if ($users->isEmpty()) {
-                $this->command->warn('No se encontraron usuarios en la tabla users. No se simularán visitas.');
+                $this->command->warn('No se encontraron usuarios en la tabla users. No se simularan visitas.');
                 Log::warning('SimulateVisitsFromUsersSeeder: No hay usuarios para simular visitas.');
                 return; // No hay usuarios, salir del seeder
             }
 
             $insertedCount = 0;
             foreach ($users as $user) {
-                // Simular 1 a 3 visitas para cada usuario, cerca de su fecha de registro o último login.
+                // Simular 1 a 3 visitas para cada usuario, cerca de su fecha de registro o ultimo login.
                 $baseDate = $user->created_at ?? Carbon::now()->subDays(rand(0, 30)); // Fecha base para la visita
 
                 for ($i = 0; $i < rand(1, 3); $i++) {
                     try {
                         DB::table('visits')->insert([
-                            'user_id'    => $user->id, // Coincide con 'user id' de tu tabla (¡con espacio!)
-                            'page'       => '/simulated/page/' . rand(1, 10), // Ruta de página simulada
+                            'user_id'    => $user->id, // Coincide con 'user id' de tu tabla (!con espacio!)
+                            'page'       => '/simulated/page/' . rand(1, 10), // Ruta de pagina simulada
                             'ip'         => '192.168.' . rand(0, 255) . '.' . rand(0, 255), // Coincide con 'ip'
                             'created_at' => $baseDate->copy()->addMinutes(rand(0, 1440)), // Fecha y hora de la visita
                         ]);
@@ -63,11 +63,11 @@ class SimulateVisitsFromUsersSeeder extends Seeder
                 }
             }
 
-            $this->command->info('Simulación de visitas completada. Se insertaron ' . $insertedCount . ' registros en la tabla visits.');
-            Log::info('SimulateVisitsFromUsersSeeder: Simulación completada. Registros insertados: ' . $insertedCount);
+            $this->command->info('Simulacion de visitas completada. Se insertaron ' . $insertedCount . ' registros en la tabla visits.');
+            Log::info('SimulateVisitsFromUsersSeeder: Simulacion completada. Registros insertados: ' . $insertedCount);
 
         } catch (\Throwable $e) {
-            $this->command->error('Error inesperado durante la simulación de visitas: ' . $e->getMessage());
+            $this->command->error('Error inesperado durante la simulacion de visitas: ' . $e->getMessage());
             Log::error('SimulateVisitsFromUsersSeeder: Error inesperado. ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
         }
     }

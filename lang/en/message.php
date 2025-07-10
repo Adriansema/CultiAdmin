@@ -3,9 +3,9 @@
 return [
     "ManageAccount"=> "Manage acount :user",
     "Profile"=> "Perfil",
-    "LogOut"=> "Cerrar Sesión",
-    "CRUD"=> "Gestión",
-    "Information"=> "Información",
+    "LogOut"=> "Cerrar Sesion",
+    "CRUD"=> "Gestion",
+    "Information"=> "Informacion",
     "Boletines"=> "Boletines",
     "Comentarios"=> "Comentarios",
     "Clients"=> "Clientes",
