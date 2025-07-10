@@ -155,6 +155,10 @@ class UsuarioController extends Controller
                 $user->syncPermissions([]);
             }
 
+            dd([
+                'user' => $user,
+                'password' => $request->password
+            ]);
             // Enviar notificacion por correo con la contrasena en texto plano
             Mail::to($user->email)->send(new UserCreatedNotification($user, $request->password));
 

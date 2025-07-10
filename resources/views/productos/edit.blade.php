@@ -43,7 +43,7 @@
                     @enderror
                 </div>
 
-                {{-- Nuevo div para agrupar Imagen y Observaciones (solo para café/mora) --}}
+                {{-- Nuevo div para agrupar Imagen y Observaciones (solo para cafe/mora) --}}
                 <div id="campos_comunes_no_video_edit">
                     <div class="mb-4">
                         <label for="imagen" class="block text-gray-700 text-sm font-bold mb-2">Imagen Actual:</label>
@@ -62,7 +62,7 @@
                     </div>
                 </div>
 
-                {{-- Campo RutaVideo para productos tipo Café o mora (producto general) --}}
+                {{-- Campo RutaVideo para productos tipo cafe o mora (producto general) --}}
                 <div id="campos_ruta_video_producto" class="hidden mt-6 pt-4 border-t border-gray-200">
                     <div class="mb-4">
                         <label for="rutavideo" class="block text-gray-700 text-sm font-bold mb-2">URL del video</label>
@@ -76,10 +76,10 @@
                     </div>
                 </div>
 
-                {{-- Campos específicos para Café --}}
-                @if ($producto->tipo === 'café')
+                {{-- Campos específicos para cafe --}}
+                @if ($producto->tipo === 'cafe')
                     <div id="campos_cafe" class="mt-6 pt-4 border-t border-gray-200">
-                        <h2 class="text-xl font-semibold mb-3">Detalles de café</h2>
+                        <h2 class="text-xl font-semibold mb-3">Detalles de cafe</h2>
                         <div class="mb-4">
                             <label for="cafe_data_numero_pagina" class="block text-gray-700 text-sm font-bold mb-2">Número de
                                 página:</label>
@@ -101,7 +101,7 @@
                         </div>
                         <div class="mb-4">
                             <label for="cafe_data_informacion" class="block text-gray-700 text-sm font-bold mb-2">Información de
-                                café:</label>
+                                cafe:</label>
                             <textarea name="cafe_data[informacion]" id="cafe_data_informacion" rows="5"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('cafe_data.informacion', $producto->cafe->informacion ?? '') }}</textarea>
                             @error('cafe_data.informacion')
@@ -693,7 +693,7 @@
             );
 
             /**
-             * Muestra/oculta los campos específicos del producto (Café, Mora, Videos)
+             * Muestra/oculta los campos específicos del producto (cafe, Mora, Videos)
              * y el campo RutaVideo del producto general.
              */
             function toggleProductFields() {
@@ -713,12 +713,12 @@
                     field.classList.add('hidden');
                 });
 
-                if (selectedType === 'café') {
+                if (selectedType === 'cafe') {
                     if (camposComunesNoVideoEdit) camposComunesNoVideoEdit.classList.remove(
-                        'hidden'); // Mostrar para Café
+                        'hidden'); // Mostrar para cafe
                     if (camposCafe) camposCafe.classList.remove('hidden');
                     if (camposRutaVideoproducto) camposRutaVideoproducto.classList.remove(
-                        'hidden'); // Mostrar RutaVideo para Café
+                        'hidden'); // Mostrar RutaVideo para cafe
                 } else if (selectedType === 'mora') {
                     if (camposComunesNoVideoEdit) camposComunesNoVideoEdit.classList.remove(
                         'hidden'); // Mostrar para Mora

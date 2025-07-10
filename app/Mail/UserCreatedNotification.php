@@ -50,6 +50,7 @@ class UserCreatedNotification extends Mailable
             with: [
                 'user' => $this->user, 
                 'userName' => $this->user->name, 
+                'userEmail' => $this->user->email,
                 'appName' => $this->appName,
                 'generatedPassword' => $this->generatedPassword,
             ],

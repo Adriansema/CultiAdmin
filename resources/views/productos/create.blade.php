@@ -24,7 +24,7 @@
                 <select name="tipo" id="tipo"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('tipo') border-red-500 @else border-gray-300 @enderror">
                     <option value="">Seleccione un tipo</option>
-                    <option value="café" {{ old('tipo') == 'café' ? 'selected' : '' }}>Café</option>
+                    <option value="cafe" {{ old('tipo') == 'cafe' ? 'selected' : '' }}>cafe</option>
                     <option value="mora" {{ old('tipo') == 'mora' ? 'selected' : '' }}>Mora</option>
                     <option value="videos" {{ old('tipo') == 'videos' ? 'selected' : '' }}>Video</option>
                 </select>
@@ -47,7 +47,7 @@
                 </div>
             </div>
 
-            {{-- Campo rutavideo para productos tipo Café o Mora --}}
+            {{-- Campo rutavideo para productos tipo cafe o Mora --}}
             <div id="campos_ruta_video_producto" class="hidden">
                 <div class="mb-4">
                     <label for="rutavideo" class="block text-gray-700 text-sm font-bold mb-2">URL del video (Producto
@@ -61,9 +61,9 @@
                 </div>
             </div>
 
-            {{-- Campos específicos para Café --}}
+            {{-- Campos específicos para cafe --}}
             <div id="campos_cafe" class="hidden mt-6 pt-4 border-t border-gray-200">
-                <h2 class="text-xl font-semibold mb-3">Detalles de café</h2>
+                <h2 class="text-xl font-semibold mb-3">Detalles de cafe</h2>
                 <div class="mb-4">
                     <label for="cafe_data_numero_pagina" class="block text-gray-700 text-sm font-bold mb-2">
                         Número de página: <span class="text-red-500">*</span>
@@ -89,7 +89,7 @@
 
                 <div class="mb-4">
                     <label for="cafe_data_informacion" class="block text-gray-700 text-sm font-bold mb-2">Información de
-                        café: <span class="text-red-500">*</span></label>
+                        cafe: <span class="text-red-500">*</span></label>
                     <textarea name="cafe_data[informacion]" id="cafe_data_informacion" rows="5"
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('cafe_data.informacion') }}</textarea>
                     @error('cafe_data.informacion')
@@ -661,7 +661,7 @@
             );
 
             /**
-             * Muestra/oculta los campos específicos del producto (Café, Mora, Videos)
+             * Muestra/oculta los campos específicos del producto (cafe, Mora, Videos)
              * y el campo RutaVideo del producto general.
              */
             function toggleProductFields() {
@@ -682,10 +682,10 @@
                 });
 
 
-                if (selectedType === 'café') {
-                    camposComunesNoVideo.classList.remove('hidden'); // Mostrar para Café
+                if (selectedType === 'cafe') {
+                    camposComunesNoVideo.classList.remove('hidden'); // Mostrar para cafe
                     camposCafe.classList.remove('hidden');
-                    camposRutaVideoProducto.classList.remove('hidden'); // Mostrar RutaVideo para Café
+                    camposRutaVideoProducto.classList.remove('hidden'); // Mostrar RutaVideo para cafe
                 } else if (selectedType === 'mora') {
                     camposComunesNoVideo.classList.remove('hidden'); // Mostrar para Mora
                     camposMora.classList.remove('hidden');
