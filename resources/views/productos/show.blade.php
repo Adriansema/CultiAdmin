@@ -29,7 +29,7 @@
 
         {{-- Sección de Información General --}}
         <h2 class="pb-4 mb-8 text-3xl font-extrabold text-center text-gray-800 border-b-2 border-gray-200">
-            Información General del Producto
+            Información general del producto
         </h2>
 
         <div class="grid grid-cols-1 mb-10 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-6"> {{-- Grid más flexible --}}
@@ -62,8 +62,8 @@
             </div>
 
             {{-- Observaciones Generales (solo para Café o Mora) --}}
-      
-            @if (($producto->tipo === 'café' || $producto->tipo === 'mora') && ($producto->estado === 'aprobado' ||
+
+            @if (($producto->tipo === 'cafe' || $producto->tipo === 'mora') && ($producto->estado === 'aprobado' ||
             $producto->estado === 'rechazado'))
             <div class="mt-4 md:col-span-2 lg:col-span-3">
                 <strong class="block mb-2 text-lg font-semibold text-gray-700">Observaciones:</strong>
