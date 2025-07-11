@@ -24,7 +24,8 @@
 
                     <div class="flex space-x-2 text-md font-semibold">
                         <button data-noticia-id="{{ $noticia->id_noticias }}"
-                            class="mark-as-read-btn text-[var(--color-textmarca)] hover:bg-[var(--color-hovermarca)] hover:text-white rounded-lg px-2 focus:outline-none">
+                            class="mark-as-read-btn text-[var(--color-textmarca)] hover:bg-[var(--color-hovermarca)] hover:text-white rounded-lg px-2 
+                            ocus:outline-none">
                             Marcar como leído
                         </button>
                         @if ($noticia && $noticia->id_noticias)

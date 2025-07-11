@@ -457,3 +457,61 @@ html {
 body.modal-open {
   overflow: hidden;
 }
+
+/* Estilos base para los botones de ordenación */
+.sort-icon-btn {
+  /* Elimina padding y margin por defecto del botón para mayor control */
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  /* Para centrar las imágenes dentro del botón */
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  /* Para evitar espacio extra */
+}
+
+/* Ajusta el margen entre los botones de flecha si es necesario */
+.flex-col .sort-icon-btn:first-child {
+  margin-bottom: -4px;
+  /* Ajusta este valor para acercar o separar las flechas */
+}
+
+/* Por defecto: icono normal visible, icono de hover oculto */
+.sort-icon-btn .normal-icon {
+  display: block;
+}
+
+.sort-icon-btn .hover-icon {
+  display: none;
+}
+
+/* Al hacer hover en el botón (si no está activo): icono normal oculto, icono de hover visible */
+.sort-icon-btn:not(.is-active):hover .normal-icon {
+  display: none;
+}
+
+.sort-icon-btn:not(.is-active):hover .hover-icon {
+  display: block;
+}
+
+/* Cuando el botón está activo (tiene la clase 'is-active'):
+       icono normal oculto, icono de hover visible (esto sobrescribe el comportamiento de hover) */
+.sort-icon-btn.is-active .normal-icon {
+  display: none;
+}
+
+.sort-icon-btn.is-active .hover-icon {
+  display: block;
+}
+
+/* Asegúrate de que el contenedor de los iconos no ocupe un espacio excesivo */
+th>div.flex.flex-col.ml-2 {
+  /* Establece un ancho fijo o máximo si es necesario para evitar que empuje */
+  /* max-width: 20px; /* Ejemplo: ajusta según el tamaño de tus iconos */
+  flex-shrink: 0;
+  /* Evita que este contenedor se encoja */
+}

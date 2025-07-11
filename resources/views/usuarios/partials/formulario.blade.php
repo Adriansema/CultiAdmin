@@ -618,7 +618,8 @@
         </div>
         <div class="flex justify-center mt-6">
             <button type="button" id="returnFromMissingDataModalButton"
-                class="btn-secondary px-4 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                class="btn-secondary px-4 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 
+                focus:ring-offset-2 focus:ring-indigo-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2 transform rotate-180"
                     viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd"

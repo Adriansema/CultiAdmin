@@ -2,10 +2,98 @@
      <table class="min-w-full text-md text-left">
          <thead class="bg-[var(--color-tabla)]">
              <tr>
-                 <th class="px-6 py-3 font-bold text-left text-gray-600">Rol</th>
-                 <th class="px-6 py-3 font-bold text-left text-gray-600">Nombre</th>
-                 <th class="px-6 py-3 font-bold text-left text-gray-600">Email</th>
-                 <th class="px-6 py-3 font-bold text-left text-gray-600">Estado</th>
+                 <th class="px-6 py-3 font-bold text-left text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <span>Rol</span>
+                        <div class="flex flex-col ml-2">
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="roles.name" data-sort-direction="asc">
+                                <img src="{{ asset('images/asce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                <img src="{{ asset('images/asce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon"
+                                    alt="Icono ascendente hover">
+                            </button>
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="roles.name" data-sort-direction="desc">
+                                <img src="{{ asset('images/desce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                <img src="{{ asset('images/desce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon"
+                                    alt="Icono descendente hover">
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <span>Nombre</span>
+                        <div class="flex flex-col ml-2">
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="name" data-sort-direction="asc">
+                                <img src="{{ asset('images/asce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                <img src="{{ asset('images/asce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon"
+                                    alt="Icono ascendente hover">
+                            </button>
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="name" data-sort-direction="desc">
+                                <img src="{{ asset('images/desce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                <img src="{{ asset('images/desce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon"
+                                    alt="Icono descendente hover">
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <span>Email</span>
+                        <div class="flex flex-col ml-2">
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="email" data-sort-direction="asc">
+                                <img src="{{ asset('images/asce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                <img src="{{ asset('images/asce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon"
+                                    alt="Icono ascendente hover">
+                            </button>
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="email" data-sort-direction="desc">
+                                <img src="{{ asset('images/desce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                <img src="{{ asset('images/desce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon"
+                                    alt="Icono descendente hover">
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <span>Estado</span>
+                        <div class="flex flex-col ml-2">
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="estado" data-sort-direction="asc">
+                                <img src="{{ asset('images/asce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                <img src="{{ asset('images/asce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon"
+                                    alt="Icono ascendente hover">
+                            </button>
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="estado" data-sort-direction="desc">
+                                <img src="{{ asset('images/desce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                <img src="{{ asset('images/desce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon"
+                                    alt="Icono descendente hover">
+                            </button>
+                        </div>
+                    </div>
+                </th>
              </tr>
          </thead>
 
@@ -77,7 +165,7 @@
                          </td>
 
                          <td class="px-6 py-4">
-                             {{ $usuario->name }}
+                             {{ $usuario->name }} {{ $usuario->lastname }}
                          </td>
 
                          <td class="px-6 py-4">

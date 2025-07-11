@@ -11,13 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\View; // Para la funcion view()
-use Illuminate\Support\Facades\Response; // Para la funcion response()
-use Illuminate\Support\Facades\Redirect; // Para la funcion redirect()
 use Illuminate\Database\QueryException; // Importar para manejar errores de base de datos
-use Carbon\Carbon; // Para la funcion now() (si la usas para obtener la fecha y hora actual)
 use Illuminate\Support\Str;
 
 class BoletinController extends Controller
@@ -29,10 +24,6 @@ class BoletinController extends Controller
 
         return view('boletines.index', compact('boletines'));
     }
-
-    // ELIMINADO: getFilteredBoletin ya no es necesario con el enfoque de recarga de pogina.
-    // ELIMINADO: getBoletinRowHtml ya no es necesario.
-    // ELIMINADO: getRowAndModalsHtml ya no es necesario.
 
     public function create()
     {

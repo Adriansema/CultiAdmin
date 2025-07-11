@@ -21,7 +21,7 @@ class BoletinService
         $text = mb_strtolower($text, 'UTF-8');
         $text = str_replace(
             ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ', 'Á', 'É', 'Í', 'Ó', 'Ú', 'Ü', 'Ñ'],
-            ['a', 'e', 'i', 'o', 'u', 'u', 'n', 'A', 'E', 'I', 'O', 'U', 'U', 'N'],
+            ['a', 'e', 'i', 'o', 'u', 'u', 'u', 'n', 'A', 'E', 'I', 'O', 'U', 'U', 'N'], // Corregido 'ñ' a 'n' en mayúscula
             $text
         );
         $text = preg_replace('/[^a-z0-9\s]/', '', $text);
@@ -42,11 +42,12 @@ class BoletinService
         // Esto es compatible con la paginación de Laravel que se renderiza en Blade.
         $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100])
             ? $request->input('per_page')
-            : 10;
+            : 9;
 
         $query  = $request->input('q');
         $estado = $request->input('estado');
-        $precio = $request->input('precio');
+        $sortBy        = $request->input('sort_by'); // Nuevo: columna para ordenar
+        $sortDirection = $request->input('sort_direction'); // Nuevo: dirección de ordenamiento
 
         $boletines = Boletin::query();
 
@@ -55,12 +56,9 @@ class BoletinService
             $cleanedQuery = $this->cleanSearchQuery($query);
 
             $boletines->where(function ($q2) use ($cleanedQuery, $query) {
-                // Búsqueda en 'nombre'
                 $q2->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(nombre), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '') LIKE ?", ['%' . $cleanedQuery . '%'])
-                   // Búsqueda en 'descripcion'
-                   ->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(descripcion), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '') LIKE ?", ['%' . $cleanedQuery . '%']);
+                    ->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(descripcion), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '') LIKE ?", ['%' . $cleanedQuery . '%']);
 
-                // Búsqueda por fecha de creación (created_at)
                 try {
                     $date = Carbon::parse($query);
                     $q2->orWhereDate('created_at', $date->toDateString());
@@ -75,31 +73,26 @@ class BoletinService
             $boletines->where('estado', $estado);
         }
 
-        // Ordenamiento por precios
-        if ($precio) {
-            switch ($precio) {
-                case 'precio_alto_desc':
-                    $boletines->orderBy('precio_mas_alto', 'desc');
-                    break;
-                case 'precio_alto_asc':
-                    $boletines->orderBy('precio_mas_alto', 'asc');
-                    break;
-                case 'precio_bajo_desc':
-                    $boletines->orderBy('precio_mas_bajo', 'desc');
-                    break;
-                case 'precio_bajo_asc':
-                    $boletines->orderBy('precio_mas_bajo', 'asc');
-                    break;
-            }
-        }
+        // Ordenamiento genérico por columna y dirección
+        $allowedSortColumns = [
+            'nombre',
+            'descripcion',
+            'created_at',
+            'estado',
+            'precio_mas_alto',
+            'precio_mas_bajo',
+        ];
 
-        // Ordenamiento por defecto si no hay un orden de precios específico
-        if (!$precio) {
+        $allowedSortDirections = ['asc', 'desc'];
+
+        if (in_array($sortBy, $allowedSortColumns) && in_array($sortDirection, $allowedSortDirections)) {
+            $boletines->orderBy($sortBy, $sortDirection);
+        } else {
+            // Ordenamiento por defecto si no hay un orden válido o si no se especifica
             $boletines->orderBy('created_at', 'desc');
         }
 
         // Cargar relaciones necesarias para las vistas de la tabla
-        // Asegúrate de que estas relaciones estén definidas en tu modelo Boletin.
         $boletines->with(['user.roles', 'validador', 'rechazador']);
 
         return $boletines->paginate($perPage)->withQueryString();

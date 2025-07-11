@@ -266,7 +266,7 @@ async function checkDuplicatesEarly(usersData) {
     formData.append('users_data', JSON.stringify(usersData));
 
     try {
-        const response = await fetch('/usuario/check-duplicates', { // NUEVA RUTA PARA VALIDAR DUPLICADOS
+        const response = await fetch('./usuario/check-duplicates', { // NUEVA RUTA PARA VALIDAR DUPLICADOS
             method: 'POST',
             body: formData,
             headers: {
@@ -603,14 +603,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const originalBtnText = confirmImportActionButton.innerHTML;
             confirmImportActionButton.disabled = true;
             // CAMBIO: 'Cargando...'
-            confirmImportActionButton.innerHTML = `Importando <img src="/images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">`;
+            confirmImportActionButton.innerHTML = `Importando <img src="./images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">`;
 
             const formData = new FormData();
             formData.append('_token', importCsvState.csrfToken);
             formData.append('users_data', JSON.stringify(importCsvState.validUsers));
 
             try {
-                const response = await fetch('/usuario/importar-csv', {
+                const response = await fetch('./usuario/importar-csv', {
                     method: 'POST',
                     body: formData,
                     headers: {

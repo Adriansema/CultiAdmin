@@ -19,9 +19,9 @@ return new class extends Migration
 
             // user_id (Int8) - Clave foranea, puede ser nulo segun tu especificacion
             $table->foreignId('user_id')
-                  ->nullable() // Puede ser nulo
-                  ->constrained() // Asume 'users' tabla y 'id' columna
-                  ->onDelete('set null'); // Si un usuario es eliminado, user_id se establece a NULL
+                ->nullable() // Puede ser nulo
+                ->constrained() // Asume 'users' tabla y 'id' columna
+                ->onDelete('set null'); // Si un usuario es eliminado, user_id se establece a NULL
             $table->string('nombre')->after('estado')->nullable();
             $table->text('descripcion'); // descripcion (text, no nulo)
             $table->string('archivo', 255)->nullable(); // archivo (varchar(255), puede ser nulo)
@@ -32,15 +32,15 @@ return new class extends Migration
             $table->decimal('precio_mas_bajo', 10, 2)->nullable()->after('lugar_precio_mas_alto');
             $table->string('lugar_precio_mas_bajo', 255)->nullable()->after('precio_mas_bajo');
             $table->foreignId('validado_por_user_id')
-                  ->nullable()
-                  ->constrained('users')
-                  ->onDelete('set null'); // <-- Anade esta linea
+                ->nullable()
+                ->constrained('users')
+                ->onDelete('set null'); // <-- Anade esta linea
 
             $table->foreignId('rechazado_por_user_id')
-                  ->nullable()
-                  ->constrained('users')
-                  ->onDelete('set null')
-                  ->after('validado_por_user_id'); // <-- Anade esta linea
+                ->nullable()
+                ->constrained('users')
+                ->onDelete('set null')
+                ->after('validado_por_user_id'); // <-- Anade esta linea
             $table->timestamps(); // created_at y updated_at (timestamp(0))
         });
     }
