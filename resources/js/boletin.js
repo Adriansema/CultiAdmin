@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 updateButton.innerHTML = `
                     <span class="flex items-center justify-center w-full">
                         <span>Actualizando...</span>
-                        <img src="/images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">
+                        <img src="./images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">
                     </span>
                 `;
             }

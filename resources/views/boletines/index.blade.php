@@ -12,46 +12,22 @@
             </div>
         </div>
 
-        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-2xl p-4">
+        <div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-2xl p-4 mb-8">
             <div class="flex items-center justify-between">
                 <form id="searchBoletinForm" action="{{ route('boletines.index') }}" method="GET"
                     class="flex items-center w-full max-w-xl space-x-2">
                     @include('boletines.partials.search')
-
-                    <select id="filtro-estado" name="estado"
-                        class="inline-flex items-center justify-center px-4 py-3 space-x-2 space-x-reverse transition-all
-                        duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)]
-                        hover:border-[#39A900] rounded-full whitespace-nowrap text-md font-medium
-                        text-black pr-10 form-control  hover:border-[var(--color-hover)] w-full
-                        focus:border-[var(--color-hover)] focus:outline-none focus:ring-0">
-                        <option value="">{{ __('Todos los estados') }}</option>
-                        <option value="aprobado" {{ request('estado') == 'aprobado' ? 'selected' : '' }}>{{ __('Aprobado') }}
-                        </option>
-                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>{{ __('Pendiente') }}
-                        </option>
-                        <option value="rechazado" {{ request('estado') == 'rechazado' ? 'selected' : '' }}>{{ __('Rechazado') }}
-                        </option>
-                    </select>
-
-                    <select id="filtro-precio" name="precio"
-                        class="inline-flex items-center justify-center px-4 py-3 space-x-2 space-x-reverse transition-all
-                        duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)]
-                        hover:border-[#39A900] rounded-full whitespace-nowrap font-medium
-                        hover:border-[var(--color-hover)]
-                        focus:border-[var(--color-hover)] focus:outline-none focus:ring-0 pr-10">
-                        <option value="">{{ __('Todos los precios') }}</option>
-                        <option value="precio_alto_desc" {{ request('precio') == 'precio_alto_desc' ? 'selected' : '' }}>
-                            {{ __('Precio Más Alto (Desc)') }}</option>
-                        <option value="precio_alto_asc" {{ request('precio') == 'precio_alto_asc' ? 'selected' : '' }}>
-                            {{ __('Precio Más Alto (Asc)') }}</option>
-                        <option value="precio_bajo_desc" {{ request('precio') == 'precio_bajo_desc' ? 'selected' : '' }}>
-                            {{ __('Precio Más Bajo (Desc)') }}</option>
-                        <option value="precio_bajo_asc" {{ request('precio') == 'precio_bajo_asc' ? 'selected' : '' }}>
-                            {{ __('Precio Más Bajo (Asc)') }}</option>
-                    </select>
                 </form>
 
                 <div class="flex items-center justify-end py-5 space-x-2">
+                    <button id="resetFiltersButton"
+                        class="inline-flex items-center group justify-center px-6 py-3 space-x-2 transition-all duration-300 ease-in-out
+                        bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] text-white rounded-full whitespace-nowrap">
+                        <span class="font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
+                            {{ __('Restablecer filtros') }}
+                        </span>
+                    </button>
+
                     <button type="button" id="exportCsvButton"
                         class="inline-flex items-center group justify-center px-6 py-3 space-x-2 transition-all duration-300 ease-in-out
                         bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] text-white rounded-full whitespace-nowrap">

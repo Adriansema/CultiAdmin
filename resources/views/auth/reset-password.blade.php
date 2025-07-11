@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="absolute inset-0 z-0">
-        <div class="absolute transform -translate-x-1/2 top-56 left-1/2">
+        <div class="absolute transform -translate-x-1/2 top-44 left-1/2">
             <img src="{{ asset('images/cultivasena.svg') }}" alt="Logo Cultiva" class="w-auto h-24 sm:h-28 opacity-90">
         </div>
     </div>
@@ -107,7 +107,7 @@
 </div>
 
 {{-- Logo SENA en la parte inferior --}}
-<div class="absolute transform -translate-x-1/2 bottom-36 left-1/2">
+<div class="absolute transform -translate-x-1/2 bottom-32 left-1/2">
     <img src="{{ asset('images/sena-logo.svg') }}" alt="Logo SENA" class="w-auto h-24 opacity-90">
 </div>
 @endsection

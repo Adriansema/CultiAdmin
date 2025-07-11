@@ -38,7 +38,7 @@
                             clearTimeout(debounceTimeout);
                             debounceTimeout = setTimeout(() => {
                                 if (email.length > 0) { // Solo si hay algo escrito
-                                    fetch('/check-email', { // Llama a tu endpoint de Laravel
+                                    fetch('./check-email', { // Llama a tu endpoint de Laravel
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json',

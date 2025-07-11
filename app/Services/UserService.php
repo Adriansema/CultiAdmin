@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Spatie\Permission\Models\Role; // Asegúrate de importar el modelo Role si lo usas directamente aquí
 
 class UserService
 {
@@ -28,21 +29,33 @@ class UserService
             ? $request->input('per_page')
             : 10;
 
-        // Inicializar todas las variables al principio
-        $searchQuery = $request->input('q', '');
-        $estadoFilter = $request->input('estado', '');
-        $rolFilter = $request->input('rol', '');
+        $searchQuery   = $request->input('q', '');
+        $estadoFilter  = $request->input('estado', ''); // Ahora usado solo para filtrar, no para ordenar
+        $rolFilter     = $request->input('rol', '');    // Ahora usado solo para filtrar, no para ordenar
+        $sortBy        = $request->input('sort_by');    // Nuevo: columna para ordenar
+        $sortDirection = $request->input('sort_direction'); // Nuevo: dirección de ordenamiento
 
-        // Asegurarse de que $cleanedSearchQuery siempre esté definida
-        $cleanedSearchQuery = $this->cleanSearchQuery($searchQuery); // Mover fuera del 'if' para que siempre exista
+        $cleanedSearchQuery = $this->cleanSearchQuery($searchQuery);
 
-        $usuarios = User::query()->with('roles');
+        $usuarios = User::query();
 
-        // Búsqueda robusta en múltiples columnas (solo se aplica si hay algo en searchQuery)
-        if (!empty($searchQuery)) { // La condición 'if' ahora solo controla la aplicación del filtro, no la definición de la variable
-            $usuarios->where(function ($q) use ($cleanedSearchQuery, $searchQuery) { // Pasa $cleanedSearchQuery aquí
+        // Condicionalmente unimos las tablas de roles si se va a ordenar por rol o filtrar por rol
+        // Esto es crucial para poder ordenar por 'roles.name'
+        if (($sortBy === 'roles.name') || !empty($rolFilter)) {
+            $usuarios->leftJoin('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                     ->leftJoin('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                     ->select('users.*', 'roles.name as role_name'); // Seleccionar role_name para usarlo en el orderBy
+        }
+
+        // Siempre cargar la relación 'roles' para mostrar en la vista, incluso si no se une para ordenar
+        $usuarios->with('roles');
+
+        // Búsqueda robusta en múltiples columnas
+        if (!empty($searchQuery)) {
+            $usuarios->where(function ($q) use ($cleanedSearchQuery, $searchQuery) {
                 $sqlNormalize = function($column) {
-                    if (in_array($column, ['created_at', 'updated_at'])) {
+                    // Adaptación para PostgreSQL, si usas MySQL, 'TO_CHAR' no es necesario para fechas
+                    if (config('database.default') === 'pgsql' && in_array($column, ['created_at', 'updated_at'])) {
                         return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                     }
                     return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER({$column}), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
@@ -51,7 +64,7 @@ class UserService
                 $q->orWhereRaw($sqlNormalize('name') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
                   ->orWhereRaw($sqlNormalize('email') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
                   ->orWhereRaw($sqlNormalize('lastname') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
-                
+
                 try {
                     $date = Carbon::parse($searchQuery);
                     $q->orWhereDate('created_at', $date->toDateString());
@@ -61,19 +74,51 @@ class UserService
             });
         }
 
-        // Aplicar filtro por estado
+        // Aplicar filtro por estado (si el parámetro 'estado' todavía se usa para filtrar)
+        // Nota: Si el filtro de estado ahora es solo por ordenamiento, puedes quitar este bloque.
+        // Lo mantengo por si necesitas la funcionalidad de filtro además de la ordenación.
         if (!empty($estadoFilter) && in_array($estadoFilter, ['activo', 'inactivo'])) {
             $usuarios->where('estado', $estadoFilter);
         }
 
-        // Aplicar filtro por rol
+        // Aplicar filtro por rol (si el parámetro 'rol' todavía se usa para filtrar)
+        // Nota: Si el filtro de rol ahora es solo por ordenamiento, puedes quitar este bloque.
+        // Lo mantengo por si necesitas la funcionalidad de filtro además de la ordenación.
         if (!empty($rolFilter)) {
-            $usuarios->whereHas('roles', function ($query) use ($rolFilter) {
-                $query->where('name', $rolFilter);
-            });
+            // Si ya se hizo un join para ordenar, simplemente usa la columna 'roles.name'
+            if (($sortBy === 'roles.name') || !empty($rolFilter)) {
+                $usuarios->where('roles.name', $rolFilter);
+            } else {
+                // Si no se hizo join, usa whereHas para filtrar por rol
+                $usuarios->whereHas('roles', function ($query) use ($rolFilter) {
+                    $query->where('name', $rolFilter);
+                });
+            }
         }
 
-        $usuarios->orderBy('name', 'asc');
+
+        // Ordenamiento genérico por columna y dirección
+        $allowedSortColumns = [
+            'name',
+            'email',
+            'estado',
+            'created_at',
+            'roles.name', // Ahora 'roles.name' es una columna válida después del join
+        ];
+
+        $allowedSortDirections = ['asc', 'desc'];
+
+        if (in_array($sortBy, $allowedSortColumns) && in_array($sortDirection, $allowedSortDirections)) {
+            // Si se ordena por rol, usamos el alias 'role_name' si se hizo el select
+            if ($sortBy === 'roles.name') {
+                $usuarios->orderBy('role_name', $sortDirection);
+            } else {
+                $usuarios->orderBy($sortBy, $sortDirection);
+            }
+        } else {
+            // Ordenamiento por defecto si no hay un orden válido o si no se especifica
+            $usuarios->orderBy('name', 'asc');
+        }
 
         return $usuarios->paginate($perPage)->withQueryString();
     }

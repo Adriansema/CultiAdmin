@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const selectedType = csvTypeSelect.value;
             
             // Construye la URL de descarga, incluyendo el tipo de CSV como parámetro de consulta
-            const downloadUrl = `/exportar-csv?type=${selectedType}`;
+            const downloadUrl = `./exportar-csv?type=${selectedType}`;
             
             
             // Redirige la ventana del navegador a la URL de descarga.

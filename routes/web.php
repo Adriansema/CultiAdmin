@@ -144,7 +144,6 @@ Route::middleware([
 
      // --- Modulo de USUARIOS ---
      Route::prefix('usuario')->name('usuarios.')->group(function () {
-          Route::get('role-permissions-map', [UsuarioController::class, 'getRolePermissionsMap'])->name('role-permissions-map');
           Route::get('/filtered-users', [UsuarioController::class, 'getFilteredUsers'])->name('filtered.ajax');
           Route::get('/', [UsuarioController::class, 'index'])->name('index')->middleware('can:crear usuario');
           Route::get('/create', [UsuarioController::class, 'create'])->name('create');
@@ -156,6 +155,7 @@ Route::middleware([
           Route::put('/{usuario}', [UsuarioController::class, 'update'])->name('update')->middleware('can:editar usuario');
           Route::patch('/{usuario}/toggle', [UsuarioController::class, 'toggle'])->name('toggle');
           Route::get('/usuarios/{usuario}/data', [UsuarioController::class, 'getUserData'])->name('users.data')->middleware('can:editar usuario');
+          Route::get('role-permissions-map', [UsuarioController::class, 'getRolePermissionsMap'])->name('role-permissions-map');
      });
 
      // --- Modulo de NOTICIAS ---
@@ -185,4 +185,17 @@ Route::fallback(function () {
      }
      // Si el usuario esta autenticado pero la ruta no se encuentra, redirige al dashboard
      return redirect()->route('dashboard')->with('error', 'La pagina solicitada no existe o no tienes permiso para acceder a ella.');
+});
+
+
+//------------------- livewire--------------------
+//------------------------------
+
+Livewire::setScriptRoute(function ($handle) {
+    return Route::get('/cultiadmin/livewire/livewire.js', $handle);
+});
+
+Livewire::setUpdateRoute(function ($handle) {
+    return Route::post('/cultiadmin/livewire/update', $handle)
+                 ->middleware('web');
 });

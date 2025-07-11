@@ -1,5 +1,5 @@
 {{-- Este div contiene solo el HTML del sidebar --}}
-<div :class="sidebarOpen ? 'w-64' : 'w-24'"
+<div :class="sidebarOpen ? 'w-64' : 'w-28'"
     class="h-full flex flex-col transition-all duration-1000 bg-[#00304D] text-white flex-shrink-0 overflow-y-auto overflow-x-hidden">
 
     <div class="flex items-center justify-between px-4 py-3">
@@ -9,15 +9,14 @@
                 <x-application-mark class="block w-auto h-9" />
             </a>
         </div>
-        {{-- <button @click="toggleSidebar"
-            class="-ml-2 text-[var(--color-text)] rounded hover:bg-[var(--color-sidebarhoverbtn)] transition-transform duration-700 ease-in-out hover:translate-x-1"
-            :class="!sidebarOpen && 'rotate-180 mx-auto'">
-
-            <svg class="w-4 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-        </button> --}}
+        <button @click="sidebarOpen = !sidebarOpen"
+                class="-ml-2 text-[var(--color-text)] rounded hover:bg-[var(--color-sidebarhoverbtn)] transition-transform duration-700 ease-in-out hover:translate-x-1"
+                :class="!sidebarOpen && 'rotate-180 mx-auto'">
+                <svg class="w-4 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
     </div>
 
     <nav class="flex-1 px-6 pt-4 space-y-2">
@@ -27,7 +26,7 @@
                 :class="sidebarOpen
                     ?
                     '{{ request()->routeIs('dashboard') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
-                    '{{ request()->routeIs('dashboard') ? 'bg-white' : '' }} flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
+                    '{{ request()->routeIs('dashboard') ? 'bg-white' : '' }} flex justify-center px-4 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                 <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                     <img src="{{ asset(request()->routeIs('dashboard') ? 'images/casaColor.svg' : 'images/casa.svg') }}"
                         class="w-4 h-4" alt="Inicio">
@@ -44,7 +43,7 @@
                     :class="sidebarOpen
                         ?
                         '{{ request()->routeIs('productos.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
-                        '{{ request()->routeIs('productos.index') ? 'bg-white' : '' }} flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
+                        '{{ request()->routeIs('productos.index') ? 'bg-white' : '' }} flex justify-center px-4 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                     <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                         <img src="{{ asset(request()->routeIs('productos.index') ? 'images/plantColor.svg' : 'images/plant.svg') }}"
                             class="w-4 h-4" alt="Cultivos">
@@ -62,7 +61,7 @@
                     :class="sidebarOpen
                         ?
                         '{{ request()->routeIs('noticias.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
-                        '{{ request()->routeIs('noticias.index') ? 'bg-white' : '' }} flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
+                        '{{ request()->routeIs('noticias.index') ? 'bg-white' : '' }} flex justify-center px-4 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                     <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                         <img src="{{ asset(request()->routeIs('noticias.index') ? 'images/noticiasColor.svg' : 'images/noticias.svg') }}"
                             class="w-4 h-4" alt="Noticias">
@@ -80,7 +79,7 @@
                     :class="sidebarOpen
                         ?
                         '{{ request()->routeIs('boletines.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
-                        '{{ request()->routeIs('boletines.index') ? 'bg-white' : '' }} flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
+                        '{{ request()->routeIs('boletines.index') ? 'bg-white' : '' }} flex justify-center px-4 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                     <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                         <img src="{{ asset(request()->routeIs('boletines.index') ? 'images/formColor.svg' : 'images/form.svg') }}"
                             class="w-4 h-4" alt="Boletines">
@@ -109,7 +108,7 @@
                         {{-- Anadir una referencia para Alpine.js --}}
                         :class="sidebarOpen
                             ?
-                            '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[14px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
+                            '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
                             '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                         <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                             <img src="{{ asset(request()->routeIs('usuarios.index') ? 'images/IconColor.svg' : 'images/Icon.svg') }}"
@@ -186,7 +185,7 @@
                 :class="sidebarOpen
                     ?
                     '{{ request()->routeIs('accesibilidad.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
-                    '{{ request()->routeIs('accesibilidad.index') ? 'bg-white' : '' }} flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
+                    '{{ request()->routeIs('accesibilidad.index') ? 'bg-white' : '' }} flex justify-center px-4 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                 <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                     <img src="{{ asset(request()->routeIs('accesibilidad.index') ? 'images/accesiColor.svg' : 'images/accesi.svg') }}"
                         class="w-4 h-4" alt="Accesibilidad">
@@ -202,7 +201,7 @@
                 :class="sidebarOpen
                     ?
                     '{{ request()->routeIs('centroAyuda.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
-                    '{{ request()->routeIs('centroAyuda.index') ? 'bg-white' : '' }} flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
+                    '{{ request()->routeIs('centroAyuda.index') ? 'bg-white' : '' }} flex justify-center px-4 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                 <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                     <img src="{{ asset(request()->routeIs('centroAyuda.index') ? 'images/pregColors.svg' : 'images/preg.svg') }}"
                         class="w-4 h-4" alt="Centro de Ayuda">
@@ -220,7 +219,7 @@
                     :class="sidebarOpen
                         ?
                         'flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
-                        'flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
+                        'flex justify-center px-4 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                     <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                         <img src="{{ asset('images/off.svg') }}" class="w-4 h-4" alt="Cerrar Sesion">
                         <span x-show="sidebarOpen" x-transition
