@@ -65,10 +65,16 @@ class PendienteProController extends Controller
         // Encuentra el producto por ID o falla
         $producto = Producto::findOrFail($id);
 
+          // Valida que se proporcionen observaciones para el rechazo
+        $request->validate([
+            'observaciones' => 'nullable|string|max:500',
+        ]);
+
+
         // Actualiza el estado del producto a 'aprobado'
         $producto->update([
             'estado' => 'aprobado',
-            'observaciones' => null, // Limpia las observaciones si las hubiera
+            'observaciones' => $request->observaciones, // Limpia las observaciones si las hubiera
             'validado_por_user_id' => Auth::id(), // Registra quien lo valido
             'rechazado_por_user_id' => null, // Limpia el ID de rechazador
         ]);

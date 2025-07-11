@@ -32,6 +32,9 @@ class Noticia extends Model
         'estado',
         'autor',
         'leida',
+        'observaciones',
+        'validado_por_user_id',
+        'rechazado_por_user_id',
     ];
 
     /**
