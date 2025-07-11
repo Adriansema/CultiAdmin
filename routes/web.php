@@ -186,3 +186,16 @@ Route::fallback(function () {
      // Si el usuario esta autenticado pero la ruta no se encuentra, redirige al dashboard
      return redirect()->route('dashboard')->with('error', 'La pagina solicitada no existe o no tienes permiso para acceder a ella.');
 });
+
+
+//------------------- livewire--------------------
+//------------------------------
+
+Livewire::setScriptRoute(function ($handle) {
+    return Route::get('/cultiadmin/livewire/livewire.js', $handle);
+});
+
+Livewire::setUpdateRoute(function ($handle) {
+    return Route::post('/cultiadmin/livewire/update', $handle)
+                 ->middleware('web');
+});
