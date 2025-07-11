@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     noticiaElement.classList.add('fade-out');
 
                     // Enviar peticion al servidor para marcarla como leida
-                    fetch(`/noticia/${noticiaId}/mark-as-read`, {
+                    fetch(`./noticia/${noticiaId}/mark-as-read`, {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': csrfToken,

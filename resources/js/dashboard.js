@@ -201,7 +201,7 @@ function setActiveFilterButton(filterType) {
  * @param {string|number} [value=null] - Valor adicional del filtro (ej. el ano para 'ano').
  */
 function loadData(filterType, value = null) {
-    let url = `/api/estadisticas?`;
+    let url = `./api/estadisticas?`;
 
     if (filterType === 'ano' && value) {
         url += `filter=ano&year=${value}`;

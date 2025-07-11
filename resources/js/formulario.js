@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     async function fetchRolePermissionsMapping() {
         try {
-            const response = await fetch('/usuario/role-permissions-map');
+            const response = await fetch('./usuario/role-permissions-map');
             const data = await response.json();
             if (response.ok && data.roleDefaultPermissions) {
                 modalData.rolePermissionsMapping = data.roleDefaultPermissions;
@@ -344,33 +344,33 @@ document.addEventListener('DOMContentLoaded', async function () {
             const spanStep3 = step3Indicator.querySelector('span');
 
             // Resetear todos los estados visuales (poner todos en inactivo primero)
-            imgStep1.src = '/images/paso1_inactivo.svg';
+            imgStep1.src = './images/paso1_inactivo.svg';
             spanStep1.classList.remove('text-gray-700');
             spanStep1.classList.add('text-gray-400');
 
-            imgStep2.src = '/images/paso2_inactivo.svg';
+            imgStep2.src = './images/paso2_inactivo.svg';
             spanStep2.classList.remove('text-gray-700');
             spanStep2.classList.add('text-gray-400');
 
-            imgStep3.src = '/images/paso3_inactivo.svg';
+            imgStep3.src = './images/paso3_inactivo.svg';
             spanStep3.classList.remove('text-gray-700');
             spanStep3.classList.add('text-gray-400');
 
             // Establecer estados segun el paso actual
             if (modalData.currentStep >= 1) {
-                imgStep1.src = (modalData.currentStep === 1) ? '/images/paso1_activo.svg' : '/images/paso1_completado.svg';
+                imgStep1.src = (modalData.currentStep === 1) ? './images/paso1_activo.svg' : './images/paso1_completado.svg';
                 spanStep1.classList.remove('text-gray-400');
                 spanStep1.classList.add('text-gray-700');
             }
 
             if (modalData.currentStep >= 2) {
-                imgStep2.src = (modalData.currentStep === 2) ? '/images/paso2_completado.svg' : '/images/paso1_completado.svg';
+                imgStep2.src = (modalData.currentStep === 2) ? './images/paso2_completado.svg' : './images/paso1_completado.svg';
                 spanStep2.classList.remove('text-gray-400');
                 spanStep2.classList.add('text-gray-700');
             }
 
             if (modalData.currentStep >= 3) {
-                imgStep3.src = (modalData.currentStep === 3) ? '/images/paso3_activo.svg' : '/images/paso2_completado.svg';
+                imgStep3.src = (modalData.currentStep === 3) ? './images/paso3_activo.svg' : './images/paso2_completado.svg';
                 spanStep3.classList.remove('text-gray-400');
                 spanStep3.classList.add('text-gray-700');
             }
@@ -381,9 +381,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             nextButton.classList.remove('hidden');
 
             if (modalData.currentStep === 1 || modalData.currentStep === 2) {
-                nextButton.innerHTML = `Siguiente <img src="/images/siguiente.svg" alt="siguiente" class="w-5 h-6 ml-2">`;
+                nextButton.innerHTML = `Siguiente <img src="./images/siguiente.svg" alt="siguiente" class="w-5 h-6 ml-2">`;
             } else if (modalData.currentStep === 3) {
-                nextButton.innerHTML = `${modalData.isEditMode ? 'Actualizar' : 'Asignar'} <img src="/images/siguiente.svg" alt="enviar" class="w-5 h-6 ml-2">`;
+                nextButton.innerHTML = `${modalData.isEditMode ? 'Actualizar' : 'Asignar'} <img src="./images/siguiente.svg" alt="enviar" class="w-5 h-6 ml-2">`;
             } else {
                 nextButton.classList.add('hidden');
             }
@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         updateModalUI();
 
         try {
-            const response = await fetch(`/usuario/usuarios/${userId}/data`);
+            const response = await fetch(`./usuario/usuarios/${userId}/data`);
             const data = await response.json();
 
             if (!response.ok) {
@@ -734,7 +734,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (passwordInputInModal) {
             const type = passwordInputInModal.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInputInModal.setAttribute('type', type);
-            buttonElement.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+            buttonElement.querySelector('img').src = type === 'password' ? './images/ojo-close.svg' : './images/ojo-open.svg';
             buttonElement.setAttribute('title', type === 'password' ? 'Mostrar contrasena' : 'Ocultar contrasena');
         }
     };
@@ -755,7 +755,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             // Replicando el estilo del radio button seleccionado: bg-indigo-200, text-indigo-800, con_marca.svg
             rolesHtml += `
                 <span class="bg-indigo-200 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold inline-flex items-center mr-2 mb-2">
-                    <img src="/images/con_marca.svg" alt="icono de verificacion" class="w-4 h-4 mr-1">
+                    <img src="./images/con_marca.svg" alt="icono de verificacion" class="w-4 h-4 mr-1">
                     ${modalData.selectedRole}
                 </span>
             `;
@@ -787,7 +787,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 <div class="relative flex items-center mb-4 bg-gray-100 p-3 rounded-lg border border-gray-200">
                     <input type="password" id="confirmPasswordDisplayInput" value="${modalData.password}" readonly
                         class="w-full bg-transparent text-gray-800 text-base font-mono focus:outline-none cursor-not-allowed pr-12" /> <button type="button" class="absolute right-4 text-gray-500 hover:text-gray-700" title="Mostrar contrasena" onclick="toggleConfirmPasswordVisibilityInModal(this)">
-                        <img src="/images/ojo-close.svg" alt="Mostrar/Ocultar" class="w-5 h-5" />
+                        <img src="./images/ojo-close.svg" alt="Mostrar/Ocultar" class="w-5 h-5" />
                     </button>
                 </div>
                 <p class="text-gray-600 text-sm mb-4">Esta contrasena se enviara al correo del usuario.</p>
@@ -869,7 +869,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         actionButton.innerHTML = `
             <span class="flex items-center justify-between w-full">
                 <span>Confirmando</span>
-                <img src="/images/cargando_.svg" alt="Cargando..." class="w-5 h-5 animate-spin">
+                <img src="./images/cargando_.svg" alt="Cargando..." class="w-5 h-5 animate-spin">
             </span>
         `;
 
@@ -883,10 +883,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         let method = 'POST';
 
         if (modalData.isEditMode) {
-            url = `/usuario/${modalData.userId}`;
+            url = `./usuario/${modalData.userId}`;
             formData.append('_method', 'PUT');
         } else {
-            url = `/usuario`;
+            url = `./usuario`;
         }
 
         // ANADIR TODOS LOS DATOS RECOPILADOS DE TODOS LOS PASOS
@@ -1074,7 +1074,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         togglePasswordVisibility.addEventListener('click', function () {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-            this.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+            this.querySelector('img').src = type === 'password' ? './images/ojo-close.svg' : './images/ojo-open.svg';
             this.setAttribute('title', type === 'password' ? 'Mostrar contrasena' : 'Ocultar contrasena');
         });
     }
@@ -1083,7 +1083,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         toggleConfirmPasswordVisibility.addEventListener('click', function () {
             const type = passwordConfirmationInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordConfirmationInput.setAttribute('type', type);
-            this.querySelector('img').src = type === 'password' ? '/images/ojo-close.svg' : '/images/ojo-open.svg';
+            this.querySelector('img').src = type === 'password' ? './images/ojo-close.svg' : './images/ojo-open.svg';
             this.setAttribute('title', type === 'password' ? 'Mostrar contrasena' : 'Ocultar contrasena');
         });
     }
