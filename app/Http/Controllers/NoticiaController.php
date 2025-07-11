@@ -300,7 +300,7 @@ class NoticiaController extends Controller
             ->get();
 
         // Retorna la vista parcial con las noticias.
-        return view('partials.notificacion-noticia', compact('noticias'));
+        return view('partials.notification-noticia', compact('noticias'));
     }
 
     /**

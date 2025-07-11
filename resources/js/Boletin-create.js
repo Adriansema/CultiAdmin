@@ -294,7 +294,6 @@ async function handleCreateBoletinSubmit(event) {
         formData.delete('precio_mas_alto');
     }
     if (hasLugarAlto) {
-        // CRUCIAL: Usar la version limpia al anadir al formData
         formData.set('lugar_precio_mas_alto', cleanedLugarPrecioMasAlto);
     } else {
         formData.delete('lugar_precio_mas_alto');
@@ -305,7 +304,6 @@ async function handleCreateBoletinSubmit(event) {
         formData.delete('precio_mas_bajo');
     }
     if (hasLugarBajo) {
-        // CRUCIAL: Usar la version limpia al anadir al formData
         formData.set('lugar_precio_mas_bajo', cleanedLugarPrecioMasBajo);
     } else {
         formData.delete('lugar_precio_mas_bajo');
@@ -317,7 +315,7 @@ async function handleCreateBoletinSubmit(event) {
         submitCreateBoletinButton.innerHTML = `
             <span class="flex items-center justify-center w-full">
                 <span>Subiendo...</span>
-                <img src="/images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">
+                <img src="./images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">
             </span>
         `;
     }

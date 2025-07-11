@@ -31,7 +31,7 @@
             N/A
         @endif
     </td>
-    
+
     <td class="px-6 py-4">
         @if ($boletin->precio_mas_bajo)
             <p class="flex items-center text-red-600">

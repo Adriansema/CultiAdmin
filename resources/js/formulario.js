@@ -181,10 +181,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     function applyRoleDefaultPermissions(roleName) {
         console.log('JS: Aplicando permisos por defecto para el rol:', roleName);
+        resetPermissions();
+
+        // Asegurarse de que defaultPermsForRole sea siempre un array para evitar el error
+        const defaultPermsForRole = modalData.rolePermissionsMapping[roleName] || [];
+
         console.log('JS: Permisos por defecto para este rol:', defaultPermsForRole);
 
-        const defaultPermsForRole = modalData.rolePermissionsMapping[roleName];
-        if (defaultPermsForRole && defaultPermsForRole.length > 0) {
+        if (defaultPermsForRole.length > 0) { // Ya no necesitamos verificar 'defaultPermsForRole' si siempre es un array
             defaultPermsForRole.forEach(permName => {
                 updateModalDataPermission(permName, true);
             });
@@ -455,6 +459,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         }
     }
+
     function renderSuccessMessage() {
         if (modalData.successMessage && successMessageContainer) {
             successMessageContainer.innerHTML = `<span>${modalData.successMessage}</span>`;
