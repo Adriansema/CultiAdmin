@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         updateModalVisibility(); // Ahora se llama a la funcion dedicada
 
         if (modalTitle) {
-            modalTitle.textContent = modalData.isEditMode ? 'Editar Usuario' : 'Registrar Nuevo Usuario';
+            modalTitle.textContent = modalData.isEditMode ? 'Editar usuario' : 'Registrar nuevo usuario';
         }
 
         // Control de visibilidad del contenido de los pasos
@@ -615,17 +615,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
     // ************* NUEVAS FUNCIONES DE VALIDACIÓN Y FILTRADO EN TIEMPO REAL *************
-    // Regex para filtrar caracteres no permitidos
-    // CORREGIDO: Permite letras (incluyendo tildes y ñ), y espacios
     const alphaSpaceOnlyFilterRegex = /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g;
-    // CORREGIDO: Elimina todo lo que NO sea letra, número, punto, arroba, guion o guion bajo
-    const emailFilterRegex = /[^a-zA-Z0-9.@_-]/g;
+    const emailFilterRegex = /[^a-zA-Z0-9.@_-\u00F1\u00D1]/g;
     const numericOnlyFilterRegex = /[^\d]/g; // Elimina todo lo que NO sea dígito
 
     // Regex para validación completa (usado en handleNextAction)
     // CORREGIDO: Solo letras (incluyendo tildes y ñ) y espacios
     const alphaOnlyTestRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-    const emailStructureRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Estructura de email
+    const emailStructureRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const phoneLengthTestRegex = /^\d{10,15}$/; // Solo dígitos, entre 10 y 15 de longitud
     const documentNumericTestRegex = /^\d+$/; // Solo dígitos
 
@@ -992,30 +989,30 @@ document.addEventListener('DOMContentLoaded', async function () {
         let passwordDisplayHtml = '';
         if (!modalData.isEditMode && modalData.password) {
             passwordDisplayHtml = `
-                <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contrasena generada:</h4>
+                <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contraseña generada:</h4>
                 <div class="relative flex items-center mb-4 bg-gray-100 p-3 rounded-lg border border-gray-200">
                     <input type="password" id="confirmPasswordDisplayInput" value="${modalData.password}" readonly
                         class="w-full bg-transparent text-gray-800 text-base font-mono focus:outline-none cursor-not-allowed pr-12" /> <button type="button" class="absolute right-4 text-gray-500 hover:text-gray-700" title="Mostrar contrasena" onclick="toggleConfirmPasswordVisibilityInModal(this)">
                         <img src="./images/ojo-close.svg" alt="Mostrar/Ocultar" class="w-5 h-5" />
                     </button>
                 </div>
-                <p class="text-gray-600 text-sm mb-4">Esta contrasena se enviara al correo del usuario.</p>
+                <p class="text-gray-600 text-sm mb-4">Esta contraseña se enviara al correo del usuario.</p>
             `;
         } else if (modalData.isEditMode && modalData.password) {
             passwordDisplayHtml = `
-                <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contrasena a actualizar:</h4>
-                <p class="text-gray-600 text-sm mb-4">Se actualizara la contrasena a la ingresada.</p>
+                <h4 class="font-semibold text-gray-700 mt-4 mb-2">Contraseña a actualizar:</h4>
+                <p class="text-gray-600 text-sm mb-4">Se actualizara la contraseña a la ingresada.</p>
             `;
         }
 
 
         confirmMessageBody.innerHTML = `
-            <p class="text-gray-700 text-lg mb-6">Estas a punto de <span class="font-bold">${modalData.isEditMode ? 'actualizar' : 'registrar'}</span> un usuario con la siguiente informacion:</p>
+            <p class="text-gray-700 text-lg mb-6">Estas a punto de <span class="font-bold">${modalData.isEditMode ? 'actualizar' : 'registrar'}</span> un usuario con la siguiente información:</p>
             
             <div class="bg-gray-50 p-4 rounded-lg shadow-inner mb-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Nombre Completo:</p>
+                        <p class="text-sm font-medium text-gray-500">Nombre completo:</p>
                         <p class="text-gray-900 font-semibold">${modalData.name} ${modalData.lastname}</p>
                     </div>
                     <div>
@@ -1023,15 +1020,15 @@ document.addEventListener('DOMContentLoaded', async function () {
                         <p class="text-gray-900 font-semibold">${modalData.type_document} ${modalData.document}</p>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Correo Electronico:</p>
+                        <p class="text-sm font-medium text-gray-500">Correo electrónico:</p>
                         <p class="text-gray-900 font-semibold">${modalData.email}</p>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Telefono:</p>
+                        <p class="text-sm font-medium text-gray-500">Teléfono:</p>
                         <p class="text-gray-900 font-semibold">${modalData.phone}</p>
                     </div>
                     <div class="md:col-span-2">
-                        <p class="text-sm font-medium text-gray-500 mb-1">Rol Asignado:</p>
+                        <p class="text-sm font-medium text-gray-500 mb-1">Rol asignado:</p>
                         <div class="flex flex-wrap gap-2">
                             ${rolesHtml}
                         </div>
@@ -1046,7 +1043,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             
             ${passwordDisplayHtml}
             
-            <p class="text-gray-700 text-lg mt-6 font-semibold">Confirmas ${modalData.isEditMode ? 'la actualizacion' : 'la creacion'} de este usuario con estas atribuciones?</p>
+            <p class="text-gray-700 text-lg mt-6 font-semibold">Confirmas ${modalData.isEditMode ? 'la actualización' : 'la creación'} de este usuario con estas atribuciones?</p>
         `;
 
         // Ajustar el contenedor de botones para el espacio
@@ -1069,7 +1066,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     async function submitFormConfirmed() {
-        console.log('JS: submitFormConfirmed llamado. Iniciando envio.');
+        console.log('JS: submitFormConfirmed llamado. iniciando envío.');
 
         // Deshabilitar boton y mostrar spinner en el boton del modal de confirmacion
         const actionButton = confirmActionButton;
@@ -1131,7 +1128,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             formData.append('permissions[]', '');
         }
 
-        console.log(`JS: Enviando solicitud de ${modalData.isEditMode ? 'EDICION' : 'CREACION'} a URL: ${url} con metodo ${method}.`);
+        console.log(`JS: Enviando solicitud de ${modalData.isEditMode ? 'Edición' : 'Creación'} a URL: ${url} con metodo ${method}.`);
 
         try {
             const response = await fetch(url, {
@@ -1186,7 +1183,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             modalData.isOpen = false;
             updateModalVisibility(); // Esto activara la logica para ocultar userFormModal
 
-            showAppNotification('Error de conexion o inesperado. Por favor, intentalo de nuevo.', false); // False para error
+            showAppNotification('Error de conexión o inesperado. Por favor, intentalo de nuevo.', false); // False para error
         }
     }
 

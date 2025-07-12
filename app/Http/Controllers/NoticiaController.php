@@ -111,7 +111,7 @@ class NoticiaController extends Controller
             ]);
 
             // Si la creacion es exitosa, el codigo continua aqui.
-            return redirect()->route('noticias.index')->with('success_message', '!Noticia creada con exito!');
+            return redirect()->route('noticias.index')->with('success_message', '¡Noticia creada con éxito!');
         } catch (QueryException $e) {
             // Captura errores especificos de la base de datos
             Log::error('Error de base de datos al crear noticia: ' . $e->getMessage());
@@ -206,7 +206,7 @@ class NoticiaController extends Controller
             $noticia->save();
 
             // Si la actualizacion es exitosa, el codigo continua aqui.
-            return redirect()->route('noticias.index')->with('success_message', '!Noticia actualizada con exito!');
+            return redirect()->route('noticias.index')->with('success_message', '¡Noticia actualizada con éxito!');
         } catch (QueryException $e) {
             // Captura errores especificos de la base de datos
             Log::error('Error de base de datos al actualizar noticia (ID: ' . $noticia->id . '): ' . $e->getMessage());
