@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Nueva Revision Pendiente - {{ ucfirst($itemTipo) }}</title>
+    <title>Nueva revisión pendiente - {{ ucfirst($itemTipo) }}</title>
     <style>
         /* Estilos generales para el cuerpo del correo */
         body {
@@ -26,7 +26,8 @@
             padding: 20px 30px;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
-            background-color: #FFFFFF; /* Fondo blanco explicito para el contenido */
+            background-color: #FFFFFF;
+            /* Fondo blanco explicito para el contenido */
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
@@ -78,7 +79,8 @@
 
         /* Estilo para el mensaje intuitivo como el de Twitch */
         .welcome-section {
-            background-color: #E6F0FF; /* Fondo azul claro, similar al ejemplo */
+            background-color: #E6F0FF;
+            /* Fondo azul claro, similar al ejemplo */
             padding: 25px;
             border-radius: 8px;
             text-align: center;
@@ -100,15 +102,19 @@
 
         /* Contenedor del icono, centrado y con espacio */
         .icon-container {
-            text-align: center; /* Asegura que la imagen este centrada */
+            text-align: center;
+            /* Asegura que la imagen este centrada */
             margin-bottom: 15px;
         }
 
         /* Estilo para el logo */
         .logo-img {
-            max-width: 150px; /* Tamano maximo del logo */
-            height: auto;    /* Mantener proporciones */
-            display: inline-block; /* Asegura que se centre con text-align: center */
+            max-width: 150px;
+            /* Tamano maximo del logo */
+            height: auto;
+            /* Mantener proporciones */
+            display: inline-block;
+            /* Asegura que se centre con text-align: center */
             /* Eliminar opacity-90 que podria hacerla menos visible */
         }
 
@@ -155,25 +161,27 @@
                 <div class="container">
                     <div class="welcome-section">
                         <div class="icon-container">
-                            <img src="{{ url('/images/cultivasena.svg') }}" alt="Logo Cultiva Sena" class="logo-img" style="max-width: 150px; height: auto; display: block; margin: 0 auto;">
+                            <img src="{{ url('/images/cultivasena.svg') }}" alt="Logo Cultiva Sena" class="logo-img"
+                                style="max-width: 150px; height: auto; display: block; margin: 0 auto;">
                         </div>
-                        <h2>¡Nueva Revision Pendiente!</h2>
-                        <p>Un nuevo elemento ha sido registrado y esta esperando tu atencion.</p>
+                        <h2>¡Nueva revisión pendiente!</h2>
+                        <p>Un nuevo elemento ha sido registrado y esta esperando tu atención.</p>
                     </div>
 
-                    <p>Tienes un nuevo elemento de tipo **{{ ucfirst($itemTipo) }}** pendiente de revision.</p>
+                    <p>Tienes un nuevo elemento de tipo <b>{{ ucfirst($itemTipo) }}</b> pendiente de revisión.</p>
 
-                    <p><strong>Detalles Clave del {{ strtolower($itemTipo) }}:</strong></p>
+                    <p><strong>Detalles clave del {{ strtolower($itemTipo) }}:</strong></p>
                     <ul>
                         <li><strong>ID:</strong> {{ $item->id }}</li>
                         <li><strong>Tipo:</strong> {{ ucfirst($item->tipo) }}</li>
                         <li><strong>Estado:</strong> {{ ucfirst($item->estado) }}</li>
                         <li><strong>Creado por:</strong> {{ $item->user->name ?? 'Usuario Desconocido' }}</li>
-                        <li><strong>Fecha de Registro:</strong> {{ $item->created_at->format('d/m/Y H:i A') }}</li>
+                        <li><strong>Fecha de registro:</strong> {{ $item->created_at->format('d/m/Y H:i A') }}</li>
 
                         @if ($item->imagen)
-                            <li><strong>Adjunto:</strong> <a href="{{ asset('storage/' . $item->imagen) }}" target="_blank">Ver
-                                    Imagen Asociada</a></li>
+                            <li><strong>Adjunto:</strong> <a href="{{ asset('storage/' . $item->imagen) }}"
+                                    target="_blank">Ver
+                                    imagen asociada</a></li>
                         @endif
                     </ul>
 
@@ -182,11 +190,15 @@
                         {{-- Condicionalmente dirige al usuario segun el tipo de item --}}
                         @if ($itemTipo === 'Boletin')
                             <a href="{{ route('pendientes.boletines.index') }}" class="button">
-                                Ir a Boletines Pendientes
+                                Ir a Boletines pendientes
                             </a>
                         @elseif ($itemTipo === 'Producto')
                             <a href="{{ route('pendientes.productos.index') }}" class="button">
-                                Ir a Productos Pendientes
+                                Ir a Productos pendientes
+                            </a>
+                        @elseif ($itemTipo === 'Noticia')
+                            <a href="{{ route('pendientes.noticias.index') }}" class="button">
+                                Ir a Productos pendientes
                             </a>
                         @else
                             {{-- Fallback si no es ni boletin ni producto --}}
@@ -197,7 +209,7 @@
                     </p>
 
                     <div class="footer">
-                        <p>&copy; {{ date('Y') }} Cultiva Sena. Todos los derechos reservados.</p>
+                        <p>&copy; {{ date('Y') }} Cultiva sena. Todos los derechos reservados.</p>
                     </div>
                 </div>
             </td>

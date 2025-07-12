@@ -1,13 +1,13 @@
 <x-form-section submit="updatePassword">
     <x-slot name="title">
         {{-- CORRECCIÓN APLICADA AQUÍ: 'Actualizacion' -> 'Actualización' --}}
-        <h1 class="text-2xl whitespace-nowrap font-bold">Actualización de Contraseñas</h1>
+        <h1 class="text-2xl whitespace-nowrap font-bold">Actualización de contraseñas</h1>
     </x-slot>
 
     <x-slot name="description">
         {{-- RECUERDA: Las tildes en 'números' y 'símbolos' deben estar en tu archivo de traducción --}}
         {{ __('Asegúrese de que su cuenta utilice una contraseña larga y aleatoria para mantener su seguridad. Por ejemplo: puedes usar 
-        Mayúsculas, minúsculas, numeros y simbolos.') }}
+        Mayúsculas, minúsculas, números y simbolos.') }}
     </x-slot>
 
     <x-slot name="form">

@@ -3,34 +3,51 @@ document.addEventListener('DOMContentLoaded', function () {
     const SearchUser = document.getElementById('SearchUser'); // Input de búsqueda de usuario
     const searchIcon = document.getElementById('searchIcon'); // Icono de lupa
     const clearIconContainer = document.getElementById('clearIconContainer'); // Contenedor de la 'X'
-    // const filtrarEstadoSelect = document.getElementById('filtrarEstado'); // ELIMINADO
-    // const filtrarRolSelect = document.getElementById('filtrarRol');     // ELIMINADO
-    const resetFiltersButton = document.getElementById('resetFiltersButton'); // Nuevo: Botón de restablecer filtros
-
-    // Seleccionar todos los botones de ordenación
-    const sortButtons = document.querySelectorAll('.sort-icon-btn');
+    const resetFiltersButton = document.getElementById('resetFiltersButton'); // Botón de restablecer filtros
+    const sortButtons = document.querySelectorAll('.sort-icon-btn'); // Seleccionar todos los botones de ordenación
+    const exportCsvButton = document.getElementById('exportCsvButton'); // Botón de exportar CSV
 
     // --- Función central para aplicar todos los filtros y navegar ---
     function applyAllFilters() {
         const currentUrl = new URL(window.location.href);
+
         const searchQuery = SearchUser ? SearchUser.value : '';
+        // Los filtros de estado y rol ya no se manejan por selects en el HTML,
+        // pero pueden seguir siendo parte de la URL si se aplican de otra forma
+        // o si queremos que se restablezcan con el botón.
+        const urlParams = new URLSearchParams(window.location.search);
+        const estadoFilter = urlParams.get('estado') || '';
+        const rolFilter = urlParams.get('rol') || '';
+        const sortBy = urlParams.get('sort_by') || '';
+        const sortDirection = urlParams.get('sort_direction') || '';
 
-        // Limpiar parámetros existentes de 'q'
+
+        // Limpiar parámetros existentes de 'q', 'estado', 'rol', 'sort_by', 'sort_direction'
         currentUrl.searchParams.delete('q');
-        // Los parámetros 'estado' y 'rol' ya no se manejan por selects para filtrar
-        // Si se usaban para filtrar la tabla, ahora se manejarán via sort_by/sort_direction si se ordenan por ellos.
-        // Si aún necesitas filtrar por estado/rol SIN ordenar, la lógica debería ser diferente (e.g., checkboxes).
-        // Por ahora, asumimos que el filtro de estado/rol se ha movido a la ordenación.
+        currentUrl.searchParams.delete('estado');
+        currentUrl.searchParams.delete('rol');
+        currentUrl.searchParams.delete('sort_by');
+        currentUrl.searchParams.delete('sort_direction');
+        currentUrl.searchParams.delete('page');
 
-        // Añadir nuevo parámetro 'q' si tiene valor
+        // Añadir nuevos parámetros si tienen valor
         if (searchQuery) {
             currentUrl.searchParams.set('q', searchQuery);
         }
+        if (estadoFilter) {
+            currentUrl.searchParams.set('estado', estadoFilter);
+        }
+        if (rolFilter) {
+            currentUrl.searchParams.set('rol', rolFilter);
+        }
+        if (sortBy) {
+            currentUrl.searchParams.set('sort_by', sortBy);
+        }
+        if (sortDirection) {
+            currentUrl.searchParams.set('sort_direction', sortDirection);
+        }
 
-        // Eliminar el parámetro 'page' para reiniciar la paginación
-        currentUrl.searchParams.delete('page');
-
-        // Redireccionar a la nueva URL con los filtros aplicados
+        // Redireccionar a la nueva URL con todos los filtros aplicados
         window.location.href = currentUrl.toString();
     }
 
@@ -79,24 +96,22 @@ document.addEventListener('DOMContentLoaded', function () {
     if (sortButtons.length > 0) {
         sortButtons.forEach(button => {
             button.addEventListener('click', function () {
-                const sortField = this.dataset.sortField; // e.g., 'name', 'email', 'estado', 'roles.name'
-                const sortDirection = this.dataset.sortDirection; // e.g., 'asc', 'desc'
+                const sortField = this.dataset.sortField;
+                const sortDirection = this.dataset.sortDirection;
 
                 const url = new URL(window.location.href);
 
-                // Elimina los parámetros de ordenación existentes para aplicar el nuevo
                 url.searchParams.delete('sort_by');
                 url.searchParams.delete('sort_direction');
 
-                // Establece los nuevos parámetros de ordenación
                 url.searchParams.set('sort_by', sortField);
                 url.searchParams.set('sort_direction', sortDirection);
 
-                url.searchParams.delete('page'); // Reinicia la paginación
+                url.searchParams.delete('page');
 
                 console.log('Botón de ordenación clicado. Nuevo sort_by:', sortField, 'sort_direction:', sortDirection);
                 console.log('URL de redirección:', url.toString());
-                window.location.href = url.toString(); // Redirige
+                window.location.href = url.toString();
             });
         });
     }
@@ -104,33 +119,96 @@ document.addEventListener('DOMContentLoaded', function () {
     // LÓGICA: Botón de Restablecer Filtros con spinner y retraso
     if (resetFiltersButton) {
         resetFiltersButton.addEventListener('click', function() {
-            const button = this; // Referencia al botón clicado
-            button.disabled = true; // Deshabilita el botón para evitar múltiples clics
+            const button = this;
+            button.disabled = true;
             button.innerHTML = `
                 <span class="flex items-center justify-center text-black w-full">
                     <span>Restableciendo</span>
                     <img src="./images/restablecer.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">
                 </span>
-            `; // Cambia el contenido a "Restableciendo" con el spinner
+            `;
 
             const url = new URL(window.location.href);
 
             // Elimina todos los parámetros de filtro conocidos de la URL
             url.searchParams.delete('q');
-            url.searchParams.delete('estado'); // Aunque el select ya no está, es buena práctica limpiarlo
-            url.searchParams.delete('rol');    // Aunque el select ya no está, es buena práctica limpiarlo
+            url.searchParams.delete('estado');
+            url.searchParams.delete('rol');
             url.searchParams.delete('sort_by');
             url.searchParams.delete('sort_direction');
-            url.searchParams.delete('page'); // Siempre restablecer la paginación a la primera página
+            url.searchParams.delete('page');
 
             console.log('Restableciendo filtros. La página se recargará en 3 segundos.');
 
-            // Retrasa la recarga de la página por 3 segundos (3000 milisegundos)
             setTimeout(() => {
-                window.location.href = url.origin + url.pathname; // Redirige a la URL base sin parámetros
-            }, 3000); // 3 segundos de retraso
+                window.location.href = url.origin + url.pathname;
+            }, 3000);
         });
     }
+
+    // Lógica para el botón de Exportar CSV (NUEVA LÓGICA)
+    if (exportCsvButton) {
+        exportCsvButton.addEventListener('click', function (e) {
+            e.preventDefault(); // Previene el envío por defecto del formulario
+
+            const exportForm = this.closest('form'); // Obtiene el formulario padre
+            if (!exportForm) {
+                console.error('Error: No se encontró el formulario para el botón de exportar CSV.');
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentQuery = urlParams.get('q') || '';
+            const currentEstado = urlParams.get('estado') || '';
+            const currentRol = urlParams.get('rol') || '';
+            const currentSortBy = urlParams.get('sort_by') || '';
+            const currentSortDirection = urlParams.get('sort_direction') || '';
+
+            // Limpiar inputs ocultos existentes para evitar duplicados
+            exportForm.querySelectorAll('input[type="hidden"][name="q"], input[type="hidden"][name="estado"], input[type="hidden"][name="rol"], input[type="hidden"][name="sort_by"], input[type="hidden"][name="sort_direction"]').forEach(input => input.remove());
+
+            // Añadir inputs ocultos al formulario con los parámetros actuales
+            if (currentQuery) {
+                const inputQ = document.createElement('input');
+                inputQ.type = 'hidden';
+                inputQ.name = 'q';
+                inputQ.value = currentQuery;
+                exportForm.appendChild(inputQ);
+            }
+            if (currentEstado) {
+                const inputEstado = document.createElement('input');
+                inputEstado.type = 'hidden';
+                inputEstado.name = 'estado';
+                inputEstado.value = currentEstado;
+                exportForm.appendChild(inputEstado);
+            }
+            if (currentRol) {
+                const inputRol = document.createElement('input');
+                inputRol.type = 'hidden';
+                inputRol.name = 'rol';
+                inputRol.value = currentRol;
+                exportForm.appendChild(inputRol);
+            }
+            if (currentSortBy) {
+                const inputSortBy = document.createElement('input');
+                inputSortBy.type = 'hidden';
+                inputSortBy.name = 'sort_by';
+                inputSortBy.value = currentSortBy;
+                exportForm.appendChild(inputSortBy);
+            }
+            if (currentSortDirection) {
+                const inputSortDirection = document.createElement('input');
+                inputSortDirection.type = 'hidden';
+                inputSortDirection.name = 'sort_direction';
+                inputSortDirection.value = currentSortDirection;
+                exportForm.appendChild(inputSortDirection);
+            }
+
+            // Enviar el formulario
+            exportForm.submit();
+        });
+    }
+
 
     // Al cargar la pagina, se inicializan los valores de los filtros desde la URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -139,19 +217,16 @@ document.addEventListener('DOMContentLoaded', function () {
         toggleSearchIcons(); // Asegura que los iconos se muestren correctamente al cargar
     }
 
-    // Lógica para resaltar el icono de ordenación activo al cargar la página
     const currentSortBy = urlParams.get('sort_by');
     const currentSortDirection = urlParams.get('sort_direction');
 
     console.log('Parámetros de ordenación actuales al cargar:', 'sort_by:', currentSortBy, 'sort_direction:', currentSortDirection);
 
     if (currentSortBy && currentSortDirection) {
-        // Desactivar todos los botones de ordenación activos previamente
         document.querySelectorAll('.sort-icon-btn').forEach(button => {
             button.classList.remove('is-active');
         });
 
-        // Busca el botón que tenga los data-attributes que coincidan
         const activeSortButton = document.querySelector(`.sort-icon-btn[data-sort-field="${currentSortBy}"][data-sort-direction="${currentSortDirection}"]`);
 
         if (activeSortButton) {

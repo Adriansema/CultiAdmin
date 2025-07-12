@@ -28,7 +28,6 @@ class Noticia extends Model
         'clase',
         'imagen',
         'informacion',
-        'numero_pagina',
         'estado',
         'autor',
         'leida',

@@ -4,7 +4,7 @@
     <div class="inline-block px-8 py-10">
         <div class="flex items-center space-x-2">
             <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-            <h1 class="text-3xl whitespace-nowrap font-bold">Centro de ayuda de la aplicacion</h1>
+            <h1 class="text-3xl whitespace-nowrap font-bold">Centro de ayuda de la aplicación</h1>
         </div>
         {!! Breadcrumbs::render('centroAyuda.index') !!}
     </div>

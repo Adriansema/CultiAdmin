@@ -44,7 +44,7 @@
         </div>
 
         <div class="mb-6" x-data="{ showPassword: false }">
-            <label for="password" class="block mb-1 text-md font-bold text-gray-700">Contrasena:</label>
+            <label for="password" class="block mb-1 text-md font-bold text-gray-700">Contraseña:</label>
 
             {{-- Este es el div que envolvera todo el campo de contrasena, iconos y error --}}
             <div class="relative">
@@ -55,7 +55,7 @@
 
                 {{-- Campo de Contrasena --}}
                 <input id="password" :type="showPassword ? 'text' : 'password'" name="password"
-                    placeholder="ingrese su contrasena" required
+                    placeholder="ingrese su contraseña" required
                     class="w-full px-3 py-2 pl-10 pr-10 text-md border border-gray-300 rounded-full focus:outline-none focus:ring-2
                      focus:ring-green-500 focus:border-transparent" />
 
@@ -74,13 +74,13 @@
 
         <div class="mb-6" x-data="{ showConfirmPassword: false }"> {{-- Usa una nueva variable para este campo --}}
             <label for="password_confirmation" class="block mb-1 text-md font-bold text-gray-700">Confirmar
-                Contrasena:</label>
+                Contraseña:</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                     <img src="{{ asset('images/candado.svg') }}" alt="candado" class="w-4 h-4">
                 </span>
                 <input id="password_confirmation" :type="showConfirmPassword ? 'text' : 'password'"
-                    name="password_confirmation" placeholder="confirme su contrasena" required
+                    name="password_confirmation" placeholder="confirme su contraseña" required
                     class="w-full px-3 py-2 pl-10 pr-10 text-md border border-gray-300 rounded-full focus:outline-none focus:ring-2
                      focus:ring-green-500 focus:border-transparent" />
 
@@ -100,7 +100,7 @@
             {{-- Reemplaza <x-button> con <button> y sus clases --}}
             <button type="submit"
                 class="w-full px-4 py-3 font-semibold bg-[var(--color-textmarca)] hover:bg-[var(--color-texthovermarca)] border border-transparent rounded-full text-white ">
-                {{ __('Restablecer Contrasena') }}
+                {{ __('Restablecer Contraseña') }}
             </button>
         </div>
     </form>

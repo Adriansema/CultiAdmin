@@ -91,7 +91,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Actualizacion de Estado de tu Noticia</h1>
+            <h1>Actualizacion de estado de tu noticia</h1>
         </div>
         <div class="content">
             <p>Hola,</p>
@@ -115,14 +115,14 @@
                 </p>
             @endif
 
-            <p>Puedes ver los detalles de tu noticia iniciando sesion en nuestra plataforma:</p>
+            <p>Puedes ver los detalles de tu noticia iniciando sesión en nuestra plataforma:</p>
             <p style="text-align: center;">
-                <a href="{{ url('/pendientes/noticias/' . $noticia->id_noticias) }}" class="button">Ver Noticia</a>
+                <a href="{{ url('/pendientes/noticias/' . $noticia->id_noticias) }}" class="button">Ver noticia</a>
             </p>
         </div>
         <div class="footer">
             <p>Este es un correo electronico automático, por favor no respondas a este mensaje.</p>
-            <p>&copy; {{ date('Y') }} Tu Aplicacion. Todos los derechos reservados.</p>
+            <p>&copy; {{ date('Y') }} Cultiva sena. Todos los derechos reservados.</p>
         </div>
     </div>
 </body>

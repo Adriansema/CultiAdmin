@@ -3,7 +3,7 @@
     <div class="relative bg-[var(--color-Gestion)] rounded-3xl shadow-xl p-6 w-full max-w-3xl mx-auto my-8">
         {{-- Encabezado del modal --}}
         <div class="flex justify-between items-center pb-3 border-b border-gray-200">
-            <h3 class="text-2xl font-semibold text-gray-900">Editar Boletín</h3>
+            <h3 class="text-2xl font-semibold text-gray-900">Editar boletín</h3>
             {{-- Botón para cerrar el modal --}}
             <button type="button" class="text-gray-400 hover:text-gray-600"
                 onclick="cerrarModal('editar', '{{ $boletin->id }}')">
@@ -23,7 +23,7 @@
 
             <div class="mb-4">
                 <label for="edit_nombre_{{ $boletin->id }}" class="block text-sm font-bold text-gray-700">Nombre del
-                    Boletín</label>
+                    boletín:</label>
                 <input type="text" name="nombre" id="edit_nombre_{{ $boletin->id }}"
                     value="{{ old('nombre', $boletin->nombre) }}"
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
@@ -33,7 +33,7 @@
             {{-- Campo Descripción --}}
             <div class="mb-4">
                 <label for="edit_descripcion_{{ $boletin->id }}"
-                    class="block text-sm font-bold text-gray-700">Descripción</label>
+                    class="block text-sm font-bold text-gray-700">Descripción:</label>
                 <textarea name="descripcion" id="edit_descripcion_{{ $boletin->id }}" rows="3"
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">{{ old('descripcion', $boletin->descripcion) }}</textarea>
                 {{-- Div para mostrar errores de validación de la descripción --}}
@@ -42,7 +42,7 @@
 
             {{-- Campo Archivo PDF - MEJORADO --}}
             <div class="mb-4">
-                <label class="block text-sm font-bold text-gray-700 mb-2">Archivo PDF (opcional)</label>
+                <label class="block text-sm font-bold text-gray-700 mb-2">Archivo pdf (opcional)</label>
 
                 <div class="flex items-center gap-2">
                     <label for="edit_archivo_upload_{{ $boletin->id }}"
@@ -68,14 +68,13 @@
                 @if ($boletin->archivo)
                     <div class="flex flex-col items-center justify-center p-3 mt-4 rounded-md bg-gray-50"
                         id="current_file_section_{{ $boletin->id }}">
-                        <h3 class="mb-2 text-md font-semibold text-black">Archivo Adjunto Actual:</h3>
+                        <h3 class="mb-2 text-md font-semibold text-black">Archivo adjunto actual:</h3>
                         <div class="flex items-center gap-4">
                             {{-- Construye la URL con asset() y la ruta relativa --}}
-                            <a href="{{ Storage::url($boletin->archivo) }}" target="_blank"
+                            <a href="{{ asset('storage/' . $boletin->archivo) }}" target="_blank"
                                 class="flex flex-col items-center text-blue-600 transition-transform duration-300 ease-in-out transform hover:underline hover:scale-105">
-                                <img src="{{ asset('images/PDF.svg') }}" alt="Icono PDF"
-                                    class="mb-1 cursor-pointer w-16 h-20">
-                                <span class="text-sm text-gray-700">Ver PDF</span>
+                                <img src="{{ asset('images/PDF.svg') }}" alt="Icono PDF" class="mb-1 cursor-pointer w-14 h-14">
+                                <span class="text-sm text-gray-700">Ver pdf</span>
                             </a>
                             <button type="button" onclick="removeFile('{{ $boletin->id }}')"
                                 class="flex flex-col items-center text-red-600 hover:text-red-800 transition duration-150 ease-in-out focus:outline-none">
@@ -94,7 +93,7 @@
                 @else
                     <div class="p-3 mt-4 rounded-md bg-gray-50" id="current_file_section_{{ $boletin->id }}"
                         style="display:none;">
-                        <p class="text-gray-700">No hay archivo PDF adjunto para este boletín.</p>
+                        <p class="text-gray-700">No hay archivo pdf adjunto para este boletín.</p>
                     </div>
                 @endif
             </div>
@@ -103,7 +102,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label for="edit_precio_mas_alto_{{ $boletin->id }}"
-                        class="block text-sm font-bold text-gray-700">Precio Más Alto</label>
+                        class="block text-sm font-bold text-gray-700">Precio más alto</label>
                     <div class="flex items-center gap-2 mt-1"> {{-- Usamos flexbox aquí --}}
                         <img src="{{ asset('images/alto.svg') }}" alt="Icono subir" class="w-6 h-6">
                         <input type="number" step="0.01" name="precio_mas_alto"
@@ -115,7 +114,7 @@
                 </div>
                 <div>
                     <label for="edit_lugar_precio_mas_alto_{{ $boletin->id }}"
-                        class="block text-sm font-bold text-gray-700">Lugar Precio Más Alto</label>
+                        class="block text-sm font-bold text-gray-700">Lugar precio más alto</label>
                     <input type="text" name="lugar_precio_mas_alto"
                         id="edit_lugar_precio_mas_alto_{{ $boletin->id }}"
                         value="{{ old('lugar_precio_mas_alto', $boletin->lugar_precio_mas_alto) }}"
@@ -130,20 +129,19 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label for="edit_precio_mas_bajo_{{ $boletin->id }}"
-                        class="block text-sm font-bold text-gray-700">Precio Más Bajo</label>
-                    <div class="flex items-center gap-2 mt-1"> {{-- Usamos flexbox aquí --}}
+                        class="block text-sm font-bold text-gray-700">Precio más bajo</label>
+                    <div class="flex items-center gap-2 mt-1"> 
                         <img src="{{ asset('images/bajo.svg') }}" alt="Iconobajar" class="w-6 h-6">
                         <input type="number" step="0.01" name="precio_mas_bajo"
                             id="edit_precio_mas_bajo_{{ $boletin->id }}"
                             value="{{ old('precio_mas_bajo', $boletin->precio_mas_bajo) }}"
                             class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                     </div>
-                    {{-- Div para mostrar errores de validación del precio más bajo --}}
                     <div id="edit_precio_mas_bajo_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1"></div>
                 </div>
                 <div>
                     <label for="edit_lugar_precio_mas_bajo_{{ $boletin->id }}"
-                        class="block text-sm font-bold text-gray-700">Lugar Precio Más Bajo</label>
+                        class="block text-sm font-bold text-gray-700">Lugar precio más bajo</label>
                     <input type="text" name="lugar_precio_mas_bajo"
                         id="edit_lugar_precio_mas_bajo_{{ $boletin->id }}"
                         value="{{ old('lugar_precio_mas_bajo', $boletin->lugar_precio_mas_bajo) }}"

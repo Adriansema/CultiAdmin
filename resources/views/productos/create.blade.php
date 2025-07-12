@@ -24,7 +24,7 @@
                 <select name="tipo" id="tipo"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('tipo') border-red-500 @else border-gray-300 @enderror">
                     <option value="">Seleccione un tipo</option>
-                    <option value="cafe" {{ old('tipo') == 'cafe' ? 'selected' : '' }}>cafe</option>
+                    <option value="cafe" {{ old('tipo') == 'cafe' ? 'selected' : '' }}>Café</option>
                     <option value="mora" {{ old('tipo') == 'mora' ? 'selected' : '' }}>Mora</option>
                     <option value="videos" {{ old('tipo') == 'videos' ? 'selected' : '' }}>Video</option>
                 </select>
@@ -50,8 +50,7 @@
             {{-- Campo rutavideo para productos tipo cafe o Mora --}}
             <div id="campos_ruta_video_producto" class="hidden">
                 <div class="mb-4">
-                    <label for="rutavideo" class="block text-gray-700 text-sm font-bold mb-2">URL del video (Producto
-                        general):<span class="text-red-500">*</span></label>
+                    <label for="rutavideo" class="block text-gray-700 text-sm font-bold mb-2">URL del video:<span class="text-red-500">*</span></label>
                     <input type="url" name="rutavideo" id="rutavideo"
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('rutavideo') border-red-500 @else border-gray-300 @enderror"
                         value="{{ old('rutavideo') }}" placeholder="https://ejemplo.com/tu-video-general.mp4">
@@ -63,7 +62,7 @@
 
             {{-- Campos específicos para cafe --}}
             <div id="campos_cafe" class="hidden mt-6 pt-4 border-t border-gray-200">
-                <h2 class="text-xl font-semibold mb-3">Detalles de cafe</h2>
+                <h2 class="text-xl font-semibold mb-3">Detalles de café</h2>
                 <div class="mb-4">
                     <label for="cafe_data_numero_pagina" class="block text-gray-700 text-sm font-bold mb-2">
                         Número de página: <span class="text-red-500">*</span>
@@ -89,7 +88,7 @@
 
                 <div class="mb-4">
                     <label for="cafe_data_informacion" class="block text-gray-700 text-sm font-bold mb-2">Información de
-                        cafe: <span class="text-red-500">*</span></label>
+                        café: <span class="text-red-500">*</span></label>
                     <textarea name="cafe_data[informacion]" id="cafe_data_informacion" rows="5"
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('cafe_data.informacion') }}</textarea>
                     @error('cafe_data.informacion')
@@ -146,165 +145,165 @@
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.tipo') border-red-500 @else border-gray-300 @enderror">
                         <option value="">Seleccione un subtipo</option>
 
-                        <option value="Educativo" {{ old('videos_data.tipo') == 'Educativo' ? 'selected' : '' }}>Video
-                            Educativo</option>
-                        <option value="Secundarios" {{ old('videos_data.tipo') == 'Secundarios' ? 'selected' : '' }}>Video
-                            Secundarios</option>
-                        <option value="Insumos_y_abonos"
-                            {{ old('videos_data.tipo') == 'Insumos_y_abonos' ? 'selected' : '' }}>Video
-                            Insumos y Abonos</option>
-                        <option value="Cuidados_generales"
-                            {{ old('videos_data.tipo') == 'Cuidados_generales' ? 'selected' : '' }}>Video
-                            Cuidados Generales</option>
-                        <option value="Preparacion_terreno_siembra"
-                            {{ old('videos_data.tipo') == 'Preparacion_terreno_siembra' ? 'selected' : '' }}>Video
-                            Preparacion del terreno y siembra</option>
-                        <option value="Sugerencias_generales"
-                            {{ old('videos_data.tipo') == 'Sugerencias_generales' ? 'selected' : '' }}>Video
-                            Sugerencias generales</option>
-                        <option value="Metodos_recoleccion"
-                            {{ old('videos_data.tipo') == 'Metodos_recoleccion' ? 'selected' : '' }}>Video
-                            Metodos de recoleccion</option>
-                        <option value="Cuidados_cosecha"
-                            {{ old('videos_data.tipo') == 'Cuidados_cosecha' ? 'selected' : '' }}>Video
-                            Cuidados de la cosecha</option>
-                        <option value="Buenas_practicas_agricolas"
-                            {{ old('videos_data.tipo') == 'Buenas_practicas_agricolas' ? 'selected' : '' }}>Video
-                            Buenas Practicas Agricolas</option>
+                        <option value="educativos" {{ old('videos_data.tipo') == 'educativos' ? 'selected' : '' }}>Video
+                            educativos</option>
+                        <option value="recomendados" {{ old('videos_data.tipo') == 'recomendados' ? 'selected' : '' }}>Video
+                            recomendados</option>
+                        <option value="insumos_y_abonos"
+                            {{ old('videos_data.tipo') == 'insumos_y_abonos' ? 'selected' : '' }}>Video
+                            insumos y abonos</option>
+                        <option value="cuidados_generales"
+                            {{ old('videos_data.tipo') == 'cuidados_generales' ? 'selected' : '' }}>Video
+                            cuidados generales</option>
+                        <option value="preparacion_terreno_siembra"
+                            {{ old('videos_data.tipo') == 'preparacion_terreno_siembra' ? 'selected' : '' }}>Video
+                            preparación del terreno y siembra</option>
+                        <option value="sugerencias_generales"
+                            {{ old('videos_data.tipo') == 'sugerencias_generales' ? 'selected' : '' }}>Video
+                            sugerencias generales</option>
+                        <option value="metodos_recoleccion"
+                            {{ old('videos_data.tipo') == 'metodos_recoleccion' ? 'selected' : '' }}>Video
+                            métodos de recolección</option>
+                        <option value="cuidados_cosecha"
+                            {{ old('videos_data.tipo') == 'cuidados_cosecha' ? 'selected' : '' }}>Video
+                            cuidados de la cosecha</option>
+                        <option value="buenas_practicas_agricolas"
+                            {{ old('videos_data.tipo') == 'buenas_practicas_agricolas' ? 'selected' : '' }}>Video
+                            buenas prácticas agrícolas</option>
                     </select>
 
-                    <div id="campos_subtipo_Educativo" class="hidden mt-4 pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold mb-2">Campos para Video Educativo</h3>
+                    <div id="campos_subtipo_educativos" class="hidden mt-4 pt-4 border-t border-gray-200">
+                        <h3 class="text-lg font-semibold mb-2">Campos para video educativo</h3>
                         <div class="mb-4">
-                            <label for="Educativo_titulo" class="block text-gray-700 text-sm font-bold mb-2">Título: <span
+                            <label for="educativos_titulo" class="block text-gray-700 text-sm font-bold mb-2">Título: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Educativo][titulo]" id="Educativo_titulo"
+                            <input type="text" name="videos_data[educativos][titulo]" id="educativos_titulo"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Educativo.titulo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Educativo.titulo') }}">
-                            @error('videos_data.Educativo.titulo')
+                                value="{{ old('videos_data.educativos.titulo') }}">
+                            @error('videos_data.educativos.titulo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Educativo_autor" class="block text-gray-700 text-sm font-bold mb-2">Autor: <span
+                            <label for="educativos_autor" class="block text-gray-700 text-sm font-bold mb-2">Autor: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Educativo][autor]" id="Educativo_autor"
+                            <input type="text" name="videos_data[educativos][autor]" id="educativos_autor"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Educativo.autor') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Educativo.autor') }}">
-                            @error('videos_data.Educativo.autor')
+                                value="{{ old('videos_data.educativos.autor') }}">
+                            @error('videos_data.educativos.autor')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Educativo_descripcion"
+                            <label for="educativos_descripcion"
                                 class="block text-gray-700 text-sm font-bold mb-2">Descripción:<span
                                     class="text-red-500">*</span></label>
-                            <textarea name="videos_data[Educativo][descripcion]" id="Educativo_descripcion" rows="5"
+                            <textarea name="videos_data[educativos][descripcion]" id="educativos_descripcion" rows="5"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Educativo.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.Educativo.descripcion') }}</textarea>
-                            @error('videos_data.Educativo.descripcion')
+                            @error('videos_data.educativos.descripcion')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Educativo_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del
+                            <label for="educativos_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del
                                 video: <span class="text-red-500">*</span></label>
-                            <input type="url" name="videos_data[Educativo][rutaVideo]" id="Educativo_rutaVideo"
+                            <input type="url" name="videos_data[educativos][rutaVideo]" id="educativos_rutaVideo"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Educativo.rutaVideo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Educativo.rutaVideo') }}"
+                                value="{{ old('videos_data.educativos.rutaVideo') }}"
                                 placeholder="https://ejemplo.com/tu-video-primario.mp4">
-                            @error('videos_data.Educativo.rutaVideo')
+                            @error('videos_data.educativos.rutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <div id="campos_subtipo_Secundarios" class="hidden mt-4 pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold mb-2">Campos para Video Secundarios</h3>
+                    <div id="campos_subtipo_recomendados" class="hidden mt-4 pt-4 border-t border-gray-200">
+                        <h3 class="text-lg font-semibold mb-2">Campos para video recomendados</h3>
                         <div class="mb-4">
-                            <label for="Secundarios_titulo" class="block text-gray-700 text-sm font-bold mb-2">Título:
+                            <label for="recomendados_titulo" class="block text-gray-700 text-sm font-bold mb-2">Título:
                                 <span class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Secundarios][titulo]" id="Secundarios_titulo"
+                            <input type="text" name="videos_data[recomendados][titulo]" id="recomendados_titulo"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Secundarios.titulo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Secundarios.titulo') }}">
-                            @error('videos_data.Secundarios.titulo')
+                                value="{{ old('videos_data.recomendados.titulo') }}">
+                            @error('videos_data.recomendados.titulo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Secundarios_autor" class="block text-gray-700 text-sm font-bold mb-2">Autor: <span
+                            <label for="recomendados_autor" class="block text-gray-700 text-sm font-bold mb-2">Autor: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Secundarios][autor]" id="Secundarios_autor"
+                            <input type="text" name="videos_data[recomendados][autor]" id="recomendados_autor"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Secundarios.autor') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Secundarios.autor') }}">
-                            @error('videos_data.Secundarios.autor')
+                                value="{{ old('videos_data.recomendados.autor') }}">
+                            @error('videos_data.recomendados.autor')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Secundarios_descripcion"
+                            <label for="recomendados_descripcion"
                                 class="block text-gray-700 text-sm font-bold mb-2">Descripción:<span
                                     class="text-red-500">*</span></label>
-                            <textarea name="videos_data[Secundarios][descripcion]" id="Secundarios_descripcion" rows="5"
+                            <textarea name="videos_data[recomendados][descripcion]" id="recomendados_descripcion" rows="5"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Secundarios.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.Secundarios.descripcion') }}</textarea>
-                            @error('videos_data.Secundarios.descripcion')
+                            @error('videos_data.recomendados.descripcion')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Secundarios_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del
+                            <label for="recomendados_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL del
                                 video: <span class="text-red-500">*</span></label>
-                            <input type="url" name="videos_data[Secundarios][rutaVideo]" id="Secundarios_rutaVideo"
+                            <input type="url" name="videos_data[recomendados][rutaVideo]" id="recomendados_rutaVideo"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Secundarios.rutaVideo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Secundarios.rutaVideo') }}"
-                                placeholder="https://ejemplo.com/tu-video-secundario.mp4">
-                            @error('videos_data.Secundarios.rutaVideo')
+                                value="{{ old('videos_data.recomendados.rutaVideo') }}"
+                                placeholder="https://ejemplo.com/tu-video-recomendados.mp4">
+                            @error('videos_data.recomendados.rutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <div id="campos_subtipo_Insumos_y_abonos" class="hidden mt-4 pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold mb-2">Campos para Video Insumos y Abonos</h3>
+                    <div id="campos_subtipo_insumos_y_abonos" class="hidden mt-4 pt-4 border-t border-gray-200">
+                        <h3 class="text-lg font-semibold mb-2">Campos para video insumos y abonos</h3>
                         <div class="mb-4">
-                            <label for="Insumos_y_abonos_titulo"
+                            <label for="insumos_y_abonos_titulo"
                                 class="block text-gray-700 text-sm font-bold mb-2">Título: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Insumos_y_abonos][titulo]"
-                                id="Insumos_y_abonos_titulo"
+                            <input type="text" name="videos_data[insumos_y_abonos][titulo]"
+                                id="insumos_y_abonos_titulo"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Insumos_y_abonos.titulo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Insumos_y_abonos.titulo') }}">
-                            @error('videos_data.Insumos_y_abonos.titulo')
+                                value="{{ old('videos_data.insumos_y_abonos.titulo') }}">
+                            @error('videos_data.insumos_y_abonos.titulo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Insumos_y_abonos_autor" class="block text-gray-700 text-sm font-bold mb-2">Autor:
+                            <label for="insumos_y_abonos_autor" class="block text-gray-700 text-sm font-bold mb-2">Autor:
                                 <span class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Insumos_y_abonos][autor]" id="Insumos_y_abonos_autor"
+                            <input type="text" name="videos_data[insumos_y_abonos][autor]" id="insumos_y_abonos_autor"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Insumos_y_abonos.autor') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Insumos_y_abonos.autor') }}">
-                            @error('videos_data.Insumos_y_abonos.autor')
+                                value="{{ old('videos_data.insumos_y_abonos.autor') }}">
+                            @error('videos_data.insumos_y_abonos.autor')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Insumos_y_abonos_descripcion"
+                            <label for="insumos_y_abonos_descripcion"
                                 class="block text-gray-700 text-sm font-bold mb-2">Descripción:<span
                                     class="text-red-500">*</span></label>
-                            <textarea name="videos_data[Insumos_y_abonos][descripcion]" id="Insumos_y_abonos_descripcion" rows="5"
+                            <textarea name="videos_data[insumos_y_abonos][descripcion]" id="insumos_y_abonos_descripcion" rows="5"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Insumos_y_abonos.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.Insumos_y_abonos.descripcion') }}</textarea>
-                            @error('videos_data.Insumos_y_abonos.descripcion')
+                            @error('videos_data.insumos_y_abonos.descripcion')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Insumos_y_abonos_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL
+                            <label for="insumos_y_abonos_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL
                                 del
                                 video: <span class="text-red-500">*</span></label>
-                            <input type="url" name="videos_data[Insumos_y_abonos][rutaVideo]"
-                                id="Insumos_y_abonos_rutaVideo"
+                            <input type="url" name="videos_data[insumos_y_abonos][rutaVideo]"
+                                id="insumos_y_abonos_rutaVideo"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Insumos_y_abonos.rutaVideo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Insumos_y_abonos.rutaVideo') }}"
+                                value="{{ old('videos_data.insumos_y_abonos.rutaVideo') }}"
                                 placeholder="https://ejemplo.com/tu-video-insumos.mp4">
                             @error('videos_y_abonos.rutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
@@ -312,308 +311,309 @@
                         </div>
                     </div>
 
-                    <div id="campos_subtipo_Cuidados_generales" class="hidden mt-4 pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold mb-2">Campos para Video Cuidados Generales</h3>
+                    <div id="campos_subtipo_cuidados_generales" class="hidden mt-4 pt-4 border-t border-gray-200">
+                        <h3 class="text-lg font-semibold mb-2">Campos para video cuidados generales</h3>
                         <div class="mb-4">
-                            <label for="Cuidados_generales_titulo"
+                            <label for="cuidados_generales_titulo"
                                 class="block text-gray-700 text-sm font-bold mb-2">Título: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Cuidados_generales][titulo]"
-                                id="Cuidados_generales_titulo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Cuidados_generales.titulo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Cuidados_generales.titulo') }}">
-                            @error('videos_data.Cuidados_generales.titulo')
+                            <input type="text" name="videos_data[cuidados_generales][titulo]"
+                                id="cuidados_generales_titulo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.cuidados_generales.titulo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.cuidados_generales.titulo') }}">
+                            @error('videos_data.cuidados_generales.titulo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Cuidados_generales_autor"
+                            <label for="cuidados_generales_autor"
                                 class="block text-gray-700 text-sm font-bold mb-2">Autor: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Cuidados_generales][autor]"
-                                id="Cuidados_generales_autor"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Cuidados_generales.autor') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Cuidados_generales.autor') }}">
-                            @error('videos_data.Cuidados_generales.autor')
+                            <input type="text" name="videos_data[cuidados_generales][autor]"
+                                id="cuidados_generales_autor"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.cuidados_generales.autor') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.cuidados_generales.autor') }}">
+                            @error('videos_data.cuidados_generales.autor')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Cuidados_generales_descripcion"
+                            <label for="cuidados_generales_descripcion"
                                 class="block text-gray-700 text-sm font-bold mb-2">Descripción:<span
                                     class="text-red-500">*</span></label>
-                            <textarea name="videos_data[Cuidados_generales][descripcion]" id="Cuidados_generales_descripcion" rows="5"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Cuidados_generales.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.Cuidados_generales.descripcion') }}</textarea>
-                            @error('videos_data.Cuidados_generales.descripcion')
+                            <textarea name="videos_data[cuidados_generales][descripcion]" id="cuidados_generales_descripcion" rows="5"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.cuidados_generales.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.Cuidados_generales.descripcion') }}</textarea>
+                            @error('videos_data.cuidados_generales.descripcion')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Cuidados_generales_rutaVideo"
+                            <label for="cuidados_generales_rutaVideo"
                                 class="block text-gray-700 text-sm font-bold mb-2">URL del
                                 video: <span class="text-red-500">*</span></label>
-                            <input type="url" name="videos_data[Cuidados_generales][rutaVideo]"
-                                id="Cuidados_generales_rutaVideo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Cuidados_generales.rutaVideo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Cuidados_generales.rutaVideo') }}"
+                            <input type="url" name="videos_data[cuidados_generales][rutaVideo]"
+                                id="cuidados_generales_rutaVideo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.cuidados_generales.rutaVideo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.cuidados_generales.rutaVideo') }}"
                                 placeholder="https://ejemplo.com/tu-video-cuidados-generales.mp4">
-                            @error('videos_data.Cuidados_generales.rutaVideo')
+                            @error('videos_data.cuidados_generales.rutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
-<div id="campos_subtipo_Preparacion_terreno_siembra"
+
+                    <div id="campos_subtipo_preparacion_terreno_siembra"
                         class="hidden mt-4 pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold mb-2">Campos para Video Preparación del Terreno y Siembra</h3>
+                        <h3 class="text-lg font-semibold mb-2">Campos para video preparación del terreno y siembra</h3>
                         <div class="mb-4">
-                            <label for="Preparacion_terreno_siembra_titulo"
+                            <label for="preparacion_terreno_siembra_titulo"
                                 class="block text-gray-700 text-sm font-bold mb-2">Título: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Preparacion_terreno_siembra][titulo]"
-                                id="Preparacion_terreno_siembra_titulo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Preparacion_terreno_siembra.titulo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Preparacion_terreno_siembra.titulo') }}">
-                            @error('videos_data.Preparacion_terreno_siembra.titulo')
+                            <input type="text" name="videos_data[preparacion_terreno_siembra][titulo]"
+                                id="preparacion_terreno_siembra_titulo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.preparacion_terreno_siembra.titulo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.preparacion_terreno_siembra.titulo') }}">
+                            @error('videos_data.preparacion_terreno_siembra.titulo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Preparacion_terreno_siembra_autor"
+                            <label for="preparacion_terreno_siembra_autor"
                                 class="block text-gray-700 text-sm font-bold mb-2">Autor: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Preparacion_terreno_siembra][autor]"
-                                id="Preparacion_terreno_siembra_autor"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Preparacion_terreno_siembra.autor') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Preparacion_terreno_siembra.autor') }}">
-                            @error('videos_data.Preparacion_terreno_siembra.autor')
+                            <input type="text" name="videos_data[preparacion_terreno_siembra][autor]"
+                                id="preparacion_terreno_siembra_autor"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.preparacion_terreno_siembra.autor') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.preparacion_terreno_siembra.autor') }}">
+                            @error('videos_data.preparacion_terreno_siembra.autor')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Preparacion_terreno_siembra_descripcion"
+                            <label for="preparacion_terreno_siembra_descripcion"
                                 class="block text-gray-700 text-sm font-bold mb-2">Descripción:<span
                                     class="text-red-500">*</span></label>
-                            <textarea name="videos_data[Preparacion_terreno_siembra][descripcion]" id="Preparacion_terreno_siembra_descripcion"
+                            <textarea name="videos_data[preparacion_terreno_siembra][descripcion]" id="preparacion_terreno_siembra_descripcion"
                                 rows="5"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Preparacion_terreno_siembra.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.Preparacion_terreno_siembra.descripcion') }}</textarea>
-                            @error('videos_data.Preparacion_terreno_siembra.descripcion')
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.preparacion_terreno_siembra.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.preparacion_terreno_siembra.descripcion') }}</textarea>
+                            @error('videos_data.preparacion_terreno_siembra.descripcion')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Preparacion_terreno_siembra_rutaVideo"
+                            <label for="preparacion_terreno_siembra_rutaVideo"
                                 class="block text-gray-700 text-sm font-bold mb-2">URL del
                                 video: <span class="text-red-500">*</span></label>
-                            <input type="url" name="videos_data[Preparacion_terreno_siembra][rutaVideo]"
-                                id="Preparacion_terreno_siembra_rutaVideo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Preparacion_terreno_siembra.rutaVideo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Preparacion_terreno_siembra.rutaVideo') }}"
+                            <input type="url" name="videos_data[preparacion_terreno_siembra][rutaVideo]"
+                                id="preparacion_terreno_siembra_rutaVideo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.preparacion_terreno_siembra.rutaVideo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.preparacion_terreno_siembra.rutaVideo') }}"
                                 placeholder="https://ejemplo.com/tu-video-preparación.mp4"> {{-- CORRECCIÓN AQUÍ --}}
-                            @error('videos_data.Preparacion_terreno_siembra.rutaVideo')
+                            @error('videos_data.preparacion_terreno_siembra.rutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <div id="campos_subtipo_Sugerencias_generales" class="hidden mt-4 pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold mb-2">Campos para Video Sugerencias Generales</h3>
+                    <div id="campos_subtipo_sugerencias_generales" class="hidden mt-4 pt-4 border-t border-gray-200">
+                        <h3 class="text-lg font-semibold mb-2">Campos para video sugerencias generales</h3>
                         <div class="mb-4">
-                            <label for="Sugerencias_generales_titulo"
+                            <label for="sugerencias_generales_titulo"
                                 class="block text-gray-700 text-sm font-bold mb-2">Título: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Sugerencias_generales][titulo]"
-                                id="Sugerencias_generales_titulo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Sugerencias_generales.titulo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Sugerencias_generales.titulo') }}">
-                            @error('videos_data.Sugerencias_generales.titulo')
+                            <input type="text" name="videos_data[sugerencias_generales][titulo]"
+                                id="sugerencias_generales_titulo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.sugerencias_generales.titulo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.sugerencias_generales.titulo') }}">
+                            @error('videos_data.sugerencias_generales.titulo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Sugerencias_generales_autor"
+                            <label for="sugerencias_generales_autor"
                                 class="block text-gray-700 text-sm font-bold mb-2">Autor: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Sugerencias_generales][autor]"
-                                id="Sugerencias_generales_autor"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Sugerencias_generales.autor') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Sugerencias_generales.autor') }}">
-                            @error('videos_data.Sugerencias_generales.autor')
+                            <input type="text" name="videos_data[sugerencias_generales][autor]"
+                                id="sugerencias_generales_autor"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.sugerencias_generales.autor') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.sugerencias_generales.autor') }}">
+                            @error('videos_data.sugerencias_generales.autor')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Sugerencias_generales_descripcion"
+                            <label for="sugerencias_generales_descripcion"
                                 class="block text-gray-700 text-sm font-bold mb-2">Descripción:<span
                                     class="text-red-500">*</span></label>
-                            <textarea name="videos_data[Sugerencias_generales][descripcion]" id="Sugerencias_generales_descripcion"
+                            <textarea name="videos_data[sugerencias_generales][descripcion]" id="sugerencias_generales_descripcion"
                                 rows="5"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Sugerencias_generales.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.Sugerencias_generales.descripcion') }}</textarea>
-                            @error('videos_data.Sugerencias_generales.descripcion')
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.sugerencias_generales.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.sugerencias_generales.descripcion') }}</textarea>
+                            @error('videos_data.sugerencias_generales.descripcion')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Sugerencias_generales_rutaVideo"
+                            <label for="sugerencias_generales_rutaVideo"
                                 class="block text-gray-700 text-sm font-bold mb-2">URL del
                                 video: <span class="text-red-500">*</span></label>
-                            <input type="url" name="videos_data[Sugerencias_generales][rutaVideo]"
-                                id="Sugerencias_generales_rutaVideo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Sugerencias_generales.rutaVideo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Sugerencias_generales.rutaVideo') }}"
+                            <input type="url" name="videos_data[sugerencias_generales][rutaVideo]"
+                                id="sugerencias_generales_rutaVideo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.sugerencias_generales.rutaVideo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.sugerencias_generales.rutaVideo') }}"
                                 placeholder="https://ejemplo.com/tu-video-sugerencias.mp4">
-                            @error('videos_data.Sugerencias_generales.rutaVideo')
+                            @error('videos_data.sugerencias_generales.rutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <div id="campos_subtipo_Metodos_recoleccion" class="hidden mt-4 pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold mb-2">Campos para Video Métodos de Recolección</h3>
+                    <div id="campos_subtipo_metodos_recoleccion" class="hidden mt-4 pt-4 border-t border-gray-200">
+                        <h3 class="text-lg font-semibold mb-2">Campos para video métodos de recolección</h3>
                         <div class="mb-4">
-                            <label for="Metodos_recoleccion_titulo"
+                            <label for="metodos_recoleccion_titulo"
                                 class="block text-gray-700 text-sm font-bold mb-2">Título: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Metodos_recoleccion][titulo]"
-                                id="Metodos_recoleccion_titulo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Metodos_recoleccion.titulo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Metodos_recoleccion.titulo') }}">
-                            @error('videos_data.Metodos_recoleccion.titulo')
+                            <input type="text" name="videos_data[metodos_recoleccion][titulo]"
+                                id="metodos_recoleccion_titulo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.metodos_recoleccion.titulo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.metodos_recoleccion.titulo') }}">
+                            @error('videos_data.metodos_recoleccion.titulo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Metodos_recoleccion_autor"
+                            <label for="metodos_recoleccion_autor"
                                 class="block text-gray-700 text-sm font-bold mb-2">Autor: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Metodos_recoleccion][autor]"
-                                id="Metodos_recoleccion_autor"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Metodos_recoleccion.autor') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Metodos_recoleccion.autor') }}">
-                            @error('videos_data.Metodos_recoleccion.autor')
+                            <input type="text" name="videos_data[metodos_recoleccion][autor]"
+                                id="metodos_recoleccion_autor"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.metodos_recoleccion.autor') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.metodos_recoleccion.autor') }}">
+                            @error('videos_data.metodos_recoleccion.autor')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Metodos_recoleccion_descripcion"
+                            <label for="metodos_recoleccion_descripcion"
                                 class="block text-gray-700 text-sm font-bold mb-2">Descripción:<span
                                     class="text-red-500">*</span></label>
-                            <textarea name="videos_data[Metodos_recoleccion][descripcion]" id="Metodos_recoleccion_descripcion" rows="5"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Metodos_recoleccion.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.Metodos_recoleccion.descripcion') }}</textarea>
-                            @error('videos_data.Metodos_recoleccion.descripcion')
+                            <textarea name="videos_data[metodos_recoleccion][descripcion]" id="metodos_recoleccion_descripcion" rows="5"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.metodos_recoleccion.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.metodos_recoleccion.descripcion') }}</textarea>
+                            @error('videos_data.metodos_recoleccion.descripcion')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Metodos_recoleccion_rutaVideo"
+                            <label for="metodos_recoleccion_rutaVideo"
                                 class="block text-gray-700 text-sm font-bold mb-2">URL del
                                 video: <span class="text-red-500">*</span></label>
-                            <input type="url" name="videos_data[Metodos_recoleccion][rutaVideo]"
-                                id="Metodos_recoleccion_rutaVideo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Metodos_recoleccion.rutaVideo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Metodos_recoleccion.rutaVideo') }}"
+                            <input type="url" name="videos_data[metodos_recoleccion][rutaVideo]"
+                                id="metodos_recoleccion_rutaVideo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.metodos_recoleccion.rutaVideo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.metodos_recoleccion.rutaVideo') }}"
                                 placeholder="https://ejemplo.com/tu-video-recolección.mp4"> {{-- CORRECCIÓN AQUÍ --}}
-                            @error('videos_data.Metodos_recoleccion.rutaVideo')
+                            @error('videos_data.metodos_recoleccion.rutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
                     
-                    <div id="campos_subtipo_Cuidados_cosecha" class="hidden mt-4 pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold mb-2">Campos para Video Cuidados de la Cosecha</h3>
+                    <div id="campos_subtipo_cuidados_cosecha" class="hidden mt-4 pt-4 border-t border-gray-200">
+                        <h3 class="text-lg font-semibold mb-2">Campos para video cuidados de la cosecha</h3>
                         <div class="mb-4">
-                            <label for="Cuidados_cosecha_titulo"
+                            <label for="cuidados_cosecha_titulo"
                                 class="block text-gray-700 text-sm font-bold mb-2">Título: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Cuidados_cosecha][titulo]"
-                                id="Cuidados_cosecha_titulo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Cuidados_cosecha.titulo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Cuidados_cosecha.titulo') }}">
-                            @error('videos_data.Cuidados_cosecha.titulo')
+                            <input type="text" name="videos_data[cuidados_cosecha][titulo]"
+                                id="cuidados_cosecha_titulo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.cuidados_cosecha.titulo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.cuidados_cosecha.titulo') }}">
+                            @error('videos_data.cuidados_cosecha.titulo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Cuidados_cosecha_autor" class="block text-gray-700 text-sm font-bold mb-2">Autor:
+                            <label for="cuidados_cosecha_autor" class="block text-gray-700 text-sm font-bold mb-2">Autor:
                                 <span class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Cuidados_cosecha][autor]" id="Cuidados_cosecha_autor"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Cuidados_cosecha.autor') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Cuidados_cosecha.autor') }}">
-                            @error('videos_data.Cuidados_cosecha.autor')
+                            <input type="text" name="videos_data[cuidados_cosecha][autor]" id="cuidados_cosecha_autor"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.cuidados_cosecha.autor') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.cuidados_cosecha.autor') }}">
+                            @error('videos_data.cuidados_cosecha.autor')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Cuidados_cosecha_descripcion"
+                            <label for="cuidados_cosecha_descripcion"
                                 class="block text-gray-700 text-sm font-bold mb-2">Descripción:<span
                                     class="text-red-500">*</span></label>
-                            <textarea name="videos_data[Cuidados_cosecha][descripcion]" id="Cuidados_cosecha_descripcion" rows="5"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Cuidados_cosecha.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.Cuidados_cosecha.descripcion') }}</textarea>
-                            @error('videos_data.Cuidados_cosecha.descripcion')
+                            <textarea name="videos_data[cuidados_cosecha][descripcion]" id="cuidados_cosecha_descripcion" rows="5"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.cuidados_cosecha.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.Cuidados_cosecha.descripcion') }}</textarea>
+                            @error('videos_data.cuidados_cosecha.descripcion')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Cuidados_cosecha_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL
+                            <label for="cuidados_cosecha_rutaVideo" class="block text-gray-700 text-sm font-bold mb-2">URL
                                 del
                                 video: <span class="text-red-500">*</span></label>
-                            <input type="url" name="videos_data[Cuidados_cosecha][rutaVideo]"
-                                id="Cuidados_cosecha_rutaVideo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Cuidados_cosecha.rutaVideo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Cuidados_cosecha.rutaVideo') }}"
+                            <input type="url" name="videos_data[cuidados_cosecha][rutaVideo]"
+                                id="cuidados_cosecha_rutaVideo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.cuidados_cosecha.rutaVideo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.cuidados_cosecha.rutaVideo') }}"
                                 placeholder="https://ejemplo.com/tu-video-cosecha.mp4">
-                            @error('videos_data.Cuidados_cosecha.rutaVideo')
+                            @error('videos_data.cuidados_cosecha.rutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <div id="campos_subtipo_Buenas_practicas_agricolas" class="hidden mt-4 pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold mb-2">Campos para Video Buenas Prácticas Agrícolas</h3>
+                    <div id="campos_subtipo_buenas_practicas_agricolas" class="hidden mt-4 pt-4 border-t border-gray-200">
+                        <h3 class="text-lg font-semibold mb-2">Campos para video buenas prácticas agrícolas</h3>
                         <div class="mb-4">
-                            <label for="Buenas_practicas_agricolas_titulo"
+                            <label for="buenas_practicas_agricolas_titulo"
                                 class="block text-gray-700 text-sm font-bold mb-2">Título: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Buenas_practicas_agricolas][titulo]"
-                                id="Buenas_practicas_agricolas_titulo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Buenas_practicas_agricolas.titulo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Buenas_practicas_agricolas.titulo') }}">
-                            @error('videos_data.Buenas_practicas_agricolas.titulo')
+                            <input type="text" name="videos_data[buenas_practicas_agricolas][titulo]"
+                                id="buenas_practicas_agricolas_titulo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.buenas_practicas_agricolas.titulo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.buenas_practicas_agricolas.titulo') }}">
+                            @error('videos_data.buenas_practicas_agricolas.titulo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Buenas_practicas_agricolas_autor"
+                            <label for="buenas_practicas_agricolas_autor"
                                 class="block text-gray-700 text-sm font-bold mb-2">Autor: <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" name="videos_data[Buenas_practicas_agricolas][autor]"
-                                id="Buenas_practicas_agricolas_autor"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Buenas_practicas_agricolas.autor') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Buenas_practicas_agricolas.autor') }}">
-                            @error('videos_data.Buenas_practicas_agricolas.autor')
+                            <input type="text" name="videos_data[buenas_practicas_agricolas][autor]"
+                                id="buenas_practicas_agricolas_autor"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.buenas_practicas_agricolas.autor') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.buenas_practicas_agricolas.autor') }}">
+                            @error('videos_data.buenas_practicas_agricolas.autor')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Buenas_practicas_agricolas_descripcion"
+                            <label for="buenas_practicas_agricolas_descripcion"
                                 class="block text-gray-700 text-sm font-bold mb-2">Descripción:<span
                                     class="text-red-500">*</span></label>
-                            <textarea name="videos_data[Buenas_practicas_agricolas][descripcion]" id="Buenas_practicas_agricolas_descripcion"
+                            <textarea name="videos_data[buenas_practicas_agricolas][descripcion]" id="buenas_practicas_agricolas_descripcion"
                                 rows="5"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Buenas_practicas_agricolas.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.Buenas_practicas_agricolas.descripcion') }}</textarea>
-                            @error('videos_data.Buenas_practicas_agricolas.descripcion')
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.buenas_practicas_agricolas.descripcion') border-red-500 @else border-gray-300 @enderror">{{ old('videos_data.buenas_practicas_agricolas.descripcion') }}</textarea>
+                            @error('videos_data.buenas_practicas_agricolas.descripcion')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="Buenas_practicas_agricolas_rutaVideo"
+                            <label for="buenas_practicas_agricolas_rutaVideo"
                                 class="block text-gray-700 text-sm font-bold mb-2">URL del
                                 video: <span class="text-red-500">*</span></label>
-                            <input type="url" name="videos_data[Buenas_practicas_agricolas][rutaVideo]"
-                                id="Buenas_practicas_agricolas_rutaVideo"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.Buenas_practicas_agricolas.rutaVideo') border-red-500 @else border-gray-300 @enderror"
-                                value="{{ old('videos_data.Buenas_practicas_agricolas.rutaVideo') }}"
+                            <input type="url" name="videos_data[buenas_practicas_agricolas][rutaVideo]"
+                                id="buenas_practicas_agricolas_rutaVideo"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('videos_data.buenas_practicas_agricolas.rutaVideo') border-red-500 @else border-gray-300 @enderror"
+                                value="{{ old('videos_data.buenas_practicas_agricolas.rutaVideo') }}"
                                 placeholder="https://ejemplo.com/tu-video-bpa.mp4">
-                            @error('videos_data.Buenas_practicas_agricolas.rutaVideo')
+                            @error('videos_data.buenas_practicas_agricolas.rutaVideo')
                                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
                             @enderror
                         </div>
@@ -649,15 +649,15 @@
 
             // Seleccionar todos los divs de subtipo de video de una vez
             const allSubtypeFields = document.querySelectorAll(
-                '#campos_subtipo_Educativo, ' +
-                '#campos_subtipo_Secundarios, ' +
-                '#campos_subtipo_Insumos_y_abonos, ' +
-                '#campos_subtipo_Cuidados_generales, ' +
-                '#campos_subtipo_Preparacion_terreno_siembra, ' +
-                '#campos_subtipo_Sugerencias_generales, ' +
-                '#campos_subtipo_Metodos_recoleccion, ' +
-                '#campos_subtipo_Cuidados_cosecha, ' +
-                '#campos_subtipo_Buenas_practicas_agricolas'
+                '#campos_subtipo_educativos, ' +
+                '#campos_subtipo_recomendados, ' +
+                '#campos_subtipo_insumos_y_abonos, ' +
+                '#campos_subtipo_cuidados_generales, ' +
+                '#campos_subtipo_preparacion_terreno_siembra, ' +
+                '#campos_subtipo_sugerencias_generales, ' +
+                '#campos_subtipo_metodos_recoleccion, ' +
+                '#campos_subtipo_cuidados_cosecha, ' +
+                '#campos_subtipo_buenas_practicas_agricolas'
             );
 
             /**

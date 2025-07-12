@@ -111,10 +111,10 @@
                 }
             @endphp
 
-            <p>{{ $saludo }} {{ $userName }},</p>
+            <p>{{ $saludo }} <b>{{ $userName }}</b>,</p>
 
             <p>
-                Te damos la bienvenida a <strong>Cultiva Sena</strong>, la plataforma para gestionar productos agrícolas
+                Te damos la bienvenida a <strong>Cultiva sena</strong>, la plataforma para gestionar productos agrícolas
                 con eficiencia y confianza.
             </p>
 
@@ -141,14 +141,14 @@
                 Estamos para ayudarte.
             </p>
 
-            <p>Gracias por ser parte de este cultivo digital</p>
+            <p>Gracias por ser parte de este panel de administración</p>
         </div>
 
         <div class="footer">
-            <p>El equipo de Cultiva Sena</p>
+            <p>El equipo de Cultiva sena</p>
             <p><em>Este mensaje es confidencial. No compartas tu contraseña con nadie. Si sospechas de un acceso no
                     autorizado, contáctanos de inmediato.</em></p>
-            <p>&copy; {{ date('Y') }} Cultiva Sena. Todos los derechos reservados.</p>
+            <p>&copy; {{ date('Y') }} Cultiva sena. Todos los derechos reservados.</p>
         </div>
     </div>
 </body>

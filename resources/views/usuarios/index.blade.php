@@ -33,8 +33,8 @@
                         </span>
                     </button>
 
-                    <form method="GET" action="{{ route('usuarios.exportar') }}" class="mr-2 mb-2 md:mb-0">
-                        <x-responsive-nav-link href="#" onclick="this.closest('form').submit(); return false;"
+                    <form method="GET" action="{{ route('usuarios.exportar') }}" id="exportCsvForm" class="mr-2 mb-2 md:mb-0">
+                        <button type="submit" id="exportCsvButton"
                             class="inline-flex items-center group justify-center px-4 py-2 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] text-white rounded-full w-auto">
                             <span class="text-md font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
                                 {{ __('Exportar csv') }}
@@ -43,7 +43,7 @@
                                 class="w-6 h-8 relative inset-0 block group-hover:hidden" alt="Icono Exportar CSV">
                             <img src="{{ asset('images/export-hover.svg') }}"
                                 class="w-6 h-8 relative inset-0 hidden group-hover:block" alt="Icono Exportar CSV">
-                        </x-responsive-nav-link>
+                        </button>
                     </form>
 
                     @if (Auth::user()->hasAnyRole(['SuperAdmin', 'Administrador']))

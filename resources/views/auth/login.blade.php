@@ -1,21 +1,9 @@
 @extends('layouts.guest')
-{{-- todo: El usuario ve el formulario de iniciar sesion, luego Envia el formulario a la ruta POST /login --}}
-{{-- ! GET|HEAD  login ..... login › Laravel\Fortify › AuthenticatedSessionController@create --}}
-{{-- ! POST      login .... login.store › Laravel\Fortify › AuthenticatedSessionController@store --}}
-{{-- ! POST      logout .... logout › Laravel\Fortify › AuthenticatedSessionController@destroy  --}}
-{{-- ? Login = Autenticacion: Es el evento inicial donde se confirma tu identidad. --}}
-{{-- * Sesion = Estado despues de la Autenticacion: Es el mecanismo que mantiene tu estado de "autenticado" a lo largo 
-* de tu interaccion con la aplicacion, evitando que tengas que loguearte en cada clic o navegacion de pagina. * --}}
 
 @section('content')
-    {{-- Fondo de logos superpuestos --}}
     <div class="absolute inset-0 z-0">
-        {{-- Logo Cultiva centrado arriba --}}
-        {{-- CAMBIOS AQUi: Eliminado translate-y-1/2, ajustado top-10, y el tamano del logo --}}
         <div class="absolute transform -translate-x-1/2 top-60 left-1/2">
             <img src="{{ asset('images/cultivasena.svg') }}" alt="Logo Cultiva" class="w-auto h-24 sm:h-24 opacity-90">
-            {{-- h-24 o h-32 (96px o 128px) para controlar la altura y que el ancho se ajuste proporcionalmente --}}
-            {{-- w-auto para mantener la proporcion, eliminado w-1/2 max-w-xl para evitar problemas de centrado en este contexto --}}
         </div>
     </div>
 
@@ -25,14 +13,13 @@
             @csrf
 
             {{-- Campo de Correo Electronico --}}
-            {{-- Ajustado x-data para usar old() directamente, manteniendo el valor del input --}}
             <div class="mb-6" x-data="{ email: '{{ old(Laravel\Fortify\Fortify::username()) }}', emailExists: null, debounceTimeout: null }">
-                <label for="email" class="block mb-1 text-sm font-bold text-gray-700">Correo electronico</label>
+                <label for="email" class="block mb-1 text-sm font-bold text-gray-700">Correo electrónico</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                         <img src="{{ asset('images/user.svg') }}" alt="persona" class="w-4 h-4">
                     </span>
-                    <input id="email" type="email" name="email" placeholder="ingrese su correo electronico" required
+                    <input id="email" type="email" name="email" placeholder="ingrese su correo electrónico" required
                         autofocus x-model="email" {{-- Enlaza el valor del input a la variable 'email' de Alpine --}}
                         @input.debounce.500ms="
                             clearTimeout(debounceTimeout);
@@ -62,7 +49,7 @@
                         class="w-full px-3 py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
 
                     {{-- Icono de validacion (exito o error) --}}
-                    <template x-if="emailExists !== null"> {{-- Muestra el icono solo si ya se ha validado --}}
+                    <template x-if="emailExists !== null"> 
                         <span class="absolute inset-y-0 right-0 flex items-center pr-3">
                             <img :src="emailExists ? '{{ asset('images/bien.svg') }}' : '{{ asset('images/mal.svg') }}'"
                                 :alt="emailExists ? 'Correo existe' : 'Correo no existe'" class="w-5 h-5"
@@ -70,11 +57,6 @@
                         </span>
                     </template>
                 </div>
-                {{--
-                Este bloque mostrara el mensaje "El correo no coincide."
-                cuando el correo no existe en la base de datos (manejado por FailedLoginResponse).
-                Utilizamos Fortify::username() para la clave del error, que por defecto es 'email'.
-            --}}
                 @if ($errors->has(Laravel\Fortify\Fortify::username()))
                     <div class="mb-4 text-sm text-red-500">
                         {{ $errors->first(Laravel\Fortify\Fortify::username()) }}
@@ -90,7 +72,7 @@
 
             {{-- Contrasena --}}
             <div class="mb-6" x-data="{ showPassword: false }">
-                <label for="password" class="block mb-1 text-sm font-bold text-gray-700">Contrasena</label>
+                <label for="password" class="block mb-1 text-sm font-bold text-gray-700">Contraseña</label>
 
                 {{-- Este es el div que envolvera todo el campo de contrasena, iconos y error --}}
                 <div class="relative">
@@ -101,8 +83,8 @@
 
                     {{-- Campo de Contrasena --}}
                     <input id="password" :type="showPassword ? 'text' : 'password'" name="password"
-                        placeholder="ingrese su contrasena" required
-                        class="w-full px-3 py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                        placeholder="ingrese su contraseña" required
+                        class="w-full px-3 py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"/>
 
                     {{-- Icono de Ojo (Mostrar/Ocultar Contrasena) --}}
                     <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 cursor-pointer"
@@ -122,7 +104,7 @@
                 <label class="flex items-center text-sm font-bold text-gray-600">
                     <input type="checkbox" name="remember"
                         class="mr-2 h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
-                    Recuerdame en este dispositivo
+                    Recuérdame en este dispositivo
                 </label>
                 <a href="{{ route('password.request') }}" class="text-sm font-bold text-purple-600 hover:underline">
                     ¿Olvidaste tu contrasena?
@@ -132,7 +114,7 @@
             {{-- Boton de ingreso --}}
             <button type="submit"
                 class="w-full px-4 py-2 font-semibold text-white transition duration-150 bg-green-600 rounded-full hover:bg-green-700">
-                Iniciar Sesion
+                Iniciar sesión
             </button>
         </form>
     </div>
@@ -143,17 +125,16 @@
 
     {{-- Modal usuario inactivo --}}
     @if (session('inactivo'))
-        <div id="inactivoModal" x-data="{ show: true }" x-show="show" {{-- !Anade esta directiva x-show="show" aqui! --}}
+        <div id="inactivoModal" x-data="{ show: true }" x-show="show" 
             class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
             <div class="max-w-md p-6 text-center bg-white shadow-md rounded-3xl">
                 {{-- Icono --}}
                 <img src="{{ asset('images/warning.svg') }}" alt="Icono de advertencia" class="w-56 mx-auto mb-4 h-36">
-                <h2 class="mb-4 text-2xl font-bold text-red-600">Cuenta Desactivada</h2>
+                <h2 class="mb-4 text-2xl font-bold text-red-600">Cuenta desactivada</h2>
                 <p class="text-sm text-gray-700">
-                    Si crees que esto es un error, contacta a
-                    {{-- CAMBIO AQUi: apunto a la ruta de PQR --}}
+                    Si crees que esto es un error, contácta a
                     <a href="{{ route('pqrs.create') }}" class="text-blue-600 underline">
-                        nuestro soporte de PQR
+                        nuestro soporte de PQRs
                     </a>
                 </p>
 

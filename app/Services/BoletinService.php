@@ -51,19 +51,29 @@ class BoletinService
 
         $boletines = Boletin::query();
 
+        // Cargar la relación 'user' para el creador
+        $boletines->with('user');
+
         // Búsqueda robusta por nombre, descripción y fecha de creación
         if ($query) {
             $cleanedQuery = $this->cleanSearchQuery($query);
 
             $boletines->where(function ($q2) use ($cleanedQuery, $query) {
-                $q2->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(nombre), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '') LIKE ?", ['%' . $cleanedQuery . '%'])
-                    ->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(descripcion), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '') LIKE ?", ['%' . $cleanedQuery . '%']);
+                $sqlNormalize = function($column) {
+                    if (config('database.default') === 'pgsql' && in_array($column, ['created_at', 'updated_at'])) {
+                        return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
+                    }
+                    return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER({$column}), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
+                };
+
+                $q2->whereRaw($sqlNormalize('nombre') . ' LIKE ?', ['%' . $cleanedQuery . '%'])
+                   ->orWhereRaw($sqlNormalize('descripcion') . ' LIKE ?', ['%' . $cleanedQuery . '%']);
 
                 try {
                     $date = Carbon::parse($query);
                     $q2->orWhereDate('created_at', $date->toDateString());
                 } catch (\Exception $e) {
-                    // Si no es una fecha válida, no se aplica este filtro de fecha
+                    // No hace nada si la fecha no es válida
                 }
             });
         }
@@ -96,5 +106,74 @@ class BoletinService
         $boletines->with(['user.roles', 'validador', 'rechazador']);
 
         return $boletines->paginate($perPage)->withQueryString();
+    }
+
+    /**
+     * Obtiene boletines filtrados para exportación (sin paginación).
+     *
+     * @param Request $request La solicitud HTTP con los parámetros de filtro.
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function obtenerBoletinFiltradosParaExportar(Request $request)
+    {
+        $query         = $request->input('q');
+        $estado        = $request->input('estado');
+        $sortBy        = $request->input('sort_by');
+        $sortDirection = $request->input('sort_direction');
+
+        $boletines = Boletin::query();
+
+        // Cargar la relación 'user' para el creador
+        $boletines->with('user');
+
+        // Búsqueda robusta por nombre, descripción y fecha de creación
+        if ($query) {
+            $cleanedQuery = $this->cleanSearchQuery($query);
+
+            $boletines->where(function ($q2) use ($cleanedQuery, $query) {
+                $sqlNormalize = function($column) {
+                    if (config('database.default') === 'pgsql' && in_array($column, ['created_at', 'updated_at'])) {
+                        return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
+                    }
+                    return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER({$column}), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
+                };
+
+                $q2->whereRaw($sqlNormalize('nombre') . ' LIKE ?', ['%' . $cleanedQuery . '%'])
+                   ->orWhereRaw($sqlNormalize('descripcion') . ' LIKE ?', ['%' . $cleanedQuery . '%']);
+
+                try {
+                    $date = Carbon::parse($query);
+                    $q2->orWhereDate('created_at', $date->toDateString());
+                } catch (\Exception $e) {
+                    // No hace nada si la fecha no es válida
+                }
+            });
+        }
+
+        // Filtro por estado
+        if (in_array($estado, ['aprobado', 'pendiente', 'rechazado'])) {
+            $boletines->where('estado', $estado);
+        }
+
+        // Ordenamiento genérico por columna y dirección
+        $allowedSortColumns = [
+            'nombre',
+            'descripcion',
+            'created_at',
+            'estado',
+            'precio_mas_alto',
+            'precio_mas_bajo',
+        ];
+
+        $allowedSortDirections = ['asc', 'desc'];
+
+        if (in_array($sortBy, $allowedSortColumns) && in_array($sortDirection, $allowedSortDirections)) {
+            $boletines->orderBy($sortBy, $sortDirection);
+        } else {
+            $boletines->orderBy('created_at', 'desc');
+        }
+
+        // No paginar, obtener todos los resultados
+        return $boletines->get();
     }
 }

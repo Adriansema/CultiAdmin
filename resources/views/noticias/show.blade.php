@@ -4,7 +4,7 @@
      <div class="inline-block px-20 py-6">
             <div class="flex items-center space-x-4">
                 <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-                <h1 class="text-3xl font-bold whitespace-nowrap"> Detalles de noticias</h1>
+                <h1 class="text-3xl font-bold whitespace-nowrap"> Detalles de la noticia</h1>
             </div>
             <div class="py-2">
             {!! Breadcrumbs::render('noticias.show', $noticia) !!}
@@ -13,7 +13,7 @@
 
     <div class="container p-6 mx-auto">
         <div class="p-6 bg-white border border-gray-300 shadow-2xl rounded-2xl md:p-10"> {{-- Cambiado a bg-white y anadido borde --}}
-            <h2 class="mb-6 text-3xl font-extrabold text-center text-gray-800">Informacion de la noticia</h2> {{-- Titulo mas prominente --}}
+            <h2 class="mb-6 text-3xl font-extrabold text-center text-gray-800">Información de la noticia</h2> {{-- Titulo mas prominente --}}
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6"> {{-- Grid para un diseno de dos columnas --}}
 
@@ -34,7 +34,7 @@
 
                 {{-- Fila para Autor Acreditado --}}
                 <div class="flex items-center">
-                    <strong class="flex-shrink-0 w-40 font-bold text-gray-700">Autor acreditado:</strong>
+                    <strong class="flex-shrink-0 w-40 font-bold text-gray-700">Autor acréditado:</strong>
                     <span class="ml-2 text-gray-900">{{ $noticia->autor ?? 'N/A' }}</span>
                 </div>
 
@@ -46,7 +46,7 @@
 
                 {{-- Fila para Titulo --}}
                 <div class="flex items-center">
-                    <strong class="flex-shrink-0 w-40 font-bold text-gray-700">Titulo:</strong>
+                    <strong class="flex-shrink-0 w-40 font-bold text-gray-700">Título:</strong>
                     <span class="ml-2 text-gray-900">{{ $noticia->titulo ?? 'N/A' }}</span>
                 </div>
 
@@ -54,12 +54,6 @@
                 <div class="flex items-center">
                     <strong class="flex-shrink-0 w-40 font-bold text-gray-700">Clase:</strong>
                     <span class="ml-2 text-gray-900">{{ $noticia->clase ?? 'N/A' }}</span>
-                </div>
-
-                {{-- Fila para Numero de pagina --}}
-                <div class="flex items-center">
-                    <strong class="flex-shrink-0 w-40 font-bold text-gray-700">Numero de pagina:</strong>
-                    <span class="ml-2 text-gray-900">{{ $noticia->numero_pagina }}</span>
                 </div>
 
                 {{-- Fila para Estado --}}
@@ -74,7 +68,7 @@
 
                  {{-- Fila para Fecha de creacion --}}
                 <div class="flex items-center">
-                    <strong class="flex-shrink-0 w-40 font-bold text-gray-700">Fecha de creacion:</strong>
+                    <strong class="flex-shrink-0 w-40 font-bold text-gray-700">Fecha de creación:</strong>
                     <span class="ml-2 text-gray-900">{{ $noticia->created_at->format('d/m/Y H:i') }}</span>
                 </div>
 
@@ -82,7 +76,7 @@
 
                 {{-- Fila para ultima actualizacion --}}
                 <div class="flex items-center">
-                    <strong class="flex-shrink-0 w-40 font-bold text-gray-700">ultima actualizacion:</strong>
+                    <strong class="flex-shrink-0 w-40 font-bold text-gray-700">ultima actualización:</strong>
                     <span class="ml-2 text-gray-900">{{ $noticia->updated_at->format('d/m/Y H:i') }}</span>
                 </div>
 
@@ -114,12 +108,10 @@
                     </div>
                 </div>
             @endif
-            {{-- FIN: Seccion de Observaciones de la Noticia --}}
-
 
             {{-- Seccion de Informacion (texto largo) --}}
             <div class="pt-6 mt-8 border-t border-gray-200"> {{-- Separador visual --}}
-                <strong class="block mb-3 text-lg font-bold text-gray-700">Informacion:</strong>
+                <strong class="block mb-3 text-lg font-bold text-gray-700">Información:</strong>
                 <div class="p-4 leading-relaxed text-gray-800 rounded-lg shadow-inner bg-gray-50"> {{-- Fondo suave para el texto largo --}}
                     {!! nl2br(e($noticia->informacion ?? 'N/A')) !!} {{-- Usar nl2br para saltos de linea y e() para escapar HTML --}}
                 </div>

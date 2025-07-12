@@ -17,32 +17,36 @@
                 </div>
             @endif
 
-            <div class="block">
-                <label for="email" class="block font-medium text-sm text-gray-700">
-                    {{ __('Email') }}
+            <div class="mb-4 relative">
+                <label for="email" class="block mb-2 text-md font-bold text-gray-700">
+                    {{ __('Correo electrónico') }}
                 </label>
+
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3" style="top: 2rem;">
+                    <img src="{{ asset('images/email.svg') }}" alt="email" class="w-5 h-4 text-gray-500">
+                </div>
+
                 <input id="email"
-                    class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                    type="email" name="email" placeholder="email" value="{{ old('email') }}" required autofocus
-                    autocomplete="username" />
+                    class="w-full px-3 py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    type="email" name="email" placeholder="ingrese su correo electrónico" value="{{ old('email') }}"
+                    required autofocus autocomplete="username" />
             </div>
 
-            <div class="flex items-center justify-end mt-4">
-
-            </div>
             <div class="flex items-center justify-between">
                 {{-- Boton para volver al inicio de sesion (primero para que aparezca a la izquierda) --}}
                 <a href="{{ route('login') }}"
-                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-sm font-semibold py-2 px-4 rounded-lg text-center
+                    class="bg-[var(--color-Gestion)] hover:bg-gray-300 text-gray-800 text-md font-bold py-2 px-4 rounded-full text-center
                              focus:outline-none focus:shadow-outline">
-                    Volver
+                    {{ __('Volver') }}
                 </a>
 
                 <button type="submit"
-                    class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    class="bg-[var(--color-textmarca)] hover:bg-[var(--color-texthovermarca)] text-white text-md font-bold py-2 px-4 rounded-full text-center
+                    focus:outline-none focus:shadow-outline"">
                     {{ __('Restablecer contraseña') }}
                 </button>
             </div>
+
             @if ($errors->any())
                 <div class="mb-4">
                     <div class="font-medium text-red-600">

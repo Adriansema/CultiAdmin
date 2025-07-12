@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Confirmacion de Recepcion de tu PQR</title>
+    <title>Confirmación de Recepción de tu PQR</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -76,42 +76,42 @@
     <div class="container">
         <h1>¡Hola {{ $pqrs->nombre ?? 'Estimado Usuario' }}!</h1>
 
-        <p>Agradecemos tu comunicacion. Hemos recibido exitosamente tu PQR y le hemos asignado la siguiente referencia:</p>
+        <p>Agradecemos tu comunicación. Hemos recibido éxitosamente tu PQRs y le hemos asignado la siguiente referencia:</p>
 
         <div class="highlight-box">
             <strong>Referencia de tu PQR: {{ $pqrs->id }}</strong>
         </div>
 
-        <p>A continuacion, puedes encontrar un resumen de los detalles de tu solicitud:</p>
+        <p>A continuación, puedes encontrar un resumen de los detalles de tu solicitud:</p>
 
         <ul>
-            <li><strong>Tipo de Solicitud:</strong> {{ ucfirst($pqrs->tipo) }}</li>
+            <li><strong>Tipo de solicitud:</strong> {{ ucfirst($pqrs->tipo) }}</li>
             <li><strong>Asunto:</strong> "{{ $pqrs->asunto }}"</li>
             <li><strong>Mensaje:</strong>
                 <p style="white-space: pre-wrap; background-color: #f0f0f0; padding: 10px; border-radius: 5px; border: 1px solid #e0e0e0; font-style: italic;">
                     {{ $pqrs->mensaje }}
                 </p>
             </li>
-            <li><strong>Fecha y Hora de Envio:</strong> {{ $pqrs->created_at->format('d/m/Y H:i A') }}</li>
+            <li><strong>Fecha y Hora de Envío:</strong> {{ $pqrs->created_at->format('d/m/Y H:i A') }}</li>
             {{-- Si tienes el email del remitente en el PQR --}}
             @if (!empty($pqrs->email))
-                <li><strong>Email de Contacto:</strong> {{ $pqrs->email }}</li>
+                <li><strong>Correo electrónico del contacto:</strong> {{ $pqrs->email }}</li>
             @endif
             {{-- Si tienes un campo para el numero de telefono --}}
             @if (!empty($pqrs->telefono))
-                <li><strong>Telefono de Contacto:</strong> {{ $pqrs->telefono }}</li>
+                <li><strong>Teléfono de contacto:</strong> {{ $pqrs->telefono }}</li>
             @endif
             {{-- Puedes anadir otros campos relevantes aqui --}}
         </ul>
 
-        <p>Nuestro equipo de soporte revisara tu solicitud con la referencia **{{ $pqrs->id }}** y te contactara a la brevedad posible, o a mas tardar dentro de nuestros plazos de respuesta establecidos.</p>
+        <p>Nuestro equipo de soporte revisará tu solicitud con la referencia <b>{{ $pqrs->id }}</b> y te contactará a la brevedad posible, o a mas tardar dentro de nuestros plazos de respuesta establecidos.</p>
 
         <p>Agradecemos tu paciencia mientras procesamos tu PQR.</p>
 
         <div class="footer">
-            <p>Este es un mensaje automatico, por favor no respondas a este correo.</p>
-            <p>Atentamente,<br>El equipo de Tu Empresa</p>
-            <p>&copy; {{ date('Y') }} Tu Empresa. Todos los derechos reservados.</p>
+            <p>Este es un mensaje automático, por favor no respondas a este correo.</p>
+            <p>Atentamente,<br>El equipo de Cultiva sena</p>
+            <p>&copy; {{ date('Y') }} Cultiva sena. Todos los derechos reservados.</p>
         </div>
     </div>
 </body>

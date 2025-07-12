@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Log; // Importar la clase Log para registrar erro
 use Illuminate\Database\QueryException; //
 use Symfony\Component\HttpFoundation\StreamedResponse; // Necesario para la descarga de archivos grandes
 use App\Services\NoticiaService;
+use Carbon\Carbon;
+use GuzzleHttp\Psr7\Message;
+use League\Csv\Writer; // Asegúrate de tener esta librería instalada (composer require league/csv)
+use SplTempFileObject; // Necesario para League/Csv
 
 class NoticiaController extends Controller
 {
@@ -42,17 +46,43 @@ class NoticiaController extends Controller
     public function store(Request $request)
     {
         // 1. Validar los datos del formulario.
-        $request->validate([
-            'tipo' => 'required|string|max:255',
+        $rules = [
+            'tipo' => 'required|string|in:cafe,mora',
             'titulo' => 'required|string|max:255',
             'clase' => 'required|string|max:255',
-            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validacion para imagen
+            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'informacion' => 'required|string',
-            'numero_pagina' => 'required|integer',
             'autor' => 'required|string|max:255',
-        ]);
+        ];
 
-        $messages = [];
+        $messages = [
+            'tipo.required' => 'El campo tipo es obligatorio.',
+            'tipo.string' => 'El campo tipo debe ser texto.',
+            'tipo.max' => 'El campo tipo no debe exceder los :max caracteres.',
+
+            'titulo.required' => 'El campo título es obligatorio.',
+            'titulo.string' => 'El campo título debe ser texto.',
+            'titulo.max' => 'El campo título no debe exceder los :max caracteres.',
+
+            'clase.required' => 'El campo clase es obligatorio.',
+            'clase.string' => 'El campo clase debe ser texto.',
+            'clase.max' => 'El campo clase no debe exceder los :max caracteres.',
+
+            'imagen.required' => 'La imagen es obligatoria.',
+            'imagen.image' => 'El archivo debe ser una imagen.',
+            'imagen.mimes' => 'La imagen debe ser un archivo de tipo: :values.',
+            'imagen.max' => 'La imagen no debe ser mayor de :max kilobytes.',
+
+            'informacion.required' => 'El campo información es obligatorio.',
+            'informacion.string' => 'El campo información debe ser texto.',
+
+            'autor.required' => 'El campo autor es obligatorio.',
+            'autor.string' => 'El campo autor debe ser texto.',
+            'autor.max' => 'El campo autor no debe exceder los :max caracteres.',
+        ];
+
+        // 3. Aplicar las reglas de validacion.
+        $request->validate($rules, $messages);
 
         try {
             // 2. Logica para guardar la imagen (si se ha subido).
@@ -76,14 +106,12 @@ class NoticiaController extends Controller
                 'clase' => $request->clase,
                 'imagen' => $imagenPath, // Guarda la ruta de la imagen
                 'informacion' => $request->informacion,
-                'numero_pagina' => $request->numero_pagina,
                 'autor' => $request->autor,
                 'leida' => false, // Nueva columna, por defecto false!
             ]);
 
             // Si la creacion es exitosa, el codigo continua aqui.
             return redirect()->route('noticias.index')->with('success_message', '!Noticia creada con exito!');
-
         } catch (QueryException $e) {
             // Captura errores especificos de la base de datos
             Log::error('Error de base de datos al crear noticia: ' . $e->getMessage());
@@ -129,15 +157,17 @@ class NoticiaController extends Controller
             $originalEstado = $noticia->estado;
 
             // Valida los datos de la solicitud
-            $request->validate([
+            $rules = [
                 'tipo' => 'required|string|max:255',
                 'titulo' => 'required|string|max:255',
                 'clase' => 'required|string|max:255',
                 'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'informacion' => 'required|string',
-                'numero_pagina' => 'required|integer',
                 'autor' => 'required|string|max:255',
-            ]);
+            ];
+
+            // 3. Aplicar las reglas de validacion.
+            $request->validate($rules);
 
             // 1. Logica para actualizar la imagen.
             if ($request->hasFile('imagen')) {
@@ -170,7 +200,6 @@ class NoticiaController extends Controller
             $noticia->titulo = $request->titulo;
             $noticia->clase = $request->clase;
             $noticia->informacion = $request->informacion;
-            $noticia->numero_pagina = $request->numero_pagina;
             $noticia->autor = $request->autor;
 
             // Guarda todos los cambios en la base de datos en una sola operacion
@@ -178,7 +207,6 @@ class NoticiaController extends Controller
 
             // Si la actualizacion es exitosa, el codigo continua aqui.
             return redirect()->route('noticias.index')->with('success_message', '!Noticia actualizada con exito!');
-
         } catch (QueryException $e) {
             // Captura errores especificos de la base de datos
             Log::error('Error de base de datos al actualizar noticia (ID: ' . $noticia->id . '): ' . $e->getMessage());
@@ -210,78 +238,89 @@ class NoticiaController extends Controller
     }
 
     /**
-     * Exporta todas las noticias a un archivo CSV.
+     * Exporta las noticias a un archivo CSV, aplicando los filtros y ordenamiento actuales.
+     *
+     * @param Request $request
+     * @param NoticiaService $noticiaService // <-- CAMBIO CLAVE: Inyectar el servicio aquí
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function exportarCsv()
+    public function exportarCsv(Request $request, NoticiaService $noticiaService)
     {
-        // Define los encabezados del CSV
+        // Obtiene los mismos parámetros de filtro y ordenación que la tabla
+        $query = $request->input('q');
+        $estado = $request->input('estado');
+        $sortBy = $request->input('sort_by');
+        $sortDirection = $request->input('sort_direction');
+
+        // Llama al nuevo método del servicio para obtener las noticias sin paginación
+        $noticiasResultados = $noticiaService->obtenerNoticiaFiltradasParaExportar($request);
+
+        $nombreArchivo = 'noticias_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
         $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="noticias_exportadas_' . now()->format('Ymd_His') . '.csv"',
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"$nombreArchivo\"",
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
         ];
 
-        // Columnas que se incluiran en el CSV.
-        // Asegurate de que estos nombres coincidan con los nombres de las columnas en tu tabla 'noticias'.
-        $columns = [
+        // Columnas que se incluirán en el CSV.
+        // Asegúrate de que estos nombres coincidan con los nombres de las columnas en tu tabla 'noticias'.
+        // Ajustado para incluir 'creador' y eliminar 'clase', 'numero_pagina'
+        $columnas = [
             'id',
-            'user_id',
             'tipo',
             'titulo',
-            'clase',
-            'imagen', // Ruta de la imagen
-            'informacion',
-            'numero_pagina',
             'autor',
+            'creador', // Para el nombre del usuario creador
+            'estado',
+            'informacion',
+            'imagen_url', // Para la URL pública de la imagen
             'leida',
             'created_at',
             'updated_at',
         ];
 
-        // Crea una respuesta de tipo StreamedResponse para manejar archivos grandes de manera eficiente
-        $callback = function () use ($columns) {
+        $callback = function () use ($noticiasResultados, $columnas) {
             $file = fopen('php://output', 'w'); // Abre el flujo de salida para escribir el CSV
+            // Añadir la marca BOM para asegurar que UTF-8 se muestre correctamente en Excel
+            fputs($file, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
+            fputcsv($file, $columnas);
 
-            // Escribe los encabezados del CSV
-            fputcsv($file, $columns);
-
-            // Obtiene todas las noticias. Para conjuntos de datos muy grandes, considera paginacion
-            // o chunking para evitar problemas de memoria.
-            // Ejemplo con chunking (recomendado para muchos registros):
-            Noticia::chunk(2000, function ($noticias) use ($file, $columns) {
-                foreach ($noticias as $noticia) {
-                    $row = [];
-                    foreach ($columns as $column) {
-                        // Accede al atributo del modelo.
-                        // Para 'imagen', podrias querer la URL completa en lugar de solo la ruta de almacenamiento.
-                        // Si 'informacion' puede contener saltos de linea, fputcsv los manejara correctamente.
-                        $value = $noticia->$column;
-
-                        // Si la columna es 'imagen' y quieres la URL publica, puedes hacer esto:
-                        if ($column === 'imagen' && $value) {
-                            $value = asset('storage/' . $value); // Asume que 'noticias' esta en el disco 'public'
-                        }
-
-                        // Si la columna es 'informacion' y necesitas limpiar caracteres especiales o HTML:
-                        if ($column === 'informacion' && $value) {
-                            $value = strip_tags($value); // Elimina etiquetas HTML
-                            $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'); // Decodifica entidades HTML
-                            $value = str_replace(["\r", "\n"], " ", $value); // Reemplaza saltos de linea por espacios
-                        }
-
-                        $row[] = $value;
+            foreach ($noticiasResultados as $noticia) {
+                $row = [];
+                foreach ($columnas as $column) {
+                    $value = null;
+                    switch ($column) {
+                        case 'creador':
+                            $value = optional($noticia->user)->name ?? 'N/A'; // Accede al nombre del usuario
+                            break;
+                        case 'imagen_url':
+                            $value = $noticia->imagen ? asset('storage/' . $noticia->imagen) : ''; // URL pública de la imagen
+                            break;
+                        case 'informacion':
+                            $value = strip_tags($noticia->informacion ?? ''); // Elimina HTML y decodifica entidades
+                            $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            $value = str_replace(["\r", "\n"], " ", $value); // Reemplaza saltos de línea
+                            break;
+                        default:
+                            $value = $noticia->$column;
+                            // Formatear fechas si es necesario
+                            if (in_array($column, ['created_at', 'updated_at']) && $value instanceof Carbon) {
+                                $value = $value->format('Y-m-d H:i:s');
+                            }
+                            break;
                     }
-                    fputcsv($file, $row); // Escribe la fila de datos
+                    $row[] = $value;
                 }
-            });
+                fputcsv($file, $row); // Escribe la fila de datos
+            }
 
             fclose($file); // Cierra el flujo de salida
         };
 
-        return new StreamedResponse($callback, 200, $headers);
+        return response()->stream($callback, 200, $headers);
     }
 
     /**

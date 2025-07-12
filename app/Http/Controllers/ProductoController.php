@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon; // Necesario para formatear fechas
 use App\Models\User;
 use App\Models\Cafe;
 use App\Models\Mora;
 use App\Models\Video;
+use League\Csv\Writer; // Asegúrate de tener esta librería instalada (composer require league/csv)
+use SplTempFileObject; // Necesario para League/Csv
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use App\Services\ProductService;
@@ -70,7 +73,7 @@ class ProductoController extends Controller
             $rules['rutavideo'] = 'required|url|max:255'; // Se aplica solo si el tipo es mora
 
         } elseif ($tipoProductoPrincipal === 'videos') {
-             $rules['videos_data.tipo'] = 'required|string|in:Educativo,Secundarios,Insumos_y_abonos,Cuidados_generales,Preparacion_terreno_siembra,Sugerencias_generales,Metodos_recoleccion,Cuidados_cosecha,Buenas_practicas_agricolas';
+            $rules['videos_data.tipo'] = 'required|string|in:educativos,recomendados,insumos_y_abonos,cuidados_generales,preparacion_terreno_siembra,sugerencias_generales,metodos_recoleccion,cuidados_cosecha,buenas_practicas_agricolas';
             $subtipoSeleccionado = $request->input('videos_data.tipo');
 
             if ($subtipoSeleccionado) {
@@ -108,9 +111,9 @@ class ProductoController extends Controller
             'mora_data.informacion.string' => 'La informacion debe ser texto.',
 
             // Mensajes para 'videos'
-            'videos_data.tipo.required' => 'El tipo de video (primarios, secundarios o categorias) es obligatorio.',
+            'videos_data.tipo.required' => 'El tipo de video (primarios, recomendados o categorias) es obligatorio.',
             'videos_data.tipo.string' => 'El tipo de video debe ser texto.',
-            'videos_data.tipo.in' => 'El tipo de video seleccionado no es valido. Debe ser "primarios", "secundarios", "Insumos y Abonos", "Cuidados Generales", "Preparacion del terreno y siembra", "Sugerencias generales", "Metodos de recoleccion", "Cuidados de la cosecha", "Buenas Practicas Agricolas".',
+            'videos_data.tipo.in' => 'El tipo de video seleccionado no es valido. Debe ser "primarios", "recomendados", "Insumos y Abonos", "Cuidados Generales", "Preparacion del terreno y siembra", "Sugerencias generales", "Metodos de recoleccion", "Cuidados de la cosecha", "Buenas Practicas Agricolas".',
 
             // Mensajes dinamicos para 'videos' segun el subtipo seleccionado
             'videos_data.*.autor.required' => 'El autor es obligatorio.',
@@ -272,7 +275,7 @@ class ProductoController extends Controller
                 $rules['rutavideo'] = 'nullable|url|max:255';
             } elseif ($requestType === 'videos') {
                 // Asegurate de que los valores aqui coincidan con los 'value' de tus <option> en el HTML
-                $rules['videos_data.tipo'] = 'required|string|in:Educativo,Secundarios,Insumos_y_abonos,Cuidados_generales,Preparacion_terreno_siembra,Sugerencias_generales,Metodos_recoleccion,Cuidados_cosecha,Buenas_practicas_agricolas';
+                $rules['videos_data.tipo'] = 'required|string|in:educativos,recomendados,insumos_y_abonos,cuidados_generales,preparacion_terreno_siembra,sugerencias_generales,metodos_recoleccion,cuidados_cosecha,buenas_practicas_agricolas';
                 $subtipoSeleccionado = $request->input('videos_data.tipo');
 
                 if ($subtipoSeleccionado) {
@@ -374,7 +377,7 @@ class ProductoController extends Controller
             }
 
             // 10. Redirigir con un mensaje de exito.
-            return redirect()->route('productos.index')->with('success_message', 'Producto actualizado y enviado a revision del operario.');
+            return redirect()->route('productos.index')->with('success_message', 'Producto actualizado y enviado a revision.');
         } catch (QueryException $e) {
             Log::error('Error de base de datos al actualizar producto (ID: ' . $producto->id . '): ' . $e->getMessage());
             // Si se subio una nueva imagen y la DB fallo, intentar eliminarla
@@ -465,7 +468,7 @@ class ProductoController extends Controller
             'videos_titulo',
             'videos_descripcion',
             'videos_rutavideo', // 'rutaVideo' para la tabla 'videos'
-            'videos_tipo', // Este es el subtipo de video (primarios, secundarios, categorias)
+            'videos_tipo', // Este es el subtipo de video (primarios, recomendados, categorias)
         ];
 
         // 3. Validar que todos los encabezados requeridos esten presentes en el CSV
@@ -574,8 +577,8 @@ class ProductoController extends Controller
                         throw new \Exception("URL de video especifica invalida: '{$videoData['rutaVideo']}'.");
                     }
                     // Validar que el subtipo sea uno de los esperados
-                    if (!in_array($videoData['tipo'], ['primarios', 'secundarios', 'categorias'])) {
-                        throw new \Exception("Subtipo de video invalido: '{$videoData['tipo']}'. Debe ser 'primarios', 'secundarios' o 'categorias'.");
+                    if (!in_array($videoData['tipo'], ['primarios', 'recomendados', 'categorias'])) {
+                        throw new \Exception("Subtipo de video invalido: '{$videoData['tipo']}'. Debe ser 'primarios', 'recomendados' o 'categorias'.");
                     }
 
                     Video::create(array_merge(['producto_id' => $producto->id, 'user_id' => Auth::id()], $videoData));
@@ -611,48 +614,27 @@ class ProductoController extends Controller
 
     /**
      * Exporta productos a un archivo CSV, aplicando filtros y cargando relaciones de detalles (cafe/mora/videos).
+     *
+     * @param Request $request
+     * @param ProductService $productService // <-- Inyectar el servicio aquí
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function exportarCSV(Request $request)
+    public function exportarCSV(Request $request, ProductService $productService)
     {
-        // 1. Obtener los parametros de filtro de la solicitud
-        $querySearch = $request->input('q'); // Usamos 'q' para busqueda general
+        // Obtener los mismos parámetros de filtro y ordenación que la tabla
+        $querySearch = $request->input('q');
         $estadoFilter = $request->input('estado');
-        $userIdFilter = $request->input('user_id');
-        $tipoFilter = $request->input('tipo'); // Nuevo filtro para el tipo de producto
+        $sortBy = $request->input('sort_by');
+        $sortDirection = $request->input('sort_direction');
 
-        // 2. Iniciar la consulta Eloquent para el modelo Producto
-        $productosQuery = Producto::query();
+        // Llama al nuevo método del servicio para obtener los productos sin paginación
+        // Este método ya se encarga de aplicar los filtros y el ordenamiento
+        $productos = $productService->obtenerProductosFiltradosParaExportar($request);
 
-        // 3. Aplicar los filtros dinamicamente a la consulta
-        if ($querySearch) {
-            $productosQuery->where(function ($q) use ($querySearch) {
-                // Busqueda por ID de producto o por observaciones (si es relevante)
-                $q->where('id', $querySearch)
-                    ->orWhereRaw('LOWER(observaciones) LIKE ?', ['%' . strtolower($querySearch) . '%']);
-            });
-        }
-
-        if ($estadoFilter) {
-            $productosQuery->where('estado', $estadoFilter);
-        }
-
-        if ($userIdFilter) {
-            $productosQuery->where('user_id', $userIdFilter);
-        }
-
-        // Si se filtra por tipo, aplicar el filtro
-        if ($tipoFilter && in_array($tipoFilter, ['cafe', 'mora', 'videos'])) {
-            $productosQuery->where('tipo', $tipoFilter);
-        }
-
-        // 4. Cargar las relaciones anidadas y luego obtener los productos
-        // Asegurate de cargar todas las relaciones de detalle relevantes
-        $productos = $productosQuery->with(['user', 'cafe', 'mora', 'videos'])->get();
-
-        // 5. Generar un nombre de archivo unico para el CSV
+        // Generar un nombre de archivo único para el CSV
         $nombreArchivo = 'productos_exportados_' . now()->format('Y-m-d_H-i-s') . '.csv';
 
-        // 6. Definir los encabezados HTTP necesarios para la descarga del archivo CSV
+        // Definir los encabezados HTTP necesarios para la descarga del archivo CSV
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8', // Aseguramos UTF-8
             'Content-Disposition' => "attachment; filename=\"$nombreArchivo\"",
@@ -661,8 +643,7 @@ class ProductoController extends Controller
             'Expires' => '0',
         ];
 
-        // 7. Definir los nombres de las columnas que apareceran en la primera fila del CSV
-        // Esto refleja las columnas directas en tus tablas 'cafe', 'mora' y 'videos'
+        // Definir los nombres de las columnas que aparecerán en la primera fila del CSV
         $columnas = [
             'ID Producto',
             'Tipo Producto',
@@ -674,15 +655,15 @@ class ProductoController extends Controller
             'Nombre Usuario Creador',
             'Email Usuario Creador',
             'Fecha de Creacion',
-            // Campos especificos para Cafe
+            // Campos específicos para Cafe
             'Cafe - Numero Pagina',
             'Cafe - Clase',
             'Cafe - Informacion',
-            // Campos especificos para Mora
+            // Campos específicos para Mora
             'Mora - Numero Pagina',
             'Mora - Clase',
             'Mora - Informacion',
-            // Campos especificos para Videos
+            // Campos específicos para Videos
             'Video - Autor',
             'Video - Titulo',
             'Video - Descripcion',
@@ -690,11 +671,11 @@ class ProductoController extends Controller
             'Video - Subtipo', // Este es el subtipo de video
         ];
 
-        // 8. Definir la funcion de callback que generara el contenido del CSV
+        // Definir la función de callback que generará el contenido del CSV
         $callback = function () use ($productos, $columnas) {
             $file = fopen('php://output', 'w');
-            // Escribir la codificacion UTF-8 BOM para asegurar la correcta lectura en Excel
-            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            // Escribir la codificación UTF-8 BOM para asegurar la correcta lectura en Excel
+            fputs($file, chr(0xEF) . chr(0xBB) . chr(0xBF)); // Usar fputs para el BOM
             fputcsv($file, $columnas);
 
             foreach ($productos as $producto) {
@@ -704,44 +685,56 @@ class ProductoController extends Controller
                     $producto->tipo,
                     $producto->estado,
                     $producto->observaciones ?? '',
-                    $producto->imagen ?? '', // Asegura que no sea null
+                    $producto->imagen ? asset('storage/' . $producto->imagen) : '', // URL completa de la imagen
                     $producto->RutaVideo ?? '', // RutaVideo de la tabla 'productos'
                     $producto->user_id,
-                    $producto->user->name ?? 'N/A', // Nombre del creador
-                    $producto->user->email ?? 'N/A', // Email del creador
+                    optional($producto->user)->name ?? 'N/A', // Nombre del creador
+                    optional($producto->user)->email ?? 'N/A', // Email del creador
                     $producto->created_at ? $producto->created_at->format('Y-m-d H:i:s') : '',
                 ];
 
-                // Anadir campos especificos de Cafe
+                // Añadir campos específicos de Cafe
                 if ($producto->tipo === 'cafe' && $producto->cafe) {
                     $row[] = $producto->cafe->numero_pagina ?? '';
                     $row[] = $producto->cafe->clase ?? '';
-                    $row[] = $producto->cafe->informacion ?? '';
+                    // Limpiar información de HTML y saltos de línea
+                    $infoCafe = strip_tags($producto->cafe->informacion ?? '');
+                    $infoCafe = html_entity_decode($infoCafe, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    $infoCafe = str_replace(["\r", "\n"], " ", $infoCafe);
+                    $row[] = $infoCafe;
                 } else {
-                    // Si no es cafe, anadir celdas vacias para las columnas de cafe para mantener la consistencia
-                    $row = array_merge($row, array_fill(0, 3, '')); // 3 campos vacios para Cafe
+                    // Si no es cafe, añadir celdas vacías para las columnas de cafe para mantener la consistencia
+                    $row = array_merge($row, array_fill(0, 3, '')); // 3 campos vacíos para Cafe
                 }
 
-                // Anadir campos especificos de Mora
+                // Añadir campos específicos de Mora
                 if ($producto->tipo === 'mora' && $producto->mora) {
                     $row[] = $producto->mora->numero_pagina ?? '';
                     $row[] = $producto->mora->clase ?? '';
-                    $row[] = $producto->mora->informacion ?? '';
+                    // Limpiar información de HTML y saltos de línea
+                    $infoMora = strip_tags($producto->mora->informacion ?? '');
+                    $infoMora = html_entity_decode($infoMora, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    $infoMora = str_replace(["\r", "\n"], " ", $infoMora);
+                    $row[] = $infoMora;
                 } else {
-                    // Si no es mora, anadir celdas vacias para las columnas de mora
-                    $row = array_merge($row, array_fill(0, 3, '')); // 3 campos vacios para Mora
+                    // Si no es mora, añadir celdas vacías para las columnas de mora
+                    $row = array_merge($row, array_fill(0, 3, '')); // 3 campos vacíos para Mora
                 }
 
-                // Anadir campos especificos de Videos
+                // Añadir campos específicos de Videos
                 if ($producto->tipo === 'videos' && $producto->videos) {
                     $row[] = $producto->videos->autor ?? '';
                     $row[] = $producto->videos->titulo ?? '';
-                    $row[] = $producto->videos->descripcion ?? '';
+                    // Limpiar descripción de HTML y saltos de línea
+                    $descVideo = strip_tags($producto->videos->descripcion ?? '');
+                    $descVideo = html_entity_decode($descVideo, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    $descVideo = str_replace(["\r", "\n"], " ", $descVideo);
+                    $row[] = $descVideo;
                     $row[] = $producto->videos->rutaVideo ?? ''; // 'rutaVideo' de la tabla 'videos'
                     $row[] = $producto->videos->tipo ?? ''; // Este es el subtipo
                 } else {
-                    // Si no es videos, anadir celdas vacias para las columnas de videos
-                    $row = array_merge($row, array_fill(0, 5, '')); // 5 campos vacios para Video
+                    // Si no es videos, añadir celdas vacías para las columnas de videos
+                    $row = array_merge($row, array_fill(0, 5, '')); // 5 campos vacíos para Video
                 }
 
                 fputcsv($file, $row);
@@ -750,7 +743,7 @@ class ProductoController extends Controller
             fclose($file);
         };
 
-        // 9. Retornar la respuesta de streaming
+        // Retornar la respuesta de streaming
         return Response::stream($callback, 200, $headers);
     }
 }

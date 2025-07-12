@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Boletin extends Model
 {
@@ -44,32 +45,31 @@ class Boletin extends Model
         return $this->belongsTo(User::class, 'rechazado_por_user_id');
     }
 
-    // Accessors para el formato de precios
-    /**
-     * Obtiene el precio_mas_alto formateado como moneda ($X.XXX,XX).
-     *
-     * @return string
-     */
-    public function getPrecioMasAltoFormattedAttribute(): string
+    // Define the casts for attributes (optional, but good practice for numerical fields)
+    protected $casts = [
+        'precio_mas_alto' => 'decimal:2', // Guarda con 2 decimales en la DB
+        'precio_mas_bajo' => 'decimal:2', // Guarda con 2 decimales en la DB
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+     // --- Accessor para precio_mas_alto_formatted ---
+    protected function precioMasAltoFormatted(): Attribute
     {
-        if (is_null($this->precio_mas_alto)) {
-            return 'N/A'; // O un valor predeterminado si no hay precio
-        }
-        // Formato para espanol de Colombia: 2 decimales, coma para decimales, punto para miles
-        return '$' . number_format($this->precio_mas_alto, 2, ',', '.');
+        return Attribute::make(
+            get: fn ($value, $attributes) => $attributes['precio_mas_alto'] !== null ?
+                '$' . number_format($attributes['precio_mas_alto'], 2, ',', '.') . ' COP' :
+                null,
+        );
     }
 
-    /**
-     * Obtiene el precio_mas_bajo formateado como moneda ($X.XXX,XX).
-     *
-     * @return string
-     */
-    public function getPrecioMasBajoFormattedAttribute(): string
+    // --- Accessor para precio_mas_bajo_formatted ---
+    protected function precioMasBajoFormatted(): Attribute
     {
-        if (is_null($this->precio_mas_bajo)) {
-            return 'N/A'; // O un valor predeterminado si no hay precio
-        }
-        // Formato para espanol de Colombia: 2 decimales, coma para decimales, punto para miles
-        return '$' . number_format($this->precio_mas_bajo, 2, ',', '.');
+        return Attribute::make(
+            get: fn ($value, $attributes) => $attributes['precio_mas_bajo'] !== null ?
+                '$' . number_format($attributes['precio_mas_bajo'], 2, ',', '.') . ' COP' :
+                null,
+        );
     }
 }

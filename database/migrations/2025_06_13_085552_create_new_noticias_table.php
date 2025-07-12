@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('clase', 255)->nullable()->default(null);
             $table->string('imagen', 255)->nullable(); // Ruta de la imagen
             $table->text('informacion')->nullable()->default(null);
-            $table->integer('numero_pagina'); // int4 y NOT NULL
             $table->boolean('leida')->default(false); // funcion para obtener los mensajes en el dashboard como leido
             $table->string('estado', 255)->default('pendiente'); // Estado (ej. 'pendiente', 'aprobada', 'rechazada')
             $table->string('autor', 255)->nullable()->default(null);

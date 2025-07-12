@@ -58,7 +58,7 @@ Breadcrumbs::for('productos.edit', function ($trail, $producto) {
 
 Breadcrumbs::for('boletines.index', function ($trail) {
     $trail->parent('dashboard')
-        ->push('Gestion de boletines', route('boletines.index'));
+        ->push('Tabla de boletines', route('boletines.index'));
 });
 
 Breadcrumbs::for('boletines.create', function ($trail) {
@@ -123,7 +123,7 @@ Breadcrumbs::for('statistics.index', function ($trail) {
 
 Breadcrumbs::for('noticias.index', function ($trail) {
     $trail->parent('dashboard')
-        ->push('Gestion de noticias', route('noticias.index'));
+        ->push('Tabla de noticias', route('noticias.index'));
 });
 
 Breadcrumbs::for('noticias.create', function ($trail) {

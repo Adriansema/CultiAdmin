@@ -2,7 +2,7 @@
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
         <div class="w-full max-w-xl p-6 bg-[var(--color-gris1)] rounded-lg shadow-xl space-y-4 ">
             <h1 class="mb-4 text-xl font-semibold">
-                Detalles del Boletín
+                Detalles del boletín
             </h1>
 
             {{-- Sección de Estado del Boletín (Más Prominente) --}}
@@ -14,18 +14,18 @@
                     @else bg-gray-100 text-gray-800 border border-gray-300 @endif">
 
                 <p class="mb-2">
-                    <strong class="font-semibold">Usuario Creador:</strong>
+                    <strong class="font-semibold">Usuario creador:</strong>
                     @if ($boletin->user)
                         {{ $boletin->user->name }}
                         @if ($boletin->user->roles->isNotEmpty())
                             <span class="text-gray-600">({{ $boletin->user->roles->pluck('name')->join(', ') }})</span>
                         @endif
                     @else
-                        Usuario Desconocido
+                        Usuario desconocido
                     @endif
                 </p>
 
-                <h3 class="text-base font-semibold">Estado Actual:
+                <h3 class="text-base font-semibold">Estado actual:
                     <span class="font-bold">{{ ucfirst($boletin->estado) }}</span>
                 </h3>
 
@@ -33,7 +33,7 @@
 
                 @if ($boletin->estado === 'rechazado' && $boletin->observaciones)
                     <p class="mt-2 text-sm">
-                        <strong>Observación del Operador:</strong> {{ $boletin->observaciones }}
+                        <strong>Observaciones:</strong> {{ $boletin->observaciones }}
                     </p>
                     {{-- Aquí puedes añadir quién lo rechazó --}}
                     @if ($boletin->rechazador)
@@ -42,12 +42,9 @@
                         </p>
                     @endif
                     <div class="mt-4">
-                        {{-- <a href="{{ route('boletines.edit', $boletin->id) }}"
-                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Ir a Editar Boletín →
-                    </a> --}}
-                        <p>Debes ir a editar el Boletin para que puedas Corregir tú error</p>
+                        <p>Debes ir a editar el boletin para que puedas corregir tú error</p>
                     </div>
+
                 @elseif ($boletin->estado === 'aprobado')
                     <p class="mt-2 text-sm">¡Tu boletín ha sido aprobado y está listo para ser consumido!</p>
                     {{-- Aquí puedes añadir quién lo validó --}}
@@ -57,15 +54,13 @@
                         </p>
                     @endif
                 @elseif ($boletin->estado === 'pendiente')
-                    <p class="mt-2 text-sm">Tu boletín está pendiente de revisión por parte del operador.</p>
-                    {{-- Opcional: Si quieres indicar que aún no hay validador/rechazador --}}
-                    {{-- <p class="mt-1 text-sm text-gray-600">Aún no ha sido revisado por un operador.</p> --}}
+                    <p class="mt-2 text-sm">Tu boletín está pendiente de revisión</p>
                 @endif
             </div>
 
             {{-- Detalles del Boletin (Nombre, Descripción, Archivo) --}}
             <div class="p-3 mt-4 rounded-md bg-gray-50">
-                <h3 class="mb-2 font-semibold text-black text-md">Nombre del Boletín:</h3>
+                <h3 class="mb-2 font-semibold text-black text-md">Nombre del boletín:</h3>
                 <p class="mb-4 text-black whitespace-pre-line">{{ $boletin->nombre }}</p> {{-- Muestra el nombre --}}
 
                 <h3 class="mb-2 font-semibold text-black text-md">Descripción:</h3>
@@ -76,28 +71,28 @@
             @if ($boletin->archivo)
                 {{-- ¡REVERTIDO! Usa $boletin->archivo --}}
                 <div class="flex flex-col items-center justify-center p-3 mt-4 rounded-md bg-gray-50">
-                    <h3 class="mb-2 text-xs font-semibold text-black">Archivo Adjunto:</h3>
+                    <h3 class="mb-2 text-xs font-semibold text-black">Archivo adjunto:</h3>
                     {{-- Construye la URL con asset() y la ruta relativa --}}
                     <a href="{{ asset('storage/' . $boletin->archivo) }}" target="_blank"
                         class="flex flex-col items-center text-blue-600 transition-transform duration-300 ease-in-out transform hover:underline hover:scale-105">
                         <img src="{{ asset('images/PDF.svg') }}" alt="Icono PDF" class="mb-1 cursor-pointer w-14 h-14">
-                        <span class="text-sm text-gray-700">Ver PDF</span>
+                        <span class="text-sm text-gray-700">Ver pdf</span>
                     </a>
                 </div>
             @else
                 <div class="p-3 mt-4 rounded-md bg-gray-50">
-                    <p class="text-gray-700">No hay archivo PDF adjunto para este boletín.</p>
+                    <p class="text-gray-700">No hay archivo pdf adjunto para este boletín.</p>
                 </div>
             @endif
 
             {{-- Sección de Indicadores de Precio --}}
             <div class="p-3 mt-4 rounded-md bg-gray-50">
-                <h3 class="mb-2 font-semibold text-black text-md">Indicadores de Precio:</h3>
+                <h3 class="mb-2 font-semibold text-black text-md">Indicadores de precio:</h3>
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {{-- Precio Más Alto --}}
                     <div>
                         <p class="text-gray-700">
-                            <strong>Precio Más Alto:</strong>
+                            <strong>Precio más alto:</strong>
                             @if ($boletin->precio_mas_alto_formatted) {{-- Usar la propiedad formateada --}}
                                 <span class="text-green-600">{{ $boletin->precio_mas_alto_formatted }}</span>
                                 @if ($boletin->lugar_precio_mas_alto)
@@ -111,7 +106,7 @@
                     {{-- Precio Más Bajo --}}
                     <div>
                         <p class="text-gray-700">
-                            <strong>Precio Más Bajo:</strong>
+                            <strong>Precio más bajo:</strong>
                             @if ($boletin->precio_mas_bajo_formatted) {{-- Usar la propiedad formateada --}}
                                 <span class="text-red-600">{{ $boletin->precio_mas_bajo_formatted }}</span>
                                 @if ($boletin->lugar_precio_mas_bajo)

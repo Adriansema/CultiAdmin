@@ -50,7 +50,7 @@
                 </th>
                 <th class="px-6 py-3 font-bold text-left text-gray-600">
                     <div class="flex items-center justify-between">
-                        <span>Email</span>
+                        <span>Correo</span>
                         <div class="flex flex-col ml-2">
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="email" data-sort-direction="asc">

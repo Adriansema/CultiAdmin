@@ -24,7 +24,7 @@
                 <select name="tipo" id="tipo"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('tipo') border-red-500 @enderror">
                     <option value="">Seleccione un tipo</option>
-                    <option value="cafe" {{ old('tipo') == 'cafe' ? 'selected' : '' }}>Cafe</option>
+                    <option value="cafe" {{ old('tipo') == 'cafe' ? 'selected' : '' }}>Café</option>
                     <option value="mora" {{ old('tipo') == 'mora' ? 'selected' : '' }}>Mora</option>
                 </select>
                 @error('tipo')
@@ -35,7 +35,7 @@
             <!-- Campo: Titulo (Requerido) -->
             <div class="mb-4">
                 <label for="titulo" class="block text-gray-700 text-sm font-bold mb-2">
-                    Titulo: <span class="text-red-500">*</span>
+                    Título: <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="titulo" id="titulo"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('titulo') border-red-500 @enderror"
@@ -61,7 +61,7 @@
             <!-- Campo: Autor (Requerido) -->
             <div class="mb-4">
                 <label for="autor" class="block text-gray-700 text-sm font-bold mb-2">
-                    Autor acreditado: <span class="text-red-500">*</span>
+                    Autor acréditado: <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="autor" id="autor"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('autor') border-red-500 @enderror"
@@ -86,7 +86,7 @@
             <!-- Campo: Informacion (Requerido) -->
             <div class="mb-4">
                 <label for="informacion" class="block text-gray-700 text-sm font-bold mb-2">
-                    Informacion: <span class="text-red-500">*</span>
+                    Información: <span class="text-red-500">*</span>
                 </label>
                 <textarea name="informacion" id="informacion" rows="5"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('informacion') border-red-500 @enderror">{{ old('informacion') }}</textarea>
@@ -94,20 +94,6 @@
                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                 @enderror
             </div>
-
-            <!-- Campo: Numero de Pagina (Requerido) -->
-            <div class="mb-4">
-                <label for="numero_pagina" class="block text-gray-700 text-sm font-bold mb-2">
-                    Numero de pagina: <span class="text-red-500">*</span>
-                </label>
-                <input type="number" name="numero_pagina" id="numero_pagina"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('numero_pagina') border-red-500 @enderror"
-                    value="{{ old('numero_pagina') }}">
-                @error('numero_pagina')
-                    <p class="text-red-500 text-xs italic">{{ $message }}</p>
-                @enderror
-            </div>
-
 
             <div class="flex items-center justify-between">
 

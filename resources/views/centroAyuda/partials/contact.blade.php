@@ -55,7 +55,7 @@
             <div class="mb-4">
                 <button type="submit"
                     class="w-full py-3 font-semibold text-white transition duration-300 bg-blue-600 rounded-lg hover:bg-blue-700">
-                    Enviar Mensaje
+                    Enviar mensaje
                 </button>
             </div>
         </form>

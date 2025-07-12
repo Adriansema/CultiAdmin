@@ -5,7 +5,7 @@
         <div class="inline-block px-20 py-6">
             <div class="flex items-center space-x-4">
                 <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
-                <h1 class="text-3xl whitespace-nowrap font-bold">Boletines</h1>
+                <h1 class="text-3xl whitespace-nowrap font-bold">Gestión de boletines</h1>
             </div>
             <div class="py-2">
                 {!! Breadcrumbs::render('boletines.index') !!}
@@ -28,23 +28,24 @@
                         </span>
                     </button>
 
-                    <button type="button" id="exportCsvButton"
-                        class="inline-flex items-center group justify-center px-6 py-3 space-x-2 transition-all duration-300 ease-in-out
-                        bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] text-white rounded-full whitespace-nowrap">
-                        <span class="font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
-                            {{ __('Exportar Csv') }}
-                        </span>
-                        <img src="{{ asset('images/export.svg') }}" class="relative inset-0 block w-6 h-6 group-hover:hidden"
-                            alt="Icono Exportar CSV">
-                        <img src="{{ asset('images/export-hover.svg') }}"
-                            class="relative inset-0 hidden w-6 h-6 group-hover:block" alt="Icono Exportar CSV">
-                    </button>
+                    <form method="GET" action="{{ route('boletines.exportarCSV') }}" id="exportCsvForm">
+                        <button type="submit" id="exportCsvButton"
+                            class="inline-flex items-center group justify-center px-6 py-3 space-x-2 space-x-reverse transition-all duration-300 ease-in-out bg-[var(--color-Gestion)] border border-[var(--color-ajustes)] hover:border-[#39A900] text-white rounded-full w-auto">
+                            <span class="text-md font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
+                                {{ __('Exportar Csv') }}
+                            </span>
+                            <img src="{{ asset('images/export.svg') }}"
+                                class="w-5 h-4 relative inset-0 block group-hover:hidden" alt="Icono Exportar CSV">
+                            <img src="{{ asset('images/export-hover.svg') }}"
+                                class="w-5 h-4 relative inset-0 hidden group-hover:block" alt="Icono Exportar CSV">
+                        </button>
+                    </form>
 
                     <button type="button" @click.prevent="window.openCreateBoletinModal()"
                         class="inline-flex items-center px-6 py-3 space-x-2 transition-all duration-300 ease-in-out bg-[#39A900]
                         hover:bg-[#61BA33] text-white rounded-full whitespace-nowrap">
                         <img src="{{ asset('images/signo.svg') }}" class=" w-4 h-5 mr-3" alt="Icono signo de +">
-                        Crear/Importar Boletín
+                        Crear/importar boletín
                     </button>
                 </div>
             </div>
@@ -87,8 +88,3 @@
         </div>
     @endcan
 @endsection
-@push('scripts')
-    <script>
-        const exportCsvBoletinesRoute = "{{ route('boletines.exportarCSV') }}";
-    </script>
-@endpush

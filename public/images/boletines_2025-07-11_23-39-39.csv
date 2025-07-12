@@ -1,0 +1,11 @@
+﻿ID,Usuario,Estado,Nombre,Descripcion,Observaciones,Archivo,"Precio Mas Alto","Lugar Precio Mas Alto","Precio Mas Bajo","Lugar Precio Mas Bajo",Creado
+2,SuperAdmin,aprobado,"Boletín de mora","Semana 10 del 14 de 2025",,boletines/EFOfxulVgblrTzUThi6gKeLvGkJNh76gf52DmxIi.pdf,3500,Cali,1750.00,Pereira,"2025-07-06 22:31:13"
+10,SuperAdmin,pendiente,"Boletín de mora","Semana de 10 al 17 de julio",,boletines/nZe8GnUfrbO8LdSFLrOfau4W7IvIwfLQ4f23PefS.pdf,890000.00,Maracay,800000.00,Morros,"2025-07-07 15:02:13"
+11,SuperAdmin,pendiente,"Boletín de café","Semana 2 del 6 al 14 de julio",,boletines/GHuOjaL7wcJo3h8IwM8DFJEdxQbkzJz13DtfoPw4.pdf,900000.00,Cali,899999.00,Bucaramanga,"2025-07-07 15:03:55"
+3,SuperAdmin,pendiente,"boletin de mora","semana 1",,boletines/4l9fvmX27Pie2MR4cHcJV68GZ0Q3vSEUURimElcM.pdf,3000.00,risaralda,1500.00,risaralda,"2025-07-07 09:38:07"
+4,SuperAdmin,pendiente,"Boletín de café","Semana 16 del año 2025",,boletines/zLBaSC3wP6c8PAEKKu8nD1qd7RbHvrv7w4jDxBBY.pdf,17500.00,Cali,15000.00,Susurro,"2025-07-07 10:38:26"
+5,SuperAdmin,pendiente,"Boletín de mora","Semana 10 de 15 hasta 16 de 2025",,boletines/LpJdrgjB1Nhk6LrfKd4Q7KnBF9DjRXicPR8F989G.pdf,20000.00,Pereira,15000.00,Dosquebradas,"2025-07-07 10:41:25"
+6,SuperAdmin,pendiente,"Boletin de mora","Semana del 10 al 16 de Julio",,boletines/Te86DOkkEK8XtQz1TLJb4yundbBCEgeaL1IxlUtJ.pdf,40000.00,Cali,39999.00,Buga,"2025-07-07 11:12:49"
+12,SuperAdmin,pendiente,"Boletín de cafe","Semana 02 al 07 de julio 2025",,boletines/qpudL3G0pJ1Ha3iQcXECOd4J2Zp9jKVzIF9C1Iz6.pdf,555000.00,Borjeme,660000.00,Murán,"2025-07-07 15:07:26"
+9,SuperAdmin,pendiente,"Boletín de mora","Semana del 10 al 15 de julio",,boletines/WKibEQq8x8xBEnacQq06G5ZufejfWGtuhxw6NWyH.pdf,800000.00,risaralda,750000.00,muchachos,"2025-07-07 13:30:55"
+14,SuperAdmin,pendiente,"Boletín de café","Semana del 10 al 17 de julio",,boletines/giqHSTrrb7irRgP3emtckqfdwfacXC7g697SgqPA.pdf,30000000,luga,150000000,rujo,"2025-07-11 10:27:47"

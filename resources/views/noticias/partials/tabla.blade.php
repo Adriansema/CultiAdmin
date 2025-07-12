@@ -2,13 +2,132 @@
     <table class="min-w-full text-md text-left">
         <thead class="bg-[var(--color-tabla)]">
             <tr>
-                <th class="px-6 py-3 font-bold text-left text-gray-600">Creador</th>
-                <th class="px-6 py-3 font-bold text-left text-gray-600">Autor</th>
-                <th class="px-6 py-3 font-bold text-left text-gray-600">Tipo</th>
-                <th class="px-6 py-3 font-bold text-left text-gray-600">Titulo</th>
-                <th class="px-6 py-3 font-bold text-left text-gray-600">Clase</th>
-                <th class="px-6 py-3 font-bold text-left text-gray-600">Pág.</th>
-                <th class="px-6 py-3 font-bold text-left text-gray-600">Estado</th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <span>Creador</span>
+                        <div class="flex flex-col ml-2">
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="creador_name" data-sort-direction="asc">
+                                <img src="{{ asset('images/asce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                <img src="{{ asset('images/asce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
+                            </button>
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="creador" data-sort-direction="desc">
+                                <img src="{{ asset('images/desce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                <img src="{{ asset('images/desce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <span>Autor</span>
+                        <div class="flex flex-col ml-2">
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap" data-sort-field="autor"
+                                data-sort-direction="asc">
+                                <img src="{{ asset('images/asce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                <img src="{{ asset('images/asce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
+                            </button>
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap" data-sort-field="autor"
+                                data-sort-direction="desc">
+                                <img src="{{ asset('images/desce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                <img src="{{ asset('images/desce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <span>Tipo</span>
+                        <div class="flex flex-col ml-2">
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap" data-sort-field="tipo"
+                                data-sort-direction="asc">
+                                <img src="{{ asset('images/asce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                <img src="{{ asset('images/asce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
+                            </button>
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap" data-sort-field="tipo"
+                                data-sort-direction="desc">
+                                <img src="{{ asset('images/desce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                <img src="{{ asset('images/desce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <span>Título</span>
+                        <div class="flex flex-col ml-2">
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="titulo" data-sort-direction="asc">
+                                <img src="{{ asset('images/asce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                <img src="{{ asset('images/asce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
+                            </button>
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="titulo" data-sort-direction="desc">
+                                <img src="{{ asset('images/desce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                <img src="{{ asset('images/desce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <span>Fecha</span>
+                        <div class="flex flex-col ml-2">
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="created_at" data-sort-direction="asc">
+                                <img src="{{ asset('images/asce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                <img src="{{ asset('images/asce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
+                            </button>
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="created_at" data-sort-direction="desc">
+                                <img src="{{ asset('images/desce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                <img src="{{ asset('images/desce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th class="px-6 py-3 font-bold text-left text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <span>Estado</span>
+                        <div class="flex flex-col ml-2">
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="estado" data-sort-direction="asc">
+                                <img src="{{ asset('images/asce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                <img src="{{ asset('images/asce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
+                            </button>
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap"
+                                data-sort-field="estado" data-sort-direction="desc">
+                                <img src="{{ asset('images/desce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                <img src="{{ asset('images/desce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
+                            </button>
+                        </div>
+                    </div>
+                </th>
                 <th class="px-6 py-3 font-bold text-left text-gray-600">Acciones</th>
             </tr>
         </thead>
@@ -43,10 +162,10 @@
                             {{ Str::limit($noticia->titulo, 30) ?? 'N/A' }}
                         </td>
                         <td class="px-6 py-4">
-                            {{ $noticia->clase ?? 'N/A' }}
-                        </td>
-                        <td class="px-6 py-4">
-                            {{ $noticia->numero_pagina }}
+                            {{ $noticia->created_at->locale('es')->translatedFormat('d \d\e F \d\e\l Y h:i a') }}
+                            <span class="block text-xs text-gray-500">
+                                ({{ $noticia->created_at->diffForHumans() }})
+                            </span>
                         </td>
                         <td class="px-6 py-4">
                             <span
@@ -72,7 +191,8 @@
                                 @endcan
 
                                 @can('eliminar noticia')
-                                    <button type="button" onclick="mostrarModal('noticia', '{{ $noticia->id_noticias }}')"
+                                    <button type="button"
+                                        onclick="mostrarModal('noticia', '{{ $noticia->id_noticias }}')"
                                         class="px-3 py-2 text-center text-white bg-red-600 rounded-xl hover:bg-red-700">
                                         Eliminar
                                     </button>

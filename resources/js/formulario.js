@@ -123,6 +123,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         isAppNotificationModalOpen: false,
         appNotificationMessage: '',
         appNotificationIsSuccess: true, // true para exito (verde), false para error (rojo)
+
+        // --- NUEVOS CAMPOS PARA EL LÍMITE DE INTENTOS ---
+        invalidAttemptCount: 0, // Contador de intentos fallidos en el paso actual
+        maxInvalidAttempts: 10, // Límite de intentos fallidos antes de bloquear el botón
     };
 
     // ! Funciones Auxiliares
@@ -225,6 +229,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         modalData.isAppNotificationModalOpen = false;
         modalData.appNotificationMessage = '';
         modalData.appNotificationIsSuccess = true;
+        // --- Resetear contador de intentos fallidos ---
+        modalData.invalidAttemptCount = 0;
 
         if (nameInput) nameInput.value = '';
         if (lastnameInput) lastnameInput.value = '';
@@ -382,12 +388,21 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // CONTROL DE VISIBILIDAD DE LOS BOTONES DE NAVEGACION
         if (nextButton) {
+            // Deshabilitar el botón si se excede el límite de intentos fallidos
+            if (modalData.invalidAttemptCount >= modalData.maxInvalidAttempts) {
+                nextButton.disabled = true;
+                nextButton.classList.add('opacity-50', 'cursor-not-allowed'); // Estilo para deshabilitado
+            } else {
+                nextButton.disabled = false;
+                nextButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
             nextButton.classList.remove('hidden');
 
             if (modalData.currentStep === 1 || modalData.currentStep === 2) {
-                nextButton.innerHTML = `Siguiente <img src="./images/siguiente.svg" alt="siguiente" class="w-5 h-6 ml-2">`;
+                nextButton.innerHTML = `Siguiente <img src="/images/siguiente.svg" alt="siguiente" class="w-5 h-6 ml-2">`;
             } else if (modalData.currentStep === 3) {
-                nextButton.innerHTML = `${modalData.isEditMode ? 'Actualizar' : 'Asignar'} <img src="./images/siguiente.svg" alt="enviar" class="w-5 h-6 ml-2">`;
+                nextButton.innerHTML = `${modalData.isEditMode ? 'Actualizar' : 'Asignar'} <img src="/images/siguiente.svg" alt="enviar" class="w-5 h-6 ml-2">`;
             } else {
                 nextButton.classList.add('hidden');
             }
@@ -599,14 +614,170 @@ document.addEventListener('DOMContentLoaded', async function () {
         updateModalUI();
     };
 
-    // ************* FUNCION PRINCIPAL DE AVANCE / CONFIRMACION *************
+    // ************* NUEVAS FUNCIONES DE VALIDACIÓN Y FILTRADO EN TIEMPO REAL *************
+    // Regex para filtrar caracteres no permitidos
+    // CORREGIDO: Permite letras (incluyendo tildes y ñ), y espacios
+    const alphaSpaceOnlyFilterRegex = /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g;
+    // CORREGIDO: Elimina todo lo que NO sea letra, número, punto, arroba, guion o guion bajo
+    const emailFilterRegex = /[^a-zA-Z0-9.@_-]/g;
+    const numericOnlyFilterRegex = /[^\d]/g; // Elimina todo lo que NO sea dígito
+
+    // Regex para validación completa (usado en handleNextAction)
+    // CORREGIDO: Solo letras (incluyendo tildes y ñ) y espacios
+    const alphaOnlyTestRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+    const emailStructureRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Estructura de email
+    const phoneLengthTestRegex = /^\d{10,15}$/; // Solo dígitos, entre 10 y 15 de longitud
+    const documentNumericTestRegex = /^\d+$/; // Solo dígitos
+
+    /**
+     * Valida y filtra el nombre/apellido en tiempo real.
+     * @param {string} fieldName - 'name' o 'lastname'
+     * @param {HTMLInputElement} inputElement - El elemento input
+     */
+    function validateNameLastname(fieldName, inputElement) {
+        let value = inputElement.value;
+        // Filtrar caracteres no permitidos en tiempo real
+        const filteredValue = value.replace(alphaSpaceOnlyFilterRegex, '');
+        if (value !== filteredValue) {
+            inputElement.value = filteredValue;
+            modalData[fieldName] = filteredValue;
+            // No mostrar error si solo se filtró, el error se mostrará si el campo queda vacío o no cumple la regex final
+        } else {
+            modalData[fieldName] = value;
+        }
+
+        // Validar para mostrar error
+        if (!modalData[fieldName].trim()) {
+            modalData.errors[fieldName] = `El ${fieldName === 'name' ? 'nombre' : 'apellido'} es obligatorio.`;
+        } else if (!alphaOnlyTestRegex.test(modalData[fieldName])) {
+            // Mensaje de error actualizado para reflejar que se permiten tildes y ñ
+            modalData.errors[fieldName] = `El ${fieldName === 'name' ? 'nombre' : 'apellido'} solo debe contener letras (incluyendo tildes y ñ) y espacios.`;
+        } else {
+            delete modalData.errors[fieldName]; // Borrar error si es válido
+        }
+        renderErrors();
+    }
+
+    /**
+     * Valida y filtra el correo electrónico en tiempo real.
+     * @param {HTMLInputElement} inputElement - El elemento input
+     */
+    function validateEmail(inputElement) {
+        let value = inputElement.value;
+        // Filtrar caracteres no permitidos en tiempo real
+        const filteredValue = value.replace(emailFilterRegex, '');
+        if (value !== filteredValue) {
+            inputElement.value = filteredValue;
+            modalData.email = filteredValue;
+        } else {
+            modalData.email = value;
+        }
+
+        // Validar para mostrar error
+        if (!modalData.email.trim()) {
+            modalData.errors.email = 'El correo es obligatorio.';
+        } else if (!emailStructureRegex.test(modalData.email)) {
+            modalData.errors.email = 'El correo no es válido. Debe tener un formato como usuario@dominio.com.';
+        } else {
+            delete modalData.errors.email;
+        }
+        renderErrors();
+    }
+
+    /**
+     * Valida y filtra el teléfono en tiempo real.
+     * @param {HTMLInputElement} inputElement - El elemento input
+     */
+    function validatePhone(inputElement) {
+        let value = inputElement.value;
+        // Filtrar caracteres no permitidos en tiempo real (solo números)
+        const filteredValue = value.replace(numericOnlyFilterRegex, '');
+        if (value !== filteredValue) {
+            inputElement.value = filteredValue;
+            modalData.phone = filteredValue;
+        } else {
+            modalData.phone = value;
+        }
+
+        // Validar para mostrar error
+        if (!modalData.phone.trim()) {
+            modalData.errors.phone = 'El teléfono es obligatorio.';
+        } else if (!phoneLengthTestRegex.test(modalData.phone)) {
+            modalData.errors.phone = 'El teléfono debe contener solo números y tener entre 10 y 15 dígitos.';
+        } else {
+            delete modalData.errors.phone;
+        }
+        renderErrors();
+    }
+
+    /**
+     * Valida y filtra el documento en tiempo real.
+     * @param {HTMLInputElement} inputElement - El elemento input
+     */
+    function validateDocument(inputElement) {
+        let value = inputElement.value;
+        // Filtrar caracteres no permitidos en tiempo real (solo números)
+        const filteredValue = value.replace(numericOnlyFilterRegex, '');
+        if (value !== filteredValue) {
+            inputElement.value = filteredValue;
+            modalData.document = filteredValue;
+        } else {
+            modalData.document = value;
+        }
+
+        // Validar para mostrar error
+        if (!modalData.document.trim()) {
+            modalData.errors.document = 'El número de documento es obligatorio.';
+        } else if (!documentNumericTestRegex.test(modalData.document)) {
+            modalData.errors.document = 'El número de documento debe contener solo números.';
+        } else {
+            // Validar longitud específica solo si el tipo de documento está seleccionado
+            if (modalData.type_document) {
+                let errorMessage = null;
+                switch (modalData.type_document) {
+                    case 'PPT':
+                        if (!/^\d{7}$/.test(modalData.document)) {
+                            errorMessage = `Para PPT, el documento debe tener exactamente 7 dígitos (actualmente tiene ${modalData.document.length}).`;
+                        }
+                        break;
+                    case 'PEP':
+                        if (!/^\d{15}$/.test(modalData.document)) {
+                            errorMessage = `Para PEP, el documento debe tener exactamente 15 dígitos (actualmente tiene ${modalData.document.length}).`;
+                        }
+                        break;
+                    case 'CC':
+                        if (!/^\d{8,10}$/.test(modalData.document)) {
+                            errorMessage = `Para CC, el documento debe tener entre 8 y 10 dígitos (actualmente tiene ${modalData.document.length}).`;
+                        }
+                        break;
+                    case 'TI':
+                    case 'CE':
+                        if (!/^\d{10}$/.test(modalData.document)) {
+                            errorMessage = `Para ${modalData.type_document}, el documento debe tener exactamente 10 dígitos (actualmente tiene ${modalData.document.length}).`;
+                        }
+                        break;
+                }
+                if (errorMessage) {
+                    modalData.errors.document = errorMessage;
+                } else {
+                    delete modalData.errors.document;
+                }
+            } else {
+                delete modalData.errors.document; // Si no hay tipo de documento, solo se valida que sea numérico
+            }
+        }
+        renderErrors();
+    }
+
+    // ************* FUNCIÓN PRINCIPAL DE AVANCE / CONFIRMACIÓN *************
+    // Esta función ahora usa las funciones de validación en tiempo real para una validación final.
     function handleNextAction() {
         console.log('JS: handleNextAction llamado. Paso actual:', modalData.currentStep);
-        modalData.errors = {};
+        modalData.errors = {}; // Limpiar errores anteriores
         let hasError = false;
 
         if (modalData.currentStep === 1) {
-            // Validaciones del Paso 1
+            // Recopilar valores actuales (ya se hace en los listeners de input, pero para asegurar)
             modalData.name = nameInput.value.trim();
             modalData.lastname = lastnameInput.value.trim();
             modalData.email = emailInput.value.trim();
@@ -614,54 +785,43 @@ document.addEventListener('DOMContentLoaded', async function () {
             modalData.type_document = typeDocumentSelect.value;
             modalData.document = documentInput.value.trim();
 
-            if (!modalData.name) { modalData.errors.name = 'El nombre es obligatorio.'; hasError = true; }
-            if (!modalData.lastname) { modalData.errors.lastname = 'El apellido es obligatorio.'; hasError = true; }
-            if (!modalData.email || !/\S+@\S+\.\S+/.test(modalData.email)) { modalData.errors.email = 'El correo no es valido.'; hasError = true; }
+            // Ejecutar validaciones finales y acumular errores.
+            // Estas funciones ya actualizan modalData.errors y manejan el estado de `hasError` implícitamente.
+            validateNameLastname('name', nameInput);
+            validateNameLastname('lastname', lastnameInput);
+            validateEmail(emailInput);
+            validatePhone(phoneInput);
 
-            // --- VALIDACION DE TELEFONO ACTUALIZADA ---
-            if (!modalData.phone) {
-                modalData.errors.phone = 'El telefono es obligatorio.';
-                hasError = true;
-            } else if (!/^\d{10}$/.test(modalData.phone)) { // Revisa si son exactamente 10 digitos numericos
-                modalData.errors.phone = `El telefono debe tener 10 digitos (actualmente tiene ${modalData.phone.length}).`;
-                hasError = true;
+            // Validar tipo de documento (no tiene filtro de input, solo validación de selección)
+            if (!modalData.type_document) {
+                modalData.errors.type_document = 'Debe seleccionar un tipo de documento.';
+            } else {
+                delete modalData.errors.type_document;
             }
 
-            if (!modalData.type_document) { modalData.errors.type_document = 'Debe seleccionar un tipo de documento.'; hasError = true; }
+            validateDocument(documentInput); // Esta validación depende de type_document
 
-            // --- VALIDACION DE DOCUMENTO ACTUALIZADA ---
-            if (!modalData.document) {
-                modalData.errors.document = 'El numero de documento es obligatorio.'; // Corregido el typo
-                hasError = true;
-            } else {
-                // Revisa el tipo de documento para aplicar la regla de validacion correcta
-                switch (modalData.type_document) {
-                    case 'PPT':
-                        if (!/^\d{7}$/.test(modalData.document)) {
-                            modalData.errors.document = `Para PPT, el documento debe tener 7 digitos (actualmente tiene ${modalData.document.length}).`;
-                            hasError = true;
-                        }
-                        break;
-                    case 'PEP':
-                        if (!/^\d{15}$/.test(modalData.document)) {
-                            modalData.errors.document = `Para PEP, el documento debe tener 15 digitos (actualmente tiene ${modalData.document.length}).`;
-                            hasError = true;
-                        }
-                        break;
-                    case 'CC':
-                        if (!/^\d{8,10}$/.test(modalData.document)) {
-                            modalData.errors.document = `Para CC, el documento debe tener entre 8 y 10 digitos (actualmente tiene ${modalData.document.length}).`;
-                            hasError = true;
-                        }
-                        break;
-                    case 'TI':
-                    case 'CE':
-                        if (!/^\d{10}$/.test(modalData.document)) {
-                            modalData.errors.document = `Para ${modalData.type_document}, el documento debe tener 10 digitos (actualmente tiene ${modalData.document.length}).`;
-                            hasError = true;
-                        }
-                        break;
+            // Verificar si hay algún error acumulado después de todas las validaciones
+            hasError = Object.keys(modalData.errors).length > 0;
+
+            // --- Lógica de contador de intentos fallidos ---
+            if (hasError) {
+                modalData.invalidAttemptCount++;
+                if (modalData.invalidAttemptCount >= modalData.maxInvalidAttempts) {
+                    modalData.errors.general = `Demasiados intentos fallidos (${modalData.invalidAttemptCount}/${modalData.maxInvalidAttempts}). Por favor, contacte a soporte o intente más tarde.`;
+                    // Asegurarse de que el botón esté deshabilitado en la UI
+                    if (nextButton) {
+                        nextButton.disabled = true;
+                        nextButton.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                } else {
+                    // Si hay errores pero no se ha alcanzado el límite, mostrar un mensaje de advertencia
+                    // Esto es opcional, puedes dejar solo los errores de campo
+                    // modalData.errors.general = `Intentos fallidos: ${modalData.invalidAttemptCount}/${modalData.maxInvalidAttempts}. Por favor, corrija los errores.`;
                 }
+            } else {
+                // Si no hay errores, resetear el contador de intentos
+                modalData.invalidAttemptCount = 0;
             }
 
             if (!hasError) {
@@ -679,7 +839,24 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (!selectedRoleFound) {
                 modalData.errors.selectedRole = 'Debe seleccionar al menos un rol.';
                 hasError = true;
+            } else {
+                delete modalData.errors.selectedRole;
             }
+
+            // --- Lógica de contador de intentos fallidos para el Paso 2 ---
+            if (hasError) {
+                modalData.invalidAttemptCount++;
+                if (modalData.invalidAttemptCount >= modalData.maxInvalidAttempts) {
+                    modalData.errors.general = `Demasiados intentos fallidos (${modalData.invalidAttemptCount}/${modalData.maxInvalidAttempts}). Por favor, contacte a soporte o intente más tarde.`;
+                    if (nextButton) {
+                        nextButton.disabled = true;
+                        nextButton.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                }
+            } else {
+                modalData.invalidAttemptCount = 0;
+            }
+
             if (!hasError) {
                 modalData.currentStep = 3;
             }
@@ -687,27 +864,54 @@ document.addEventListener('DOMContentLoaded', async function () {
             modalData.password = passwordInput.value;
             modalData.passwordConfirmation = passwordConfirmationInput.value;
 
-            // Validaciones de contrasena (solo si NO estamos en modo edicion o si la contrasena no esta vacia)
+            // Validaciones de contraseña (solo si NO estamos en modo edición o si la contraseña no está vacía)
             if (!modalData.isEditMode || (modalData.isEditMode && (modalData.password || modalData.passwordConfirmation))) {
                 if (!modalData.password) {
-                    modalData.errors.password = 'La contrasena es obligatoria.';
+                    modalData.errors.password = 'La contraseña es obligatoria.';
                     hasError = true;
                 } else if (modalData.password.length < 8) {
-                    modalData.errors.password = 'La contrasena debe tener al menos 8 caracteres.';
+                    modalData.errors.password = 'La contraseña debe tener al menos 8 caracteres.';
                     hasError = true;
+                } else {
+                    delete modalData.errors.password;
                 }
+
                 if (modalData.password !== modalData.passwordConfirmation) {
-                    modalData.errors.password_confirmation = 'Las contrasenas no coinciden.';
+                    modalData.errors.password_confirmation = 'Las contraseñas no coinciden.';
                     hasError = true;
+                } else {
+                    delete modalData.errors.password_confirmation;
                 }
+            } else {
+                // Si estamos en modo edición y las contraseñas están vacías, no hay error
+                delete modalData.errors.password;
+                delete modalData.errors.password_confirmation;
+            }
+
+            // Verificar si hay algún error acumulado
+            hasError = Object.keys(modalData.errors).length > 0;
+
+            // --- Lógica de contador de intentos fallidos para el Paso 3 ---
+            if (hasError) {
+                modalData.invalidAttemptCount++;
+                if (modalData.invalidAttemptCount >= modalData.maxInvalidAttempts) {
+                    modalData.errors.general = `Demasiados intentos fallidos (${modalData.invalidAttemptCount}/${modalData.maxInvalidAttempts}). Por favor, contacte a soporte o intente más tarde.`;
+                    if (nextButton) {
+                        nextButton.disabled = true;
+                        nextButton.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                }
+            } else {
+                modalData.invalidAttemptCount = 0;
             }
 
             if (!hasError) {
+                // Si todo es válido en el paso 3, abrir el modal de confirmación
                 openConfirmModal();
-                return;
+                return; // Importante para detener el flujo aquí y esperar la confirmación
             }
         }
-        updateModalUI();
+        updateModalUI(); // Renderiza los errores
     }
 
     // ************* FUNCION DE RETROCESO DE PASO *************
@@ -1024,6 +1228,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             delete modalData.errors.password;
             delete modalData.errors.password_confirmation;
             renderErrors();
+            modalData.invalidAttemptCount = 0; // Resetear al generar contraseña
+            updateModalUI(); // Para asegurar que el botón se re-habilite si estaba deshabilitado
         });
     }
 
@@ -1035,13 +1241,18 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (confirmCancelButton) confirmCancelButton.addEventListener('click', closeConfirmModal);
     if (confirmActionButton) confirmActionButton.addEventListener('click', submitFormConfirmed);
 
-    // Actualizar `modalData` cuando los inputs cambian
-    if (nameInput) nameInput.addEventListener('input', (e) => modalData.name = e.target.value);
-    if (lastnameInput) lastnameInput.addEventListener('input', (e) => modalData.lastname = e.target.value);
-    if (emailInput) emailInput.addEventListener('input', (e) => modalData.email = e.target.value);
-    if (phoneInput) phoneInput.addEventListener('input', (e) => modalData.phone = e.target.value);
-    if (typeDocumentSelect) typeDocumentSelect.addEventListener('change', (e) => modalData.type_document = e.target.value);
-    if (documentInput) documentInput.addEventListener('input', (e) => modalData.document = e.target.value);
+    // --- LISTENERS DE INPUT PARA VALIDACIÓN EN TIEMPO REAL ---
+    // Asegúrate de que estos listeners estén presentes y correctos
+    if (nameInput) nameInput.addEventListener('input', (e) => validateNameLastname('name', e.target));
+    if (lastnameInput) lastnameInput.addEventListener('input', (e) => validateNameLastname('lastname', e.target));
+    if (emailInput) emailInput.addEventListener('input', (e) => validateEmail(e.target));
+    if (phoneInput) phoneInput.addEventListener('input', (e) => validatePhone(e.target));
+    if (documentInput) documentInput.addEventListener('input', (e) => validateDocument(e.target));
+    // El tipo de documento afecta la validación del documento, así que también debe dispararla
+    if (typeDocumentSelect) typeDocumentSelect.addEventListener('change', (e) => {
+        modalData.type_document = e.target.value; // Actualizar el estado
+        validateDocument(documentInput); // Revalidar el documento
+    });
     if (passwordInput) passwordInput.addEventListener('input', (e) => modalData.password = e.target.value);
     if (passwordConfirmationInput) passwordConfirmationInput.addEventListener('input', (e) => modalData.passwordConfirmation = e.target.value);
 

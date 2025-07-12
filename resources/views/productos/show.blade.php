@@ -96,7 +96,7 @@
         {{-- Sección de Imagen del Producto --}}
         @if ($producto->imagen)
         <div class="pb-6 mb-10 border-b-2 border-gray-200">
-            <h3 class="mb-4 text-2xl font-bold text-center text-gray-800">Imagen Principal del Producto</h3>
+            <h3 class="mb-4 text-2xl font-bold text-center text-gray-800">Imagen principal del producto</h3>
             <div class="flex items-center justify-center p-6 border border-gray-200 rounded-lg shadow-lg bg-gray-50">
                 <img src="{{ asset('storage/' . $producto->imagen) }}" alt="Imagen del producto"
                     class="max-w-full h-auto max-h-[500px] object-contain rounded-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer border-4 border-white shadow-md"
@@ -110,7 +110,7 @@
         {{-- Sección de Video del Producto General (para Café o Mora) --}}
         @if (($producto->tipo === 'café' || $producto->tipo === 'mora') && $producto->rutavideo)
         <div class="pb-6 mb-10 border-b-2 border-gray-200">
-            <h3 class="mb-4 text-2xl font-bold text-center text-gray-800">Video General del Proceso/Producto</h3>
+            <h3 class="mb-4 text-2xl font-bold text-center text-gray-800">Video general del proceso/producto</h3>
             <div class="flex items-center justify-center p-6 bg-gray-100 rounded-lg shadow-lg">
                 @include('productos.partials.video_player', ['videoUrl' => $producto->rutavideo])
             </div>
@@ -120,7 +120,7 @@
         {{-- Sección de Detalles Específicos --}}
         @if ($producto->tipo === 'café' && $producto->cafe)
         <div class="p-8 mb-10 border border-orange-200 shadow-lg bg-orange-50 rounded-xl">
-            <h3 class="mb-6 text-3xl font-extrabold text-center text-orange-800">Detalles Específicos del Café</h3>
+            <h3 class="mb-6 text-3xl font-extrabold text-center text-orange-800">Detalles específicos del café</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
                 <div class="flex items-center">
                     <strong class="flex-shrink-0 w-40 font-semibold text-orange-700">Número de página:</strong>
@@ -142,7 +142,7 @@
         </div>
         @elseif ($producto->tipo === 'mora' && $producto->mora)
         <div class="p-8 mb-10 border border-purple-200 shadow-lg bg-purple-50 rounded-xl">
-            <h3 class="mb-6 text-3xl font-extrabold text-center text-purple-800">Detalles Específicos de la Mora
+            <h3 class="mb-6 text-3xl font-extrabold text-center text-purple-800">Detalles específicos de la mora
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
                 <div class="flex items-center">
@@ -165,7 +165,7 @@
         </div>
         @elseif ($producto->tipo === 'videos' && $producto->videos)
         <div class="p-8 mb-10 border border-teal-200 shadow-lg bg-teal-50 rounded-xl">
-            <h3 class="mb-6 text-3xl font-extrabold text-center text-teal-800">Detalles Específicos del Video</h3>
+            <h3 class="mb-6 text-3xl font-extrabold text-center text-teal-800">Detalles específicos del video</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
                 <div class="flex items-center">
                     <strong class="flex-shrink-0 w-40 font-semibold text-teal-700">Autor:</strong>
@@ -190,7 +190,7 @@
             {{-- Video player para el producto de tipo 'videos' --}}
             @if ($producto->videos->rutaVideo)
             <div class="pt-6 mt-8 border-t border-teal-200">
-                <h3 class="mb-4 text-2xl font-bold text-center text-teal-800">Reproductor de Video Específico
+                <h3 class="mb-4 text-2xl font-bold text-center text-teal-800">Reproductor de video específico
                 </h3>
                 <div class="flex items-center justify-center p-6 bg-gray-100 rounded-lg shadow-lg">
                     @include('productos.partials.video_player', [

@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon; // Necesario para formatear fechas
 use App\Models\User;
+use League\Csv\Writer; // Asegúrate de tener esta librería instalada (composer require league/csv)
+use SplTempFileObject; // Necesario para League/Csv
 use Illuminate\Http\Request;
 use App\Services\UserService;
+use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 use App\Mail\UserCreatedNotification;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Response;
@@ -28,7 +31,6 @@ class UsuarioController extends Controller
     {
         Gate::authorize('crear usuario');
         $usuarios = $userService->obtenerUsuariosFiltrados($request);
-        // Necesitamos pasar los roles y permisos disponibles para el modal
         $roles = Role::all();
         $permissions = Permission::all();
 
@@ -61,39 +63,43 @@ class UsuarioController extends Controller
 
     /**
      * Almacena un nuevo usuario.
-     * Este metodo ahora recibe y valida TODOS los datos de los 3 pasos
-     * y realiza la creacion completa del usuario.
-     * !ESTE MeTODO AHORA DEVUELVE JSON!
+     * Este método ahora recibe y valida TODOS los datos de los 3 pasos
+     * y realiza la creación completa del usuario.
+     * ¡ESTE MÉTODO AHORA DEVUELVE JSON!
      */
     public function store(Request $request)
     {
-        // --- RESTRICCIoN DE ROL: Operario/Funcionario no pueden crear usuarios ---
+        // --- RESTRICCIÓN DE ROL: Operario/Funcionario no pueden crear usuarios ---
         if (Auth::user()->hasAnyRole(['Operario', 'Funcionario'])) {
             return response()->json(['message' => 'Tu rol no te permite crear usuarios.', 'errors' => ['general' => 'Permiso denegado por rol.']], 403);
         }
 
-        // Validacion para TODOS los campos de los 3 pasos para la creacion
+        // Validación para TODOS los campos de los 3 pasos para la creación
         $rules = [
-            'name'          => 'required|string|max:255',
-            'lastname'      => 'required|string|max:255',
+            // REFORZADO: Solo letras y espacios, sin tildes ni caracteres especiales
+            'name'          => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
+            'lastname'      => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
+            // REFORZADO: Validación de email estándar, Laravel ya maneja bien la estructura
             'email'         => 'required|email|unique:users,email',
-            'phone'         => 'required|string|digits:10', // Corregido para validar exactamente 10 digitos
-            'type_document' => ['required', 'string', Rule::in(['CC', 'TI', 'CE', 'PPT', 'PEP'])], // Regla mas segura
-            'document'      => 'required|string|max:10|unique:users,document',
-            'roles'         => 'required|array', // Rol es obligatorio para la creacion
+            // REFORZADO: Solo dígitos, entre 10 y 15 de longitud
+            'phone'         => ['required', 'string', 'digits_between:10,15'],
+            // REFORZADO: Tipos de documento permitidos
+            'type_document' => ['required', 'string', Rule::in(['CC', 'TI', 'CE', 'PPT', 'PEP'])],
+            // La validación del documento se construirá dinámicamente
+            'document'      => ['required', 'string', 'unique:users,document'], // Base para la validación dinámica
+            'roles'         => 'required|array',
             'roles.*'       => 'string|exists:roles,name',
             'permissions'   => 'nullable|array',
             'permissions.*' => 'string|exists:permissions,name',
-            'password'      => 'required|string|min:8|confirmed', // Contrasena es obligatoria para la creacion
+            'password'      => 'required|string|min:8|confirmed',
             'password_confirmation' => 'required|string|min:8',
         ];
 
-        // --- LoGICA DINaMICA PARA EL DOCUMENTO ---
+        // --- LÓGICA DINÁMICA PARA EL DOCUMENTO ---
+        // 1. Define las reglas base para el documento, incluyendo que solo sean números
+        $documentValidation = ['required', 'string', 'unique:users,document', 'regex:/^\d+$/'];
 
-        // 1. Define las reglas base para el documento
-        $documentValidation = ['required', 'string', 'unique:users,document'];
-
-        // 2. Anade la regla de longitud correcta segun el tipo
+        // 2. Añade la regla de longitud correcta según el tipo
         switch ($request->input('type_document')) {
             case 'PPT':
                 $documentValidation[] = 'digits:7';
@@ -108,30 +114,40 @@ class UsuarioController extends Controller
             case 'CE':
                 $documentValidation[] = 'digits:10';
                 break;
+            // Si añades otros tipos de documento extranjeros que puedan ser alfanuméricos,
+            // necesitarías una lógica diferente aquí, quizás eliminando 'regex:/^\d+$/'
+            // y añadiendo una regex específica para ese tipo (ej. pasaporte alfanumérico).
         }
 
-        // 3. Anade la regla construida dinamicamente al array principal
+        // 3. Añade la regla construida dinámicamente al array principal
         $rules['document'] = $documentValidation;
 
         $messages = [
             'name.required'             => 'El nombre es obligatorio.',
-            'lastname.required'         => 'El lastname es obligatorio.',
+            'name.regex'                => 'El nombre solo debe contener letras y espacios, sin tildes ni caracteres especiales.',
+            'lastname.required'         => 'El apellido es obligatorio.',
+            'lastname.regex'            => 'El apellido solo debe contener letras y espacios, sin tildes ni caracteres especiales.',
             'email.required'            => 'El correo es obligatorio.',
-            'email.email'               => 'El correo debe ser una direccion de email valida.',
-            'email.unique'              => 'Este correo ya esta registrado.',
-            'phone.required'            => 'El telefono es obligatorio.',
+            'email.email'               => 'El correo debe ser una dirección de email válida.',
+            'email.unique'              => 'Este correo ya está registrado.',
+            'phone.required'            => 'El teléfono es obligatorio.',
+            'phone.digits_between'      => 'El teléfono debe contener solo números y tener entre 10 y 15 dígitos.',
             'type_document.required'    => 'El tipo de documento es obligatorio.',
-            'document.required'         => 'El numero de documento es obligatorio.',
-            'document.unique'           => 'Este numero de documento ya esta registrado.',
+            'type_document.in'          => 'El tipo de documento seleccionado no es válido.',
+            'document.required'         => 'El número de documento es obligatorio.',
+            'document.unique'           => 'Este número de documento ya está registrado.',
+            'document.regex'            => 'El número de documento debe contener solo números.',
+            'document.digits'           => 'Para :attribute, el documento debe tener exactamente :digits dígitos.',
+            'document.digits_between'   => 'Para :attribute, el documento debe tener entre :min y :max dígitos.',
             'roles.required'            => 'Debe seleccionar al menos un rol.',
-            'roles.*.exists'            => 'El rol seleccionado no es valido.',
-            'password.required'         => 'La contrasena es obligatoria.',
-            'password.min'              => 'La contrasena debe tener al menos :min caracteres.',
-            'password.confirmed'        => 'Las contrasenas no coinciden.',
-            'password_confirmation.required' => 'La confirmacion de contrasena es obligatoria.',
-            'password_confirmation.min' => 'La confirmacion de contrasena debe tener al menos :min caracteres.',
+            'roles.*.exists'            => 'El rol seleccionado no es válido.',
+            'password.required'         => 'La contraseña es obligatoria.',
+            'password.min'              => 'La contraseña debe tener al menos :min caracteres.',
+            'password.confirmed'        => 'Las contraseñas no coinciden.',
+            'password_confirmation.required' => 'La confirmación de contraseña es obligatoria.',
+            'password_confirmation.min' => 'La confirmación de contraseña debe tener al menos :min caracteres.',
         ];
-
+        
         try {
             $request->validate($rules, $messages);
 
@@ -142,7 +158,7 @@ class UsuarioController extends Controller
                 'phone'             => $request->phone,
                 'type_document'     => $request->type_document,
                 'document'          => $request->document,
-                'password'          => Hash::make($request->password), // Hashear la contrasena final del formulario
+                'password'          => Hash::make($request->password), // Hashear la contraseña final del formulario
                 'estado'            => 'activo', // El usuario se crea activo ya con todos los datos
                 'email_verified_at' => null,
             ]);
@@ -154,8 +170,7 @@ class UsuarioController extends Controller
             } else {
                 $user->syncPermissions([]);
             }
-            
-            // Enviar notificacion por correo con la contrasena en texto plano
+
             Mail::to($user->email)->send(new UserCreatedNotification($user, $request->password));
 
             Log::info('Usuario creado completamente (admin) con todos los pasos.', [
@@ -168,12 +183,13 @@ class UsuarioController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Usuario creado exitosamente y notificacion enviada.',
-                'user_id' => $user->id, // Puedes devolver el ID si lo necesitas en el frontend para algo mas
+                'message' => 'Usuario creado exitosamente y notificación enviada.',
+                'user_id' => $user->id,
             ]);
+
         } catch (ValidationException $e) {
             return response()->json([
-                'message' => 'Errores de validacion.',
+                'message' => 'Errores de validación.',
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -184,18 +200,17 @@ class UsuarioController extends Controller
                 'ip_address'       => $request->ip(),
                 'trace'            => $e->getTraceAsString(),
             ]);
-            return response()->json(['message' => 'Ocurrio un error al crear el usuario. Por favor, intentalo de nuevo.', 'errors' => ['general' => $e->getMessage()]], 500);
+            return response()->json(['message' => 'Ocurrió un error al crear el usuario. Por favor, inténtalo de nuevo.', 'errors' => ['general' => $e->getMessage()]], 500);
         }
     }
 
     /**
      * Actualiza los datos de un usuario y sus roles/permisos.
-     * Este metodo se usa EXCLUSIVAMENTE para la edicion de un usuario existente.
-     * !ESTE MeTODO AHORA DEVUELVE JSON!
+     * Este método se usa EXCLUSIVAMENTE para la edición de un usuario existente.
+     * ¡ESTE MÉTODO AHORA DEVUELVE JSON!
      */
     public function update(Request $request, User $usuario)
     {
-        // Autorizacion y restricciones de rol (se mantienen igual)
         Gate::authorize('editar usuario');
 
         $loggedInUser = Auth::user();
@@ -214,36 +229,72 @@ class UsuarioController extends Controller
             }
         }
 
-        // Validacion para la edicion: todos los campos son requeridos excepto la contrasena (nullable)
         $rules = [
-            'name'          => 'required|string|max:255',
-            'lastname'      => 'required|string|max:255',
+            // REFORZADO: Solo letras y espacios, sin tildes ni caracteres especiales
+            'name'          => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
+            'lastname'      => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'], // ACTUALIZADO
+            // REFORZADO: Validación de email estándar, Laravel ya maneja bien la estructura
             'email'         => 'required|email|unique:users,email,' . $usuario->id,
-            'phone'      => 'required|string|max:20',
-            'type_document' => 'required|string|max:10',
-            'document'      => 'required|string|max:20|unique:users,document,' . $usuario->id,
+            // REFORZADO: Solo dígitos, entre 10 y 15 de longitud
+            'phone'         => ['required', 'string', 'digits_between:10,15'], // ACTUALIZADO
+            // REFORZADO: Tipos de documento permitidos
+            'type_document' => ['required', 'string', Rule::in(['CC', 'TI', 'CE', 'PPT', 'PEP'])],
+            // La validación del documento se construirá dinámicamente
+            'document'      => ['required', 'string', 'unique:users,document,' . $usuario->id], // Base para la validación dinámica
             'roles'         => 'nullable|array',
             'roles.*'       => 'string|exists:roles,name',
             'permissions'   => 'nullable|array',
             'permissions.*' => 'string|exists:permissions,name',
-            'password'          => 'nullable|string|min:8|confirmed', // Contrasena es opcional en edicion
-            'password_confirmation' => 'nullable|string|min:8', // Solo si se provee password
+            'password'          => 'nullable|string|min:8|confirmed',
+            'password_confirmation' => 'nullable|string|min:8',
         ];
+
+        // --- LÓGICA DINÁMICA PARA EL DOCUMENTO EN UPDATE ---
+        // 1. Define las reglas base para el documento, incluyendo que solo sean números
+        $documentValidation = ['required', 'string', 'unique:users,document,' . $usuario->id, 'regex:/^\d+$/'];
+
+        // 2. Añade la regla de longitud correcta según el tipo
+        switch ($request->input('type_document')) {
+            case 'PPT':
+                $documentValidation[] = 'digits:7';
+                break;
+            case 'PEP':
+                $documentValidation[] = 'digits:15';
+                break;
+            case 'CC':
+                $documentValidation[] = 'digits_between:8,10';
+                break;
+            case 'TI':
+            case 'CE':
+                $documentValidation[] = 'digits:10';
+                break;
+        }
+
+        // 3. Añade la regla construida dinámicamente al array principal
+        $rules['document'] = $documentValidation;
+
 
         $messages = [
             'name.required'             => 'El nombre es obligatorio.',
-            'lastname.required'         => 'El lastname es obligatorio.',
+            'name.regex'                => 'El nombre solo debe contener letras y espacios, sin tildes ni caracteres especiales.',
+            'lastname.required'         => 'El apellido es obligatorio.',
+            'lastname.regex'            => 'El apellido solo debe contener letras y espacios, sin tildes ni caracteres especiales.',
             'email.required'            => 'El correo es obligatorio.',
-            'email.email'               => 'El correo debe ser una direccion de email valida.',
-            'email.unique'              => 'Este correo ya esta registrado.',
-            'phone.required'         => 'El telefono es obligatorio.',
+            'email.email'               => 'El correo debe ser una dirección de email válida.',
+            'email.unique'              => 'Este correo ya está registrado.',
+            'phone.required'            => 'El teléfono es obligatorio.',
+            'phone.digits_between'      => 'El teléfono debe contener solo números y tener entre 10 y 15 dígitos.',
             'type_document.required'    => 'El tipo de documento es obligatorio.',
-            'document.required'         => 'El numero de documento es obligatorio.',
-            'document.unique'           => 'Este numero de documento ya esta registrado.',
-            'password.min'              => 'La contrasena debe tener al menos :min caracteres.',
-            'password.confirmed'        => 'Las contrasenas no coinciden.',
+            'type_document.in'          => 'El tipo de documento seleccionado no es válido.',
+            'document.required'         => 'El número de documento es obligatorio.',
+            'document.unique'           => 'Este número de documento ya está registrado.',
+            'document.regex'            => 'El número de documento debe contener solo números.',
+            'document.digits'           => 'Para :attribute, el documento debe tener exactamente :digits dígitos.',
+            'document.digits_between'   => 'Para :attribute, el documento debe tener entre :min y :max dígitos.',
+            'password.min'              => 'La contraseña debe tener al menos :min caracteres.',
+            'password.confirmed'        => 'Las contraseñas no coinciden.',
         ];
-
+        
         try {
             $request->validate($rules, $messages);
 
@@ -256,17 +307,14 @@ class UsuarioController extends Controller
                 'document'      => $request->document,
             ];
 
-            // Si se proporciono una nueva contrasena, hashearla y actualizarla
             if ($request->filled('password')) {
                 $updateData['password'] = Hash::make($request->password);
-                $updateData['estado'] = 'activo'; // Si se cambia la contrasena, asumimos que el usuario esta activo
-                // Enviar notificacion por correo con la NUEVA contrasena (solo si se cambio)
+                $updateData['estado'] = 'activo';
                 Mail::to($usuario->email)->send(new UserCreatedNotification($usuario, $request->password));
             }
 
             $usuario->update($updateData);
 
-            // Actualizacion de roles y permisos
             $usuario->syncRoles($request->roles ?? []);
 
             if ($request->has('permissions') && is_array($request->permissions)) {
@@ -289,7 +337,7 @@ class UsuarioController extends Controller
             ]);
         } catch (ValidationException $e) {
             return response()->json([
-                'message' => 'Errores de validacion.',
+                'message' => 'Errores de validación.',
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -301,7 +349,7 @@ class UsuarioController extends Controller
                 'ip_address'       => $request->ip(),
                 'trace'            => $e->getTraceAsString(),
             ]);
-            return response()->json(['message' => 'Ocurrio un error al actualizar el usuario.', 'errors' => ['general' => $e->getMessage()]], 500);
+            return response()->json(['message' => 'Ocurrió un error al actualizar el usuario.', 'errors' => ['general' => $e->getMessage()]], 500);
         }
     }
 
@@ -337,7 +385,7 @@ class UsuarioController extends Controller
     }
 
     /**
-     * Nuevo metodo para cargar datos de usuario por AJAX para la edicion (incluye nuevos campos)
+     * Nuevo método para cargar datos de usuario por AJAX para la edición (incluye nuevos campos)
      */
     public function getUserData(User $usuario)
     {
@@ -378,7 +426,7 @@ class UsuarioController extends Controller
             'document'                  => $usuario->document,
             'userRoles'                 => $userRoles,
             'allUserGrantedPermissions' => $allUserGrantedPermissions,
-            'roleDefaultPermissions'    => $roleDefaultPermissions,
+            'roleDefaultPermissions'    => $roleDefaultPermissions, 
         ]);
     }
 
@@ -396,7 +444,6 @@ class UsuarioController extends Controller
 
         return response()->json(['roleDefaultPermissions' => $roleDefaultPermissions]);
     }
-
     /**
      * Alterna el estado de un usuario entre 'activo' e 'inactivo'.
      * Requiere el permiso 'gestionar estado usuario'.
@@ -442,51 +489,46 @@ class UsuarioController extends Controller
     /**
      * Exporta la lista de usuarios a un archivo CSV.
      * Requiere el permiso 'exportar usuarios csv'.
+     *
+     * @param Request $request
+     * @param UserService $userService // <-- Inyectar el servicio aquí
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function exportarCSV(Request $request)
+    public function exportarCSV(Request $request, UserService $userService)
     {
+        // Obtiene los mismos parámetros de filtro y ordenación que la tabla
         $query = $request->input('q');
-        $rol = $request->input('rol');
-        $estado = $request->input('estado');
+        $rol = $request->input('rol'); // Si aún usas este filtro
+        $estado = $request->input('estado'); // Si aún usas este filtro
+        $sortBy = $request->input('sort_by');
+        $sortDirection = $request->input('sort_direction');
 
-        $usuarios = User::with('roles');
-
-        if ($query) {
-            $usuarios->where(function ($q2) use ($query) {
-                $q2->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%'])
-                    ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($query) . '%']);
-            });
-        }
-
-        if ($rol) {
-            $usuarios->whereHas('roles', function ($q3) use ($rol) {
-                $q3->where('name', $rol);
-            });
-        }
-
-        if ($estado) {
-            $usuarios->where('estado', $estado);
-        }
-
-        $usuarios = $usuarios->get();
+        // Llama al nuevo método del servicio para obtener los usuarios sin paginación
+        $usuariosResultados = $userService->obtenerUsuariosFiltradosParaExportar($request);
 
         $nombreArchivo = 'usuarios_' . now()->format('Y-m-d_H-i-s') . '.csv';
 
         $headers = [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8', // Asegura UTF-8
             'Content-Disposition' => "attachment; filename=\"$nombreArchivo\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
         ];
 
-        $columnas = ['ID', 'Nombre', 'Correo', 'Rol', 'Estado', 'Creado'];
+        $columnas = ['ID', 'Nombre', 'Apellido', 'Correo', 'Rol', 'Estado', 'Creado']; // Añadido 'Apellido'
 
-        $callback = function () use ($usuarios, $columnas) {
+        $callback = function () use ($usuariosResultados, $columnas) {
             $file = fopen('php://output', 'w');
+            // Añadir la marca BOM para asegurar que UTF-8 se muestre correctamente en Excel
+            fputs($file, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
             fputcsv($file, $columnas);
 
-            foreach ($usuarios as $usuario) {
+            foreach ($usuariosResultados as $usuario) {
                 fputcsv($file, [
                     $usuario->id,
                     $usuario->name,
+                    $usuario->lastname, // Asegúrate de que esta columna exista en tu modelo User
                     $usuario->email,
                     $usuario->roles->pluck('name')->implode(', '),
                     $usuario->estado,
@@ -497,7 +539,7 @@ class UsuarioController extends Controller
             fclose($file);
         };
 
-        return Response::stream($callback, 200, $headers);
+        return response()->stream($callback, 200, $headers);
     }
 
     /**

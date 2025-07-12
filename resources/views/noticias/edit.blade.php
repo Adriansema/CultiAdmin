@@ -102,16 +102,6 @@
                 @enderror
             </div>
 
-            <div class="mb-10">
-                <label for="numero_pagina" class="block text-gray-700 text-sm font-bold mb-2">Número de página:</label>
-                <input type="number" name="numero_pagina" id="numero_pagina"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    value="{{ old('numero_pagina', $noticia->numero_pagina) }}">
-                @error('numero_pagina')
-                    <p class="text-red-500 text-xs italic">{{ $message }}</p>
-                @enderror
-            </div>
-
             <div class="flex items-center justify-between">
                 <a href="{{ route('noticias.index') }}"
                     class="bg-[var(--color-textmarca)] hover:bg-[var(--color-texthovermarca)] py-3 px-4 rounded-full text-md font-bold text-white focus:outline-none focus:shadow-outline inline-flex items-center transition duration-150 ease-in-out transform hover:-translate-x-1">

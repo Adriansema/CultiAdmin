@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('Restablecer Contrasena - Cultiva SENA') }}</title>
+    <title>{{ __('Restablecer Contraseña - Cultiva sena') }}</title>
     <style>
         /* Estilos basicos para compatibilidad de email. Tailwind no funciona directamente aqui sin post-procesamiento. */
         body {
@@ -73,7 +73,7 @@
         <div class="header">
             {{-- Puedes usar un logo aqui --}}
             <img src="{{ asset('images/logo-cultiva-sena.png') }}" alt="Cultiva SENA Logo">
-            <h1>{{ __('Restablecimiento de Contrasena') }}</h1>
+            <h1>{{ __('Restablecimiento de Contraseña') }}</h1>
         </div>
 
         <div class="content">
@@ -82,7 +82,7 @@
                 $saludo = '';
 
                 if ($currentHour >= 5 && $currentHour < 12) {
-                    $saludo = 'Buenos dias';
+                    $saludo = 'Buenos días';
                 } elseif ($currentHour >= 12 && $currentHour < 19) {
                     $saludo = 'Buenas tardes';
                 } else {
@@ -90,21 +90,21 @@
                 }
             @endphp
 
-            <p>{{ $saludo }} **{{ $user->name ?? 'Usuario' }}**,</p>
-            <p>{{ __('Estas recibiendo este correo porque hemos recibido una solicitud de restablecimiento de contrasena para tu cuenta.') }}</p>
+            <p>{{ $saludo }} <b>{{ $user->name ?? 'Usuario' }}</b>,</p>
+            <p>{{ __('Estas recibiendo este correo porque hemos recibido una solicitud de restablecimiento de contraseña para tu cuenta.') }}</p>
 
             <div class="button-container">
                 <a href="{{ $url }}" class="button">{{ __('Restablecer Contrasena') }}</a>
             </div>
 
-            <p>{{ __('Este enlace de restablecimiento de contrasena expirara en :count minutos.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]) }}</p>
+            <p>{{ __('Este enlace de restablecimiento de contraseña expirara en :count minutos.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]) }}</p>
 
-            <p>{{ __('Si no solicitaste un restablecimiento de contrasena, no se requiere ninguna accion adicional.') }}</p>
+            <p>{{ __('Si no solicitaste un restablecimiento de contraseña, no se requiere ninguna acción adicional.') }}</p>
         </div>
 
         <div class="footer">
-            <p>{{ __('Saludos,') }}<br>{{ __('El equipo de Cultiva SENA') }}</p>
-            <p>&copy; {{ date('Y') }} Cultiva SENA. Todos los derechos reservados.</p>
+            <p>{{ __('Saludos,') }}<br>{{ __('El equipo de Cultiva sena') }}</p>
+            <p>&copy; {{ date('Y') }} Cultiva sena. Todos los derechos reservados.</p>
         </div>
     </div>
 </body>

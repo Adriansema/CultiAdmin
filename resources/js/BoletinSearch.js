@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchIcon = document.getElementById('searchIcon');
     const clearIconContainer = document.getElementById('clearIconContainer');
     const resetFiltersButton = document.getElementById('resetFiltersButton');
+    const exportCsvButton = document.getElementById('exportCsvButton');
 
     // Seleccionar todos los botones de ordenación
     const sortButtons = document.querySelectorAll('.sort-icon-btn');
@@ -90,26 +91,34 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Logica para el boton de exportar CSV
-    const exportCsvButton = document.getElementById('exportCsvButton');
+    // Lógica para el botón de exportar CSV
     if (exportCsvButton) {
         exportCsvButton.addEventListener('click', function (e) {
-            e.preventDefault();
+            e.preventDefault(); // Previene el envío por defecto del formulario
+
+            const exportForm = this.closest('form'); // Obtiene el formulario padre
+            if (!exportForm) {
+                console.error('Error: No se encontró el formulario para el botón de exportar CSV.');
+                return;
+            }
+
+            const url = new URL(exportForm.action); // Obtiene la URL de acción del formulario
 
             const query = searchInput ? searchInput.value : '';
-            // const estado = estadoFilterSelect ? estadoFilterSelect.value : ''; // ELIMINADO
             const urlParams = new URLSearchParams(window.location.search);
             const sortBy = urlParams.get('sort_by') || '';
             const sortDirection = urlParams.get('sort_direction') || '';
+            const estadoFilter = urlParams.get('estado') || ''; // Si aún se usa el filtro de estado
 
-            const url = new URL(exportCsvBoletinesRoute, window.location.origin);
+            // Limpia los parámetros de la URL de exportación antes de añadir los nuevos
+            url.search = '';
 
             if (query) { url.searchParams.append('q', query); }
-            // if (estado) { url.searchParams.append('estado', estado); } // ELIMINADO
+            if (estadoFilter) { url.searchParams.append('estado', estadoFilter); }
             if (sortBy) { url.searchParams.append('sort_by', sortBy); }
             if (sortDirection) { url.searchParams.append('sort_direction', sortDirection); }
 
-            window.location.href = url.toString();
+            window.location.href = url.toString(); // Esto iniciará la descarga
         });
     }
 

@@ -16,6 +16,7 @@
         "laravel/jetstream": "^5.3",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
+        "league/csv": "^9.24",
         "livewire/livewire": "^3.6",
         "smalot/pdfparser": "^2.12",
         "spatie/laravel-permission": "^6.16"

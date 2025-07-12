@@ -6,6 +6,7 @@ use App\Models\Noticia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\User;
 
 class NoticiaService
 {
@@ -28,38 +29,146 @@ class NoticiaService
             ? $request->input('per_page')
             : 10;
 
-        // Inicializar variables al principio de la función para asegurar su definición
-        $searchQuery = $request->input('q', '');
-        $estadoFilter = $request->input('estado', '');
+        $searchQuery   = $request->input('q', '');
+        $estadoFilter  = $request->input('estado', ''); // Mantener para el filtro de estado si aún se usa
+        $sortBy        = $request->input('sort_by');    // Columna para ordenar
+        $sortDirection = $request->input('sort_direction'); // Dirección de ordenamiento
 
         $noticias = Noticia::query();
 
-        // Búsqueda robusta general en múltiples columnas
+        // Bandera para saber si ya hicimos el join con la tabla de usuarios
+        $joinedUsersTable = false;
+
+        // Si se va a ordenar por 'creador' o buscar por 'creador', hacemos el join
+        if ($sortBy === 'creador' || (
+            !empty($searchQuery) &&
+            (str_contains($searchQuery, 'creador') || str_contains($searchQuery, 'Creador')) // Una heurística simple
+        )) {
+            $noticias->leftJoin('users', 'noticias.user_id', '=', 'users.id')
+                ->select('noticias.*', 'users.name as creador_name'); // Seleccionamos el nombre del usuario como 'creador_name'
+            $joinedUsersTable = true;
+        } else {
+            $noticias->select('noticias.*'); // Selecciona todas las columnas de noticias si no hay join
+        }
+
+        // Búsqueda robusta general en múltiples columnas: Creador, Autor, Tipo, Titulo, Fecha, Estado
         if (!empty($searchQuery)) {
-            // Asegúrate de que $cleanedSearchQuery se define aquí, dentro del if donde se usa
             $cleanedSearchQuery = $this->cleanSearchQuery($searchQuery);
 
-            $noticias->where(function ($q2) use ($cleanedSearchQuery, $searchQuery) { // Pasar $cleanedSearchQuery a la clausura
-                $sqlNormalize = function($column) {
-                    if (in_array($column, ['created_at', 'updated_at'])) {
+            $noticias->where(function ($q2) use ($cleanedSearchQuery, $searchQuery, $joinedUsersTable) {
+                $sqlNormalize = function ($column) {
+                    // Adaptación para PostgreSQL, si usas MySQL, 'TO_CHAR' no es necesario para fechas
+                    if (config('database.default') === 'pgsql' && in_array($column, ['created_at', 'updated_at'])) {
                         return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                     }
                     return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER({$column}), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                 };
 
-                // Búsqueda robusta en las columnas de Noticia
                 $q2->orWhereRaw($sqlNormalize('tipo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                   ->orWhereRaw($sqlNormalize('titulo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                   ->orWhereRaw($sqlNormalize('autor') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                   ->orWhereRaw($sqlNormalize('clase') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                   ->orWhereRaw($sqlNormalize('CAST(numero_pagina AS TEXT)') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
-                
+                    ->orWhereRaw($sqlNormalize('titulo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                    ->orWhereRaw($sqlNormalize('autor') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+
+                // Búsqueda por creador (si ya se hizo el join)
+                if ($joinedUsersTable) {
+                    $q2->orWhereRaw($sqlNormalize('users.name') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+                }
+
+                // Búsqueda por fecha de creación (created_at)
                 try {
                     $date = Carbon::parse($searchQuery);
                     $q2->orWhereDate('created_at', $date->toDateString());
                 } catch (\Exception $e) {
                     // No hace nada si la fecha no es válida
                 }
+
+                // Búsqueda por estado (si se desea buscar por texto en el campo de búsqueda general)
+                $q2->orWhereRaw($sqlNormalize('estado') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+            });
+        }
+
+        // Aplicar filtro por estado (si el parámetro 'estado' todavía se usa para filtrar)
+        if (!empty($estadoFilter) && in_array($estadoFilter, ['aprobado', 'pendiente', 'rechazado'])) {
+            $noticias->where('estado', $estadoFilter);
+        }
+
+        // Ordenamiento genérico por columna y dirección
+        $allowedSortColumns = [
+            'creador',
+            'autor',
+            'tipo',
+            'titulo',
+            'created_at',
+            'estado',
+        ];
+
+        $allowedSortDirections = ['asc', 'desc'];
+
+        if (in_array($sortBy, $allowedSortColumns) && in_array($sortDirection, $allowedSortDirections)) {
+            // Si se ordena por 'creador', usamos el alias 'creador_name' del join
+            if ($sortBy === 'creador') {
+                $noticias->orderBy('creador_name', $sortDirection);
+            } else {
+                $noticias->orderBy($sortBy, $sortDirection);
+            }
+        } else {
+            $noticias->orderBy('created_at', 'desc');
+        }
+
+        // Cargar la relación 'user' para que la vista pueda acceder a $noticia->user->name
+        $noticias->with('user');
+
+        return $noticias->paginate($perPage)->withQueryString();
+    }
+
+    /**
+     * Obtiene noticias filtradas para exportación (sin paginación).
+     *
+     * @param Request $request La solicitud HTTP con los parámetros de filtro.
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function obtenerNoticiaFiltradasParaExportar(Request $request)
+    {
+        $searchQuery   = $request->input('q', '');
+        $estadoFilter  = $request->input('estado', '');
+        $sortBy        = $request->input('sort_by');
+        $sortDirection = $request->input('sort_direction');
+
+        $noticias = Noticia::query();
+
+        // Cargar la relación 'user' para el creador
+        $noticias->with('user');
+
+        // Búsqueda robusta general en múltiples columnas: Creador, Autor, Tipo, Titulo, Fecha, Estado
+        if (!empty($searchQuery)) {
+            $cleanedSearchQuery = $this->cleanSearchQuery($searchQuery);
+
+            $noticias->where(function ($q2) use ($cleanedSearchQuery, $searchQuery) {
+                $sqlNormalize = function ($column) {
+                    if (config('database.default') === 'pgsql' && in_array($column, ['created_at', 'updated_at'])) {
+                        return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
+                    }
+                    return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER({$column}), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
+                };
+
+                $q2->orWhereRaw($sqlNormalize('tipo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                    ->orWhereRaw($sqlNormalize('titulo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                    ->orWhereRaw($sqlNormalize('autor') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+
+                // Búsqueda por creador (requiere join o relación cargada)
+                $q2->orWhereHas('user', function ($userQuery) use ($cleanedSearchQuery) {
+                    $userQuery->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(name), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '') LIKE ?", ['%' . $cleanedSearchQuery . '%']);
+                });
+
+                // Búsqueda por fecha de creación (created_at)
+                try {
+                    $date = Carbon::parse($searchQuery);
+                    $q2->orWhereDate('created_at', $date->toDateString());
+                } catch (\Exception $e) {
+                    // No hace nada si la fecha no es válida
+                }
+
+                // Búsqueda por estado
+                $q2->orWhereRaw($sqlNormalize('estado') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
             });
         }
 
@@ -68,8 +177,34 @@ class NoticiaService
             $noticias->where('estado', $estadoFilter);
         }
 
-        $noticias->orderBy('tipo', 'asc');
+        // Ordenamiento genérico por columna y dirección
+        $allowedSortColumns = [
+            'tipo',
+            'titulo',
+            'autor',
+            'creador', // Mapeará a 'users.name' para la ordenación
+            'estado',
+            'created_at',
+        ];
 
-        return $noticias->paginate($perPage)->withQueryString();
+        $allowedSortDirections = ['asc', 'desc'];
+
+        if (in_array($sortBy, $allowedSortColumns) && in_array($sortDirection, $allowedSortDirections)) {
+            // Si se ordena por 'creador', necesitamos un join para acceder a 'users.name'
+            if ($sortBy === 'creador') {
+                // Asegurarse de que el join se haga solo una vez si ya se hizo para la búsqueda
+                $noticias->leftJoin('users', 'noticias.user_id', '=', 'users.id')
+                    ->orderBy('users.name', $sortDirection)
+                    ->select('noticias.*'); // Asegura que solo se seleccionen columnas de noticias
+            } else {
+                $noticias->orderBy($sortBy, $sortDirection);
+            }
+        } else {
+            // Ordenamiento por defecto si no hay un orden válido o si no se especifica
+            $noticias->orderBy('created_at', 'desc');
+        }
+
+        // No paginar, obtener todos los resultados
+        return $noticias->get();
     }
 }

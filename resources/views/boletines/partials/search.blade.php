@@ -4,7 +4,7 @@
     <input type="text"
            id="buscar-boletin-input" {{-- ¡Este ID es CRUCIAL! --}}
            name="q"
-           placeholder="Buscar Boletín"
+           placeholder="Buscar boletín"
            class="form-control border border-[var(--color-ajustes)] hover:border-[var(--color-hover)] rounded-2xl pr-10 py-3 w-full
                   focus:border-[var(--color-hover)] focus:outline-none focus:ring-0"
            value="{{ request('q') }}">

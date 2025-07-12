@@ -225,6 +225,150 @@ function handleDrop(event) {
     handleFileChange(event.dataTransfer.files);
 }
 
+// =========================================================================
+// --- INICIO: Funciones para Formateo de Precios en Tiempo Real ---
+// =========================================================================
+
+/**
+ * Limpia la cadena de texto de un número, eliminando separadores de miles y el texto " COP".
+ * Convierte el separador decimal de coma a punto para parseFloat.
+ * @param {string} str La cadena de texto del input.
+ * @returns {string} La cadena limpia lista para parseFloat.
+ */
+function cleanPriceString(str) {
+    if (typeof str !== 'string') return '';
+    // Eliminar " COP" y espacios adicionales
+    let cleaned = str.replace(/\s*COP/g, '').trim();
+    // Eliminar todos los puntos (separadores de miles)
+    cleaned = cleaned.replace(/\./g, '');
+    // Reemplazar la coma decimal por un punto decimal
+    cleaned = cleaned.replace(/,/g, '.');
+    // Eliminar cualquier carácter que no sea dígito o punto decimal
+    cleaned = cleaned.replace(/[^\d.]/g, '');
+    return cleaned;
+}
+
+/**
+ * Formatea un número o cadena de número con separadores de miles, dos decimales,
+ * símbolo de moneda y el sufijo " COP".
+ * Utiliza toLocaleString para manejar la configuración regional colombiana.
+ * @param {(number|string)} value El número o cadena a formatear.
+ * @returns {string} El número formateado con separadores de miles, decimales y " COP".
+ */
+function formatPrice(value) {
+    if (value === null || value === undefined || value === '') {
+        return '';
+    }
+
+    // `cleanPriceString` ya maneja la conversión de coma a punto para parseFloat.
+    const cleanedValue = cleanPriceString(String(value));
+    const numberValue = parseFloat(cleanedValue);
+
+    if (isNaN(numberValue)) {
+        return ''; // Retorna vacío si no es un número válido
+    }
+
+    // Formatear el número con toLocaleString para la configuración regional de Colombia.
+    // 'es-CO' usará punto como separador de miles y coma como decimal.
+    // style: 'currency' y currency: 'COP' se encargarán del símbolo y la posición.
+    // minimumFractionDigits: 2 y maximumFractionDigits: 2 aseguran dos decimales.
+    let formatted = numberValue.toLocaleString('es-CO', {
+        style: 'currency',
+        currency: 'COP', // Esto añadirá el símbolo de la moneda (ej. "$")
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    // toLocaleString para 'es-CO' con currency 'COP' generalmente produce "$ 15.000,00"
+    // o "$15.000,00".
+    // Para que aparezca "COP" al final, necesitamos una pequeña manipulación.
+    // 1. Quitar el símbolo de moneda inicial que toLocaleString puso.
+    // 2. Asegurarse que los espacios son consistentes.
+    // 3. Añadir " COP" al final.
+
+    // Expresión regular para quitar el símbolo de moneda (puede ser '$' o '€' u otro) y espacios iniciales/finales
+    formatted = formatted.replace(/^[\s\uFEFF\xA0]*\D+/, '').trim(); // Quita el símbolo de moneda y espacios iniciales no numéricos
+    
+    // Asegurarse de que el formato de los miles y decimales sea el esperado (punto miles, coma decimal)
+    // toLocaleString('es-CO') ya lo hace, pero si viniera de otra fuente, podrías asegurar.
+    // formatted = formatted.replace(/\./g, 'TEMP_DOT').replace(/,/g, '.').replace(/TEMP_DOT/g, ','); // Esto es si necesitas invertir comas y puntos
+
+    // Finalmente, añadir el " COP" al final
+    return `${formatted} COP`;
+}
+
+/**
+ * Aplica el formateo en tiempo real a un campo de entrada.
+ * @param {HTMLInputElement} inputElement El elemento input HTML.
+ */
+function applyPriceInputFormatting(inputElement) {
+    inputElement.addEventListener('input', (event) => {
+        const cursorPosition = inputElement.selectionStart;
+        const originalValue = inputElement.value;
+        const originalLength = originalValue.length;
+
+        // Elimina el sufijo " COP" y los separadores de miles temporales antes de re-formatear
+        let rawValue = originalValue.replace(/\s*COP/g, '').replace(/\./g, '');
+
+        // Obtener solo dígitos para el formateo
+        let digitsOnly = rawValue.replace(/[^\d]/g, '');
+
+        let formattedDigits = '';
+        if (digitsOnly) {
+            // Convertir a número y formatear con toLocaleString
+            formattedDigits = Number(digitsOnly).toLocaleString('es-CO', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+        }
+
+        // Si el valor original terminaba en un punto (aunque nuestro formato no lo muestra por los 0 decimales),
+        // este condicional es más bien un "seguro" por si se decide en el futuro permitir decimales.
+        // Por ahora, con maximumFractionDigits: 0, esta parte tiene menos impacto.
+        if (originalValue.endsWith('.') && !formattedDigits.endsWith('.')) {
+            formattedDigits += '.'; // Mantener el punto si el usuario lo ingresó, aunque luego no se muestren decimales formateados.
+        }
+
+
+        // Añadir el sufijo COP si hay dígitos formateados
+        if (formattedDigits) {
+            inputElement.value = `${formattedDigits} COP`;
+        } else {
+            inputElement.value = ''; // Limpiar si no hay dígitos válidos
+        }
+
+        // Reajustar la posición del cursor
+        const newLength = inputElement.value.length;
+        const lengthDiff = newLength - originalLength;
+        // Ajusta la posición del cursor si se han añadido o quitado caracteres de formato
+        inputElement.setSelectionRange(cursorPosition + lengthDiff, cursorPosition + lengthDiff);
+    });
+
+    // Si el campo ya tiene un valor al cargar la página (ej. edición), formatearlo
+    if (inputElement.value) {
+        inputElement.dispatchEvent(new Event('input'));
+    }
+}
+
+// Aplicar la función de formateo a los campos de precio una vez que el DOM esté completamente cargado.
+document.addEventListener('DOMContentLoaded', () => {
+    // Seleccionamos todos los elementos con la clase 'price-input'
+    const priceInputs = document.querySelectorAll('.price-input');
+    
+    priceInputs.forEach(input => {
+        applyPriceInputFormatting(input);
+    });
+});
+
+// =========================================================================
+// --- FIN: Funciones para Formateo de Precios en Tiempo Real ---
+// =========================================================================
+
+
+// =========================================================================
+// --- INICIO: Tu función handleCreateBoletinSubmit modificada ---
+// =========================================================================
+
 /**
  * Maneja el envio del formulario de creacion de boletines.
  * @param {Event} event - El evento de envio del formulario.
@@ -249,15 +393,15 @@ async function handleCreateBoletinSubmit(event) {
     formData.set('description', cleanedBulletinDescription); // Usar la version limpia
     // --- FIN SANITIZACION DE NOMBRE Y DESCRIPCION ---
 
-
     // Pre-procesamiento de precios: Limpiar y convertir a punto decimal
     let precioMasAltoVal = document.getElementById('precioMasAlto').value;
     let lugarPrecioMasAltoVal = document.getElementById('lugarPrecioMasAlto').value;
     let precioMasBajoVal = document.getElementById('precioMasBajo').value;
     let lugarPrecioMasBajoVal = document.getElementById('lugarPrecioMasBajo').value;
 
-    let cleanedPrecioMasAlto = precioMasAltoVal ? String(precioMasAltoVal).replace(/[^\d.,]/g, '').replace(/,/g, '.') : '';
-    let cleanedPrecioMasBajo = precioMasBajoVal ? String(precioMasBajoVal).replace(/[^\d.,]/g, '').replace(/,/g, '.') : '';
+    // AQUI ES DONDE USAMOS LA NUEVA FUNCION cleanPriceString
+    let cleanedPrecioMasAlto = cleanPriceString(precioMasAltoVal);
+    let cleanedPrecioMasBajo = cleanPriceString(precioMasBajoVal);
 
     // --- SANITIZACION DE LUGARES DE PRECIO (texto libre) ---
     // Aplicamos la limpieza a las variables intermedias para los campos de lugar
@@ -269,10 +413,11 @@ async function handleCreateBoletinSubmit(event) {
     let processedPrecioMasAlto = parseFloat(cleanedPrecioMasAlto) || null;
     let processedPrecioMasBajo = parseFloat(cleanedPrecioMasBajo) || null;
 
-    const hasPrecioAlto = processedPrecioMasAlto !== null;
+    // Asegurarse de que si el parsing falla (ej. input vacío o solo "COP"), el valor sea nulo o 0.
+    const hasPrecioAlto = processedPrecioMasAlto !== null && !isNaN(processedPrecioMasAlto) && processedPrecioMasAlto > 0; // Añadido check > 0
     // Usar la version limpia y corregir .trim()
     const hasLugarAlto = cleanedLugarPrecioMasAlto.trim() !== '';
-    const hasPrecioBajo = processedPrecioMasBajo !== null;
+    const hasPrecioBajo = processedPrecioMasBajo !== null && !isNaN(processedPrecioMasBajo) && processedPrecioMasBajo > 0; // Añadido check > 0
     // Usar la version limpia y corregir .trim()
     const hasLugarBajo = cleanedLugarPrecioMasBajo.trim() !== '';
 
@@ -336,7 +481,7 @@ async function handleCreateBoletinSubmit(event) {
             window.closeCreateBoletinModalVanilla(); // Cierra el modal de creacion
 
             // Mensaje sin caracteres no ASCII
-            window.showGlobalMessage('success', resultStore.message || 'Boletin creado con exito.');
+            window.showGlobalMessage('success', resultStore.message || 'Boletín creado con éxito.');
 
             setTimeout(() => {
                 window.location.reload(); // Recarga la pagina
@@ -348,20 +493,23 @@ async function handleCreateBoletinSubmit(event) {
             window.showGlobalMessage('error', resultStore.message || 'Por favor, corrige los errores en el formulario.');
         } else {
             // Mensaje sin caracteres no ASCII
-            window.showGlobalMessage('error', resultStore.message || 'Ocurrio un error inesperado al crear el boletin.');
+            window.showGlobalMessage('error', resultStore.message || 'Ocurrio un error inesperado al crear el boletín.');
         }
     } catch (error) {
         // Mensaje sin caracteres no ASCII
-        window.showGlobalMessage('error', 'Error de red o conexion al servidor. Intentalo de nuevo.');
+        window.showGlobalMessage('error', 'Error de red o conexión al servidor. Intentalo de nuevo.');
         console.error('Fetch error:', error);
     } finally {
         if (submitCreateBoletinButton) {
             submitCreateBoletinButton.disabled = false;
             // Mensaje sin caracteres no ASCII
-            submitCreateBoletinButton.innerHTML = 'Subir Boletin';
+            submitCreateBoletinButton.innerHTML = 'Subir Boletín';
         }
     }
 }
+// =========================================================================
+// --- FIN: Tu función handleCreateBoletinSubmit modificada ---
+// =========================================================================
 
 /**
  * Muestra los errores de validacion en el formulario de creacion.

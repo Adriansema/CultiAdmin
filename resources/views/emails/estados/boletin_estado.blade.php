@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Actualizacion del Estado de tu Boletin</title>
+    <title>Actualización del estado de tu Boletín</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -106,54 +106,43 @@
 <body>
     <div class="container">
         <h1>Hola,</h1>
-        <p>Te informamos sobre una actualizacion en el estado de tu **Boletin** con ID **{{ $boletin->id }}**.</p>
+        <p>Te informamos sobre una actualización en el estado de tu <b>Boletin</b> con ID <b>{{ $boletin->id }}</b>.</p>
 
         <div class="status-box status-{{ strtolower($boletin->estado) }}">
-            Tu Boletin ha sido **{{ ucfirst($boletin->estado) }}**.
+            Tu Boletin ha sido <b>{{ ucfirst($boletin->estado) }}<b>.
         </div>
 
-        <p><strong>Detalles del Boletin:</strong></p>
+        <p><strong>Detalles del boletín:</strong></p>
         <ul>
-            <li><strong>ID de Referencia:</strong> {{ $boletin->id }}</li>
+            <li><strong>ID de referencia:</strong> {{ $boletin->id }}</li>
             {{-- Asumiendo que 'contenido' es el campo principal del boletin --}}
             <li><strong>Contenido (extracto):</strong> "{{ Str::limit($boletin->contenido ?? 'Sin contenido disponible', 250) }}"</li>
-            <li><strong>Observaciones del Operador:</strong>
+            <li><strong>Observaciones</strong>
                 @if($boletin->observaciones) {{-- Usando 'observaciones' del modelo Boletin --}}
                     "{{ $boletin->observaciones }}"
                 @else
-                    No hay observaciones adicionales del operador.
+                    No hay observaciones adicionales.
                 @endif
             </li>
-            <li><strong>Fecha de Actualizacion:</strong> {{ $boletin->updated_at ? $boletin->updated_at->format('d/m/Y H:i A') : 'N/A' }}</li>
-            {{-- Puedes anadir mas campos especificos del boletin aqui si son relevantes --}}
-            {{-- <li><strong>Fecha de Publicacion:</strong> {{ $boletin->fecha_publicacion ? $boletin->fecha_publicacion->format('d/m/Y') : 'N/A' }}</li> --}}
-            {{-- <li><strong>Autor:</strong> {{ $boletin->user->name ?? 'N/A' }}</li> --}}
+            <li><strong>Fecha de actualización:</strong> {{ $boletin->updated_at ? $boletin->updated_at->format('d/m/Y H:i A') : 'N/A' }}</li>
         </ul>
 
         @if ($boletin->estado === 'rechazado')
-            <p>Tu Boletin ha sido **rechazado**. Te recomendamos revisar las observaciones del operador y editarlo para una nueva validacion.</p>
+            <p>Tu boletín ha sido <b>rechazado</b>. Te recomendamos revisar las observaciones y editarlo para una nueva validación.</p>
             <p style="text-align: center;">
-                <a href="{{ route('boletines.edit', $boletin->id) }}" class="button">
-                    Ir a Editar Boletin
-                </a>
             </p>
         @elseif ($boletin->estado === 'aprobado')
-            <p>¡Felicidades! Tu Boletin ha sido **aprobado** y ya esta disponible.</p>
-            {{-- Opcional: Si tienes una ruta para ver el boletin aprobado en el frontend --}}
-            {{-- <p style="text-align: center;">
-                <a href="{{ route('boletines.show', $boletin->id) }}" class="button">
-                    Ver Boletin
-                </a>
-            </p> --}}
+            <p>¡Felicidades! Tu boletín ha sido <b>aprobado</b> y ya está disponible.</p>
+
         @else
-            <p>Tu Boletin actualmente esta **pendiente** de revision por parte de un operario. Te notificaremos cuando haya una actualizacion.</p>
+            <p>Tu Boletín actualmente esta <b>pendiente</b> de revisión. Te notificaremos cuando haya una actualización.</p>
         @endif
 
-        <p>Gracias por tu paciencia y colaboracion.</p>
+        <p>Gracias por tu paciencia y colaboración.</p>
 
         <div class="footer">
-            <p>Este es un mensaje automatico, por favor no respondas a este correo.</p>
-            <p>&copy; {{ date('Y') }} Tu Empresa. Todos los derechos reservados.</p>
+            <p>Este es un mensaje automático, por favor no respondas a este correo.</p>
+            <p>&copy; {{ date('Y') }} Cultiva sena. Todos los derechos reservados.</p>
         </div>
     </div>
 </body>

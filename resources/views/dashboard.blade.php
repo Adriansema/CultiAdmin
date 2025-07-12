@@ -6,14 +6,14 @@
         <section class="mb-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="mb-6 md:mb-0">
-                    <h1 class="text-2xl font-semibold text-gray-800">Panel de Administracion</h1>
-                    <p class="mt-2 text-gray-600">Visualiza estadistica de vistas al sitio, notificacion y boletines.</p>
+                    <h1 class="text-2xl font-semibold text-gray-800">Panel de administración</h1>
+                    <p class="mt-2 text-gray-600">Visualiza estadística de vistas al sitio, noticias y boletines.</p>
                 </div>
 
                 <div class="flex flex-wrap items-center mt-4 space-x-2 md:mt-0" id="filter-buttons-container">
                     <button onclick="window.setFilter('ultimos3dias')" data-filtro="ultimos3dias"
                         class="px-6 py-3 text-green-600 transition-all duration-300 ease-in-out rounded-full filter-btn hover:border hover:border-green-600 focus:outline-none">
-                        Ultimos 3 dias
+                        Últimos 3 días
                     </button>
                     <button onclick="window.setFilter('semana')" data-filtro="semana"
                         class="px-6 py-3 text-green-600 transition-all duration-300 ease-in-out rounded-full filter-btn hover:border hover:border-green-600 focus:outline-none">
@@ -37,7 +37,7 @@
                                 clip-rule="evenodd" />
                         </svg>
 
-                        <span id="yearLabel" class="text-darkblue">Año</span> {{-- Texto 'Ano' --}}
+                        <span id="yearLabel" class="text-darkblue">Año</span>
 
                         {{-- Selector de Ano Personalizado (2025 con flechas) - Oculto por defecto --}}
                         {{-- Se mostrara al activar el filtro 'Ano', quedando entre el texto 'Ano' y el icono --}}
@@ -77,7 +77,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M3 17l6-6 4 4 7-7" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-[var(--color-usucone)] -mt-3">Estadisticas de actividad</h2>
+                <h2 class="text-xl font-bold text-[var(--color-usucone)] -mt-3">Estadísticas de actividad</h2>
             </div>
 
             <div class="flex flex-col items-stretch lg:flex-row gap-x-6 gap-y-4">

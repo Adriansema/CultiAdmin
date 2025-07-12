@@ -102,13 +102,13 @@
 
             {{-- Gestion de Usuarios (el div con x-data que contiene el boton y el menu) --}}
             {{-- Este div ya no necesita ser 'relative' para el menu desplegable si usamos 'fixed' --}}
-            <div x-data="{ userMenuOpen: false }" class="px-2 space-y-2">
+            <div x-data="{ userMenuOpen: false }" class="px-0 space-x-2">
                 @canany(['crear usuario'])
                     <a href="#" @click.prevent="userMenuOpen = !userMenuOpen" x-ref="userMenuButton"
                         {{-- Anadir una referencia para Alpine.js --}}
                         :class="sidebarOpen
                             ?
-                            '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
+                            '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[12px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
                             '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                         <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                             <img src="{{ asset(request()->routeIs('usuarios.index') ? 'images/IconColor.svg' : 'images/Icon.svg') }}"
@@ -118,7 +118,7 @@
                                 {{ __('Gestion de usuarios') }}
                             </span>
                             {{-- Icono de flecha para indicar que es un menu desplegable --}}
-                            <img src="{{ asset('images/abrir-menu-2.svg') }}" class="w-3 h-4 ml-2"
+                            <img src="{{ asset('images/abrir-menu-2.svg') }}" class="w-3 h-4 ml-1"
                                 alt="icono de abrir-menu" x-show="sidebarOpen" :class="userMenuOpen ? '-rotate-90' : ''">
                         </div>
                     </a>
