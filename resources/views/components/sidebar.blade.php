@@ -109,7 +109,7 @@
                         :class="sidebarOpen
                             ?
                             '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[12px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
-                            '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex justify-center px-2 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
+                            '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex justify-center px-4 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                         <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                             <img src="{{ asset(request()->routeIs('usuarios.index') ? 'images/IconColor.svg' : 'images/Icon.svg') }}"
                                 class="w-4 h-4" alt="Usuarios">
