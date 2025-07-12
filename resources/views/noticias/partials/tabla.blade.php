@@ -2,6 +2,27 @@
     <table class="min-w-full text-md text-left">
         <thead class="bg-[var(--color-tabla)]">
             <tr>
+                 <th class="px-6 py-3 font-bold text-left text-gray-600">
+                    <div class="flex items-center justify-between">
+                        <span>Tipo</span>
+                        <div class="flex flex-col ml-2">
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap" data-sort-field="tipo"
+                                data-sort-direction="asc">
+                                <img src="{{ asset('images/asce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                <img src="{{ asset('images/asce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
+                            </button>
+                            <button type="button" class="sort-icon-btn group whitespace-nowrap" data-sort-field="tipo"
+                                data-sort-direction="desc">
+                                <img src="{{ asset('images/desce.svg') }}"
+                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                <img src="{{ asset('images/desce-hover.svg') }}"
+                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
+                            </button>
+                        </div>
+                    </div>
+                </th>
                 <th class="px-6 py-3 font-bold text-left text-gray-600">
                     <div class="flex items-center justify-between">
                         <span>Creador</span>
@@ -35,27 +56,6 @@
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
                             </button>
                             <button type="button" class="sort-icon-btn group whitespace-nowrap" data-sort-field="autor"
-                                data-sort-direction="desc">
-                                <img src="{{ asset('images/desce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
-                                <img src="{{ asset('images/desce-hover.svg') }}"
-                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
-                            </button>
-                        </div>
-                    </div>
-                </th>
-                <th class="px-6 py-3 font-bold text-left text-gray-600">
-                    <div class="flex items-center justify-between">
-                        <span>Tipo</span>
-                        <div class="flex flex-col ml-2">
-                            <button type="button" class="sort-icon-btn group whitespace-nowrap" data-sort-field="tipo"
-                                data-sort-direction="asc">
-                                <img src="{{ asset('images/asce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
-                                <img src="{{ asset('images/asce-hover.svg') }}"
-                                    class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
-                            </button>
-                            <button type="button" class="sort-icon-btn group whitespace-nowrap" data-sort-field="tipo"
                                 data-sort-direction="desc">
                                 <img src="{{ asset('images/desce.svg') }}"
                                     class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
@@ -149,15 +149,16 @@
                 {{-- Si hay noticias, las iteramos --}}
                 @forelse($noticias as $noticia)
                     <tr class="bg-white hover:bg-gray-200">
+                         <td class="px-6 py-4">
+                            {{ $noticia->tipo }}
+                        </td>
                         <td class="px-6 py-4">
                             {{ $noticia->user ? $noticia->user->name : 'Desconocido' }}
                         </td>
                         <td class="px-6 py-4">
                             {{ $noticia->autor ?? 'N/A' }}
                         </td>
-                        <td class="px-6 py-4">
-                            {{ $noticia->tipo }}
-                        </td>
+                       
                         <td class="px-6 py-4">
                             {{ Str::limit($noticia->titulo, 30) ?? 'N/A' }}
                         </td>

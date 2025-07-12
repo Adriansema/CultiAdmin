@@ -1,16 +1,6 @@
 {{-- Este div contiene solo el HTML del sidebar --}}
-{{-- Ajustes clave: `fixed inset-y-0 left-0 z-40` para posicionamiento móvil. --}}
-{{-- `md:relative md:translate-x-0 md:w-64` para desktop (siempre visible y ancho completo). --}}
-{{-- `transform transition-transform duration-300 ease-in-out` para animaciones. --}}
-{{-- `x-bind:class` para controlar `translate-x-full` en móviles y el ancho en desktop. --}}
-<div x-bind:class="{
-        'w-64': sidebarOpen && window.innerWidth >= 768,       {{-- Ancho completo en desktop si está abierto --}}
-        'w-28': !sidebarOpen && window.innerWidth >= 768,      {{-- Ancho colapsado en desktop si está cerrado --}}
-        'w-64 -translate-x-full': !sidebarOpen && window.innerWidth < 768, {{-- Oculto en móvil si está cerrado --}}
-        'w-64 translate-x-0': sidebarOpen && window.innerWidth < 768      {{-- Visible en móvil si está abierto --}}
-    }"
-    class="h-full flex flex-col transition-all duration-300 ease-in-out bg-[#00304D] text-white flex-shrink-0 overflow-y-auto
-           fixed inset-y-0 left-0 z-40 md:relative md:translate-x-0"> {{-- Eliminado 'overflow-x-hidden' --}}
+<div :class="sidebarOpen ? 'w-72' : 'w-28'"
+    class="h-full flex flex-col transition-all duration-1000 bg-[#00304D] text-white flex-shrink-0 overflow-y-auto overflow-x-hidden">
 
     <div class="flex items-center justify-between px-4 py-3">
         {{-- Logo + boton de colapsar --}}
@@ -120,7 +110,7 @@
         </div>
     </nav>
 
-    <nav class="flex-1 px-6 pt-4 space-y-2 mt-40">
+    <nav class="flex-1 px-6 pt-4 mt-40 space-y-2">
         <div class="px-2 space-y-2">
             {{-- Separar la navegacion principal de los ajustes --}}
             <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
@@ -131,25 +121,27 @@
 
             {{-- Gestion de Usuarios (el div con x-data que contiene el boton y el menu) --}}
             {{-- Este div ya no necesita ser 'relative' para el menu desplegable si usamos 'fixed' --}}
-            <div x-data="{ userMenuOpen: false }" class="px-0 space-x-2">
+            <div x-data="{ userMenuOpen: false }" class="space-x-2">
                 @canany(['crear usuario'])
                     <a href="#" @click.prevent="userMenuOpen = !userMenuOpen" x-ref="userMenuButton"
                         {{-- Anadir una referencia para Alpine.js --}}
                         :class="sidebarOpen
                             ?
-                            '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[12px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer' :
+                            '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] text-white cursor-pointer' :
                             '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex justify-center px-4 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                         <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                             <img src="{{ asset(request()->routeIs('usuarios.index') ? 'images/IconColor.svg' : 'images/Icon.svg') }}"
                                 class="w-4 h-4" alt="Usuarios">
-                            <span x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                                x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+
+                            <span x-show="sidebarOpen" x-transition
                                 class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('usuarios.index') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
                                 {{ __('Gestion de usuarios') }}
                             </span>
+
                             {{-- Icono de flecha para indicar que es un menu desplegable --}}
-                            <img src="{{ asset('images/abrir-menu-2.svg') }}" class="w-3 h-4 ml-1"
-                                alt="icono de abrir-menu" x-show="sidebarOpen" :class="userMenuOpen ? '-rotate-90' : ''">
+                            <img src="{{ asset(request()->routeIs('usuarios.index') ? 'images/menu.svg' : 'images/menu-hov.svg') }}"
+                            class="w-4 h-4 ml-3"
+                            alt="icono de abrir-menu" x-show="sidebarOpen" :class="userMenuOpen ? '-rotate-90' : ''">
                         </div>
                     </a>
                 @endcanany
@@ -163,32 +155,17 @@
                         if (value) { // Se simplifica la lógica, ya no es necesario separar por sidebarOpen
                             $nextTick(() => {
                                 const buttonRect = $refs.userMenuButton.getBoundingClientRect();
-                                // Calcular la posición en relación con la ventana (viewport)
-                                $el.style.top = `${buttonRect.top}px`; // Alinear con la parte superior del botón
-                                // Ajustar 'left' según el estado de sidebarOpen para que el menú salga del sidebar
-                                if (window.innerWidth >= 768) { // Desktop
-                                    if (sidebarOpen) { // Sidebar expandido
-                                        $el.style.left = `${buttonRect.right + 10}px`; // Un poco a la derecha del botón
-                                    } else { // Sidebar colapsado
-                                        $el.style.left = `${buttonRect.left + 50}px`; // Más a la derecha para que no se oculte detrás del contenido
-                                    }
-                                } else { // Mobile
-                                    // Para móvil, el sidebar es un overlay. El menú debería aparecer a la derecha del botón dentro del sidebar.
-                                    // Opcional: Centrarlo o darle un ancho completo dentro del overlay.
-                                    // Si quieres que salga del sidebar en móvil, el 'left' es relativo al viewport.
-                                    // Para que se vea dentro del sidebar, necesitaría ser `position: absolute` dentro de un contenedor `relative` dentro del sidebar.
-                                    // Por ahora, lo haremos que se muestre a la derecha, asumiendo que el sidebar es un overlay amplio.
-                                    $el.style.left = `${buttonRect.right + 10}px`;
-                                }
-                                $el.style.minWidth = `200px`; // Ancho mínimo para que quepa el texto. Ajusta si es necesario.
-                                $el.style.position = 'fixed'; // Asegurarse de que sea fixed
-                                $el.style.zIndex = '50'; // Asegurarse de que esté por encima de todo
+                                $el.style.top = `${buttonRect.top - 10}px`;
+                                $el.style.left = `${buttonRect.right + 8}px`; // Ajusta el '8' si es necesario
                             });
+                        } else {
+                            {{-- Cuando se cierra, permitir que la transicion use las ultimas posiciones calculadas --}}
+                            {{-- No limpiamos el style inmediatamente, Alpine.js se encargara de ocultarlo --}}
                         }
-                    });" class="fixed z-50 w-auto bg-white rounded-xl shadow-2xl py-2">
+                    });" class="fixed z-50 w-auto py-2 bg-white shadow-2xl rounded-xl">
 
                     <a href="{{ route('usuarios.index') }}"
-                        class="block px-4 py-2 text-sm rounded-xl text-gray-700 hover:bg-gray-200">
+                        class="block px-4 py-2 text-sm text-gray-700 rounded-xl hover:bg-gray-200">
                         <ul class="flex items-center">
                             <li class="mr-2">
                                 <img src="{{ asset('images/list.svg') }}" class="w-3 h-5" alt="icono de carga masiva">
@@ -199,7 +176,7 @@
 
                     @if (Auth::user()->hasAnyRole(['SuperAdmin', 'Administrador']))
                         <button type="button"
-                            class="block w-full rounded-xl text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 rounded-xl hover:bg-gray-200"
                             @click="userMenuOpen = false; document.getElementById('create-user-button').click()">
                             <ul class="flex items-center">
                                 <li class="mr-2">
@@ -212,7 +189,7 @@
                     @endif
 
                     <button type="button"
-                        class="block w-full rounded-xl text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 rounded-xl hover:bg-gray-200"
                         @click="userMenuOpen = false; document.getElementById('importCsvButton').click()">
                         <ul class="flex items-center">
                             <li class="mr-2">

@@ -76,9 +76,9 @@ class UsuarioController extends Controller
 
         // Validación para TODOS los campos de los 3 pasos para la creación
         $rules = [
-            // REFORZADO: Solo letras y espacios, sin tildes ni caracteres especiales
-            'name'          => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
-            'lastname'      => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
+            // REFORZADO:  Permite letras (incluyendo tildes y ñ) y espacios. La 'u' al final es para soporte Unicode.
+            'name'          => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u'],
+            'lastname'      => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u'],
             // REFORZADO: Validación de email estándar, Laravel ya maneja bien la estructura
             'email'         => 'required|email|unique:users,email',
             // REFORZADO: Solo dígitos, entre 10 y 15 de longitud

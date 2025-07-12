@@ -237,13 +237,13 @@ function validateCsvRows(usersData) {
         // Validacion de formato de email (minima)
         if (userData.email && !/\S+@\S+\.\S+/.test(userData.email)) {
             // CAMBIO: 'Valor no válido en columna 'Correo electrónico''
-            errors.push(`Valor no valido en columna 'Correo electronico'`);
+            errors.push(`Valor no valido en columna 'Correo electrónico'`);
         }
 
         // Ejemplo: Validar que el campo 'document' solo contenga digitos
         if (userData.document && !/^\d+$/.test(userData.document)) {
             // CAMBIO: 'El documento '${userData.document}' solo debe contener dígitos.'
-            errors.push(`El documento '${userData.document}' solo debe contener digitos.`);
+            errors.push(`El documento '${userData.document}' solo debe contener dígitos.`);
         }
 
         if (errors.length > 0) {
@@ -293,7 +293,7 @@ async function checkDuplicatesEarly(usersData) {
 
                             let errorDetail = '';
                             // CAMBIO: 'El correo electrónico' a 'El correo electronico'
-                            if (cleanErrorMsg.includes('El correo electronico')) {
+                            if (cleanErrorMsg.includes('El correo electrónico')) {
                                 errorDetail = `Correo [${originalUser ? originalUser.email : 'N/A'}]`;
                                 // CAMBIO: 'El número de documento' a 'El numero de documento'
                             } else if (cleanErrorMsg.includes('El numero de documento')) {
@@ -466,15 +466,15 @@ function renderMissingDataErrors(errorsList, errorCategory) {
     // Actualiza el titulo del modal segun la categoria de error
     if (missingDataModalTitle) {
         if (errorCategory === 'faltantes') {
-            missingDataModalTitle.textContent = 'Campos Faltantes';
+            missingDataModalTitle.textContent = 'Campos faltantes';
             // CAMBIO: 'Datos Inválidos' a 'Datos Invalidos'
         } else if (errorCategory === 'invalidos') {
-            missingDataModalTitle.textContent = 'Datos Invalidos';
+            missingDataModalTitle.textContent = 'Datos inválidos';
             // CAMBIO: 'Datos Faltantes o Inválidos' a 'Datos Faltantes o Invalidos'
         } else if (errorCategory === 'mixtos') {
-            missingDataModalTitle.textContent = 'Datos Faltantes o Invalidos';
+            missingDataModalTitle.textContent = 'Datos faltantes o Iiválidos';
         } else {
-            missingDataModalTitle.textContent = 'Error en Datos'; // Para errores generales de procesamiento
+            missingDataModalTitle.textContent = 'Error en datos'; // Para errores generales de procesamiento
         }
     }
 
@@ -484,10 +484,10 @@ function renderMissingDataErrors(errorsList, errorCategory) {
             missingDataDescription.textContent = 'Se han detectado filas con campos faltantes. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
             // CAMBIO: 'Se han detectado filas con datos inválidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:'
         } else if (errorCategory === 'invalidos') {
-            missingDataDescription.textContent = 'Se han detectado filas con datos invalidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
+            missingDataDescription.textContent = 'Se han detectado filas con datos inválidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
             // CAMBIO: 'Se han detectado filas con campos faltantes o formatos inválidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:'
         } else if (errorCategory === 'mixtos') {
-            missingDataDescription.textContent = 'Se han detectado filas con campos faltantes o formatos invalidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
+            missingDataDescription.textContent = 'Se han detectado filas con campos faltantes o formatos inválidos. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los campos a corregir:';
         } else { // 'general' o cualquier otro caso
             missingDataDescription.textContent = 'Se han detectado errores al procesar el archivo. Por favor, corrija el CSV o excluya esas filas antes de continuar. Estos son los detalles:';
         }
@@ -502,7 +502,7 @@ function renderMissingDataErrors(errorsList, errorCategory) {
         listHtml += '</ul>';
     } else {
         // CAMBIO: 'No se encontraron errores de datos faltantes/inválidos.'
-        listHtml = '<p class="text-gray-600">No se encontraron errores de datos faltantes/invalidos.</p>';
+        listHtml = '<p class="text-gray-600">No se encontraron errores de datos faltantes/inválidos.</p>';
     }
     if (missingDataList) {
         missingDataList.innerHTML = listHtml;
@@ -581,7 +581,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 updateModalVisibility();
             } else {
                 // CAMBIO: 'Intentó avanzar sin usuarios válidos en la previsualización.'
-                console.warn('Intento avanzar sin usuarios validos en la previsualizacion.');
+                console.warn('Intento avanzar sin usuarios validos en la previsualización.');
             }
         });
     }
@@ -650,7 +650,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                     let errorDetail = '';
                                     // CAMBIO: 'El correo electrónico'
-                                    if (cleanErrorMsg.includes('El correo electronico')) {
+                                    if (cleanErrorMsg.includes('El correo electrónico')) {
                                         errorDetail = `Correo [${originalUser ? originalUser.email : 'N/A'}]`;
                                         // CAMBIO: 'El número de documento'
                                     } else if (cleanErrorMsg.includes('El numero de documento')) {
@@ -668,7 +668,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         if (newDuplicateErrors.length > 0) {
                             importCsvState.duplicateErrors = newDuplicateErrors;
-                            renderDuplicatesErrors(importCsvState.duplicateErrors); // <--- Llamada con la lista de duplicados
+                            renderDuplicatesErrors(importCsvState.duplicateErrors); 
                             importCsvState.duplicatesModalOpen = true;
                         } else if (newBackendValidationErrors.length > 0) {
                             importCsvState.backendValidationErrors = newBackendValidationErrors;

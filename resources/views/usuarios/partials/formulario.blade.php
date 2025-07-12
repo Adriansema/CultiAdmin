@@ -18,7 +18,7 @@
         <div class="flex items-center justify-center mb-8">
             <div id="step1Indicator" class="flex items-center text-gray-700">
                 <img src="{{ asset('images/paso1_activo.svg') }}" alt="paso 1" class="w-7 h-10 mr-2">
-                <span class="font-semibold">Datos basicos</span>
+                <span class="font-semibold">Datos básicos</span>
             </div>
             <!-- Flecha entre paso 1 y 2 -->
             <div class="mx-4 text-gray-400">
@@ -34,7 +34,7 @@
             </div>
             <div id="step3Indicator" class="flex items-center text-gray-400">
                 <img src="{{ asset('images/paso3_inactivo.svg') }}" alt="paso 3" class="w-7 h-10 mr-2">
-                <span class="font-semibold">Contrasena</span>
+                <span class="font-semibold">Contraseña</span>
             </div>
         </div>
 
@@ -94,7 +94,7 @@
                 <div class="mb-6">
                     <label for="phone" class="block mb-1 text-sm font-bold text-gray-700">
                         <span class="inline-flex items-center">
-                            <img src="{{ asset('images/phone.svg') }}" alt="telefono" class="w-4 h-4 mr-2"> Telefono:
+                            <img src="{{ asset('images/phone.svg') }}" alt="telefono" class="w-4 h-4 mr-2"> Teléfono:
                         </span>
                     </label>
                     <div class="relative">
@@ -109,8 +109,7 @@
                         <span class="inline-flex items-center">
                             <img src="{{ asset('images/tipo_docs.svg') }}" alt="tipo de documento"
                                 class="w-4 h-4 mr-2">
-                            Tipo de
-                            documento:
+                            Tipo de documento:
                         </span>
                     </label>
                     <div class="relative">
@@ -120,9 +119,9 @@
                             <option value="">Seleccione el tipo de documento</option>
                             <option value="CC">Cedula de Ciudadania</option>
                             <option value="TI">Tarjeta de Identidad</option>
-                            <option value="CE">Cedula de Extranjeria</option>
+                            <option value="CE">Cedula de Extranjería</option>
                             <option value="PEP">Permiso Especial de Permanencia</option>
-                            <option value="PPT">Permiso de Proteccioon Temporal</option>
+                            <option value="PPT">Permiso de Protección Temporal</option>
                         </select>
                     </div>
                 </div>
@@ -166,9 +165,8 @@
                 <h4 class="text-md font-bold mb-1 flex items-center">
                     Permisos directos del usuario
                 </h4>
-                <p class="text-gray-600 text-sm mb-6">Asigna permisos adicionales ahora o modificalos mas tarde en
-                    Gestioon
-                    de Usuarios.</p>
+                <p class="text-gray-600 text-sm mb-6">Asigna permisos adicionales ahora o modificalos más tarde en
+                    gestión de usuarios.</p>
 
                 <div class="overflow-x-auto mb-12 rounded-2xl">
                     <table class="min-w-full divide-y divide-gray-300 border border-gray-300">
@@ -176,7 +174,7 @@
                             <tr>
                                 <th scope="col"
                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Moodulo
+                                    Módulo
                                 </th>
                                 <th scope="col"
                                     class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -286,11 +284,11 @@
                     <label for="password" class="block mb-1 text-sm font-bold text-gray-700">
                         <span class="inline-flex items-center">
                             <img src="{{ asset('images/candado.svg') }}" alt="contrasena" class="w-4 h-4 mr-2">
-                            Contrasena:
+                            Contraseña:
                         </span>
                     </label>
                     <div class="relative">
-                        <input id="password" type="password" name="password" placeholder="ingrese su contrasena"
+                        <input id="password" type="password" name="password" placeholder="ingrese su contraseña"
                             class="w-full px-3 py-2 text-sm border border-gray-300 rounded-2xl focus:outline-none
                             focus:ring-2 focus:ring-green-500 focus:border-transparent" />
                         <span
@@ -305,8 +303,8 @@
                 <div class="mb-4">
                     <label for="password_confirmation" class="block mb-1 text-sm font-bold text-gray-700">
                         <span class="inline-flex items-center">
-                            <img src="{{ asset('images/candado.svg') }}" alt="confirmar contrasena"
-                                class="w-4 h-4 mr-2"> Confirmar Contrasena:
+                            <img src="{{ asset('images/candado.svg') }}" alt="confirmar contraseña"
+                                class="w-4 h-4 mr-2"> Confirmar contraseña:
                         </span>
                     </label>
                     <div class="relative">
@@ -336,7 +334,7 @@
                             class="w-5 h-5 mr-2 relative inset-0 hidden group-hover:block"
                             alt="Icono de importar hover">
                         <span class="text-md font-medium text-black whitespace-nowrap hover:text-[var(--color-hover)]">
-                            {{ __('Importar Csv') }}
+                            {{ __('Importar csv') }}
                         </span>
                     </button>
 
@@ -352,9 +350,9 @@
                     <button type="button" id="generatePasswordButton"
                         class="bg-[var(--color-generador)] hover:bg-[var(--color-hovergener)] py-2 px-4 rounded-full text-md font-bold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 inline-flex items-center">
                         <!-- CAMBIOS: px-4, inline-flex items-center, y mr-2 para el icono -->
-                        <img src="{{ asset('images/gener_pass.svg') }}" alt="generar contrasena"
+                        <img src="{{ asset('images/gener_pass.svg') }}" alt="generar contraseña"
                             class="w-5 h-6 mr-2">
-                        <span class="whitespace-nowrap text-inherit">{{ __('Generar Contrasena') }}</span>
+                        <span class="whitespace-nowrap text-inherit">{{ __('Generar contraseña') }}</span>
                     </button>
                 </div>
 
@@ -389,7 +387,7 @@
         role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
 
         <div class="text-center">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" id="confirmModalTitle">Confirmar Accioon</h3>
+            <h3 class="text-xl font-bold text-gray-900 mb-4" id="confirmModalTitle">Confirmar acción</h3>
 
             <div id="confirmMessageBody" class="text-left text-gray-700 leading-relaxed mb-6">
                 <!-- El contenido se llenara dinamicamente con JavaScript -->
@@ -428,7 +426,7 @@
                     alt="Icono de Importar">
                 <img src="{{ asset('images/Importar-hover.svg') }}"class="w-12 h-12 mx-auto mb-3 relative inset-0 hidden group-hover:block"
                     alt="Icono de importar hover">
-                <p class="font-semibold text-lg">Arrastra tu archivo aqui o haz clic para seleccionar</p>
+                <p class="font-semibold text-lg">Arrastra tu archivo aquí o haz clic para seleccionar</p>
                 <p class="text-sm text-gray-500 mt-1">(Solo archivos .csv)</p>
             </label>
         </div>
@@ -449,7 +447,7 @@
 
         <p class="text-gray-700 text-sm mb-4">
             Se han detectado (<span id="detectedUsersCount" class="font-bold">0</span>) usuarios en el archivo CSV con
-            sus <span class="font-bold">roles asignados</span>. Confirme que toda la informacioon sea correcta antes de
+            sus <span class="font-bold">roles asignados</span>. Confirme que toda la información sea correcta antes de
             continuar.
         </p>
         <div id="csvPreviewTableContainer"
@@ -502,8 +500,8 @@
         </button>
 
         <h2 id="confirmImportModalTitle" class="text-2xl font-bold text-gray-800 text-center mb-6">Confirmar
-            Importacioon</h2>
-        <p class="text-gray-700 text-lg mb-6 text-center">Al continuar con esta accioon se crearan:</p>
+            importación</h2>
+        <p class="text-gray-700 text-lg mb-6 text-center">Al continuar con esta acción se crearan:</p>
         <div id="importSummaryContent" class="bg-gray-50 p-4 rounded-lg shadow-inner mb-6">
             <!-- Resumen de importacioon se llenara aqui -->
         </div>
@@ -543,12 +541,12 @@
         <button id="closeEmptyModalButton"
             class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none focus:outline-none">&times;
         </button>
-        <h2 id="emptyModalTitle" class="text-2xl font-bold text-gray-800 text-center mb-6">Archivo vacio</h2>
+        <h2 id="emptyModalTitle" class="text-2xl font-bold text-gray-800 text-center mb-6">Archivo vacío</h2>
         <p class="text-gray-700 text-center mb-6">
             No se encontraron usuarios en el archivo CSV. Verifique que el formato sea el correcto y que el CSV contenga
             al menos una fila con nombre y rol. ¿Necesita ayuda con el formato del CSV? Consulte nuestra <a
-                href="#" class="text-green-600 hover:text-green-800 font-semibold" target="_blank">guia de
-                importacioon</a>.
+                href="#" class="text-green-600 hover:text-green-800 font-semibold" target="_blank">guía de
+                importación</a>.
         </p>
         <div class="flex justify-center mt-6">
             <button type="button" id="returnFromEmptyModalButton"
@@ -578,7 +576,7 @@
         </h2>
         <p class="text-gray-700 text-center mb-6">
             Se han identificado usuarios duplicados (con el mismo correo o el mismo numero de documento). Asegurese de
-            que cada usuario sea unico para evitar conflictos. Estas son las filas con informacioon duplicada:
+            que cada usuario sea unico para evitar conflictos. Estas son las filas con información duplicada:
         </p>
         <div id="duplicatesList" class="bg-gray-50 p-4 rounded-lg shadow-inner mb-6 overflow-auto max-h-60">
             <!-- La lista de duplicados se llenara aqui con JavaScript -->
@@ -610,7 +608,7 @@
         <h2 id="missingDataModalTitle" class="text-2xl font-bold text-gray-800 text-center mb-6">Datos faltantes</h2>
         
         <p id="missingDataDescription" class="text-gray-700 text-center mb-6">
-            Se han detectado filas con campos faltantes o formatos invalidos. Por favor, corrija el CSV o excluya esas
+            Se han detectado filas con campos faltantes o formatos inválidos. Por favor, corrija el CSV o excluya esas
             filas antes de continuar. Estos son los campos a corregir:
         </p>
         <div id="missingDataList" class="bg-gray-50 p-4 rounded-lg shadow-inner mb-6 overflow-auto max-h-60">
