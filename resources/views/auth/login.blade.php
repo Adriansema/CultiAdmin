@@ -1,15 +1,21 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="absolute inset-0 z-0">
-        <div class="absolute transform -translate-x-1/2 top-60 left-1/2">
-            <img src="{{ asset('images/cultivasena.svg') }}" alt="Logo Cultiva" class="w-auto h-24 sm:h-24 opacity-90">
+    {{-- Fondo con logos: Cultiva Sena y SENA --}}
+    <div class="absolute inset-0 z-0 overflow-hidden"> {{-- Añadido overflow-hidden para evitar scroll si los logos se salen --}}
+        {{-- Logo Cultiva Sena (arriba y centrado) --}}
+        <div class="absolute transform -translate-x-1/2 top-16 sm:top-24 md:top-32 left-1/2"> {{-- Ajuste de top para diferentes pantallas --}}
+            <img src="{{ asset('images/cultivasena.svg') }}" alt="Logo Cultiva" class="w-auto h-20 sm:h-24 md:h-28 opacity-90"> {{-- Ajuste de altura para diferentes pantallas --}}
+        </div>
+        {{-- Logo SENA (abajo y centrado) --}}
+        <div class="absolute transform -translate-x-1/2 bottom-16 sm:bottom-24 md:bottom-32 left-1/2"> {{-- Ajuste de bottom para diferentes pantallas --}}
+            <img src="{{ asset('images/sena-logo.svg') }}" alt="Logo SENA" class="w-auto h-16 sm:h-20 md:h-24 opacity-90"> {{-- Ajuste de altura para diferentes pantallas --}}
         </div>
     </div>
 
     {{-- Formulario de inicio de sesion --}}
-    <div class="relative z-20 flex flex-col items-center justify-center min-h-screen p-4">
-        <form method="POST" action="{{ route('login') }}" class="w-full max-w-md mt-16 login-form sm:mt-24">
+    <div class="relative z-20 flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 md:p-8"> {{-- Padding responsivo --}}
+        <form method="POST" action="{{ route('login') }}" class="w-full max-w-sm mt-16 sm:max-w-md login-form"> {{-- Ancho máximo responsivo, mt ajustado --}}
             @csrf
 
             {{-- Campo de Correo Electronico --}}
@@ -23,6 +29,14 @@
                         autofocus value="{{ old(Laravel\Fortify\Fortify::username()) }}"
                         class="w-full px-3 py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
 
+                    {{-- Icono de validacion (exito o error) --}}
+                    <template x-if="emailExists !== null">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <img :src="emailExists ? '{{ asset('images/bien.svg') }}' : '{{ asset('images/mal.svg') }}'"
+                                :alt="emailExists ? 'Correo existe' : 'Correo no existe'" class="w-5 h-5"
+                                :class="{ 'text-green-500': emailExists, 'text-red-500': !emailExists }" />
+                        </span>
+                    </template>
                     {{-- Contenedor para el icono de validación JS --}}
                     <span id="email-icon-container" class="absolute inset-y-0 right-0 flex items-center pr-3">
                         {{-- Los iconos se inyectarán aquí por JavaScript --}}
@@ -39,6 +53,7 @@
                 @endif
                 {{-- Mensaje de exito (ej. despues de restablecer contrasena) --}}
                 @if (session('status'))
+                    <div class="mb-4 text-sm font-medium text-green-600">
                     <div id="session-status-message" class="mb-4 font-medium text-sm text-green-600">
                         {{ session('status') }}
                     </div>
@@ -70,15 +85,16 @@
 
                 {{-- Errores de Laravel para la contraseña (ocultos por JS si el JS ya los maneja) --}}
                 @error('password')
+                    <span class="block mt-1 text-xs text-red-500">{{ $message }}</span>
                     <span id="laravel-password-error" class="text-red-500 text-sm block mt-1">{{ $message }}</span>
                 @enderror
             </div>
 
             {{-- Recuerdame y olvido --}}
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex flex-col items-center justify-between mb-6 space-y-2 sm:flex-row sm:space-y-0"> {{-- Se apilan en móvil, en fila en sm+ --}}
                 <label class="flex items-center text-sm font-bold text-gray-600">
                     <input type="checkbox" name="remember"
-                        class="mr-2 h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                        class="w-5 h-5 mr-2 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
                     Recuérdame en este dispositivo
                 </label>
                 <a href="{{ route('password.request') }}" class="text-sm font-bold text-purple-600 hover:underline">
@@ -88,14 +104,10 @@
 
             {{-- Boton de ingreso --}}
             <button type="submit"
-                class="w-full px-4 py-2 font-semibold text-white transition duration-150 bg-green-600 rounded-full hover:bg-green-700">
+                class="w-full px-4 py-3 text-lg font-semibold text-white transition duration-150 bg-green-600 rounded-full hover:bg-green-700"> {{-- Aumentado padding y tamaño de texto --}}
                 Iniciar sesión
             </button>
         </form>
-    </div>
-
-    <div class="absolute transform -translate-x-1/2 bottom-44 left-1/2">
-        <img src="{{ asset('images/sena-logo.svg') }}" alt="Logo SENA" class="w-auto h-20 opacity-90">
     </div>
 
     {{-- Modal usuario inactivo --}}
@@ -104,9 +116,9 @@
             class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
             <div class="max-w-md p-6 text-center bg-white shadow-md rounded-3xl">
                 {{-- Icono --}}
-                <img src="{{ asset('images/warning.svg') }}" alt="Icono de advertencia" class="w-56 mx-auto mb-4 h-36">
-                <h2 class="mb-4 text-2xl font-bold text-red-600">Cuenta desactivada</h2>
-                <p class="text-sm text-gray-700">
+                <img src="{{ asset('images/warning.svg') }}" alt="Icono de advertencia" class="w-48 h-32 mx-auto mb-4 sm:w-56 sm:h-36"> {{-- Ajuste de tamaño de imagen --}}
+                <h2 class="mb-4 text-xl font-bold text-red-600 sm:text-2xl">Cuenta desactivada</h2> {{-- Título responsivo --}}
+                <p class="text-sm text-gray-700 sm:text-base"> {{-- Texto responsivo --}}
                     Si crees que esto es un error, contácta a
                     <a href="{{ route('pqrs.create') }}" class="text-blue-600 underline">
                         nuestro soporte de PQRs
@@ -114,7 +126,7 @@
                 </p>
 
                 <button @click="show = false"
-                    class="mt-6 px-4 py-2 bg-[var(--color-iconos4)] text-white rounded hover:bg-green-600">
+                    class="mt-6 px-6 py-3 bg-[var(--color-iconos4)] text-white rounded-full hover:bg-green-600 text-lg"> {{-- Aumentado padding y tamaño de texto --}}
                     Cerrar
                 </button>
             </div>

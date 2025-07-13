@@ -123,64 +123,68 @@
         </section>
 
         {{-- Seccion de Noticias y boletines --}}
-        <section id="novedades-boletines" class="relative grid items-start mt-1 gap-7 md:grid-cols-2 rounded-xl">
+       {{-- Seccion de Noticias y boletines --}}
+    <section id="novedades-boletines" class="relative grid items-start mt-1 gap-7 md:grid-cols-2 rounded-xl">
 
-            {{-- sesion de noticias --}}
-            <section id="mensajes" class="p-4 flex flex-col bg-[var(--color-gris1)] rounded-3xl">
-                <div class="flex items-center justify-between mb-1">
+        {{-- sesion de noticias --}}
+        <section id="mensajes" class="p-4 flex flex-col bg-[var(--color-gris1)] rounded-3xl">
+            {{-- Contenedor del título, contador y botón "Ver Todo" --}}
+            <div class="flex flex-col justify-between mb-4 space-y-2 sm:flex-row sm:items-center sm:space-y-0"> {{-- CLAVE: flex-col en móvil, flex-row en sm+, space-y para separación vertical, space-x para horizontal --}}
 
-                    <div class="flex items-center space-x-2">
-                        <img src="{{ asset('images/noticias-n.svg') }}" alt="noticias-notificacion"
-                            class="w-10 h-8 ml-2">
-                        <h2 class="text-lg font-semibold text-[var(--color-iconos)]">Noticias</h2>
-                        {{-- ¡Aqui esta el nuevo contador! --}}
-                        <span id="unread-news-count" class="ml-2 text-lg font-bold text-blue-600">
-                            @if ($totalUnreadNoticiasCount >= 10)
-                                +9
-                            @else
-                                {{ $totalUnreadNoticiasCount }}
-                            @endif
-                        </span>
-                    </div>
-
-                    <x-responsive-nav-link href="{{ route('noticias.index') }}" :active="request()->routeIs('boletines.index')"
-                        class="hover:text-[var(--color-hovertextver)] group py-2 px-2 rounded-full text-md font-bold text-gray-700 focus:outline-none focus:shadow-outline inline-flex items-center transition duration-150 ease-in-out">
-                        <span class="whitespace-nowrap text-inherit">{{ __('Ver Todo') }}</span>
-                        <img src="{{ asset('images/verTodo.svg') }}"
-                            class="w-10 h-8 relative inset-0 block group-hover:hidden" alt="Icono de Importar">
-                        <img src="{{ asset('images/hoverTodo.svg') }}"
-                            class="w-10 h-8 relative inset-0 hidden group-hover:block" alt="Icono de importar hover">
-                    </x-responsive-nav-link>
-                </div>
-                <div id="mensajes-noticias" class="p-2 rounded-2xl flex-grow">
-                    @include('partials.notification-noticia')
-                </div>
-            </section>
-
-            {{-- sesion de boletines --}}
-            <section id="boletines" class="p-4 flex flex-col bg-[var(--color-gris1)] rounded-3xl">
-                <div class="flex items-center justify-between mb-1">
-
-                    <div class="flex items-center space-x-2">
-                        <img src="{{ asset('images/boletin-n.svg') }}" alt="boletines-notificacion"
-                            class="w-10 h-8 ml-2">
-                        <h2 class="text-lg font-semibold text-[var(--color-iconos)]">Boletines</h2>
-                    </div>
-
-                    <x-responsive-nav-link href="{{ route('boletines.index') }}" :active="request()->routeIs('boletines.index')"
-                        class="hover:text-[var(--color-hovertextver)] group py-2 px-2 rounded-full text-md font-bold text-gray-700 focus:outline-none focus:shadow-outline inline-flex items-center transition duration-150 ease-in-out">
-                        <span class="whitespace-nowrap text-inherit">{{ __('Ver Todos') }}</span>
-                        <img src="{{ asset('images/verTodo.svg') }}"
-                            class="w-10 h-8 relative inset-0 block group-hover:hidden" alt="Icono de Ver Todo">
-                        <img src="{{ asset('images/hoverTodo.svg') }}"
-                            class="w-10 h-8 relative inset-0 hidden group-hover:block" alt="Icono de Ver Todo hover">
-                    </x-responsive-nav-link>
+                <div class="flex items-center space-x-2">
+                    <img src="{{ asset('images/noticias-n.svg') }}" alt="noticias-notificacion"
+                        class="w-10 h-8 ml-2">
+                    <h2 class="text-lg font-semibold text-[var(--color-iconos)] whitespace-nowrap">Noticias</h2> {{-- Añadido whitespace-nowrap --}}
+                    {{-- ¡Aqui esta el nuevo contador! --}}
+                    <span id="unread-news-count" class="ml-2 text-lg font-bold text-blue-600 whitespace-nowrap"> {{-- Añadido whitespace-nowrap --}}
+                        @if ($totalUnreadNoticiasCount >= 10)
+                            +9
+                        @else
+                            {{ $totalUnreadNoticiasCount }}
+                        @endif
+                    </span>
                 </div>
 
-                <div id="mensajes-boletines" class="p-2 rounded-2xl flex-grow">
-                    @include('partials.notification-boletin')
+                {{-- El x-responsive-nav-link es un enlace, no un botón de modal --}}
+                <x-responsive-nav-link href="{{ route('noticias.index') }}" :active="request()->routeIs('boletines.index')"
+                    class="hover:text-[var(--color-hovertextver)] group py-2 px-4 rounded-full text-md font-bold text-gray-700 focus:outline-none focus:shadow-outline inline-flex items-center transition duration-150 ease-in-out w-full sm:w-auto justify-center sm:justify-start"> {{-- w-full en móvil, w-auto en sm+, justify-center en móvil --}}
+                    <span class="whitespace-nowrap text-inherit">{{ __('Ver Todo') }}</span>
+                    <img src="{{ asset('images/verTodo.svg') }}"
+                        class="relative inset-0 block w-10 h-8 ml-2 group-hover:hidden" alt="Icono de Importar"> {{-- Añadido ml-2 --}}
+                    <img src="{{ asset('images/hoverTodo.svg') }}"
+                        class="relative inset-0 hidden w-10 h-8 ml-2 group-hover:block" alt="Icono de importar hover"> {{-- Añadido ml-2 --}}
+                </x-responsive-nav-link>
+            </div>
+            <div id="mensajes-noticias" class="flex-grow p-2 rounded-2xl">
+                @include('partials.notification-noticia')
+            </div>
+        </section>
+
+        {{-- sesion de boletines --}}
+        <section id="boletines" class="p-4 flex flex-col bg-[var(--color-gris1)] rounded-3xl">
+            {{-- Contenedor del título y botón "Ver Todos" --}}
+            <div class="flex flex-col justify-between mb-4 space-y-2 sm:flex-row sm:items-center sm:space-y-0"> {{-- CLAVE: flex-col en móvil, flex-row en sm+, space-y para separación vertical, space-x para horizontal --}}
+
+                <div class="flex items-center space-x-2">
+                    <img src="{{ asset('images/boletin-n.svg') }}" alt="boletines-notificacion"
+                        class="w-10 h-8 ml-2">
+                    <h2 class="text-lg font-semibold text-[var(--color-iconos)] whitespace-nowrap">Boletines</h2> {{-- Añadido whitespace-nowrap --}}
                 </div>
-            </section>
+
+                <x-responsive-nav-link href="{{ route('boletines.index') }}" :active="request()->routeIs('boletines.index')"
+                    class="hover:text-[var(--color-hovertextver)] group py-2 px-4 rounded-full text-md font-bold text-gray-700 focus:outline-none focus:shadow-outline inline-flex items-center transition duration-150 ease-in-out w-full sm:w-auto justify-center sm:justify-start"> {{-- w-full en móvil, w-auto en sm+, justify-center en móvil --}}
+                    <span class="whitespace-nowrap text-inherit">{{ __('Ver Todos') }}</span>
+                    <img src="{{ asset('images/verTodo.svg') }}"
+                        class="relative inset-0 block w-10 h-8 ml-2 group-hover:hidden" alt="Icono de Ver Todo"> {{-- Añadido ml-2 --}}
+                    <img src="{{ asset('images/hoverTodo.svg') }}"
+                        class="relative inset-0 hidden w-10 h-8 ml-2 group-hover:block" alt="Icono de Ver Todo hover"> {{-- Añadido ml-2 --}}
+                </x-responsive-nav-link>
+            </div>
+
+            <div id="mensajes-boletines" class="flex-grow p-2 rounded-2xl">
+                @include('partials.notification-boletin')
+            </div>
+        </section>
         </section>
     </main>
 @endsection

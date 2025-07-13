@@ -9,12 +9,25 @@
                 <x-application-mark class="block w-auto h-9" />
             </a>
         </div>
+        {{-- Botón para colapsar en desktop, o cerrar en móvil --}}
         <button @click="sidebarOpen = !sidebarOpen"
                 class="-ml-2 text-[var(--color-text)] rounded hover:bg-[var(--color-sidebarhoverbtn)] transition-transform duration-700 ease-in-out hover:translate-x-1"
-                :class="!sidebarOpen && 'rotate-180 mx-auto'">
+                :class="{
+                    'rotate-180 mx-auto': !sidebarOpen && window.innerWidth >= 768, {{-- Rotar solo en desktop colapsado --}}
+                    'md:block': window.innerWidth >= 768, {{-- Visible en md+ --}}
+                    'hidden': window.innerWidth < 768 {{-- Oculto en móviles --}}
+                }">
                 <svg class="w-4 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+
+            {{-- Botón de CERRAR sidebar para pantallas móviles --}}
+            <button @click="sidebarOpen = false"
+                    class="ml-auto text-white focus:outline-none md:hidden"> {{-- Solo visible en móviles --}}
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
     </div>
@@ -30,7 +43,8 @@
                 <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                     <img src="{{ asset(request()->routeIs('dashboard') ? 'images/casaColor.svg' : 'images/casa.svg') }}"
                         class="w-4 h-4" alt="Inicio">
-                    <span x-show="sidebarOpen" x-transition
+                    <span x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                         class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('dashboard') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
                         {{ __('Inicio') }}
                     </span>
@@ -47,7 +61,8 @@
                     <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                         <img src="{{ asset(request()->routeIs('productos.index') ? 'images/plantColor.svg' : 'images/plant.svg') }}"
                             class="w-4 h-4" alt="Cultivos">
-                        <span x-show="sidebarOpen" x-transition
+                        <span x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                            x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                             class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('productos.index') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
                             {{ __('Cultivos') }}
                         </span>
@@ -65,7 +80,8 @@
                     <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                         <img src="{{ asset(request()->routeIs('noticias.index') ? 'images/noticiasColor.svg' : 'images/noticias.svg') }}"
                             class="w-4 h-4" alt="Noticias">
-                        <span x-show="sidebarOpen" x-transition
+                        <span x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                            x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                             class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('noticias.index') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
                             {{ __('Noticias') }}
                         </span>
@@ -83,7 +99,8 @@
                     <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                         <img src="{{ asset(request()->routeIs('boletines.index') ? 'images/formColor.svg' : 'images/form.svg') }}"
                             class="w-4 h-4" alt="Boletines">
-                        <span x-show="sidebarOpen" x-transition
+                        <span x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                            x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                             class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('boletines.index') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
                             {{ __('Boletines') }}
                         </span>
@@ -93,10 +110,12 @@
         </div>
     </nav>
 
-    <nav class="flex-1 px-6 pt-4 space-y-2 mt-40">
+    <nav class="flex-1 px-6 pt-4 mt-40 space-y-2">
         <div class="px-2 space-y-2">
             {{-- Separar la navegacion principal de los ajustes --}}
-            <div x-show="sidebarOpen" x-transition class="px-7 py-2 text-sm text-[var(--color-ajustes)] mt-8">
+            <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                class="px-7 py-2 text-sm text-[var(--color-ajustes)] mt-8">
                 {{ __('Ajustes') }}
             </div>
 
@@ -120,7 +139,7 @@
                             </span>
 
                             {{-- Icono de flecha para indicar que es un menu desplegable --}}
-                            <img src="{{ asset(request()->routeIs('usuarios.index') ? 'images/menu.svg' : 'images/menu-hov.svg') }}" 
+                            <img src="{{ asset(request()->routeIs('usuarios.index') ? 'images/menu.svg' : 'images/menu-hov.svg') }}"
                             class="w-4 h-4 ml-3"
                             alt="icono de abrir-menu" x-show="sidebarOpen" :class="userMenuOpen ? '-rotate-90' : ''">
                         </div>
@@ -133,8 +152,7 @@
                     x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75"
                     x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                     x-init="$watch('userMenuOpen', (value) => {
-                        if (value) {
-                            {{-- Calcular la posicion solo cuando se abre --}}
+                        if (value) { // Se simplifica la lógica, ya no es necesario separar por sidebarOpen
                             $nextTick(() => {
                                 const buttonRect = $refs.userMenuButton.getBoundingClientRect();
                                 $el.style.top = `${buttonRect.top - 10}px`;
@@ -144,10 +162,10 @@
                             {{-- Cuando se cierra, permitir que la transicion use las ultimas posiciones calculadas --}}
                             {{-- No limpiamos el style inmediatamente, Alpine.js se encargara de ocultarlo --}}
                         }
-                    });" class="fixed z-50 w-auto bg-white rounded-xl shadow-2xl py-2">
+                    });" class="fixed z-50 w-auto py-2 bg-white shadow-2xl rounded-xl">
 
                     <a href="{{ route('usuarios.index') }}"
-                        class="block px-4 py-2 text-sm rounded-xl text-gray-700 hover:bg-gray-200">
+                        class="block px-4 py-2 text-sm text-gray-700 rounded-xl hover:bg-gray-200">
                         <ul class="flex items-center">
                             <li class="mr-2">
                                 <img src="{{ asset('images/list.svg') }}" class="w-3 h-5" alt="icono de carga masiva">
@@ -158,7 +176,7 @@
 
                     @if (Auth::user()->hasAnyRole(['SuperAdmin', 'Administrador']))
                         <button type="button"
-                            class="block w-full rounded-xl text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+                            class="block w-full px-4 py-2 text-sm text-left text-gray-700 rounded-xl hover:bg-gray-200"
                             @click="userMenuOpen = false; document.getElementById('create-user-button').click()">
                             <ul class="flex items-center">
                                 <li class="mr-2">
@@ -171,7 +189,7 @@
                     @endif
 
                     <button type="button"
-                        class="block w-full rounded-xl text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 rounded-xl hover:bg-gray-200"
                         @click="userMenuOpen = false; document.getElementById('importCsvButton').click()">
                         <ul class="flex items-center">
                             <li class="mr-2">
@@ -192,7 +210,8 @@
                 <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                     <img src="{{ asset(request()->routeIs('accesibilidad.index') ? 'images/accesiColor.svg' : 'images/accesi.svg') }}"
                         class="w-4 h-4" alt="Accesibilidad">
-                    <span x-show="sidebarOpen" x-transition
+                    <span x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                         class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('accesibilidad.index') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
                         {{ __('Accesibilidad') }}
                     </span>
@@ -208,7 +227,8 @@
                 <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                     <img src="{{ asset(request()->routeIs('centroAyuda.index') ? 'images/pregColors.svg' : 'images/preg.svg') }}"
                         class="w-4 h-4" alt="Centro de Ayuda">
-                    <span x-show="sidebarOpen" x-transition
+                    <span x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                         class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('centroAyuda.index') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
                         {{ __('Centro de ayuda') }}
                     </span>
@@ -225,7 +245,8 @@
                         'flex justify-center px-4 py-2 transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] cursor-pointer'">
                     <div class="flex items-center w-full transition-all duration-300 ease-in-out">
                         <img src="{{ asset('images/off.svg') }}" class="w-4 h-4" alt="Cerrar Sesion">
-                        <span x-show="sidebarOpen" x-transition
+                        <span x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                            x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                             class="ml-2 text-sm font-medium text-[var(--color-text)] whitespace-nowrap">
                             {{ __('Cerrar sesion') }}
                         </span>
@@ -238,7 +259,7 @@
     <div class="px-5">
         {{-- Perfil (Generalmente visible para todos) --}}
         <x-responsive-nav-link href="{{ route('profile.show') }}"
-            class="rounded-3xl relative top-[-30px] {{-- mt-[-20px] --}}"
+            class="rounded-3xl relative top-[-30px]"
             x-bind:class="sidebarOpen ? 'px-3 py-6' : 'flex justify-center p-0'">
 
             <div class="flex items-center w-full rounded-lg"
@@ -250,7 +271,8 @@
                 <img class="object-cover rounded-md size-10" src="{{ Auth::user()->profile_photo_url }}"
                     alt="{{ Auth::user()->name }}" />
 
-                <div class="flex flex-col ml-3" x-show="sidebarOpen">
+                <div class="flex flex-col ml-3" x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                     <span class="text-base font-bold text-gray-800">
                         {{ Auth::user()->name }}
                     </span>
