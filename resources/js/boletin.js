@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (response.ok) {
                     window.cerrarModal('editar', boletinId); // Cierra el modal de edicion
-                    window.showGlobalMessage('success', result.message || 'Boletin actualizado con exito.');
+                    window.showGlobalMessage('success', result.message || 'Boletín actualizado con éxito.');
 
                     // *** CAMBIO CLAVE AQUI: Recargar la pagina completa despues de la actualizacion ***
                     setTimeout(() => {
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.displayValidationErrors(boletinId, result.errors);
                     window.showGlobalMessage('error', result.message || 'Por favor, corrige los errores en el formulario.');
                 } else {
-                    window.showGlobalMessage('error', result.message || 'Ocurrio un error inesperado al actualizar el boletin.');
+                    window.showGlobalMessage('error', result.message || 'Ocurrio un error inesperado al actualizar el boletín.');
                 }
             } catch (error) {
                 window.showGlobalMessage('error', 'Error de red o conexion al servidor. Intentalo de nuevo.');
@@ -223,11 +223,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-
-    // Se elimina la funcion reindexTableRows y su llamada,
-    // ya que la recarga de pagina la hace innecesaria.
-    // function reindexTableRows() { /* ... */ }
-    // reindexTableRows(); // Ya no se llama aqui.
 
     // Listener para cerrar modales por click externo/tecla Escape
     document.addEventListener('click', function (event) {

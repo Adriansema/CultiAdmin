@@ -515,34 +515,3 @@ th>div.flex.flex-col.ml-2 {
   flex-shrink: 0;
   /* Evita que este contenedor se encoja */
 }
-
-/* Añade esto al final de tu archivo CSS */
-.highlight-new-row {
-  /* Color inicial y sombra */
-  background-color: #e0f2fe;
-  /* Un azul claro */
-  box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
-  /* Sombra para "sobresalir" */
-  animation: highlightFade 4s forwards;
-  /* Duración de la animación y que se quede al final */
-}
-
-@keyframes highlightFade {
-  0% {
-    background-color: #e0f2fe;
-    /* Azul claro al inicio */
-    box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
-  }
-
-  80% {
-    /* Mantiene el color y la sombra por la mayor parte de la duración */
-    background-color: #e0f2fe;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
-  }
-
-  100% {
-    /* Se desvanece a transparente y quita la sombra */
-    background-color: transparent;
-    box-shadow: none;
-  }
-}
