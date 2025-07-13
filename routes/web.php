@@ -11,7 +11,6 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\CentroAyudaController;
-use App\Http\Controllers\ExportarCsvController;
 use App\Http\Controllers\PendienteBolController;
 use App\Http\Controllers\PendienteProController;
 use App\Http\Controllers\PendienteNotiController;
@@ -56,9 +55,6 @@ Route::middleware([
 ])->group(function () {
 
      Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-     // Ruta para generar masivos usuarios
-     Route::get('/exportar-csv', [ExportarCsvController::class, 'generarCsv']);
 
      // Rutas de Centro de Ayuda
      Route::prefix('centro-ayuda')->name('centroAyuda.')->group(function () {
@@ -198,4 +194,5 @@ Route::fallback(function () {
 Livewire::setUpdateRoute(function ($handle) {
     return Route::post('/cultiadmin/livewire/update', $handle)
                  ->middleware('web');
-}); */
+});
+ */

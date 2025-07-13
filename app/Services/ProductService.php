@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Models\Producto;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Models\User; // Asegúrate de importar el modelo User
+use App\Models\User;
+use Illuminate\Support\Str;
 
 class ProductService
 {
@@ -48,29 +48,22 @@ class ProductService
         // Bandera para saber si ya hicimos el join con la tabla de usuarios para ordenar/buscar
         $joinedUsersTable = false;
 
-        // Si se va a ordenar por 'creador' o buscar por 'creador', hacemos el join
-        // Asumimos que 'creador' en el frontend se mapea a 'users.name' en la DB
-        if ($sortBy === 'creador' || (
-            !empty($searchQuery) &&
-            (str_contains($this->cleanSearchQuery($searchQuery), 'creador')) // Heurística simple para búsqueda
-        )) {
+        // Si se va a ordenar por 'creador', hacemos el join y seleccionamos el nombre.
+        if ($sortBy === 'creador') {
             $productos->leftJoin('users', 'productos.user_id', '=', 'users.id')
-                     ->select('productos.*', 'users.name as creador_name'); // Seleccionamos el nombre del usuario como 'creador_name'
+                ->select('productos.*', 'users.name as creador_name');
             $joinedUsersTable = true;
         } else {
-            // Si no hay join por 'creador' y no hay select previo, seleccionar todas las columnas de productos
-            // para evitar errores si se llama a select() múltiples veces sin agregar columnas.
-            // Si ya hay un select() en otro lugar, esto podría ser redundante o causar problemas.
-            // Lo ideal es que el select() inicial sea más explícito o que el join siempre se haga si 'creador' es una columna mostrada.
-            // Para simplificar, si no hay join, no se añade un select específico aquí.
+            // Asegura que se seleccionen las columnas de productos si no hay un join con select
+            $productos->select('productos.*');
         }
 
         // Búsqueda robusta general en múltiples columnas
         if (!empty($searchQuery)) {
             $cleanedSearchQuery = $this->cleanSearchQuery($searchQuery);
-            
+
             $productos->where(function ($q) use ($cleanedSearchQuery, $searchQuery, $joinedUsersTable) {
-                $sqlNormalize = function($column) {
+                $sqlNormalize = function ($column) {
                     if (config('database.default') === 'pgsql' && in_array($column, ['created_at', 'updated_at'])) {
                         return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                     }
@@ -78,31 +71,97 @@ class ProductService
                 };
 
                 // Búsqueda robusta en las columnas de Producto
-                $q->orWhereRaw($sqlNormalize('tipo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                  ->orWhereRaw($sqlNormalize('observaciones') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                  ->orWhereRaw($sqlNormalize('RutaVideo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
-                
+                $q->orWhereRaw($sqlNormalize('tipo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+
                 // Búsqueda por estado
                 $q->orWhereRaw($sqlNormalize('estado') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
 
-                // Búsqueda por creador (si la tabla de usuarios está unida o se puede acceder vía relación)
-                // Usamos whereHas para buscar en la relación si no se hizo un join explícito para la ordenación.
-                // Si ya se hizo un leftJoin con select('users.name as creador_name'), entonces podemos usar 'creador_name'.
-                if ($joinedUsersTable) {
-                    $q->orWhereRaw($sqlNormalize('users.name') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
-                } else {
-                    $q->orWhereHas('user', function ($userQuery) use ($cleanedSearchQuery) {
-                        $userQuery->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(name), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '') LIKE ?", ['%' . $cleanedSearchQuery . '%']);
-                    });
+                // Búsqueda por creador (a través de la relación, más flexible que un join directo para la búsqueda)
+                $q->orWhereHas('user', function ($userQuery) use ($cleanedSearchQuery) {
+                    $userQuery->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(name), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '') LIKE ?", ['%' . $cleanedSearchQuery . '%']);
+                });
+
+                // --- INICIO DE LA MODIFICACIÓN DE FECHAS (COPIADO DE BOLETINES) ---
+                $date = null; // Variable para almacenar la fecha parseada
+                $originalQueryCleanedForDate = trim(mb_strtolower($searchQuery, 'UTF-8')); // Usa $searchQuery aquí
+
+                $originalLocale = Carbon::getLocale();
+                Carbon::setLocale('es');
+
+                try {
+                    if (preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $originalQueryCleanedForDate)) {
+                        $date = Carbon::createFromFormat('Y-m-d', str_replace('/', '-', $originalQueryCleanedForDate));
+                    } elseif (preg_match('/^\d{2}[\/\-]\d{2}[\/\-]\d{4}$/', $originalQueryCleanedForDate)) {
+                        $date = Carbon::createFromFormat('d-m-Y', str_replace('/', '-', $originalQueryCleanedForDate));
+                    } elseif (preg_match('/^\d{2}[\/\-]\d{2}[\/\-]\d{4}$/', $originalQueryCleanedForDate)) {
+                        $date = Carbon::createFromFormat('m-d-Y', str_replace('/', '-', $originalQueryCleanedForDate));
+                    }
+                } catch (\Exception $e) {
+                    // No hace nada, se intentará el siguiente método
                 }
 
-                // Intenta buscar por fecha limpia si la cadena de búsqueda parece una fecha
-                try {
-                    $date = Carbon::parse($searchQuery);
-                    $q->orWhereDate('created_at', $date->toDateString());
-                } catch (\Exception $e) {
-                    // No hace nada si la fecha no es válida
+                if (!$date) {
+                    $normalizedMonthQuery = $originalQueryCleanedForDate;
+
+                    $monthMap = [
+                        'enero' => '01',
+                        'ene' => '01',
+                        'febrero' => '02',
+                        'feb' => '02',
+                        'marzo' => '03',
+                        'mar' => '03',
+                        'abril' => '04',
+                        'abr' => '04',
+                        'mayo' => '05',
+                        'mayo' => '05',
+                        'junio' => '06',
+                        'jun' => '06',
+                        'julio' => '07',
+                        'jul' => '07',
+                        'agosto' => '08',
+                        'ago' => '08',
+                        'septiembre' => '09',
+                        'sep' => '09',
+                        'octubre' => '10',
+                        'oct' => '10',
+                        'noviembre' => '11',
+                        'nov' => '11',
+                        'diciembre' => '12',
+                        'dic' => '12',
+                    ];
+
+                    foreach ($monthMap as $monthName => $monthNum) {
+                        $normalizedMonthQuery = str_replace($monthName, $monthNum, $normalizedMonthQuery);
+                    }
+
+                    $normalizedMonthQuery = str_replace([' de ', ' del ', ' del año '], ' ', $normalizedMonthQuery);
+                    $normalizedMonthQuery = trim(preg_replace('/\s+/', ' ', $normalizedMonthQuery));
+
+                    try {
+                        $date = Carbon::createFromFormat('d m Y', $normalizedMonthQuery);
+                    } catch (\Exception $e) {
+                        if (!$date) {
+                            try {
+                                $normalizedMonthQuery = str_ireplace(['a.m.', 'p.m.', 'a m', 'p m'], ['am', 'pm', 'am', 'pm'], $normalizedMonthQuery);
+                                $date = Carbon::createFromFormat('d m Y H:i', $normalizedMonthQuery);
+                            } catch (\Exception | \InvalidArgumentException $e) { // Agrega InvalidArgumentException
+                                try {
+                                    $date = Carbon::createFromFormat('d m Y h:i a', $normalizedMonthQuery);
+                                } catch (\Exception $e) {
+                                    // Fallback final si nada de lo anterior funcionó para formatos con mes
+                                }
+                            }
+                        }
+                    }
                 }
+
+                if ($date) {
+                    if ($date->year > 1900 && $date->year < 2100) {
+                        $q->orWhereDate('created_at', $date->toDateString()); // q en lugar de q2
+                    }
+                }
+                Carbon::setLocale($originalLocale);
+                // --- FIN DE LA NUEVA MODIFICACIÓN PARA FECHAS ---
             });
         }
 
@@ -127,7 +186,7 @@ class ProductService
                 // Asegurarse de que el join se haga solo una vez si ya se hizo para la búsqueda
                 if (!$joinedUsersTable) { // Solo si no se unió antes
                     $productos->leftJoin('users', 'productos.user_id', '=', 'users.id')
-                             ->select('productos.*', 'users.name as creador_name');
+                        ->select('productos.*', 'users.name as creador_name');
                 }
                 $productos->orderBy('creador_name', $sortDirection);
             } else {
@@ -169,7 +228,7 @@ class ProductService
             (str_contains($this->cleanSearchQuery($searchQuery), 'creador'))
         )) {
             $productos->leftJoin('users', 'productos.user_id', '=', 'users.id')
-                     ->select('productos.*', 'users.name as creador_name');
+                ->select('productos.*', 'users.name as creador_name');
             $joinedUsersTable = true;
         } else {
             $productos->select('productos.*'); // Asegura que solo se seleccionen columnas de productos si no hay join
@@ -178,9 +237,9 @@ class ProductService
         // Búsqueda robusta general en múltiples columnas
         if (!empty($searchQuery)) {
             $cleanedSearchQuery = $this->cleanSearchQuery($searchQuery);
-            
+
             $productos->where(function ($q) use ($cleanedSearchQuery, $searchQuery, $joinedUsersTable) {
-                $sqlNormalize = function($column) {
+                $sqlNormalize = function ($column) {
                     if (config('database.default') === 'pgsql' && in_array($column, ['created_at', 'updated_at'])) {
                         return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                     }
@@ -188,9 +247,9 @@ class ProductService
                 };
 
                 $q->orWhereRaw($sqlNormalize('tipo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                  ->orWhereRaw($sqlNormalize('observaciones') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
-                  ->orWhereRaw($sqlNormalize('RutaVideo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
-                
+                    ->orWhereRaw($sqlNormalize('observaciones') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
+                    ->orWhereRaw($sqlNormalize('RutaVideo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+
                 $q->orWhereRaw($sqlNormalize('estado') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
 
                 if ($joinedUsersTable) {
@@ -229,7 +288,7 @@ class ProductService
             if ($sortBy === 'creador') {
                 if (!$joinedUsersTable) { // Solo si no se unió antes
                     $productos->leftJoin('users', 'productos.user_id', '=', 'users.id')
-                             ->select('productos.*', 'users.name as creador_name');
+                        ->select('productos.*', 'users.name as creador_name');
                 }
                 $productos->orderBy('creador_name', $sortDirection);
             } else {

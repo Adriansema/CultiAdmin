@@ -133,7 +133,7 @@
                         </div>
                     </div>
                 </th>
-                
+
                 <th class="px-6 py-3 font-bold text-left text-gray-600">Acciones</th>
             </tr>
         </thead>
@@ -142,8 +142,14 @@
                 @include('boletines.partials.boletin_row', ['boletin' => $boletin])
             @empty
                 <tr id="no-boletines-row">
+                    {{-- Asegúrate de ajustar este 'colspan' al número total de columnas de tu tabla --}}
                     <td colspan="9" class="px-6 py-4 text-center text-gray-500">
-                        No hay boletines para mostrar.
+                        @if (request()->has('q') && !empty(request()->get('q')))
+                            No se encontraron boletines que coincidan con
+                            <b>{{ htmlspecialchars(request()->get('q')) }}</b>.
+                        @else
+                            No hay boletines registrados.
+                        @endif
                     </td>
                 </tr>
             @endforelse

@@ -1,4 +1,3 @@
-<!-- Modal de paso a paso creacion de usuarios -->
 <div id="userFormModal"
     class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center 
     transition-opacity duration-300 ease-out opacity-0 pointer-events-none">

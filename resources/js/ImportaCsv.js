@@ -98,14 +98,6 @@ function resetImportCsvFlow() {
     updateModalVisibility();
     document.body.classList.remove('overflow-hidden'); // Asegurarse de liberar el scroll del body
 
-    // === IMPORTANTE: SE ELIMINO LA LOGICA QUE RE-ABRIA userFormModal AQUI ===
-    // La decision de que modal abrir despues de un reset se maneja en los listeners
-    // o en la funcion que inicia el flujo (ej. openImportCsvModal).
-    /* const userFormModal = document.getElementById('userFormModal');
-    if (userFormModal) {
-        userFormModal.classList.remove('opacity-0', 'pointer-events-none');
-        userFormModal.classList.add('opacity-100');
-    } */
 }
 
 /**

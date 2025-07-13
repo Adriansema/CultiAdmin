@@ -19,39 +19,14 @@
             @csrf
 
             {{-- Campo de Correo Electronico --}}
-            <div class="mb-6" x-data="{ email: '{{ old(Laravel\Fortify\Fortify::username()) }}', emailExists: null, debounceTimeout: null }">
+            <div class="mb-6">
                 <label for="email" class="block mb-1 text-sm font-bold text-gray-700">Correo electrónico</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                         <img src="{{ asset('images/user.svg') }}" alt="persona" class="w-4 h-4">
                     </span>
                     <input id="email" type="email" name="email" placeholder="ingrese su correo electrónico" required
-                        autofocus x-model="email"
-                        @input.debounce.500ms="
-                            clearTimeout(debounceTimeout);
-                            debounceTimeout = setTimeout(() => {
-                                if (email.length > 0) {
-                                    fetch('./check-email', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': document.querySelector('meta[name=&quot;csrf-token&quot;]').content
-                                        },
-                                        body: JSON.stringify({ email: email })
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        emailExists = data.exists;
-                                    })
-                                    .catch(error => {
-                                        console.error('Error checking email:', error);
-                                        emailExists = null;
-                                    });
-                                } else {
-                                    emailExists = null;
-                                }
-                            }, 500);
-                        "
+                        autofocus value="{{ old(Laravel\Fortify\Fortify::username()) }}"
                         class="w-full px-3 py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
 
                     {{-- Icono de validacion (exito o error) --}}
@@ -62,46 +37,56 @@
                                 :class="{ 'text-green-500': emailExists, 'text-red-500': !emailExists }" />
                         </span>
                     </template>
+                    {{-- Contenedor para el icono de validación JS --}}
+                    <span id="email-icon-container" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                        {{-- Los iconos se inyectarán aquí por JavaScript --}}
+                    </span>
                 </div>
+                {{-- Div para mostrar errores de validación JS/Backend --}}
+                <div id="email-error-message" class="mb-4 text-sm text-red-500" style="display:none;"></div>
+
+                {{-- Errores de Laravel (ocultos por JS si el JS ya los maneja) --}}
                 @if ($errors->has(Laravel\Fortify\Fortify::username()))
-                    <div class="mb-4 text-sm text-red-500">
+                    <div id="laravel-email-error" class="mb-4 text-sm text-red-500">
                         {{ $errors->first(Laravel\Fortify\Fortify::username()) }}
                     </div>
                 @endif
                 {{-- Mensaje de exito (ej. despues de restablecer contrasena) --}}
                 @if (session('status'))
                     <div class="mb-4 text-sm font-medium text-green-600">
+                    <div id="session-status-message" class="mb-4 font-medium text-sm text-green-600">
                         {{ session('status') }}
                     </div>
                 @endif
             </div>
 
-            {{-- Contrasena --}}
-            <div class="mb-6" x-data="{ showPassword: false }">
+            {{-- Contraseña --}}
+            <div class="mb-6">
                 <label for="password" class="block mb-1 text-sm font-bold text-gray-700">Contraseña</label>
 
-                {{-- Este es el div que envolvera todo el campo de contrasena, iconos y error --}}
                 <div class="relative">
                     {{-- Icono de Candado --}}
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                         <img src="{{ asset('images/candado.svg') }}" alt="candado" class="w-4 h-4">
                     </span>
 
-                    {{-- Campo de Contrasena --}}
-                    <input id="password" :type="showPassword ? 'text' : 'password'" name="password"
-                        placeholder="ingrese su contraseña" required
-                        class="w-full px-3 py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"/>
+                    {{-- Campo de Contraseña --}}
+                    <input id="password" type="password" name="password" placeholder="ingrese su contraseña" required
+                        class="w-full px-3 py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
 
-                    {{-- Icono de Ojo (Mostrar/Ocultar Contrasena) --}}
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 cursor-pointer"
-                        @click="showPassword = !showPassword">
-                        <img :src="showPassword ? '{{ asset('images/ojo-open.svg') }}' : '{{ asset('images/ojo-close.svg') }}'"
-                            alt="Mostrar/Ocultar contrasena" class="w-5 h-5 opacity-50">
+                    {{-- Icono de Ojo (Mostrar/Ocultar Contraseña) --}}
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 cursor-pointer">
+                        <img id="password-toggle-icon" src="{{ asset('images/ojo-close.svg') }}"
+                            alt="Mostrar/Ocultar contraseña" class="w-5 h-5 opacity-50">
                     </span>
                 </div>
-                {{-- Mensaje de error para el campo de contrasena --}}
+                {{-- Div para mostrar errores de validación JS --}}
+                <div id="password-error-message" class="text-red-500 text-sm block mt-1" style="display:none;"></div>
+
+                {{-- Errores de Laravel para la contraseña (ocultos por JS si el JS ya los maneja) --}}
                 @error('password')
                     <span class="block mt-1 text-xs text-red-500">{{ $message }}</span>
+                    <span id="laravel-password-error" class="text-red-500 text-sm block mt-1">{{ $message }}</span>
                 @enderror
             </div>
 
@@ -128,8 +113,8 @@
     {{-- Modal usuario inactivo --}}
     @if (session('inactivo'))
         <div id="inactivoModal" x-data="{ show: true }" x-show="show"
-            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900 bg-opacity-50"> {{-- Añadido p-4 para padding en móvil --}}
-            <div class="w-full max-w-md p-6 text-center bg-white shadow-md rounded-3xl"> {{-- w-full para móvil --}}
+            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+            <div class="max-w-md p-6 text-center bg-white shadow-md rounded-3xl">
                 {{-- Icono --}}
                 <img src="{{ asset('images/warning.svg') }}" alt="Icono de advertencia" class="w-48 h-32 mx-auto mb-4 sm:w-56 sm:h-36"> {{-- Ajuste de tamaño de imagen --}}
                 <h2 class="mb-4 text-xl font-bold text-red-600 sm:text-2xl">Cuenta desactivada</h2> {{-- Título responsivo --}}
