@@ -139,7 +139,7 @@
                     <td colspan="9" class="px-6 py-4 text-center text-gray-500">
                         @if (request()->has('q') && !empty(request()->get('q')))
                             No se encontraron noticias que coincidan con
-                            "{{ htmlspecialchars(request()->get('q')) }}".
+                           <b>{{ htmlspecialchars(request()->get('q')) }}</b>.
                         @else
                             No hay noticias registradas.
                         @endif

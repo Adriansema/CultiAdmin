@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Models\Noticia;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class NoticiaService
 {
@@ -36,19 +36,21 @@ class NoticiaService
 
         $noticias = Noticia::query();
 
+        // Cargar la relación 'user' para que la vista pueda acceder a $noticia->user->name
+        $noticias->with('user');
+
         // Bandera para saber si ya hicimos el join con la tabla de usuarios
         $joinedUsersTable = false;
 
-        // Si se va a ordenar por 'creador' o buscar por 'creador', hacemos el join
-        if ($sortBy === 'creador' || (
-            !empty($searchQuery) &&
-            (str_contains($searchQuery, 'creador') || str_contains($searchQuery, 'Creador')) // Una heurística simple
-        )) {
+        // Si se va a ordenar por 'creador', hacemos el join y seleccionamos el nombre.
+        // No lo hacemos para la búsqueda en este punto, ya que la búsqueda 'orWhereHas' es más flexible.
+        if ($sortBy === 'creador') {
             $noticias->leftJoin('users', 'noticias.user_id', '=', 'users.id')
-                ->select('noticias.*', 'users.name as creador_name'); // Seleccionamos el nombre del usuario como 'creador_name'
+                ->select('noticias.*', 'users.name as creador_name');
             $joinedUsersTable = true;
         } else {
-            $noticias->select('noticias.*'); // Selecciona todas las columnas de noticias si no hay join
+            // Asegura que se seleccionen las columnas de noticias si no hay un join con select
+            $noticias->select('noticias.*');
         }
 
         // Búsqueda robusta general en múltiples columnas: Creador, Autor, Tipo, Titulo, Fecha, Estado
@@ -57,7 +59,6 @@ class NoticiaService
 
             $noticias->where(function ($q2) use ($cleanedSearchQuery, $searchQuery, $joinedUsersTable) {
                 $sqlNormalize = function ($column) {
-                    // Adaptación para PostgreSQL, si usas MySQL, 'TO_CHAR' no es necesario para fechas
                     if (config('database.default') === 'pgsql' && in_array($column, ['created_at', 'updated_at'])) {
                         return "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(TO_CHAR({$column}, 'YYYY-MM-DD HH24:MI:SS')), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '')";
                     }
@@ -68,21 +69,84 @@ class NoticiaService
                     ->orWhereRaw($sqlNormalize('titulo') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%'])
                     ->orWhereRaw($sqlNormalize('autor') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
 
-                // Búsqueda por creador (si ya se hizo el join)
-                if ($joinedUsersTable) {
-                    $q2->orWhereRaw($sqlNormalize('users.name') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
-                }
-
-                // Búsqueda por fecha de creación (created_at)
-                try {
-                    $date = Carbon::parse($searchQuery);
-                    $q2->orWhereDate('created_at', $date->toDateString());
-                } catch (\Exception $e) {
-                    // No hace nada si la fecha no es válida
-                }
+                // Búsqueda por creador (a través de la relación, más flexible que un join directo para la búsqueda)
+                $q2->orWhereHas('user', function ($userQuery) use ($cleanedSearchQuery) {
+                    $userQuery->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(name), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'), 'ü', 'u'), 'ñ', 'n'), '.', ''), '-', '') LIKE ?", ['%' . $cleanedSearchQuery . '%']);
+                });
 
                 // Búsqueda por estado (si se desea buscar por texto en el campo de búsqueda general)
                 $q2->orWhereRaw($sqlNormalize('estado') . ' LIKE ?', ['%' . $cleanedSearchQuery . '%']);
+
+
+                // --- INICIO DE LA MODIFICACIÓN DE FECHAS (COPIADO DE BOLETINES) ---
+                $date = null; // Variable para almacenar la fecha parseada
+                $originalQueryCleanedForDate = trim(mb_strtolower($searchQuery, 'UTF-8')); // Usa $searchQuery aquí
+
+                $originalLocale = Carbon::getLocale();
+                Carbon::setLocale('es');
+
+                try {
+                    if (preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $originalQueryCleanedForDate)) {
+                        $date = Carbon::createFromFormat('Y-m-d', str_replace('/', '-', $originalQueryCleanedForDate));
+                    } elseif (preg_match('/^\d{2}[\/\-]\d{2}[\/\-]\d{4}$/', $originalQueryCleanedForDate)) {
+                        $date = Carbon::createFromFormat('d-m-Y', str_replace('/', '-', $originalQueryCleanedForDate));
+                    } elseif (preg_match('/^\d{2}[\/\-]\d{2}[\/\-]\d{4}$/', $originalQueryCleanedForDate)) {
+                        $date = Carbon::createFromFormat('m-d-Y', str_replace('/', '-', $originalQueryCleanedForDate));
+                    }
+                } catch (\Exception $e) {
+                    // No hace nada, se intentará el siguiente método
+                }
+
+                if (!$date) {
+                    $normalizedMonthQuery = $originalQueryCleanedForDate;
+
+                    $monthMap = [
+                        'enero' => '01', 'ene' => '01',
+                        'febrero' => '02', 'feb' => '02',
+                        'marzo' => '03', 'mar' => '03',
+                        'abril' => '04', 'abr' => '04',
+                        'mayo' => '05', 'may' => '05',
+                        'junio' => '06', 'jun' => '06',
+                        'julio' => '07', 'jul' => '07',
+                        'agosto' => '08', 'ago' => '08',
+                        'septiembre' => '09', 'sep' => '09',
+                        'octubre' => '10', 'oct' => '10',
+                        'noviembre' => '11', 'nov' => '11',
+                        'diciembre' => '12', 'dic' => '12',
+                    ];
+
+                    foreach ($monthMap as $monthName => $monthNum) {
+                        $normalizedMonthQuery = str_replace($monthName, $monthNum, $normalizedMonthQuery);
+                    }
+
+                    $normalizedMonthQuery = str_replace([' de ', ' del ', ' del año '], ' ', $normalizedMonthQuery);
+                    $normalizedMonthQuery = trim(preg_replace('/\s+/', ' ', $normalizedMonthQuery));
+
+                    try {
+                        $date = Carbon::createFromFormat('d m Y', $normalizedMonthQuery);
+                    } catch (\Exception $e) {
+                        if (!$date) {
+                            try {
+                                $normalizedMonthQuery = str_ireplace(['a.m.', 'p.m.', 'a m', 'p m'], ['am', 'pm', 'am', 'pm'], $normalizedMonthQuery);
+                                $date = Carbon::createFromFormat('d m Y H:i', $normalizedMonthQuery);
+                            } catch (\Exception $e) {
+                                try {
+                                    $date = Carbon::createFromFormat('d m Y h:i a', $normalizedMonthQuery);
+                                } catch (\Exception $e) {
+                                    // Fallback final si nada de lo anterior funcionó para formatos con mes
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ($date) {
+                    if ($date->year > 1900 && $date->year < 2100) {
+                        $q2->orWhereDate('created_at', $date->toDateString());
+                    }
+                }
+                Carbon::setLocale($originalLocale);
+                // --- FIN DE LA MODIFICACIÓN DE FECHAS ---
             });
         }
 
@@ -113,9 +177,6 @@ class NoticiaService
         } else {
             $noticias->orderBy('created_at', 'desc');
         }
-
-        // Cargar la relación 'user' para que la vista pueda acceder a $noticia->user->name
-        $noticias->with('user');
 
         return $noticias->paginate($perPage)->withQueryString();
     }

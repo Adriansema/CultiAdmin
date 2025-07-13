@@ -1,0 +1,7 @@
+﻿ID,Usuario,Estado,Nombre,Descripcion,Observaciones,Archivo,"Precio Mas Alto","Lugar Precio Mas Alto","Precio Mas Bajo","Lugar Precio Mas Bajo",Creado
+7,SuperAdmin,pendiente,"Boletín de mora","Semana del 10 al 17 de julio",,boletines/T9fIddida5Q45EjKyHgwNVr8TLmKTEpZBk8JS4iB.pdf,24000.00,Risaralda,20000.00,Cacn,"2025-07-12 14:06:07"
+5,SuperAdmin,aprobado,"Boletín de mora","Semana del 07 al 13 de agosto",,boletines/BgeTjnaLDm0kB9A2pukIx8ZE3MHPkIm1YOytZXKw.pdf,48000.00,Magdalena,24000.00,Arauca,"2025-07-12 12:14:14"
+4,SuperAdmin,rechazado,"Boletín de café","Semana del 31 al 06 de agosto","Revisa el contenido ya que se encuentra un poco mal configurado",boletines/D9XO2cW4HdPm9lvgidjrfSbZsQmbgIgg5V81SNmZ.pdf,25550.00,Guajira,24000.00,Risaralda,"2025-07-12 12:10:50"
+3,SuperAdmin,pendiente,"Boletín de café","Semana del 17 al 23 julio",,boletines/IMV4hW3ThRZpe4JSVD6JPwb68Yj4btg13zdrDJGG.pdf,15000.00,"Valle del cauca",10000.00,Antioquia,"2025-07-12 12:01:54"
+2,SuperAdmin,pendiente,"Boletín de café","Semana del 09 al 16 de julio",,boletines/4ZaKXtSJ0E74BwgPCgJ3h581IWzjwjn8dBKmAYXx.pdf,12400.00,Choco,4500.00,Pereira,"2025-07-12 11:59:55"
+1,SuperAdmin,pendiente,"Boletín de café","Semana del 01 al 08 de julio",,boletines/BiAtNibH6K90m9njk8XA1dCQWyKWhugHo5IP2C7u.pdf,12300.00,Putumayo,4200.00,Quindio,"2025-07-12 11:58:05"
