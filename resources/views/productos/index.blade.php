@@ -7,7 +7,7 @@
 
     @can('crear producto')
         {{-- Contenedor del título y breadcrumbs (ya tiene buen responsive) --}}
-        <div class="w-full px-4 py-6 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="w-full px-4 py-6 mx-auto sm:px-6 lg:px-8 max-w-7xl">
             <div class="flex items-center space-x-4">
                 <img src="{{ asset('images/reverse.svg') }}" class="w-4 h-4" alt="Icono Nuevo Usuario">
                 <h1 class="text-xl font-bold sm:text-2xl lg:text-3xl whitespace-nowrap">Gestión de productos</h1>
@@ -20,11 +20,9 @@
         {{-- Contenedor principal de la página de productos: ¡AJUSTE CRÍTICO DE PADDING AQUÍ! --}}
         {{-- Quitamos p-4 y usamos padding responsivo directamente en este div. --}}
         {{-- Este div es el que tiene el fondo bg-[var(--color-Gestion)] --}}
-        <div class="w-full mx-auto bg-[var(--color-Gestion)] rounded-2xl mb-8 max-w-7xl
-                    p-4                {{-- Padding base para todos los lados en pantallas pequeñas (16px) --}}
-                    sm:p-6             {{-- Padding para todos los lados en pantallas sm+ (24px) --}}
-                    lg:p-8             {{-- Padding para todos los lados en pantallas lg+ (32px) --}}
-                    ">
+        <div class="bg-[var(--color-Gestion)] rounded-2xl max-w-7xl
+            mx-2 sm:mx-auto p-4 sm:p-6 lg:p-8 mb-8">
+
             {{-- Contenedor de búsqueda y botones (contenido interno del div principal) --}}
             <div class="flex flex-col justify-between gap-4 mb-4 md:flex-row md:items-center">
 

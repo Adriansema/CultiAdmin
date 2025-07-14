@@ -49,18 +49,18 @@
       }">
 
     {{-- Barra superior de GOV.CO --}}
-    <div class="p-1 bg-blue-500 flex justify-between items-center pr-4">
+    <div class="flex items-center justify-between p-1 pr-4 bg-blue-500">
         <img src="https://zajuna.sena.edu.co/img/logos/gov-logo.svg" alt="Logo GOV.CO" width="100px">
     </div>
 
     {{-- Header/Navbar superior para móviles (con botón de hamburguesa) --}}
-    <header class="bg-white shadow p-4 flex items-center justify-between md:hidden">
+    <header class="flex items-center justify-between p-4 bg-white shadow md:hidden">
         <button @click="sidebarOpen = !sidebarOpen" class="text-gray-600 focus:outline-none">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
         </button>
-        <img src="{{ asset('images/cultiva-logo.svg') }}" alt="Logo Cultiva Sena" class="h-8">
+        
     </header>
 
     <x-banner />
