@@ -104,7 +104,7 @@
                     Recuérdame en este dispositivo
                 </label>
                 <a href="{{ route('password.request') }}" class="text-sm font-bold text-[#751E72] hover:underline">
-                    ¿Olvidaste tu contrasena?
+                    ¿Olvidaste tu contraseña?
                 </a>
             </div>
 
