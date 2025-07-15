@@ -75,21 +75,21 @@
             @endcan
 
             @can('eliminar boletin')
-                <button type="button" onclick="mostrarModal('boletin', '{{ $boletin->id }}')"
+                <button type="button" onclick="mostrarModal('boletines', '{{ $boletin->id }}')"
                     class="px-3 py-2 text-center text-white bg-red-600 rounded-xl hover:bg-red-700">
                     Eliminar
                 </button>
             @endcan
 
             @can('validar boletin')
-                <button type="button" onclick="mostrarModal('validar-boletin', '{{ $boletin->id }}')"
+                <button type="button" onclick="mostrarModal('validar-boletines', '{{ $boletin->id }}')"
                     class="px-3 py-2 text-center text-white bg-blue-600 rounded-xl hover:bg-blue-700">
                     Validar
                 </button>
             @endcan
 
             @can('validar boletin')
-                <button type="button" onclick="mostrarModal('rechazar-boletin', '{{ $boletin->id }}')"
+                <button type="button" onclick="mostrarModal('rechazar-boletines', '{{ $boletin->id }}')"
                     class="px-3 py-2 text-center text-white bg-orange-600 rounded-xl hover:bg-orange-700">
                     Rechazar
                 </button>

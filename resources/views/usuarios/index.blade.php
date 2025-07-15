@@ -83,7 +83,7 @@
             @include('usuarios.partials.tabla')
 
             @if ($usuarios->total() > 0 && $usuarios->hasPages())
-                <div class="p-2 mt-6 bg-white shadow-sm rounded-b-xl"> {{-- Añadido p-2 bg-white shadow-sm para la paginación --}}
+                <div class="p-2 mt-6 rounded-b-xl"> {{-- Añadido p-2 bg-white shadow-sm para la paginación --}}
                     {{ $usuarios->links('vendor.pagination.tailwind') }}
                 </div>
             @endif

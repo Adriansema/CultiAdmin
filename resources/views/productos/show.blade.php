@@ -63,7 +63,7 @@
 
             {{-- Observaciones Generales (solo para Café o Mora) --}}
 
-            @if (($producto->tipo === 'cafe' || $producto->tipo === 'mora') && ($producto->estado === 'aprobado' ||
+            @if (($producto->tipo === 'cafe' || $producto->tipo === 'mora' || $producto->tipo === 'videos') && ($producto->estado === 'aprobado' ||
             $producto->estado === 'rechazado'))
             <div class="mt-4 md:col-span-2 lg:col-span-3">
                 <strong class="block mb-2 text-lg font-semibold text-gray-700">Observaciones:</strong>

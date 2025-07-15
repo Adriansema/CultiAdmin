@@ -196,32 +196,35 @@ class ProductoController extends Controller
                 Mail::to($operario->email)->send(new NuevaRevisionPendienteMail($producto, $tipoProductoPrincipal));
             }
 
-            // 8. Redirigir con un mensaje de exito.
-            return redirect()->route('productos.index')->with('success_message', 'Informacion guardada con exito y enviada a revision.');
+            // 8. Redirigir con un mensaje de exito O responder JSON
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Información guardada con éxito y enviada a revisión.'], 200);
+            }
+            return redirect()->route('productos.index')->with('success_message', 'Información guardada con éxito y enviada a revisión.');
         } catch (QueryException $e) {
-            // Captura errores especificos de la base de datos
             Log::error('Error de base de datos al crear producto: ' . $e->getMessage());
-            // Si el producto principal se creo pero la relacion fallo, eliminarlo
             if ($producto && $producto->exists) {
                 $producto->delete();
             }
-            // Si la imagen se subio antes de la falla de la DB, intentar eliminarla
             if ($imagen && Storage::disk('public')->exists($imagen)) {
                 Storage::disk('public')->delete($imagen);
             }
-            return redirect()->back()->with('error_message', 'Ocurrio un error de base de datos al crear el producto. Por favor, intentalo de nuevo.');
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error de base de datos al crear el producto. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al crear el producto. Por favor, inténtalo de nuevo.');
         } catch (\Exception $e) {
-            // Captura cualquier otra excepcion inesperada
             Log::error('Error inesperado al crear producto: ' . $e->getMessage());
-            // Si el producto principal se creo pero la relacion fallo, eliminarlo
             if ($producto && $producto->exists) {
                 $producto->delete();
             }
-            // Si la imagen se subio antes de la falla, intentar eliminarla
             if ($imagen && Storage::disk('public')->exists($imagen)) {
                 Storage::disk('public')->delete($imagen);
             }
-            return redirect()->back()->with('error_message', 'Ocurrio un error inesperado al crear el producto. Por favor, intentalo de nuevo.');
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error inesperado al crear el producto. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al crear el producto. Por favor, inténtalo de nuevo.');
         }
     }
 
@@ -376,22 +379,29 @@ class ProductoController extends Controller
                 }
             }
 
-            // 10. Redirigir con un mensaje de exito.
-            return redirect()->route('productos.index')->with('success_message', 'Producto actualizado y enviado a revision.');
+            // 10. Redirigir con un mensaje de exito O responder JSON
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Producto actualizado y enviado a revisión.'], 200);
+            }
+            return redirect()->route('productos.index')->with('success_message', 'Producto actualizado y enviado a revisión.');
         } catch (QueryException $e) {
             Log::error('Error de base de datos al actualizar producto (ID: ' . $producto->id . '): ' . $e->getMessage());
-            // Si se subio una nueva imagen y la DB fallo, intentar eliminarla
             if ($newImagenPath && Storage::disk('public')->exists($newImagenPath)) {
                 Storage::disk('public')->delete($newImagenPath);
             }
-            return redirect()->back()->with('error_message', 'Ocurrio un error de base de datos al actualizar el producto. Por favor, intentalo de nuevo.');
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error de base de datos al actualizar el producto. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al actualizar el producto. Por favor, inténtalo de nuevo.');
         } catch (\Exception $e) {
             Log::error('Error inesperado al actualizar producto (ID: ' . $producto->id . '): ' . $e->getMessage());
-            // Si se subio una nueva imagen y la operacion fallo, intentar eliminarla
             if ($newImagenPath && Storage::disk('public')->exists($newImagenPath)) {
                 Storage::disk('public')->delete($newImagenPath);
             }
-            return redirect()->back()->with('error_message', 'Ocurrio un error inesperado al actualizar el producto. Por favor, intentalo de nuevo.');
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error inesperado al actualizar el producto. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al actualizar el producto. Por favor, inténtalo de nuevo.');
         }
     }
 
@@ -413,13 +423,25 @@ class ProductoController extends Controller
         return view('productos.show', compact('producto'));
     }
 
-    public function destroy(Producto $producto)
+    public function destroy(Producto $producto, Request $request)
     {
         Gate::authorize('eliminar producto');
-        // Tu logica de borrado (manten la misma)
-        $producto->delete();
 
-        return redirect()->route('productos.index')->with('success', 'Producto eliminado.');
+        try {
+            // Tu logica de borrado (manten la misma)
+            $producto->delete();
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Producto eliminado con éxito.'], 200);
+            }
+            return redirect()->route('productos.index')->with('success', 'Producto eliminado.');
+        } catch (\Exception $e) { // <-- Cierra el try y abre el catch
+            Log::error('Error al eliminar producto (ID: ' . $producto->id . '): ' . $e->getMessage());
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error al eliminar el producto. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error al eliminar el producto.');
+        }
     }
 
     /**

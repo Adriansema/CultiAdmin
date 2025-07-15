@@ -108,9 +108,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 url.searchParams.set('sort_direction', sortDirection);
 
                 url.searchParams.delete('page');
-
-                console.log('Botón de ordenación clicado. Nuevo sort_by:', sortField, 'sort_direction:', sortDirection);
-                console.log('URL de redirección:', url.toString());
                 window.location.href = url.toString();
             });
         });
@@ -138,8 +135,6 @@ document.addEventListener('DOMContentLoaded', function () {
             url.searchParams.delete('sort_direction');
             url.searchParams.delete('page');
 
-            console.log('Restableciendo filtros. La página se recargará en 3 segundos.');
-
             setTimeout(() => {
                 window.location.href = url.origin + url.pathname;
             }, 3000);
@@ -153,7 +148,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const exportForm = this.closest('form'); // Obtiene el formulario padre
             if (!exportForm) {
-                console.error('Error: No se encontró el formulario para el botón de exportar CSV.');
                 return;
             }
 
@@ -220,8 +214,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const currentSortBy = urlParams.get('sort_by');
     const currentSortDirection = urlParams.get('sort_direction');
 
-    console.log('Parámetros de ordenación actuales al cargar:', 'sort_by:', currentSortBy, 'sort_direction:', currentSortDirection);
-
     if (currentSortBy && currentSortDirection) {
         document.querySelectorAll('.sort-icon-btn').forEach(button => {
             button.classList.remove('is-active');
@@ -230,10 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const activeSortButton = document.querySelector(`.sort-icon-btn[data-sort-field="${currentSortBy}"][data-sort-direction="${currentSortDirection}"]`);
 
         if (activeSortButton) {
-            console.log('Botón de ordenación activo encontrado para resaltar:', activeSortButton);
             activeSortButton.classList.add('is-active');
-        } else {
-            console.log('No se encontró el botón de ordenación activo para resaltar:', currentSortBy, currentSortDirection);
-        }
+        } 
     }
 });

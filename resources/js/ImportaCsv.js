@@ -441,7 +441,7 @@ async function handleFileProcessing(file) {
         renderCsvPreview([]);
 
         importCsvState.backendValidationErrors = [{ lineNumber: 'Procesamiento', errors: [`Error al procesar el archivo: ${error.message}`] }];
-        renderMissingDataErrors(importCsvState.backendValidationErrors , 'general'); // Usar 'general' para errores de procesamiento
+        renderMissingDataErrors(importCsvState.backendValidationErrors, 'general'); // Usar 'general' para errores de procesamiento
         importCsvState.missingDataModalOpen = true;
         updateModalVisibility();
     }
@@ -528,12 +528,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (closeUploadModalButton) {
         closeUploadModalButton.addEventListener('click', resetImportCsvFlow);
     }
+
     if (csvFileInput) {
         csvFileInput.addEventListener('change', async function (event) {
             const file = event.target.files[0];
             await handleFileProcessing(file);
         });
     }
+
     if (dropArea) { // Drag and Drop
         dropArea.addEventListener('dragover', (event) => {
             event.preventDefault();
@@ -557,6 +559,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (closePreviewModalButton) {
         closePreviewModalButton.addEventListener('click', resetImportCsvFlow);
     }
+
     if (previewPrevButton) {
         previewPrevButton.addEventListener('click', function () {
             importCsvState.previewModalOpen = false; // Cierra la previsualizacion
@@ -564,6 +567,7 @@ document.addEventListener('DOMContentLoaded', function () {
             updateModalVisibility();
         });
     }
+
     if (previewNextButton) {
         previewNextButton.addEventListener('click', function () {
             if (importCsvState.validUsers.length > 0) {
@@ -582,6 +586,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (closeConfirmImportModalButton) {
         closeConfirmImportModalButton.addEventListener('click', resetImportCsvFlow);
     }
+
     if (confirmImportPrevButton) {
         confirmImportPrevButton.addEventListener('click', function () {
             importCsvState.confirmModalOpen = false; // Cierra la confirmacion
@@ -589,12 +594,12 @@ document.addEventListener('DOMContentLoaded', function () {
             updateModalVisibility();
         });
     }
+
     if (confirmImportActionButton) {
         confirmImportActionButton.addEventListener('click', async function () {
             // Deshabilitar boton y mostrar spinner
             const originalBtnText = confirmImportActionButton.innerHTML;
             confirmImportActionButton.disabled = true;
-            // CAMBIO: 'Cargando...'
             confirmImportActionButton.innerHTML = `Importando <img src="./images/cargando_.svg" alt="Cargando..." class="w-5 h-5 ml-2 animate-spin">`;
 
             const formData = new FormData();
@@ -612,11 +617,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const data = await response.json();
 
-                // Restablecer el boton
+                // Restablecer el boton (siempre aquí, antes de cualquier lógica de error o éxito)
                 confirmImportActionButton.disabled = false;
                 confirmImportActionButton.innerHTML = originalBtnText;
 
                 if (!response.ok) {
+                    // Si la respuesta NO es OK (hubo un error en la importación o validación del servidor)
                     importCsvState.duplicateErrors = [];
                     importCsvState.backendValidationErrors = [];
 
@@ -630,9 +636,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         for (const lineNumberKey in data.detailed_errors) {
                             const lineErrors = data.detailed_errors[lineNumberKey];
                             lineErrors.forEach(errorMsg => {
-                                // CAMBIO: 'Línea '
                                 const displayLineNumber = lineNumberKey.replace('Linea ', '');
-                                 // La expresion regular ahora incluye el espacio despues del numero de fila y el ":"
+                                // La expresion regular ahora incluye el espacio despues del numero de fila y el ":"
                                 const cleanErrorMsg = errorMsg.replace(/La fila \d+:\s*/, '');
 
                                 if (cleanErrorMsg.includes('ya existe en el sistema')) {
@@ -641,10 +646,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                     const originalUser = importCsvState.parsedUsers[originalUserIndex];
 
                                     let errorDetail = '';
-                                    // CAMBIO: 'El correo electrónico'
                                     if (cleanErrorMsg.includes('El correo electrónico')) {
                                         errorDetail = `Correo [${originalUser ? originalUser.email : 'N/A'}]`;
-                                        // CAMBIO: 'El número de documento'
                                     } else if (cleanErrorMsg.includes('El numero de documento')) {
                                         errorDetail = `Numero de documento [${originalUser ? originalUser.document : 'N/A'}]`;
                                     }
@@ -660,7 +663,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         if (newDuplicateErrors.length > 0) {
                             importCsvState.duplicateErrors = newDuplicateErrors;
-                            renderDuplicatesErrors(importCsvState.duplicateErrors); 
+                            renderDuplicatesErrors(importCsvState.duplicateErrors);
                             importCsvState.duplicatesModalOpen = true;
                         } else if (newBackendValidationErrors.length > 0) {
                             importCsvState.backendValidationErrors = newBackendValidationErrors;
@@ -680,12 +683,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     updateModalVisibility(); // Asegurar que el modal de error se muestre
                 } else {
-                    // Exito: Cerrar todos los modales de importacion y recargar la pagina
+                    // Éxito: La respuesta es OK
+                    // Cerrar todos los modales de importación del flujo
                     resetImportCsvFlow();
+
+                    // --- ¡MOSTRAR EL MENSAJE GLOBAL DE ÉXITO! ---
+                    const importedCount = importCsvState.validUsers.length;
+                    const successMessage = data.message || `¡Importación completada! Se importarón ${importedCount} usuario(s) correctamente.`;
+                    window.showGlobalMessage('success', successMessage);
+
+                    // Recargar la página después de un breve retraso para que el usuario vea el mensaje
                     setTimeout(() => {
-                        // CAMBIO: 'Recargar rápidamente'
                         window.location.reload();
-                    }, 500); // Recargar rapidamente
+                    }, 1500); // Se recomienda 1.5 segundos (1500ms) para que el usuario lea el mensaje
                 }
             } catch (error) {
                 // Restablecer el boton

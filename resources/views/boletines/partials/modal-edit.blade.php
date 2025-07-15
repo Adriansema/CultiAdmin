@@ -1,3 +1,6 @@
+{{-- @php
+    dd($boletin); // Esto mostrará el objeto Boletin que se pasa a la vista
+@endphp --}}
 <div id="modal-editar-{{ $boletin->id }}"
     class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900 bg-opacity-50 items-center justify-center">
     <div class="relative bg-[var(--color-Gestion)] rounded-3xl shadow-xl p-6 w-full max-w-3xl mx-auto my-8">
@@ -26,7 +29,7 @@
                     boletín:</label>
                 <input type="text" name="nombre" id="edit_nombre_{{ $boletin->id }}"
                     value="{{ old('nombre', $boletin->nombre) }}"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:ring-opacity-50">
                 <div id="edit_nombre_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1"></div>
             </div>
 
@@ -35,7 +38,7 @@
                 <label for="edit_descripcion_{{ $boletin->id }}"
                     class="block text-sm font-bold text-gray-700">Descripción:</label>
                 <textarea name="descripcion" id="edit_descripcion_{{ $boletin->id }}" rows="3"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">{{ old('descripcion', $boletin->descripcion) }}</textarea>
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:ring-opacity-50">{{ old('descripcion', $boletin->descripcion) }}</textarea>
                 {{-- Div para mostrar errores de validación de la descripción --}}
                 <div id="edit_descripcion_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1"></div>
             </div>
@@ -73,7 +76,8 @@
                             {{-- Construye la URL con asset() y la ruta relativa --}}
                             <a href="{{ asset('storage/' . $boletin->archivo) }}" target="_blank"
                                 class="flex flex-col items-center text-blue-600 transition-transform duration-300 ease-in-out transform hover:underline hover:scale-105">
-                                <img src="{{ asset('images/PDF.svg') }}" alt="Icono PDF" class="mb-1 cursor-pointer w-14 h-14">
+                                <img src="{{ asset('images/PDF.svg') }}" alt="Icono PDF"
+                                    class="mb-1 cursor-pointer w-14 h-14">
                                 <span class="text-sm text-gray-700">Ver pdf</span>
                             </a>
                             <button type="button" onclick="removeFile('{{ $boletin->id }}')"
@@ -108,7 +112,7 @@
                         <input type="number" step="0.01" name="precio_mas_alto"
                             id="edit_precio_mas_alto_{{ $boletin->id }}"
                             value="{{ old('precio_mas_alto', $boletin->precio_mas_alto) }}"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:ring-opacity-50">
                     </div>
                     <div id="edit_precio_mas_alto_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1"></div>
                 </div>
@@ -118,7 +122,7 @@
                     <input type="text" name="lugar_precio_mas_alto"
                         id="edit_lugar_precio_mas_alto_{{ $boletin->id }}"
                         value="{{ old('lugar_precio_mas_alto', $boletin->lugar_precio_mas_alto) }}"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:ring-opacity-50">
                     {{-- Div para mostrar errores de validación del lugar del precio más alto --}}
                     <div id="edit_lugar_precio_mas_alto_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1">
                     </div>
@@ -130,12 +134,12 @@
                 <div>
                     <label for="edit_precio_mas_bajo_{{ $boletin->id }}"
                         class="block text-sm font-bold text-gray-700">Precio más bajo</label>
-                    <div class="flex items-center gap-2 mt-1"> 
+                    <div class="flex items-center gap-2 mt-1">
                         <img src="{{ asset('images/bajo.svg') }}" alt="Iconobajar" class="w-6 h-6">
                         <input type="number" step="0.01" name="precio_mas_bajo"
                             id="edit_precio_mas_bajo_{{ $boletin->id }}"
                             value="{{ old('precio_mas_bajo', $boletin->precio_mas_bajo) }}"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:ring-opacity-50">
                     </div>
                     <div id="edit_precio_mas_bajo_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1"></div>
                 </div>
@@ -145,7 +149,7 @@
                     <input type="text" name="lugar_precio_mas_bajo"
                         id="edit_lugar_precio_mas_bajo_{{ $boletin->id }}"
                         value="{{ old('lugar_precio_mas_bajo', $boletin->lugar_precio_mas_bajo) }}"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:ring-opacity-50">
                     {{-- Div para mostrar errores de validación del lugar del precio más bajo --}}
                     <div id="edit_lugar_precio_mas_bajo_error_{{ $boletin->id }}" class="text-red-500 text-sm mt-1">
                     </div>
@@ -194,7 +198,7 @@
     function removeFile(boletinId) {
         // Establece el valor del campo oculto a 1 para indicar que se debe eliminar
         document.getElementById(`remove_archivo_${boletinId}`).value = "1";
-        
+
         // Oculta la sección de "Archivo Adjunto Actual"
         const currentFileSection = document.getElementById(`current_file_section_${boletinId}`);
         if (currentFileSection) {
@@ -207,13 +211,13 @@
 
     // Lógica para inicializar el estado al cargar el DOM o al abrir el modal
     document.addEventListener('DOMContentLoaded', function() {
-        const boletinId = '{{ $boletin->id }}'; 
+        const boletinId = '{{ $boletin->id }}';
         const removeArchivoInput = document.getElementById(`remove_archivo_${boletinId}`);
         const currentFileSection = document.getElementById(`current_file_section_${boletinId}`);
 
         if (removeArchivoInput) {
             // Siempre reinicia a 0 cuando el modal se carga/inicializa
-            removeArchivoInput.value = "0"; 
+            removeArchivoInput.value = "0";
         }
 
         // Blade solo inyecta un valor booleano para que JavaScript decida la visibilidad

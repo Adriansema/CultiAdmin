@@ -42,7 +42,7 @@ class BoletinService
         // Esto es compatible con la paginación de Laravel que se renderiza en Blade.
         $perPage = in_array($request->input('per_page'), [5, 10, 25, 50, 100])
             ? $request->input('per_page')
-            : 9;
+            : 10;
 
         $query  = $request->input('q');
         $estado = $request->input('estado');

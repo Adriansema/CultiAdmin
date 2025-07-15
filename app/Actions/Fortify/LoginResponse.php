@@ -1,7 +1,5 @@
 <?php
 
-//actualizacion 09/04/2025
-
 namespace App\Actions\Fortify;
 
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
@@ -13,15 +11,27 @@ class LoginResponse implements LoginResponseContract
     {
         $user = $request->user();
 
-        if ($user->hasRole('administrador')) {  //Ruta para el administrador
-            return redirect()->route('dashboard');
+        // Redirección para SuperAdmin
+        if ($user->hasRole('SuperAdmin')) {
+            return redirect()->route('dashboard'); // Define una ruta específica para SuperAdmin
         }
 
-        if ($user->hasRole('operador')) {
-            return redirect()->route('dashboard'); //Ruta para el operador
+        // Redirección para Administrador
+        if ($user->hasRole('Administrador')) {
+            return redirect()->route('dashboard'); // Define una ruta específica para Administrador
         }
 
-        return redirect()->intended(RouteServiceProvider::HOME); //Ruta por defecto
-        // Puedes personalizar la redireccion segun tus necesidades
+        // Redirección para Operario
+        if ($user->hasRole('Operario')) {
+            return redirect()->route('dashboard'); // Define una ruta específica para Operario
+        }
+
+        // Redirección para Funcionario
+        if ($user->hasRole('Funcionario')) {
+            return redirect()->route('dashboard'); // Define una ruta específica para Funcionario
+        }
+
+        // Si por alguna razón un usuario no tiene un rol esperado aqui esta su ruta por defecto
+        return redirect()->intended(RouteServiceProvider::HOME);
     }
 }

@@ -48,7 +48,7 @@ class PendienteNotiController extends Controller
      */
     public function show($id)
     {
-             // en la vista sin hacer consultas adicionales en el Blade.
+        // en la vista sin hacer consultas adicionales en el Blade.
         $noticia = Noticia::with(['validador', 'rechazador'])->findOrFail($id);
 
         // Retorna la vista de detalle de la noticia
@@ -70,7 +70,7 @@ class PendienteNotiController extends Controller
         // Actualiza el estado de la noticia a 'aprobado'
         $noticia->update([
             'estado' => 'aprobado',
-            'observaciones'=> $request->observaciones , // Limpia las observaciones si las hubiera
+            'observaciones' => $request->observaciones, // Limpia las observaciones si las hubiera
             'validado_por_user_id' => Auth::id(), // Registra quien la valido
             'rechazado_por_user_id' => null, // Limpia el ID de rechazador
         ]);
@@ -82,7 +82,9 @@ class PendienteNotiController extends Controller
             Mail::to($creador->email)->send(new NoticiaEstadoMail($noticia));
         }
 
-        // Redirige de vuelta con un mensaje de estado
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Noticia aprobada con éxito.'], 200);
+        }
         return back()->with('status_noticia', 'aprobado');
     }
 
@@ -114,7 +116,9 @@ class PendienteNotiController extends Controller
             Mail::to($creador->email)->send(new NoticiaEstadoMail($noticia));
         }
 
-        // Redirige de vuelta con un mensaje de estado y el ID de la noticia para posible redireccion
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Noticia rechazado con éxito.'], 200);
+        }
         return back()
             ->with('status_noticia', 'rechazado')
             ->with('noticia_id_for_redirect', $noticia->id);

@@ -83,7 +83,7 @@
             @endforelse
 
             @if ($productos->total() > 0 && $productos->hasPages())
-                <div class="p-2 mt-4 bg-white shadow-sm rounded-b-xl"> {{-- Añadido p-2 bg-white shadow-sm para la paginación --}}
+                <div class="p-2 mt-4 rounded-b-xl"> {{-- Añadido p-2 bg-white shadow-sm para la paginación --}}
                     {{ $productos->links('vendor.pagination.tailwind') }}
                 </div>
             @endif

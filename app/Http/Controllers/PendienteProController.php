@@ -27,7 +27,7 @@ class PendienteProController extends Controller
         $productos = $operarioAndFuncionarioService->obtenerProductosFiltrados($request);
 
         // Retorna la vista con los productos pendientes
-        return view('pendientes.productos_pendientes', compact('productos'));
+        return view('pendiente.productos_pendientes', compact('producto'));
     }
 
     /**
@@ -57,7 +57,7 @@ class PendienteProController extends Controller
         return view('productos.show', compact('producto'));
     }
 
-     /**
+    /**
      * Valida/Aprueba un Producto.
      */
     public function validar(Request $request, $id)
@@ -65,7 +65,7 @@ class PendienteProController extends Controller
         // Encuentra el producto por ID o falla
         $producto = Producto::findOrFail($id);
 
-          // Valida que se proporcionen observaciones para el rechazo
+        // Valida que se proporcionen observaciones para el rechazo
         $request->validate([
             'observaciones' => 'nullable|string|max:500',
         ]);
@@ -86,6 +86,9 @@ class PendienteProController extends Controller
             Mail::to($creador->email)->send(new ProductoEstadoMail($producto));
         }
 
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Producto aprobado con éxito.'], 200);
+        }
         return back()->with('status_producto', 'aprobado');
     }
 
@@ -117,6 +120,9 @@ class PendienteProController extends Controller
             Mail::to($creador->email)->send(new ProductoEstadoMail($producto));
         }
 
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Producto rechazado con éxito.'], 200);
+        }
         return back()
             ->with('status_producto', 'rechazado')
             ->with('producto_id_for_redirect', $producto->id);

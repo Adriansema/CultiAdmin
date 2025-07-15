@@ -110,16 +110,22 @@ class NoticiaController extends Controller
                 'leida' => false, // Nueva columna, por defecto false!
             ]);
 
-            // Si la creacion es exitosa, el codigo continua aqui.
+            if ($request->expectsJson()) {
+                return response()->json(['message' => '¡Noticia creada con éxito!'], 200);
+            }
             return redirect()->route('noticias.index')->with('success_message', '¡Noticia creada con éxito!');
         } catch (QueryException $e) {
-            // Captura errores especificos de la base de datos
             Log::error('Error de base de datos al crear noticia: ' . $e->getMessage());
-            return redirect()->back()->with('error_message', 'Ocurrio un error de base de datos al crear la noticia. Por favor, intentalo de nuevo.');
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error de base de datos al crear la noticia. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al crear la noticia. Por favor, inténtalo de nuevo.');
         } catch (\Exception $e) {
-            // Captura cualquier otra excepcion inesperada
             Log::error('Error inesperado al crear noticia: ' . $e->getMessage());
-            return redirect()->back()->with('error_message', 'Ocurrio un error inesperado al crear la noticia. Por favor, intentalo de nuevo.');
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error inesperado al crear la noticia. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al crear la noticia. Por favor, inténtalo de nuevo.');
         }
     }
 
@@ -205,16 +211,22 @@ class NoticiaController extends Controller
             // Guarda todos los cambios en la base de datos en una sola operacion
             $noticia->save();
 
-            // Si la actualizacion es exitosa, el codigo continua aqui.
+            if ($request->expectsJson()) {
+                return response()->json(['message' => '¡Noticia actualizada con éxito!'], 200);
+            }
             return redirect()->route('noticias.index')->with('success_message', '¡Noticia actualizada con éxito!');
         } catch (QueryException $e) {
-            // Captura errores especificos de la base de datos
             Log::error('Error de base de datos al actualizar noticia (ID: ' . $noticia->id . '): ' . $e->getMessage());
-            return redirect()->back()->with('error_message', 'Ocurrio un error de base de datos al actualizar la noticia. Por favor, intentalo de nuevo.');
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error de base de datos al actualizar la noticia. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error de base de datos al actualizar la noticia. Por favor, inténtalo de nuevo.');
         } catch (\Exception $e) {
-            // Captura cualquier otra excepcion inesperada
             Log::error('Error inesperado al actualizar noticia (ID: ' . $noticia->id . '): ' . $e->getMessage());
-            return redirect()->back()->with('error_message', 'Ocurrio un error inesperado al actualizar la noticia. Por favor, intentalo de nuevo.');
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error inesperado al actualizar la noticia. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error inesperado al actualizar la noticia. Por favor, inténtalo de nuevo.');
         }
     }
 
@@ -222,20 +234,31 @@ class NoticiaController extends Controller
      * Remove the specified resource from storage.
      * Elimina una noticia de la base de datos.
      */
-    public function destroy(Noticia $noticia)
+    public function destroy(Noticia $noticia, Request $request)
     {
         Gate::authorize('eliminar noticia');
-        // 1. Eliminar la imagen asociada si existe.
-        if ($noticia->imagen && Storage::disk('public')->exists($noticia->imagen)) {
-            Storage::disk('public')->delete($noticia->imagen);
+        try { // <-- Inicia el bloque try
+            // 1. Eliminar la imagen asociada si existe.
+            if ($noticia->imagen && Storage::disk('public')->exists($noticia->imagen)) {
+                Storage::disk('public')->delete($noticia->imagen);
+            }
+
+            // 2. Eliminar la noticia.
+            $noticia->delete();
+
+            // 3. Devolver respuesta JSON o redirigir
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Noticia eliminada con éxito.'], 200);
+            }
+            return redirect()->route('noticias.index')->with('success', 'Noticia eliminada con exito.');
+        } catch (\Exception $e) { // <-- Cierra el try y abre el catch
+            Log::error('Error al eliminar noticia (ID: ' . $noticia->id . '): ' . $e->getMessage());
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Ocurrió un error al eliminar la noticia. Por favor, inténtalo de nuevo.'], 500);
+            }
+            return redirect()->back()->with('error_message', 'Ocurrió un error al eliminar la noticia.');
         }
-
-        // 2. Eliminar la noticia.
-        $noticia->delete();
-
-        // 3. Redirigir al indice de noticias con un mensaje de exito.
-        return redirect()->route('noticias.index')->with('success', 'Noticia eliminada con exito.');
-    }
+    } 
 
     /**
      * Exporta las noticias a un archivo CSV, aplicando los filtros y ordenamiento actuales.

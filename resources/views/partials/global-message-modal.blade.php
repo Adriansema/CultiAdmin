@@ -1,5 +1,5 @@
 <div id="globalMessageModalVanilla"
-    class="fixed inset-0 z-[10000] items-center justify-center bg-gray-900 bg-opacity-50 hidden">
+    class="fixed inset-0 z-[99999] items-center justify-center bg-gray-900 bg-opacity-50 hidden">
     <div class="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-auto my-8">
         <div class="flex items-center justify-center flex-col">
             {{-- Icono (se actualizará con JS) --}}

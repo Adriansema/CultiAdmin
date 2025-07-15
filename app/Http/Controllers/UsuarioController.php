@@ -483,7 +483,7 @@ class UsuarioController extends Controller
         $usuario->estado = $usuario->estado === 'activo' ? 'inactivo' : 'activo';
         $usuario->save();
 
-        return redirect()->route('usuarios.index')->with('success', 'El estado del usuario ' . $usuario->name . ' ha sido actualizado a ' . ucfirst($usuario->estado) . '.');
+        return redirect()->route('usuarios.index')->with('');
     }
 
     /**
@@ -669,7 +669,7 @@ class UsuarioController extends Controller
                 }
             }
 
-            $message = "Proceso de importacion completado. Usuarios creados: {$importedCount}.";
+            $message = "Proceso de importación completado. Usuarios creados: {$importedCount}.";
             if ($failedCount > 0) {
                 $message .= " Usuarios con errores: {$failedCount}.";
             }

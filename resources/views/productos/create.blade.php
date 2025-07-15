@@ -147,26 +147,34 @@
 
                         <option value="educativos" {{ old('videos_data.tipo') == 'educativos' ? 'selected' : '' }}>Video
                             educativos</option>
+                            
                         <option value="recomendados" {{ old('videos_data.tipo') == 'recomendados' ? 'selected' : '' }}>Video
                             recomendados</option>
+
                         <option value="insumos_y_abonos"
                             {{ old('videos_data.tipo') == 'insumos_y_abonos' ? 'selected' : '' }}>Video
                             insumos y abonos</option>
+
                         <option value="cuidados_generales"
                             {{ old('videos_data.tipo') == 'cuidados_generales' ? 'selected' : '' }}>Video
                             cuidados generales</option>
+
                         <option value="preparacion_terreno_siembra"
                             {{ old('videos_data.tipo') == 'preparacion_terreno_siembra' ? 'selected' : '' }}>Video
                             preparación del terreno y siembra</option>
+
                         <option value="sugerencias_generales"
                             {{ old('videos_data.tipo') == 'sugerencias_generales' ? 'selected' : '' }}>Video
                             sugerencias generales</option>
+
                         <option value="metodos_recoleccion"
                             {{ old('videos_data.tipo') == 'metodos_recoleccion' ? 'selected' : '' }}>Video
                             métodos de recolección</option>
+
                         <option value="cuidados_cosecha"
                             {{ old('videos_data.tipo') == 'cuidados_cosecha' ? 'selected' : '' }}>Video
                             cuidados de la cosecha</option>
+
                         <option value="buenas_practicas_agricolas"
                             {{ old('videos_data.tipo') == 'buenas_practicas_agricolas' ? 'selected' : '' }}>Video
                             buenas prácticas agrícolas</option>

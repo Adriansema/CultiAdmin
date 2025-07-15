@@ -98,7 +98,7 @@
                         boletín: <span class="text-red-500">*</span></label>
                     <div class="relative">
                         <input type="text" id="bulletinName" name="nombre" maxlength="100"
-                            class="w-full px-4 py-2 pr-12 transition-all duration-200 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            class="w-full px-4 py-2 pr-12 transition-all duration-200 border border-gray-300 rounded-xl focus:ring-2 focus:outline-none focus:ring-green-500 focus:border-transparent"
                             placeholder="Ingresar texto" required>
                         <span id="bulletinNameCharCount"
                             class="absolute text-md text-gray-500 -translate-y-1/2 right-3 top-1/2">0/100</span>
@@ -143,7 +143,7 @@
                             class="text-red-500">*</span></label>
                     <div class="relative">
                         <textarea id="bulletinDescription" name="descripcion" maxlength="500" rows="3"
-                            class="w-full px-4 py-2 pr-12 transition-all duration-200 border border-gray-300 resize-y rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            class="w-full px-4 py-2 pr-12 transition-all duration-200 border border-gray-300 resize-y rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                             placeholder="Ej: Semana del 10 al 17 de Abril" required></textarea>
                         <span id="bulletinDescriptionCharCount"
                             class="absolute text-md text-gray-500 right-3 bottom-2">0/500</span>
@@ -165,8 +165,7 @@
                                 <img src="{{ asset('images/alto.svg') }}" alt="Icono subir"
                                     class="w-6 h-6 flex-shrink-0">
                                 <input type="text" name="precio_mas_alto" id="precioMasAlto"
-                                    class="block w-full rounded-md border-gray-300 shadow-md focus:border-indigo-300 focus:ring
-                                    focus:ring-indigo-200 focus:ring-opacity-50 text-right price-input"
+                                    class="block w-full rounded-md border-gray-300 shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:ring-opacity-50 text-right price-input"
                                     placeholder="Ingresar precio">
                             </div>
                             <div id="precio_mas_alto_error" class="text-red-500 text-md mt-1 validation-error-message"
@@ -178,8 +177,7 @@
                                 más alto: <span class="text-red-500">*</span></label>
                             <input type="text" name="lugar_precio_mas_alto" id="lugarPrecioMasAlto"
                                 maxlength="255"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-md focus:border-indigo-300 focus:ring
-                                focus:ring-indigo-200 focus:ring-opacity-50"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:ring-opacity-50"
                                 placeholder="Ingresar lugar">
                             <div id="lugar_precio_mas_alto_error"
                                 class="text-red-500 text-md mt-1 validation-error-message"
@@ -194,8 +192,7 @@
                                 <img src="{{ asset('images/bajo.svg') }}" alt="Icono bajar"
                                     class="w-6 h-6 flex-shrink-0">
                                 <input type="text" name="precio_mas_bajo" id="precioMasBajo"
-                                    class="block w-full rounded-md border-gray-300 shadow-md focus:border-indigo-300 focus:ring
-                                    focus:ring-indigo-200 focus:ring-opacity-50 text-right price-input"
+                                    class="block w-full rounded-md border-gray-300 shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:ring-opacity-50 text-right price-input"
                                     placeholder="Ingresar precio">
                             </div>
                             <div id="precio_mas_bajo_error" class="text-red-500 text-md mt-1 validation-error-message"
@@ -207,8 +204,7 @@
                                 más bajo: <span class="text-red-500">*</span></label>
                             <input type="text" name="lugar_precio_mas_bajo" id="lugarPrecioMasBajo"
                                 maxlength="255"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-md focus:border-indigo-300 focus:ring
-                                focus:ring-indigo-200 focus:ring-opacity-50"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent focus:ring-opacity-50"
                                 placeholder="Ingresar lugar">
                             <div id="lugar_precio_mas_bajo_error"
                                 class="text-red-500 text-md mt-1 validation-error-message"

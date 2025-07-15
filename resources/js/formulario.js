@@ -1,8 +1,6 @@
 import { openImportCsvModal } from './ImportaCsv.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
-    console.log('*** formulario.js: DOMContentLoaded disparado. ***');
-
     const userFormModal = document.getElementById('userFormModal');
     const closeModalButton = document.getElementById('closeModalButton');
     const nextButton = document.getElementById('nextStepButton');
@@ -56,30 +54,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     const appNotificationCloseButton = document.getElementById('appNotificationCloseButton');
 
     // Verificaciones iniciales de elementos (importante para depuracion)
-    if (!userFormModal) { console.error('ERROR: userFormModal no encontrado.'); return; }
-    if (!nextButton) console.error('ERROR: nextStepButton no encontrado. Este es crucial!');
-    if (!prevButton) console.error('ERROR: prevButton no encontrado.');
-    if (!generatePasswordButton) console.error('ERROR: generatePasswordButton no encontrado.');
-    if (!importCsvButton) console.error('ERROR: importCsvButton no encontrado.');
-    if (!step3Content) console.error('ERROR: step3Content no encontrado.');
-    if (!step3Indicator) console.error('ERROR: step3Indicator no encontrado.');
-    if (!passwordInput) console.error('ERROR: passwordInput no encontrado.');
-    if (!passwordConfirmationInput) console.error('ERROR: passwordConfirmationInput no encontrado.');
-    if (!confirmModal) console.error('ERROR: confirmModal no encontrado.');
-    if (!confirmMessageBody) console.error('ERROR: confirmMessageBody no encontrado.');
-    if (!confirmCancelButton) console.error('ERROR: confirmCancelButton no encontrado.');
-    if (!confirmActionButton) console.error('ERROR: confirmActionButton no encontrado.');
-    if (!lastnameInput) console.error('ERROR: lastnameInput no encontrado.');
-    if (!phoneInput) console.error('ERROR: phoneInput no encontrado.');
-
-    // Verificaciones para el nuevo modal de notificacion
-    if (!appNotificationModal) console.error('ERROR: appNotificationModal no encontrado.');
-    if (!appNotificationIconContainer) console.error('ERROR: appNotificationIconContainer no encontrado.');
-    if (!appNotificationSuccessIcon) console.error('ERROR: appNotificationSuccessIcon no encontrado.');
-    if (!appNotificationErrorIcon) console.error('ERROR: appNotificationErrorIcon no encontrado.');
-    if (!appNotificationText) console.error('ERROR: appNotificationText no encontrado.');
-    if (!appNotificationCloseButton) console.error('ERROR: appNotificationCloseButton no encontrado.');
-
+    if (!userFormModal) {
+        return;
+    }
 
     // Estado global del modal
     let modalData = {
@@ -137,12 +114,11 @@ document.addEventListener('DOMContentLoaded', async function () {
             const data = await response.json();
             if (response.ok && data.roleDefaultPermissions) {
                 modalData.rolePermissionsMapping = data.roleDefaultPermissions;
-                console.log('JS: Mapeo de permisos por rol cargado globalmente:', modalData.rolePermissionsMapping);
             } else {
-                console.error('Error al cargar mapeo de permisos por rol:', data.message || response.statusText);
+
             }
         } catch (error) {
-            console.error('Error de red al cargar mapeo de permisos por rol:', error);
+            
         }
     }
     await fetchRolePermissionsMapping();
@@ -171,26 +147,20 @@ document.addEventListener('DOMContentLoaded', async function () {
 
                 if (actionKey && modalData.permisos[moduleKey] && modalData.permisos[moduleKey][actionKey] !== undefined) {
                     modalData.permisos[moduleKey][actionKey] = setState;
-                    console.log(`Permiso '${spatiePerName}' mapeado a ${moduleKey}.${actionKey} y establecido a ${setState}`);
                     return true;
                 } else {
-                    // CAMBIO: 'módulo' a 'modulo'
-                    console.warn(`[Mapeo Fallido] Accion '${actionKey}' o modulo '${moduleKey}' no definido para '${spatiePerName}' en modalData.permisos.`);
+                
                 }
             }
         }
-        console.warn(`[Mapeo Fallido] Permiso Spatie '${spatiePerName}' no encontrado en modulePermissionMap.`);
         return false;
     }
 
     function applyRoleDefaultPermissions(roleName) {
-        console.log('JS: Aplicando permisos por defecto para el rol:', roleName);
         resetPermissions();
 
         // Asegurarse de que defaultPermsForRole sea siempre un array para evitar el error
         const defaultPermsForRole = modalData.rolePermissionsMapping[roleName] || [];
-
-        console.log('JS: Permisos por defecto para este rol:', defaultPermsForRole);
 
         if (defaultPermsForRole.length > 0) { // Ya no necesitamos verificar 'defaultPermsForRole' si siempre es un array
             defaultPermsForRole.forEach(permName => {
@@ -330,8 +300,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     function updateModalUI() {
-        console.log('JS: updateModalUI llamado. Paso actual:', modalData.currentStep, 'Modo:', modalData.isEditMode ? 'Editar' : 'Crear');
-
         // Control de visibilidad del modal principal
         updateModalVisibility(); // Ahora se llama a la funcion dedicada
 
@@ -461,7 +429,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                     errorMessage.textContent = modalData.errors[field];
                     roleContainer.appendChild(errorMessage);
                 } else {
-                    console.warn(`Contenedor de rol con ID 'rolesContainer' no encontrado para el campo '${field}'.`);
                 }
             } else if (field === 'password' || field === 'password_confirmation') {
                 const passwordInputParent = document.getElementById('password').closest('.relative');
@@ -541,7 +508,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     window.openCreateModal = function () {
-        console.log('JS: openCreateModal funcion llamada.');
         resetForm();
         modalData.isEditMode = false;
         modalData.userId = null;
@@ -553,7 +519,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
     window.openEditModal = async function (userId) {
-        console.log('JS: openEditModal funcion llamada para userId:', userId);
         resetForm();
         modalData.isEditMode = true;
         modalData.userId = userId;
@@ -581,12 +546,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             // Asignar el rol del usuario
             modalData.selectedRole = data.userRoles && data.userRoles.length > 0 ? data.userRoles[0] : '';
-            console.log('Rol del usuario cargado:', modalData.selectedRole);
 
             // Asignar los permisos que el usuario YA tiene asignados
             resetPermissions();
             if (data.allUserGrantedPermissions && data.allUserGrantedPermissions.length > 0) {
-                console.log('Permisos individuales del usuario cargados:', data.allUserGrantedPermissions);
                 data.allUserGrantedPermissions.forEach(permName => {
                     updateModalDataPermission(permName, true);
                 });
@@ -598,7 +561,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             updateFormValues();
         } catch (error) {
-            console.error('Error al cargar datos para edicion:', error);
             modalData.errors.general = error.message;
             modalData.isOpen = false;
             updateModalUI();
@@ -606,7 +568,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
     window.closeModal = function () {
-        console.log('JS: closeModal funcion llamada.');
         modalData.isOpen = false;
         resetForm();
         modalData.errors = {};
@@ -620,7 +581,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     const numericOnlyFilterRegex = /[^\d]/g; // Elimina todo lo que NO sea dígito
 
     // Regex para validación completa (usado en handleNextAction)
-    // CORREGIDO: Solo letras (incluyendo tildes y ñ) y espacios
     const alphaOnlyTestRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
     const emailStructureRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const phoneLengthTestRegex = /^\d{10,15}$/; // Solo dígitos, entre 10 y 15 de longitud
@@ -659,7 +619,7 @@ document.addEventListener('DOMContentLoaded', async function () {
      * Valida y filtra el correo electrónico en tiempo real.
      * @param {HTMLInputElement} inputElement - El elemento input
      */
-    function validateEmail(inputElement) {
+    function validateEmailregister(inputElement) {
         let value = inputElement.value;
         // Filtrar caracteres no permitidos en tiempo real
         const filteredValue = value.replace(emailFilterRegex, '');
@@ -769,7 +729,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     // ************* FUNCIÓN PRINCIPAL DE AVANCE / CONFIRMACIÓN *************
     // Esta función ahora usa las funciones de validación en tiempo real para una validación final.
     function handleNextAction() {
-        console.log('JS: handleNextAction llamado. Paso actual:', modalData.currentStep);
         modalData.errors = {}; // Limpiar errores anteriores
         let hasError = false;
 
@@ -786,7 +745,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             // Estas funciones ya actualizan modalData.errors y manejan el estado de `hasError` implícitamente.
             validateNameLastname('name', nameInput);
             validateNameLastname('lastname', lastnameInput);
-            validateEmail(emailInput);
+            validateEmailregister(emailInput);
             validatePhone(phoneInput);
 
             // Validar tipo de documento (no tiene filtro de input, solo validación de selección)
@@ -913,7 +872,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // ************* FUNCION DE RETROCESO DE PASO *************
     function handlePrevAction() {
-        console.log('JS: handlePrevAction llamado. Paso actual:', modalData.currentStep);
         modalData.errors = {};
         if (modalData.currentStep > 1) {
             modalData.currentStep--;
@@ -923,7 +881,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // ************* NUEVA FUNCION PARA IMPORTAR CSV *************
     function handleImportCsv() {
-        console.log('JS: handleImportCsv llamado. Iniciando flujo de importacion CSV.');
         // Ocultar el modal principal de creacion/edicion de usuario
         if (userFormModal) {
             userFormModal.classList.remove('opacity-100');
@@ -947,7 +904,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // ************* FUNCIONES PARA EL MODAL DE CONFIRMACION *************
     function openConfirmModal() {
-        console.log('JS: openConfirmModal llamado.');
         // Ocultar el modal principal antes de mostrar el de confirmacion
         userFormModal.classList.remove('opacity-100');
         userFormModal.classList.add('opacity-0', 'pointer-events-none');
@@ -1055,7 +1011,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     function closeConfirmModal() {
-        console.log('JS: closeConfirmModal llamado.');
         confirmModal.classList.remove('opacity-100', 'flex');
         confirmModal.classList.add('opacity-0', 'pointer-events-none');
         // Mostrar el modal principal si aun deberia estar abierto
@@ -1066,8 +1021,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     async function submitFormConfirmed() {
-        console.log('JS: submitFormConfirmed llamado. iniciando envío.');
-
         // Deshabilitar boton y mostrar spinner en el boton del modal de confirmacion
         const actionButton = confirmActionButton;
         const originalBtnText = actionButton.innerHTML;
@@ -1128,8 +1081,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             formData.append('permissions[]', '');
         }
 
-        console.log(`JS: Enviando solicitud de ${modalData.isEditMode ? 'Edición' : 'Creación'} a URL: ${url} con metodo ${method}.`);
-
         try {
             const response = await fetch(url, {
                 method: method,
@@ -1157,8 +1108,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                 const successMessage = modalData.isEditMode ? 'Tu usuario se ha actualizado correctamente!' : 'Tu usuario se ha creado correctamente!';
                 showAppNotification(successMessage, true); // True para exito
             } else {
-                // Errores: Mostrar mensaje de error en el nuevo modal de notificacion global
-                console.error('Error en la respuesta del envio:', data);
                 let errorMessage = 'Hubo un error al ' + (modalData.isEditMode ? 'actualizar' : 'crear') + ' el usuario.';
 
                 if (data.errors) {
@@ -1171,7 +1120,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
 
         } catch (error) {
-            console.error('Error de red o inesperado:', error);
             // Volver a habilitar el boton
             actionButton.disabled = false;
             actionButton.innerHTML = originalBtnText;
@@ -1242,7 +1190,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Asegúrate de que estos listeners estén presentes y correctos
     if (nameInput) nameInput.addEventListener('input', (e) => validateNameLastname('name', e.target));
     if (lastnameInput) lastnameInput.addEventListener('input', (e) => validateNameLastname('lastname', e.target));
-    if (emailInput) emailInput.addEventListener('input', (e) => validateEmail(e.target));
+    if (emailInput) emailInput.addEventListener('input', (e) => validateEmailregister(e.target));
     if (phoneInput) phoneInput.addEventListener('input', (e) => validatePhone(e.target));
     if (documentInput) documentInput.addEventListener('input', (e) => validateDocument(e.target));
     // El tipo de documento afecta la validación del documento, así que también debe dispararla

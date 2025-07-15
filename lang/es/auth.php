@@ -13,8 +13,10 @@ return [
     |
     */
 
-    'failed' => 'el correo o la contrasena no coincide.',
-    'password' => 'La contrasena proporcionada es incorrecta.',
-    'throttle' => 'Demasiados intentos de inicio de sesion. Por favor, intentalo de nuevo en :seconds segundos.',
+    'failed' => 'Estas credenciales no coinciden con nuestros registros.', // Lo restauramos al valor por defecto para detectarlo.
+    'throttle' => 'Demasiados intentos de inicio de sesión. Por favor, inténtelo de nuevo en :seconds segundos.',
+    'password' => 'La contraseña proporcionada es incorrecta.', // Este no se usa por defecto para fallos de auth generales.
+    'email_not_found' => 'El correo electrónico no coincide.', // para cuando el email no existe
+    'password_mismatch' => 'La contraseña no coincide.', // para cuando el email existe pero la password es errónea
 
 ];

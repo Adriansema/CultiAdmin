@@ -62,6 +62,7 @@ class PendienteBolController extends Controller
      */
     public function validar(Request $request, $id)
     {
+        // ¡Añade esto al principio del método!
         $boletin = Boletin::findOrFail($id);
 
         $boletin->update([
@@ -76,6 +77,9 @@ class PendienteBolController extends Controller
             Mail::to($creador->email)->send(new BoletinEstadoMail($boletin));
         }
 
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Boletín aprobado con éxito.'], 200);
+        }
         return back()->with('status_boletin', 'aprobado');
     }
 
@@ -84,6 +88,7 @@ class PendienteBolController extends Controller
      */
     public function rechazar(Request $request, $id)
     {
+        // ¡Añade esto al principio del método!
         $boletin = Boletin::findOrFail($id);
 
         $request->validate([
@@ -102,6 +107,9 @@ class PendienteBolController extends Controller
             Mail::to($creador->email)->send(new BoletinEstadoMail($boletin));
         }
 
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Boletín rechazado con éxito.'], 200);
+        }
         return back()
             ->with('status_boletin', 'rechazado')
             ->with('boletin_id_for_redirect', $boletin->id);

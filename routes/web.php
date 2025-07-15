@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckUserEstado;
 use App\Http\Controllers\PqrsController;
+use App\Http\Controllers\NoRoleController;
 use App\Http\Controllers\NoticiaController;
 use App\Http\Controllers\BoletinController;
 use App\Http\Controllers\UsuarioController;
@@ -55,6 +56,8 @@ Route::middleware([
 ])->group(function () {
 
      Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+     Route::get('/no-role-assigned', [NoRoleController::class, 'index'])->name('no-role-assigned');
 
      // Rutas de Centro de Ayuda
      Route::prefix('centro-ayuda')->name('centroAyuda.')->group(function () {
@@ -117,26 +120,38 @@ Route::middleware([
 
           // Rutas para Productos Pendientes
           Route::get('/productos', [PendienteProController::class, 'index'])->name('productos.index')->middleware('can:validar producto');
-          Route::get('/productos/filtrados', [PendienteProController::class, 'getFilteredProducts'])->name('productos.filtrados'); // Anadida o confirmada
+          Route::get('/productos/filtrados', [PendienteProController::class, 'getFilteredProducts'])->name('productos.filtrados'); 
           Route::get('/productos/{producto}', [PendienteProController::class, 'show'])->name('productos.show');
           Route::post('/productos/{producto}/validar', [PendienteProController::class, 'validar'])->name('productos.validar');
           Route::post('/productos/{producto}/rechazar', [PendienteProController::class, 'rechazar'])->name('productos.rechazar');
 
-          // Rutas para Boletines Pendientes (ACTUALIZADAS AQUi)
+          // Rutas para Boletines Pendientes
           Route::get('/boletines', [PendienteBolController::class, 'index'])->name('boletines.index')->middleware('can:validar boletin');
-          Route::get('/boletines/filtrados', [PendienteBolController::class, 'getFilteredBoletins'])->name('boletines.filtrados'); // !Nueva ruta anadida!
+          Route::get('/boletines/filtrados', [PendienteBolController::class, 'getFilteredBoletins'])->name('boletines.filtrados');
           Route::get('/boletines/{boletin}', [PendienteBolController::class, 'show'])->name('boletines.show');
           Route::post('/boletines/{boletin}/validar', [PendienteBolController::class, 'validar'])->name('boletines.validar');
           Route::post('/boletines/{boletin}/rechazar', [PendienteBolController::class, 'rechazar'])->name('boletines.rechazar');
 
           // Rutas para Noticias Pendientes
-          Route::get('/noticias', [PendienteNotiController::class, 'index'])->name('noticias.index')->middleware('can:validar noticia'); // Corregido: 'validar noticias' a 'ver noticias pendiente'
+          Route::get('/noticias', [PendienteNotiController::class, 'index'])->name('noticias.index')->middleware('can:validar noticia');
           Route::get('/noticias/filtradas', [PendienteNotiController::class, 'getFilteredNews'])->name('noticias.filtradas');
           Route::get('/noticias/{noticia}', [PendienteNotiController::class, 'show'])->name('noticias.show');
           Route::post('/noticias/{noticia}/validar', [PendienteNotiController::class, 'validar'])->name('noticias.validar');
           Route::post('/noticias/{noticia}/rechazar', [PendienteNotiController::class, 'rechazar'])->name('noticias.rechazar');
      });
 
+     // --- Modulo de NOTICIAS ---
+     Route::prefix('noticia')->name('noticias.')->group(function () {
+          Route::get('/', [NoticiaController::class, 'index'])->name('index')->middleware('can:crear noticia');
+          Route::get('/create', [NoticiaController::class, 'create'])->name('create');
+          Route::post('/', [NoticiaController::class, 'store'])->name('store');
+          Route::get('/exportar-csv', [NoticiaController::class, 'exportarCsv'])->name('exportarCsv');
+          Route::get('/{noticia}', [NoticiaController::class, 'show'])->name('show');
+          Route::get('/{noticia}/edit', [NoticiaController::class, 'edit'])->name('edit')->middleware('can:editar noticia');
+          Route::put('/{noticia}', [NoticiaController::class, 'update'])->name('update')->middleware('can:editar noticia');
+          Route::post('/{noticia}/mark-as-read', [NoticiaController::class, 'markAsRead'])->name('noticias.markAsRead');
+          Route::delete('/{noticia}', [NoticiaController::class, 'destroy'])->name('destroy')->middleware('can:eliminar noticia');
+     });
 
      // --- Modulo de USUARIOS ---
      Route::prefix('usuario')->name('usuarios.')->group(function () {
@@ -154,18 +169,6 @@ Route::middleware([
           Route::get('role-permissions-map', [UsuarioController::class, 'getRolePermissionsMap'])->name('role-permissions-map');
      });
 
-     // --- Modulo de NOTICIAS ---
-     Route::prefix('noticia')->name('noticias.')->group(function () {
-          Route::get('/', [NoticiaController::class, 'index'])->name('index')->middleware('can:crear noticia');
-          Route::get('/create', [NoticiaController::class, 'create'])->name('create');
-          Route::post('/', [NoticiaController::class, 'store'])->name('store');
-          Route::get('/exportar-csv', [NoticiaController::class, 'exportarCsv'])->name('exportarCsv');
-          Route::get('/{noticia}', [NoticiaController::class, 'show'])->name('show');
-          Route::get('/{noticia}/edit', [NoticiaController::class, 'edit'])->name('edit')->middleware('can:editar noticia');
-          Route::put('/{noticia}', [NoticiaController::class, 'update'])->name('update')->middleware('can:editar noticia');
-          Route::post('/{noticia}/mark-as-read', [NoticiaController::class, 'markAsRead'])->name('noticias.markAsRead');
-          Route::delete('/{noticia}', [NoticiaController::class, 'destroy'])->name('destroy')->middleware('can:eliminar noticia');
-     });
 
      // Ruta de Estadistica protegida  
      Route::get('/admin/statistics', [StatisticController::class, 'getStatistics'])->name('statistics.index')->middleware('can:ver estadisticas');
