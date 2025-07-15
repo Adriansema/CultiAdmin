@@ -1,5 +1,5 @@
 <div class="overflow-x-auto rounded-2xl">
-    <table class="min-w-full text-md text-left">
+    <table class="min-w-full text-left text-md">
         <thead class="bg-[var(--color-tabla)]">
             <tr>
                 <th class="px-4 py-2 font-bold text-left text-gray-600">

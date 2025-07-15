@@ -1,6 +1,27 @@
-{{-- Este div contiene solo el HTML del sidebar --}}
-<div :class="sidebarOpen ? 'w-72' : 'w-28'"
-    class="h-full flex flex-col transition-all duration-1000 bg-[#00304D] text-white flex-shrink-0 overflow-y-auto overflow-x-hidden">
+<aside
+    x-show="sidebarOpen || window.innerWidth >= 768"
+    class="h-full flex flex-col transition-all duration-300 ease-in-out bg-[#00304D] text-white flex-shrink-0 overflow-y-auto overflow-x-hidden" {{-- Mantenemos overflow-x-hidden aquí --}}
+    :class="{
+        'md:w-72': sidebarOpen,
+        'md:w-28': !sidebarOpen,
+        'md:static md:translate-x-0': true,
+
+        'fixed inset-y-0 left-0 z-40': window.innerWidth < 768,
+        'translate-x-0': sidebarOpen && window.innerWidth < 768,
+        '-translate-x-full': !sidebarOpen && window.innerWidth < 768,
+
+        'w-72': sidebarOpen && window.innerWidth < 768
+    }"
+    @click.away="if(window.innerWidth < 768 && sidebarOpen) sidebarOpen = false"
+
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="-translate-x-full"
+    x-transition:enter-end="translate-x-0"
+    x-transition:leave="transition ease-in duration-300"
+    x-transition:leave-start="translate-x-0"
+    x-transition:leave-end="-translate-x-full"
+>
+    {{-- TODO EL CONTENIDO INTERNO DEL SIDebar se mantiene igual --}}
 
     <div class="flex items-center justify-between px-4 py-3">
         {{-- Logo + boton de colapsar --}}
@@ -9,25 +30,16 @@
                 <x-application-mark class="block w-auto h-9" />
             </a>
         </div>
-        {{-- Botón para colapsar en desktop, o cerrar en móvil --}}
+        {{-- Botón para colapsar en desktop --}}
         <button @click="sidebarOpen = !sidebarOpen"
-                class="-ml-2 text-[var(--color-text)] rounded hover:bg-[var(--color-sidebarhoverbtn)] transition-transform duration-700 ease-in-out hover:translate-x-1"
+                class="-ml-2 text-[var(--color-text)] rounded hover:bg-[var(--color-sidebarhoverbtn)] transition-transform duration-700 ease-in-out hover:translate-x-1
+                       hidden md:block"
                 :class="{
-                    'rotate-180 mx-auto': !sidebarOpen && window.innerWidth >= 768, {{-- Rotar solo en desktop colapsado --}}
-                    'md:block': window.innerWidth >= 768, {{-- Visible en md+ --}}
-                    'hidden': window.innerWidth < 768 {{-- Oculto en móviles --}}
+                    'rotate-180 mx-auto': !sidebarOpen
                 }">
                 <svg class="w-4 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
-
-            {{-- Botón de CERRAR sidebar para pantallas móviles --}}
-            <button @click="sidebarOpen = false"
-                    class="ml-auto text-white focus:outline-none md:hidden"> {{-- Solo visible en móviles --}}
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
     </div>
@@ -120,11 +132,9 @@
             </div>
 
             {{-- Gestion de Usuarios (el div con x-data que contiene el boton y el menu) --}}
-            {{-- Este div ya no necesita ser 'relative' para el menu desplegable si usamos 'fixed' --}}
-            <div x-data="{ userMenuOpen: false }" class="space-x-2">
+            <div x-data="{ userMenuOpen: false }" class="relative space-x-2"> {{-- Este div es el contenedor relative --}}
                 @canany(['crear usuario'])
                     <a href="#" @click.prevent="userMenuOpen = !userMenuOpen" x-ref="userMenuButton"
-                        {{-- Anadir una referencia para Alpine.js --}}
                         :class="sidebarOpen
                             ?
                             '{{ request()->routeIs('usuarios.index') ? 'bg-white' : '' }} flex pl-2 py-2 ml-[20px] transition rounded-xl hover:bg-[var(--color-sidebarhoverbtn)] text-white cursor-pointer' :
@@ -133,12 +143,13 @@
                             <img src="{{ asset(request()->routeIs('usuarios.index') ? 'images/IconColor.svg' : 'images/Icon.svg') }}"
                                 class="w-4 h-4" alt="Usuarios">
 
+                            {{-- El texto solo se muestra si el sidebar está abierto --}}
                             <span x-show="sidebarOpen" x-transition
                                 class="ml-2 text-sm font-medium whitespace-nowrap {{ request()->routeIs('usuarios.index') ? 'text-[var(--color-textmarca)]' : 'text-[var(--color-text)]' }}">
                                 {{ __('Gestion de usuarios') }}
                             </span>
 
-                            {{-- Icono de flecha para indicar que es un menu desplegable --}}
+                            {{-- Icono de flecha (solo se muestra si el sidebar está abierto) --}}
                             <img src="{{ asset(request()->routeIs('usuarios.index') ? 'images/menu.svg' : 'images/menu-hov.svg') }}"
                             class="w-4 h-4 ml-3"
                             alt="icono de abrir-menu" x-show="sidebarOpen" :class="userMenuOpen ? '-rotate-90' : ''">
@@ -151,19 +162,17 @@
                     x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
                     x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75"
                     x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                    x-init="$watch('userMenuOpen', (value) => {
-                        if (value) { // Se simplifica la lógica, ya no es necesario separar por sidebarOpen
-                            $nextTick(() => {
-                                const buttonRect = $refs.userMenuButton.getBoundingClientRect();
-                                $el.style.top = `${buttonRect.top - 10}px`;
-                                $el.style.left = `${buttonRect.right + 8}px`; // Ajusta el '8' si es necesario
-                            });
-                        } else {
-                            {{-- Cuando se cierra, permitir que la transicion use las ultimas posiciones calculadas --}}
-                            {{-- No limpiamos el style inmediatamente, Alpine.js se encargara de ocultarlo --}}
-                        }
-                    });" class="fixed z-50 w-auto py-2 bg-white shadow-2xl rounded-xl">
-
+                    class="absolute z-50 w-auto py-2 bg-white border border-gray-200 shadow-2xl rounded-xl whitespace-nowrap"
+                    x-bind:style="! ?
+                        `top: ${$refs.userMenuButton.getBoundingClientRect().top}px;
+                         left: ${$refs.userMenuButton.getBoundingClientRect().right + 8}px;` :
+                        ''
+                    "
+                    :class="{
+                        'top-full right-0 mt-2': sidebarOpen, // Posición cuando el sidebar está abierto
+                    }"
+                    style="transform-origin: top left;"
+                >
                     <a href="{{ route('usuarios.index') }}"
                         class="block px-4 py-2 text-sm text-gray-700 rounded-xl hover:bg-gray-200">
                         <ul class="flex items-center">
@@ -284,4 +293,4 @@
             </div>
         </x-responsive-nav-link>
     </div>
-</div>
+</aside>
