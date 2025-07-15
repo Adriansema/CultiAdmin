@@ -190,7 +190,7 @@ Route::fallback(function () {
 //------------------- livewire--------------------
 //------------------------------
 
-/* Livewire::setScriptRoute(function ($handle) {
+Livewire::setScriptRoute(function ($handle) {
     return Route::get('/cultiadmin/livewire/livewire.js', $handle);
 });
 
@@ -198,4 +198,3 @@ Livewire::setUpdateRoute(function ($handle) {
     return Route::post('/cultiadmin/livewire/update', $handle)
                  ->middleware('web');
 });
- */
