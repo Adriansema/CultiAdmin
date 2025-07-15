@@ -191,10 +191,10 @@ Route::fallback(function () {
 //------------------------------
 
 Livewire::setScriptRoute(function ($handle) {
-    return Route::get('/cultiadmin/livewire/livewire.js', $handle);
+    return Route::get('/8000/livewire/livewire.js', $handle);
 });
 
 Livewire::setUpdateRoute(function ($handle) {
-    return Route::post('/cultiadmin/livewire/update', $handle)
+    return Route::post('/8000/livewire/update', $handle)
                  ->middleware('web');
 });
