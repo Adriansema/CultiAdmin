@@ -132,7 +132,7 @@
             </div>
 
             {{-- Gestion de Usuarios (el div con x-data que contiene el boton y el menu) --}}
-            <div x-data="{ userMenuOpen: false }" class="space-x-2 relative"> {{-- Este div es el contenedor relative --}}
+            <div x-data="{ userMenuOpen: false }" class="relative space-x-2"> {{-- Este div es el contenedor relative --}}
                 @canany(['crear usuario'])
                     <a href="#" @click.prevent="userMenuOpen = !userMenuOpen" x-ref="userMenuButton"
                         :class="sidebarOpen
@@ -162,8 +162,8 @@
                     x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
                     x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75"
                     x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                    class="absolute z-50 w-auto py-2 bg-white shadow-2xl rounded-xl whitespace-nowrap border border-gray-200"
-                    x-bind:style="!sidebarOpen ?
+                    class="absolute z-50 w-auto py-2 bg-white border border-gray-200 shadow-2xl rounded-xl whitespace-nowrap"
+                    x-bind:style="! ?
                         `top: ${$refs.userMenuButton.getBoundingClientRect().top}px;
                          left: ${$refs.userMenuButton.getBoundingClientRect().right + 8}px;` :
                         ''

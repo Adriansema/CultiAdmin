@@ -546,7 +546,7 @@ th>div.flex.flex-col.ml-2 {
     box-shadow: none;
   }
 }
-
+/*
 Para hacer tu panel de control web actual responsivo para dispositivos móviles, laptops y la web utilizando jQuery, deberás implementar una combinación de Media Queries de CSS para el estilo basado en el tamaño de la pantalla, y jQuery para cualquier manipulación dinámica de elementos o comportamiento de navegación (como un menú de hamburguesa amigable para móviles).
 
 Aquí tienes un desglose de los pasos y conceptos involucrados:
@@ -563,7 +563,7 @@ Este es el núcleo del diseño responsivo. Definirás diferentes estilos para di
 
 Enfoque Mobile-First (Recomendado): Comienza diseñando tu diseño para las pantallas más pequeñas (móviles) primero. Luego, usa min-width en las media queries para agregar estilos para pantallas más grandes. Esto asegura una experiencia base sólida y facilita las anulaciones.
 
-CSS
+CSS */
 
 /* --- Estilos base para Móvil (predeterminado) --- */
 body {

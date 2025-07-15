@@ -1,5 +1,5 @@
 <div class="overflow-x-auto rounded-2xl">
-    <table class="min-w-full text-md text-left">
+    <table class="min-w-full text-left text-md">
         <thead class="bg-[var(--color-tabla)]">
             <tr>
                 <th class="px-6 py-3 font-bold text-left text-gray-600">
@@ -9,14 +9,14 @@
                             <button type="button" class="sort-icon-btn group whitespace-nowrap" data-sort-field="nombre"
                                 data-sort-direction="asc">
                                 <img src="{{ asset('images/asce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono ascendente">
                                 <img src="{{ asset('images/asce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
                             </button>
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="nombre" data-sort-direction="desc">
                                 <img src="{{ asset('images/desce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono descendente">
                                 <img src="{{ asset('images/desce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
                             </button>
@@ -30,14 +30,14 @@
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="descripcion" data-sort-direction="asc">
                                 <img src="{{ asset('images/asce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono ascendente">
                                 <img src="{{ asset('images/asce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
                             </button>
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="descripcion" data-sort-direction="desc">
                                 <img src="{{ asset('images/desce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono descendente">
                                 <img src="{{ asset('images/desce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
                             </button>
@@ -51,14 +51,14 @@
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="created_at" data-sort-direction="asc">
                                 <img src="{{ asset('images/asce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono ascendente">
                                 <img src="{{ asset('images/asce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
                             </button>
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="created_at" data-sort-direction="desc">
                                 <img src="{{ asset('images/desce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono descendente">
                                 <img src="{{ asset('images/desce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
                             </button>
@@ -74,7 +74,7 @@
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="precio_mas_alto" data-sort-direction="asc">
                                 <img src="{{ asset('images/asce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono ascendente">
                                 <img src="{{ asset('images/asce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
                             </button>
@@ -82,7 +82,7 @@
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="precio_mas_alto" data-sort-direction="desc">
                                 <img src="{{ asset('images/desce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono descendente">
                                 <img src="{{ asset('images/desce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
                             </button>
@@ -97,7 +97,7 @@
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="precio_mas_bajo" data-sort-direction="asc">
                                 <img src="{{ asset('images/asce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono ascendente">
                                 <img src="{{ asset('images/asce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
                             </button>
@@ -105,7 +105,7 @@
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="precio_mas_bajo" data-sort-direction="desc">
                                 <img src="{{ asset('images/desce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono descendente">
                                 <img src="{{ asset('images/desce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
                             </button>
@@ -119,14 +119,14 @@
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="estado" data-sort-direction="asc">
                                 <img src="{{ asset('images/asce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono ascendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono ascendente">
                                 <img src="{{ asset('images/asce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono ascendente hover">
                             </button>
                             <button type="button" class="sort-icon-btn group whitespace-nowrap"
                                 data-sort-field="estado" data-sort-direction="desc">
                                 <img src="{{ asset('images/desce.svg') }}"
-                                    class="w-5 h-5 relative inset-0 block normal-icon" alt="Icono descendente">
+                                    class="relative inset-0 block w-5 h-5 normal-icon" alt="Icono descendente">
                                 <img src="{{ asset('images/desce-hover.svg') }}"
                                     class="relative inset-0 hidden w-6 h-6 hover-icon" alt="Icono descendente hover">
                             </button>

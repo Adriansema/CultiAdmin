@@ -13,7 +13,9 @@
 </div>
 
 {{-- Contenedor principal de la página de gestión, con fondo y bordes redondeados --}}
-<div class="w-full max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-2xl p-4 mb-8 shadow-sm">
+<div class="w-full px-4 mb-8 sm:px-6 lg:px-8">
+    <div class="max-w-screen-2xl mx-auto bg-[var(--color-Gestion)] rounded-3xl p-4 sm:p-6 lg:p-8">
+
     <div class="flex flex-col justify-between gap-4 mb-4 md:flex-row md:items-center"> {{-- Ajustado para mejor responsividad y espacio entre elementos --}}
         {{-- Formulario de búsqueda --}}
         <form id="searchBoletinForm" action="{{ route('boletines.index') }}" method="GET"

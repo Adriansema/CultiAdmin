@@ -54,7 +54,7 @@
                 {{-- Mensaje de exito (ej. despues de restablecer contrasena) --}}
                 @if (session('status'))
                     <div class="mb-4 text-sm font-medium text-green-600">
-                    <div id="session-status-message" class="mb-4 font-medium text-sm text-green-600">
+                    <div id="session-status-message" class="mb-4 text-sm font-medium text-green-600">
                         {{ session('status') }}
                     </div>
                 @endif
@@ -81,12 +81,12 @@
                     </span>
                 </div>
                 {{-- Div para mostrar errores de validación JS --}}
-                <div id="password-error-message" class="text-red-500 text-sm block mt-1" style="display:none;"></div>
+                <div id="password-error-message" class="block mt-1 text-sm text-red-500" style="display:none;"></div>
 
                 {{-- Errores de Laravel para la contraseña (ocultos por JS si el JS ya los maneja) --}}
                 @error('password')
-                    <span class="block mt-1 text-xs text-red-500">{{ $message }}</span>
-                    <span id="laravel-password-error" class="text-red-500 text-sm block mt-1">{{ $message }}</span>
+                    <span class="block mt-1 text-red-500 first-letter:text-xs ml-[0.5rem]">{{ $message }}</span>
+                    <span id="laravel-password-error" class="block mt-1 text-sm text-red-500">{{ $message }}</span>
                 @enderror
             </div>
 
@@ -97,7 +97,7 @@
                         class="w-5 h-5 mr-2 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
                     Recuérdame en este dispositivo
                 </label>
-                <a href="{{ route('password.request') }}" class="text-sm font-bold text-purple-600 hover:underline">
+                <a href="{{ route('password.request') }}" class="text-sm font-bold text-[#751E72] hover:underline">
                     ¿Olvidaste tu contrasena?
                 </a>
             </div>
